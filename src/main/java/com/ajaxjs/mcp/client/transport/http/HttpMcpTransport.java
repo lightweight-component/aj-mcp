@@ -1,15 +1,14 @@
 package com.ajaxjs.mcp.client.transport.http;
 
 import com.ajaxjs.mcp.McpUtils;
-import com.ajaxjs.mcp.client.protocol.InitializationNotification;
 import com.ajaxjs.mcp.client.protocol.ClientMessage;
+import com.ajaxjs.mcp.client.protocol.InitializationNotification;
 import com.ajaxjs.mcp.client.protocol.InitializeRequest;
 import com.ajaxjs.mcp.client.transport.McpOperationHandler;
 import com.ajaxjs.mcp.client.transport.McpTransport;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import okhttp3.*;
 import okhttp3.sse.EventSource;
 import okhttp3.sse.EventSources;

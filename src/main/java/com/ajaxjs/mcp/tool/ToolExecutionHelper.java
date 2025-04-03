@@ -46,11 +46,11 @@ public class ToolExecutionHelper {
         Stream<JsonNode> contentStream = StreamSupport.stream(contents.spliterator(), false);
 
         return contentStream.map(content -> {
-                    if (!content.get("type").asText().equals("text"))
-                        throw new RuntimeException("Unsupported content type: " + content.get("type"));
+            if (!content.get("type").asText().equals("text"))
+                throw new RuntimeException("Unsupported content type: " + content.get("type"));
 
-                    return content.get("text").asText();
-                }).collect(Collectors.joining("\n"));
+            return content.get("text").asText();
+        }).collect(Collectors.joining("\n"));
     }
 
     private static String extractError(JsonNode errorNode) {

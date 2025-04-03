@@ -1,5 +1,6 @@
 package com.ajaxjs.mcp.tool;
 
+import com.ajaxjs.mcp.client.json.JsonObjectSchema;
 import lombok.Data;
 
 @Data
@@ -7,13 +8,13 @@ public class ToolSpecification {
     private String name;
 
     private String description;
-//TODO
-//    private final JsonObjectSchema parameters;
+    //TODO
+    private final JsonObjectSchema parameters;
 
     private ToolSpecification(Builder builder) {
         this.name = builder.name;
         this.description = builder.description;
-//        this.parameters = builder.parameters;
+        this.parameters = builder.parameters;
     }
 
     public static Builder builder() {
@@ -23,7 +24,7 @@ public class ToolSpecification {
     public static final class Builder {
         private String name;
         private String description;
-//        private JsonObjectSchema parameters;
+        private JsonObjectSchema parameters;
 
         private Builder() {
         }

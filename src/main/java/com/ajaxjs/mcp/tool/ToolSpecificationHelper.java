@@ -2,13 +2,9 @@ package com.ajaxjs.mcp.tool;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-//import com.fasterxml.jackson.databind.node.ObjectNode;
-//import dev.langchain4j.agent.tool.ToolSpecification;
-//import dev.langchain4j.model.chat.request.json.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class ToolSpecificationHelper {
     /**
@@ -103,7 +99,6 @@ public class ToolSpecificationHelper {
 //        } else
 //            throw new IllegalArgumentException("Unknown element type: " + nodeType);
 //    }
-
     private static String[] toStringArray(ArrayNode jsonArray) {
         String[] result = new String[jsonArray.size()];
         for (int i = 0; i < jsonArray.size(); i++)

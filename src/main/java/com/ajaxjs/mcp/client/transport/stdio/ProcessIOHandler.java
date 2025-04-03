@@ -3,8 +3,6 @@ package com.ajaxjs.mcp.client.transport.stdio;
 import com.ajaxjs.mcp.client.transport.McpOperationHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;

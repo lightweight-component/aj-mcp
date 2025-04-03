@@ -66,7 +66,7 @@ public class ResourcesHelper {
         }
     }
 
-  public  static List<ResourceTemplate> parseResourceTemplateRefs(JsonNode mcpMessage) {
+    public static List<ResourceTemplate> parseResourceTemplateRefs(JsonNode mcpMessage) {
         McpException.checkForErrors(mcpMessage);
 
         if (mcpMessage.has("result")) {

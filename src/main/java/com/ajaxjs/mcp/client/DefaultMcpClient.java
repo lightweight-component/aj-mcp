@@ -23,9 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import lombok.extern.slf4j.Slf4j;
-
 
 import java.time.Duration;
 import java.util.List;
@@ -60,7 +58,7 @@ public class DefaultMcpClient implements McpClient {
     private final AtomicReference<List<Prompt>> promptRefs = new AtomicReference<>();
 
     public DefaultMcpClient(Builder builder) {
-        transport =  Objects.requireNonNull(builder.transport, "transport");
+        transport = Objects.requireNonNull(builder.transport, "transport");
         clientName = McpUtils.getOrDefault(builder.clientName, "langchain4j");
         clientVersion = McpUtils.getOrDefault(builder.clientVersion, "1.0");
         protocolVersion = McpUtils.getOrDefault(builder.protocolVersion, "2024-11-05");
