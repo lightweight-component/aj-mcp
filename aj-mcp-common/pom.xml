@@ -1,0 +1,57 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>aj-mcp-common</artifactId>
+    <version>1.0</version>
+    <packaging>jar</packaging>
+
+    <parent>
+        <groupId>com.ajaxjs</groupId>
+        <artifactId>ajaxjs-parent</artifactId>
+        <version>1.27</version>
+        <relativePath/>
+    </parent>
+
+    <properties>
+
+    </properties>
+
+    <url>https://framework.ajaxjs.com/docs/aj/?section=net</url>
+    <scm>
+        <url>https://github.com/lightweight-component/aj-net</url>
+        <connection>scm:git:https://github.com/lightweight-component/aj-net.git</connection>
+    </scm>
+
+    <issueManagement>
+        <system>GitHub Issues</system>
+        <url>https://github.com/lightweight-component/aj-net/issues</url>
+    </issueManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.ajaxjs</groupId>
+            <artifactId>ajaxjs-util</artifactId>
+            <version>1.2.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>4.12.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp-sse</artifactId>
+            <version>4.12.0</version>
+        </dependency>
+
+        <!-- 编译为 jar 包时依赖的 -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.1.0</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+</project>
