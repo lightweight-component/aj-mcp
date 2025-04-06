@@ -5,28 +5,24 @@ import com.ajaxjs.mcp.client.McpToolProvider;
 import com.ajaxjs.mcp.client.json.JsonBooleanSchema;
 import com.ajaxjs.mcp.client.json.JsonIntegerSchema;
 import com.ajaxjs.mcp.client.json.JsonStringSchema;
-import com.ajaxjs.mcp.tool.*;
+import com.ajaxjs.mcp.tool.ToolExecutionRequest;
+import com.ajaxjs.mcp.tool.ToolExecutor;
+import com.ajaxjs.mcp.tool.ToolProviderResult;
+import com.ajaxjs.mcp.tool.ToolSpecification;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class McpToolsTestBase {
-
     static McpClient mcpClient;
-
-    private static final Logger log = LoggerFactory.getLogger(McpToolsTestBase.class);
 
     @Test
     public void verifyToolSpecifications() {
         ToolProviderResult toolProviderResult = obtainTools();
 
-        Map<ToolSpecification, ToolExecutor> tools = toolProviderResult.getTools();
-        assertEquals(6, tools.size(), "Expected exactly 6 tools");
+        assertEquals(6, toolProviderResult.size(), "Expected exactly 6 tools");
 
         // Verify echoString tool
         ToolSpecification echoString = findToolSpecificationByName(toolProviderResult, "echoString");
@@ -141,19 +137,21 @@ public abstract class McpToolsTestBase {
     }
 
     ToolProviderResult obtainTools() {
-        ToolProvider toolProvider = McpToolProvider.builder().mcpClients(Collections.singletonList(mcpClient)).build();
+        McpToolProvider toolProvider = new McpToolProvider();
+        toolProvider.setMcpClients(Collections.singletonList(mcpClient));
+
         return toolProvider.provideTools(null);
     }
 
     ToolSpecification findToolSpecificationByName(ToolProviderResult toolProviderResult, String name) {
-        return toolProviderResult.getTools().keySet().stream()
+        return toolProviderResult.keySet().stream()
                 .filter(toolSpecification -> toolSpecification.getName().equals(name))
                 .findFirst()
                 .get();
     }
 
     ToolExecutor findToolExecutorByName(ToolProviderResult toolProviderResult, String name) {
-        return toolProviderResult.getTools().entrySet().stream()
+        return toolProviderResult.entrySet().stream()
                 .filter(entry -> entry.getKey().getName().equals(name))
                 .findFirst()
                 .get()

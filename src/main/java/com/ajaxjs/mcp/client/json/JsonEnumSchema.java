@@ -9,6 +9,6 @@ import java.util.List;
 @Builder
 public class JsonEnumSchema implements JsonSchemaElement {
     private String description;
-    private List<String> enumValues;
 
+    private List<String> enumValues;
 }

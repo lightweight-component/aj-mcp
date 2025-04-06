@@ -5,8 +5,6 @@ import com.ajaxjs.mcp.client.transport.McpTransport;
 import com.ajaxjs.mcp.client.transport.http.HttpMcpTransport;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -16,7 +14,6 @@ import static com.ajaxjs.mcp.client.integration.McpServerHelper.skipTestsIfJbang
 import static com.ajaxjs.mcp.client.integration.McpServerHelper.startServerHttp;
 
 class McpPromptsHttpTransportIT extends PromptsTestBase {
-    private static final Logger log = LoggerFactory.getLogger(McpPromptsHttpTransportIT.class);
     private static Process process;
 
     @BeforeAll

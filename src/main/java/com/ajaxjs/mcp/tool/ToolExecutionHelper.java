@@ -18,6 +18,7 @@ public class ToolExecutionHelper {
     public static String extractResult(JsonNode result) {
         if (result.has("result")) {
             JsonNode resultNode = result.get("result");
+
             if (resultNode.has("content")) {
                 String content = extractSuccessfulResult((ArrayNode) resultNode.get("content"));
                 boolean isError = false;

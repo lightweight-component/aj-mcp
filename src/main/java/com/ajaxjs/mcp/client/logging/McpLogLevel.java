@@ -12,12 +12,4 @@ public enum McpLogLevel {
     CRITICAL,
     ALERT,
     EMERGENCY;
-
-    public static McpLogLevel from(String val) {
-        try {
-            return valueOf(val.toUpperCase());
-        } catch (Exception e) {
-            return null;
-        }
-    }
 }

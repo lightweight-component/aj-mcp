@@ -1,9 +1,10 @@
 package com.ajaxjs.mcp.prompt;
 
+import com.ajaxjs.mcp.message.Content;
 import lombok.Data;
 
 @Data
-public class ImageContent implements PromptContent {
+public class PromptImageContent implements PromptContent {
     String data;
 
     String mimeType;
@@ -13,8 +14,9 @@ public class ImageContent implements PromptContent {
         return Type.IMAGE;
     }
 
-//    @Override
-//    public Content toContent() {
+    @Override
+    public Content toContent() {
+        return null;
 //        return ImageContent.from(data, mimeType);
-//    }
+    }
 }

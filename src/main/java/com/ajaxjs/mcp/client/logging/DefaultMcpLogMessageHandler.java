@@ -37,7 +37,5 @@ public class DefaultMcpLogMessageHandler implements McpLogMessageHandler {
                 log.warn("MCP logger: Unknown log level: {}", message.getLevel());
                 break;
         }
-
-
     }
 }

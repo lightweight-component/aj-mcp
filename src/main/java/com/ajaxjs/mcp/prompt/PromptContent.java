@@ -1,5 +1,6 @@
 package com.ajaxjs.mcp.prompt;
 
+import com.ajaxjs.mcp.message.Content;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Locale;
@@ -15,7 +16,7 @@ public interface PromptContent {
 
     Type type();
 
-//    Content toContent();
+    Content toContent();
 
     enum Type {
         TEXT,

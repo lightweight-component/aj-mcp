@@ -7,14 +7,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ListToolsRequest extends ClientMessage {
-
     @JsonInclude
     public final ClientMethod method = ClientMethod.TOOLS_LIST;
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Map<String, Object> params;
 
-    public ListToolsRequest(final Long id) {
+    public ListToolsRequest(Long id) {
         super(id);
         this.params = new HashMap<>();
     }

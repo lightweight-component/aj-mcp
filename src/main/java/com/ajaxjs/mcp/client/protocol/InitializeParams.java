@@ -6,8 +6,11 @@ import lombok.Data;
 @Data
 public class InitializeParams {
     private String protocolVersion;
+
     private Capabilities capabilities;
+
     private ClientInfo clientInfo;
+
 
     @Data
     public static class Capabilities {
@@ -35,6 +38,7 @@ public class InitializeParams {
     @Data
     public static class ClientInfo {
         private String name;
+
         private String version;
     }
 }

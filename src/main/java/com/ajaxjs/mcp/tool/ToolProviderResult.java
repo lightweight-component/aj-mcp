@@ -1,12 +1,9 @@
 package com.ajaxjs.mcp.tool;
 
-import lombok.Builder;
-import lombok.Data;
+import java.util.LinkedHashMap;
 
-import java.util.Map;
-
-@Data
-@Builder
-public class ToolProviderResult {
-    private Map<ToolSpecification, ToolExecutor> tools;
+/**
+ * Tool provider result
+ */
+public class ToolProviderResult extends LinkedHashMap<ToolSpecification, ToolExecutor> {
 }

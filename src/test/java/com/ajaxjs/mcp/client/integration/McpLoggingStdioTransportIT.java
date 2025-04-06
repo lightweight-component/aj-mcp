@@ -3,7 +3,7 @@ package com.ajaxjs.mcp.client.integration;
 
 import com.ajaxjs.mcp.client.DefaultMcpClient;
 import com.ajaxjs.mcp.client.transport.McpTransport;
-import com.ajaxjs.mcp.client.transport.stdio.StdioMcpTransport;
+import com.ajaxjs.mcp.client.transport.stdio.StdioTransport;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 
@@ -17,7 +17,7 @@ class McpLoggingStdioTransportIT extends McpLoggingTestBase {
 
     @BeforeAll
     static void setup() {
-        McpTransport transport = new StdioMcpTransport.Builder()
+        McpTransport transport =  StdioTransport.builder()
                 .command(Arrays.asList(getJBangCommand(), "--quiet", "--fresh", "run", getPathToScript("logging_mcp_server.java")))
                 .logEvents(true)
                 .build();

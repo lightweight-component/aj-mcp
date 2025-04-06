@@ -1,6 +1,10 @@
 package com.ajaxjs.mcp.prompt;
 
 import com.ajaxjs.mcp.McpRole;
+import com.ajaxjs.mcp.message.AiMessage;
+import com.ajaxjs.mcp.message.ChatMessage;
+import com.ajaxjs.mcp.message.Content;
+import com.ajaxjs.mcp.message.UserMessage;
 import lombok.Data;
 
 /**
@@ -22,18 +26,19 @@ public class PromptMessage {
      *
      * @throws UnsupportedOperationException if the role is 'assistant' and the content is something other than text.
      */
-//    public ChatMessage toChatMessage(McpRole role, PromptContent content) {
-//        if (role.equals(McpRole.USER))
-//            return UserMessage.userMessage(content.toContent());
-//        else if (role.equals(McpRole.ASSISTANT)) {
-//            Content convertedContent = content.toContent();
-//
-//            if (convertedContent instanceof TextContent convertedTextContent)
-//                return AiMessage.aiMessage(convertedTextContent.text());
-//            else
-//                throw new UnsupportedOperationException("Cannot create an AiMessage with content" + " of type " + convertedContent.getClass().getName());
-//        } else
-//            throw new UnsupportedOperationException("Unknown role: " + role);
-//
-//    }
+    public ChatMessage toChatMessage(McpRole role, PromptContent content) {
+        if (role.equals(McpRole.USER))
+            return UserMessage.userMessage(content.toContent());
+        else if (role.equals(McpRole.ASSISTANT)) {
+            Content convertedContent = content.toContent();
+
+            if (convertedContent instanceof PromptTextContent) {
+                PromptTextContent convertedTextContent = (PromptTextContent) convertedContent;
+                return AiMessage.aiMessage(convertedTextContent.getText());
+            } else {
+                throw new UnsupportedOperationException("Cannot create an AiMessage with content of type " + convertedContent.getClass().getName());
+            }
+        } else
+            throw new UnsupportedOperationException("Unknown role: " + role);
+    }
 }

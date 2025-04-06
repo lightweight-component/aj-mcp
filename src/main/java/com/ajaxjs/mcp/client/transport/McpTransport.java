@@ -28,8 +28,7 @@ public interface McpTransport extends Closeable {
     CompletableFuture<JsonNode> executeOperationWithResponse(ClientMessage request);
 
     /**
-     * Sends a message that does not expect a response from the server. The 'id' field
-     * of the message should be null.
+     * Sends a message that does not expect a response from the server. The 'id' field of the message should be null.
      */
     void executeOperationWithoutResponse(ClientMessage request);
 }

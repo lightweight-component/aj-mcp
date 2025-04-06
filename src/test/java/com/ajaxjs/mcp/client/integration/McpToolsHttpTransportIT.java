@@ -20,8 +20,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 
 class McpToolsHttpTransportIT extends McpToolsTestBase {
-
-    private static final Logger log = LoggerFactory.getLogger(McpToolsHttpTransportIT.class);
     private static Process process;
 
     @BeforeAll

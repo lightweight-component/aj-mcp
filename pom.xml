@@ -13,6 +13,9 @@
         <relativePath/>
     </parent>
 
+    <properties>
+
+    </properties>
 
     <url>https://framework.ajaxjs.com/docs/aj/?section=net</url>
     <scm>

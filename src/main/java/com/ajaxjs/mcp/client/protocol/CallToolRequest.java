@@ -11,11 +11,10 @@ public class CallToolRequest extends ClientMessage {
     public final ClientMethod method = ClientMethod.TOOLS_CALL;
 
     @JsonInclude
-    private Map<String, Object> params;
+    private Map<String, Object> params = new HashMap<>();
 
-    public CallToolRequest(final Long id, String toolName, ObjectNode arguments) {
+    public CallToolRequest(Long id, String toolName, ObjectNode arguments) {
         super(id);
-        this.params = new HashMap<>();
         this.params.put("name", toolName);
         this.params.put("arguments", arguments);
     }

@@ -60,7 +60,7 @@ public abstract class PromptsTestBase {
 
         PromptMessage message = prompt.getMessages().get(0);
         assertEquals(McpRole.USER, message.getRole(), "Role should be USER");
-        assertEquals("Hello", ((TextContent) message.getContent()).getText(), "Text content should be 'Hello'");
+        assertEquals("Hello", ((PromptTextContent) message.getContent()).getText(), "Text content should be 'Hello'");
     }
 
     @Test
@@ -72,12 +72,12 @@ public abstract class PromptsTestBase {
         PromptMessage message1 = prompt.getMessages().get(0);
         assertEquals(McpRole.USER, message1.getRole(), "Role of message1 should be USER");
         assertEquals(PromptContent.Type.TEXT, message1.getContent().getType(), "Type of message1 content should be TEXT");
-        assertEquals("first", ((TextContent) message1.getContent()).getText(), "Text content of message1 should be 'first'");
+        assertEquals("first", ((PromptTextContent) message1.getContent()).getText(), "Text content of message1 should be 'first'");
 
         PromptMessage message2 = prompt.getMessages().get(1);
         assertEquals(McpRole.USER, message2.getRole(), "Role of message2 should be USER");
         assertEquals(PromptContent.Type.TEXT, message2.getContent().getType(), "Type of message2 content should be TEXT");
-        assertEquals("second", ((TextContent) message2.getContent()).getText(), "Text content of message2 should be 'second'");
+        assertEquals("second", ((PromptTextContent) message2.getContent()).getText(), "Text content of message2 should be 'second'");
     }
 
 
@@ -91,7 +91,7 @@ public abstract class PromptsTestBase {
         assertEquals(McpRole.USER, message.getRole(), "Role should be USER");
         assertEquals(PromptContent.Type.IMAGE, message.getContent().getType(), "Content type should be IMAGE");
 
-        ImageContent imageContent = (ImageContent) message.getContent();
+        PromptImageContent imageContent = (PromptImageContent) message.getContent();
         assertEquals("aaa", imageContent.getData(), "Image data should be 'aaa'");
         assertEquals("image/png", imageContent.getMimeType(), "Image MIME type should be 'image/png'");
     }
@@ -106,7 +106,7 @@ public abstract class PromptsTestBase {
         assertEquals(McpRole.USER, message.getRole(), "Role should be USER");
         assertEquals(PromptContent.Type.TEXT, message.getContent().getType(), "Content type should be TEXT");
 
-        TextContent textContent = (TextContent) message.getContent();
+        PromptTextContent textContent = (PromptTextContent) message.getContent();
         assertEquals("Hello Bob", textContent.getText(), "Text content should be 'Hello Bob'");
     }
 

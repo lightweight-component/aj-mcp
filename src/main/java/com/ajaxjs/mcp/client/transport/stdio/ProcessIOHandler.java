@@ -12,7 +12,7 @@ import java.io.PrintStream;
 @Slf4j
 public class ProcessIOHandler implements Runnable {
     private final Process process;
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private final boolean logEvents;
     private final McpOperationHandler messageHandler;
     private final PrintStream out;
@@ -30,8 +30,8 @@ public class ProcessIOHandler implements Runnable {
             String line;
 
             while ((line = reader.readLine()) != null) {
-                if (logEvents)
-                    log.debug("< {}", line);
+//                if (logEvents)
+//                    log.info("< {}", line);
 
                 messageHandler.handle(OBJECT_MAPPER.readTree(line));
             }
@@ -39,7 +39,7 @@ public class ProcessIOHandler implements Runnable {
             throw new RuntimeException(e);
         }
 
-        log.debug("ProcessIOHandler has finished reading output from process with PID = {}", ProcessStderrHandler.getPid(process));
+        log.info("ProcessIOHandler has finished reading output from process");
     }
 
     public void submit(String message) throws IOException {

@@ -17,9 +17,8 @@ import com.ajaxjs.mcp.tool.ToolExecutionHelper;
 import com.ajaxjs.mcp.tool.ToolExecutionRequest;
 import com.ajaxjs.mcp.tool.ToolSpecification;
 import com.ajaxjs.mcp.tool.ToolSpecificationHelper;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.ajaxjs.util.JsonUtil;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -33,22 +32,18 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
-// TODO: currently we request a new list of tools every time, so we should
-// add support for the `ToolListChangedNotification` message, and then we can
-// cache the list
-
+// TODO: currently we request a new list of tools every time, so we should add support for the `ToolListChangedNotification` message, and then we can cache the list
 @Slf4j
 public class DefaultMcpClient implements McpClient {
     private final AtomicLong idGenerator = new AtomicLong(0);
     private final McpTransport transport;
-    public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private final String clientName;
     private final String clientVersion;
     private final String protocolVersion;
     private final Duration toolExecutionTimeout;
     private final Duration resourcesTimeout;
     private final Duration promptsTimeout;
-    private final JsonNode RESULT_TIMEOUT;
+    private final JsonNode resultTimeout;
     private final String toolExecutionTimeoutErrorMessage;
     private final Map<Long, CompletableFuture<JsonNode>> pendingOperations = new ConcurrentHashMap<>();
     private final McpOperationHandler messageHandler;
@@ -67,14 +62,16 @@ public class DefaultMcpClient implements McpClient {
         promptsTimeout = McpUtils.getOrDefault(builder.promptsTimeout, Duration.ofSeconds(60));
         logHandler = McpUtils.getOrDefault(builder.logHandler, new DefaultMcpLogMessageHandler());
         toolExecutionTimeoutErrorMessage = McpUtils.getOrDefault(builder.toolExecutionTimeoutErrorMessage, "There was a timeout executing the tool");
-        RESULT_TIMEOUT = JsonNodeFactory.instance.objectNode();
+        resultTimeout = JsonNodeFactory.instance.objectNode();
         messageHandler = new McpOperationHandler(pendingOperations, transport, logHandler::handleLogMessage);
-        ((ObjectNode) RESULT_TIMEOUT)
+
+        ((ObjectNode) resultTimeout)
                 .putObject("result")
                 .putArray("content")
                 .addObject()
                 .put("type", "text")
                 .put("text", toolExecutionTimeoutErrorMessage);
+
         initialize();
     }
 
@@ -117,7 +114,8 @@ public class DefaultMcpClient implements McpClient {
     public List<ToolSpecification> listTools() {
         ListToolsRequest operation = new ListToolsRequest(idGenerator.getAndIncrement());
         CompletableFuture<JsonNode> resultFuture = transport.executeOperationWithResponse(operation);
-        JsonNode result = null;
+        JsonNode result;
+
         try {
             result = resultFuture.get();
         } catch (InterruptedException | ExecutionException e) {
@@ -131,13 +129,7 @@ public class DefaultMcpClient implements McpClient {
 
     @Override
     public String executeTool(ToolExecutionRequest executionRequest) {
-        ObjectNode arguments;
-
-        try {
-            arguments = OBJECT_MAPPER.readValue(executionRequest.getArguments(), ObjectNode.class);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        ObjectNode arguments = executionRequest.getArguments() == null ? null : JsonUtil.fromJson(executionRequest.getArguments(), ObjectNode.class);
         long operationId = idGenerator.getAndIncrement();
         CallToolRequest operation = new CallToolRequest(operationId, executionRequest.getName(), arguments);
         long timeoutMillis = toolExecutionTimeout.toMillis() == 0 ? Integer.MAX_VALUE : toolExecutionTimeout.toMillis();
@@ -149,12 +141,13 @@ public class DefaultMcpClient implements McpClient {
             result = resultFuture.get(timeoutMillis, TimeUnit.MILLISECONDS);
         } catch (TimeoutException timeout) {
             transport.executeOperationWithoutResponse(new CancellationNotification(operationId, "Timeout"));
-            return ToolExecutionHelper.extractResult(RESULT_TIMEOUT);
+            return ToolExecutionHelper.extractResult(resultTimeout);
         } catch (ExecutionException | InterruptedException e) {
             throw new RuntimeException(e);
         } finally {
             pendingOperations.remove(operationId);
         }
+
         return ToolExecutionHelper.extractResult(result);
     }
 

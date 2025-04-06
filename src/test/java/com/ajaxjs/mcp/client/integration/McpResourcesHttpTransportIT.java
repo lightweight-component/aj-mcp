@@ -17,8 +17,6 @@ import static com.ajaxjs.mcp.client.integration.McpServerHelper.skipTestsIfJbang
 import static com.ajaxjs.mcp.client.integration.McpServerHelper.startServerHttp;
 
 class McpResourcesHttpTransportIT extends McpResourcesTestBase {
-
-    private static final Logger log = LoggerFactory.getLogger(McpResourcesHttpTransportIT.class);
     private static Process process;
 
     @BeforeAll

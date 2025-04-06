@@ -21,10 +21,11 @@ public class McpServerHelper {
         skipTestsIfJbangNotAvailable();
         String path = getPathToScript(scriptName);
         String[] command = new String[]{getJBangCommand(), "--quiet", "--fresh", "run", path};
-        log.info("Starting the MCP server using command: " + Arrays.toString(command));
+        log.info("Starting the MCP server using command: {}", Arrays.toString(command));
         Process process = new ProcessBuilder().command(command).inheritIO().start();
         waitForPort(8080, 120);
         log.info("MCP server has started");
+
         return process;
     }
 
@@ -37,9 +38,9 @@ public class McpServerHelper {
 
     static String getJBangCommand() {
         String command = System.getProperty("jbang.command");
-        if (command == null || command.isEmpty()) {
+        if (command == null || command.isEmpty())
             command = isWindows() ? "jbang.cmd" : "jbang";
-        }
+
         return command;
     }
 
@@ -60,7 +61,8 @@ public class McpServerHelper {
         Request request = new Request.Builder().url("http://localhost:" + port).build();
         long start = System.currentTimeMillis();
         OkHttpClient client = new OkHttpClient();
-        while (System.currentTimeMillis() - start < timeoutSeconds * 1000) {
+
+        while (System.currentTimeMillis() - start < timeoutSeconds * 1000L) {
             try {
                 client.newCall(request).execute();
                 return;
@@ -68,6 +70,7 @@ public class McpServerHelper {
                 TimeUnit.SECONDS.sleep(1);
             }
         }
+
         throw new TimeoutException("Port " + port + " did not open within " + timeoutSeconds + " seconds");
     }
 

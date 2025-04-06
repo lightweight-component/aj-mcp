@@ -1,89 +1,58 @@
 package com.ajaxjs.mcp.client;
 
 
-import com.ajaxjs.mcp.McpUtils;
-import com.ajaxjs.mcp.tool.ToolProvider;
 import com.ajaxjs.mcp.tool.ToolProviderRequest;
 import com.ajaxjs.mcp.tool.ToolProviderResult;
 import com.ajaxjs.mcp.tool.ToolSpecification;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
  * A tool provider backed by one or more MCP clients.
  */
-public class McpToolProvider implements ToolProvider {
-    private final List<McpClient> mcpClients;
-    private final boolean failIfOneServerFails;
-    private static final Logger log = LoggerFactory.getLogger(McpToolProvider.class);
+@Slf4j
+@Data
+public class McpToolProvider {
+    /**
+     * The list of MCP clients to use for retrieving tools.
+     */
+    private List<McpClient> mcpClients;
 
-    private McpToolProvider(Builder builder) {
-        this.mcpClients = new ArrayList<>(builder.mcpClients);
-        this.failIfOneServerFails = McpUtils.getOrDefault(builder.failIfOneServerFails, false);
-    }
+    /**
+     * If this is true, then the tool provider will throw an exception if it fails to list tools from any of the servers.
+     * If this is false (default), then the tool provider will ignore the error and continue with the next server.
+     */
+    private boolean failIfOneServerFails;
 
-    @Override
+    /**
+     * Get the tool list from all MCP clients.
+     *
+     * @param request
+     * @return tool list
+     */
     public ToolProviderResult provideTools(ToolProviderRequest request) {
-        ToolProviderResult.ToolProviderResultBuilder builder = ToolProviderResult.builder();
+        ToolProviderResult toolProviderResult = new ToolProviderResult();
 
         for (McpClient mcpClient : mcpClients) {
             try {
                 List<ToolSpecification> toolSpecifications = mcpClient.listTools();
-                for (ToolSpecification toolSpecification : toolSpecifications) {
-                    builder.add(toolSpecification, (executionRequest, memoryId) -> mcpClient.executeTool(executionRequest));
-                }
+
+                for (ToolSpecification toolSpecification : toolSpecifications)
+                    toolProviderResult.put(toolSpecification, (executionRequest, memoryId) -> mcpClient.executeTool(executionRequest));
             } catch (Exception e) {
-                if (failIfOneServerFails) {
+                if (failIfOneServerFails)
                     throw new RuntimeException("Failed to retrieve tools from MCP server", e);
-                } else {
+                else
                     log.warn("Failed to retrieve tools from MCP server", e);
-                }
             }
         }
 
-        return builder.build();
+        return toolProviderResult;
     }
 
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    public static class Builder {
-
-        private List<McpClient> mcpClients;
-        private Boolean failIfOneServerFails;
-
-        /**
-         * The list of MCP clients to use for retrieving tools.
-         */
-        public Builder mcpClients(List<McpClient> mcpClients) {
-            this.mcpClients = mcpClients;
-            return this;
-        }
-
-        /**
-         * The list of MCP clients to use for retrieving tools.
-         */
-        public Builder mcpClients(McpClient... mcpClients) {
-            this.mcpClients = Arrays.asList(mcpClients);
-            return this;
-        }
-
-        /**
-         * If this is true, then the tool provider will throw an exception if it fails to list tools from any of the servers.
-         * If this is false (default), then the tool provider will ignore the error and continue with the next server.
-         */
-        public Builder failIfOneServerFails(boolean failIfOneServerFails) {
-            this.failIfOneServerFails = failIfOneServerFails;
-            return this;
-        }
-
-        public McpToolProvider build() {
-            return new McpToolProvider(this);
-        }
+    public ToolProviderResult provideTools() {
+        return provideTools(null);
     }
 }

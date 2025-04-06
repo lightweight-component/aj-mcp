@@ -22,7 +22,6 @@ public abstract class McpLoggingTestBase {
         logMessageHandler.clearMessages();
     }
 
-
     @Test
     public void receiveInfoLogMessage() throws TimeoutException {
         String result = mcpClient.executeTool(ToolExecutionRequest.builder().arguments("{}").name("info").build());

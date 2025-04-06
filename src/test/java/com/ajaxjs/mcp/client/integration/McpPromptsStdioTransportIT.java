@@ -2,8 +2,9 @@ package com.ajaxjs.mcp.client.integration;
 
 
 import com.ajaxjs.mcp.client.DefaultMcpClient;
+import com.ajaxjs.mcp.client.logging.DefaultMcpLogMessageHandler;
 import com.ajaxjs.mcp.client.transport.McpTransport;
-import com.ajaxjs.mcp.client.transport.stdio.StdioMcpTransport;
+import com.ajaxjs.mcp.client.transport.stdio.StdioTransport;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 
@@ -16,13 +17,13 @@ class McpPromptsStdioTransportIT extends PromptsTestBase {
     @BeforeAll
     static void setup() {
         skipTestsIfJbangNotAvailable();
-        McpTransport transport = new StdioMcpTransport.Builder()
-                .command(Arrays.asList(
-                        getJBangCommand(), "--quiet", "--fresh", "run", getPathToScript("prompts_mcp_server.java")))
+        McpTransport transport = StdioTransport.builder()
+                .command(Arrays.asList(getJBangCommand(),  "--fresh", "run", getPathToScript("prompts_mcp_server.java")))
                 .logEvents(true)
                 .build();
         mcpClient = new DefaultMcpClient.Builder()
                 .transport(transport)
+                .logHandler(new DefaultMcpLogMessageHandler())
                 .toolExecutionTimeout(Duration.ofSeconds(4))
                 .build();
     }

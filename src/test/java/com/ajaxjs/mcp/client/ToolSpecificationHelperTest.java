@@ -14,7 +14,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 class ToolSpecificationHelperTest {
-
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @Test
