@@ -1,8 +1,8 @@
 package com.ajaxjs.mcp.client.integration;
 
-import com.ajaxjs.mcp.McpException;
-import com.ajaxjs.mcp.client.McpClient;
-import com.ajaxjs.mcp.resource.*;
+import com.ajaxjs.mcp.client.IMcpClient;
+import com.ajaxjs.mcp.client.resource.*;
+import com.ajaxjs.mcp.common.McpException;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -10,7 +10,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class McpResourcesTestBase {
-    static McpClient mcpClient;
+    static IMcpClient mcpClient;
 
     @Test
     public void resourceList() {
@@ -45,7 +45,7 @@ public abstract class McpResourcesTestBase {
         assertEquals("text", textContents.getText(), "Text content should be 'text'");
     }
 
-//    @Test
+    //    @Test
     public void readBlobResource() {
         ReadResourceResult response = mcpClient.readResource("file:///blob");
         assertEquals(1, response.getContents().size(), "Expected exactly one content");
@@ -58,7 +58,7 @@ public abstract class McpResourcesTestBase {
         assertEquals("blob", blobContents.getBlob(), "Blob content should be 'blob'");
     }
 
-//    @Test
+    //    @Test
     public void readTextResourceFromTemplate() {
         ReadResourceResult response = mcpClient.readResource("file:///text-template/hello");
         assertEquals(1, response.getContents().size(), "Expected exactly one content");
@@ -71,7 +71,7 @@ public abstract class McpResourcesTestBase {
         assertEquals("text hello", textContents.getText(), "Text content should be 'text hello'");
     }
 
-//    @Test
+    //    @Test
     public void readBlobResourceFromTemplate() {
         ReadResourceResult response = mcpClient.readResource("file:///blob-template/hello");
         assertEquals(1, response.getContents().size(), "Expected exactly one content");
@@ -84,7 +84,7 @@ public abstract class McpResourcesTestBase {
         assertEquals("blob hello", blobContents.getBlob(), "Blob content should be 'blob hello'");
     }
 
-//    @Test
+    //    @Test
     public void readNonExistentResource() {
         assertThrows(McpException.class, () -> mcpClient.readResource("file:///i-do-not-exist"),
                 "Expected McpException to be thrown for non-existent resource");
@@ -99,12 +99,12 @@ public abstract class McpResourcesTestBase {
         return null;
     }
 
-    private ResourceTemplate getResourceTemplateRef(
-            String resourceTemplateName, List<ResourceTemplate> resourceTemplateRefs) {
+    private ResourceTemplate getResourceTemplateRef(String resourceTemplateName, List<ResourceTemplate> resourceTemplateRefs) {
         for (ResourceTemplate ref : resourceTemplateRefs) {
             if (ref.getName().equals(resourceTemplateName))
                 return ref;
         }
+
         return null;
     }
 }

@@ -1,9 +1,8 @@
 package com.ajaxjs.mcp.client.transport.http;
 
-import com.ajaxjs.mcp.client.transport.McpOperationHandler;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.ajaxjs.mcp.client.transport.McpTransport;
+import com.ajaxjs.mcp.common.JsonUtils;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Response;
 import okhttp3.sse.EventSource;
@@ -13,14 +12,13 @@ import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 public class SseEventListener extends EventSourceListener {
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private final boolean logEvents;
     // this will contain the POST url for sending commands to the server
     private final CompletableFuture<String> initializationFinished;
-    private final McpOperationHandler messageHandler;
+    private final McpTransport transport;
 
-    public SseEventListener(McpOperationHandler messageHandler, boolean logEvents, CompletableFuture initializationFinished) {
-        this.messageHandler = messageHandler;
+    public SseEventListener(McpTransport transport, boolean logEvents, CompletableFuture initializationFinished) {
+        this.transport = transport;
         this.logEvents = logEvents;
         this.initializationFinished = initializationFinished;
     }
@@ -36,12 +34,8 @@ public class SseEventListener extends EventSourceListener {
             if (logEvents)
                 log.info("< {}", data);
 
-            try {
-                JsonNode jsonNode = OBJECT_MAPPER.readTree(data);
-                messageHandler.handle(jsonNode);
-            } catch (JsonProcessingException e) {
-                log.warn("Failed to parse JSON message: {}", data, e);
-            }
+            JsonNode jsonNode = JsonUtils.json2Node(data);
+            transport.handle(jsonNode);
         } else if (type.equals("endpoint")) {
             if (initializationFinished.isDone()) {
                 log.warn("Received endpoint event after initialization");

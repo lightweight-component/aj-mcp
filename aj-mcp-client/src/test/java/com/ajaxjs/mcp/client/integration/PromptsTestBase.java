@@ -1,13 +1,13 @@
 package com.ajaxjs.mcp.client.integration;
 
 
-import com.ajaxjs.mcp.McpException;
-import com.ajaxjs.mcp.McpRole;
-import com.ajaxjs.mcp.client.McpClient;
-import com.ajaxjs.mcp.prompt.*;
-import com.ajaxjs.mcp.resource.BlobResourceContents;
-import com.ajaxjs.mcp.resource.ResourceContents;
-import com.ajaxjs.util.ObjectHelper;
+import com.ajaxjs.mcp.McpUtils;
+import com.ajaxjs.mcp.client.IMcpClient;
+import com.ajaxjs.mcp.client.McpRole;
+import com.ajaxjs.mcp.client.prompt.*;
+import com.ajaxjs.mcp.client.resource.BlobResourceContents;
+import com.ajaxjs.mcp.client.resource.ResourceContents;
+import com.ajaxjs.mcp.common.McpException;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -16,7 +16,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class PromptsTestBase {
-    static McpClient mcpClient;
+    static IMcpClient mcpClient;
 
     @Test
     void listPrompts() {
@@ -98,7 +98,7 @@ public abstract class PromptsTestBase {
 
     @Test
     void getParametrizedPrompt() {
-        GetPromptResult prompt = mcpClient.getPrompt("parametrized", ObjectHelper.mapOf("name", "Bob"));
+        GetPromptResult prompt = mcpClient.getPrompt("parametrized", McpUtils.mapOf("name", "Bob"));
         assertNull(prompt.getDescription(), "Description should be null");
         assertEquals(1, prompt.getMessages().size(), "Expected exactly one message");
 

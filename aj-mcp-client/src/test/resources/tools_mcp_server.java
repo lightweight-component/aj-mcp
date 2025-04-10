@@ -3,14 +3,14 @@
 //DEPS io.quarkiverse.mcp:quarkus-mcp-server-stdio:1.0.0.CR1
 //DEPS io.quarkiverse.mcp:quarkus-mcp-server-sse:1.0.0.CR1
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
 import io.quarkiverse.mcp.server.TextContent;
 import io.quarkiverse.mcp.server.Tool;
 import io.quarkiverse.mcp.server.ToolArg;
 import io.quarkiverse.mcp.server.ToolResponse;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class tools_mcp_server {
 
@@ -39,7 +39,7 @@ public class tools_mcp_server {
     public String error() throws Exception {
         throw new RuntimeException("business error");
     }
-    
+
     @Tool(description = "Returns a response as an error")
     public ToolResponse errorResponse() throws Exception {
         List<TextContent> lst = new ArrayList<>();

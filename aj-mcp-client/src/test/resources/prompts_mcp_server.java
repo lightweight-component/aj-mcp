@@ -3,19 +3,9 @@
 //DEPS io.quarkiverse.mcp:quarkus-mcp-server-stdio:1.0.0.CR1
 //DEPS io.quarkiverse.mcp:quarkus-mcp-server-sse:1.0.0.CR1
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
+import io.quarkiverse.mcp.server.*;
 
-import io.quarkiverse.mcp.server.BlobResourceContents;
-import io.quarkiverse.mcp.server.Content;
-import io.quarkiverse.mcp.server.EmbeddedResource;
-import io.quarkiverse.mcp.server.ImageContent;
-import io.quarkiverse.mcp.server.Prompt;
-import io.quarkiverse.mcp.server.PromptArg;
-import io.quarkiverse.mcp.server.PromptMessage;
-import io.quarkiverse.mcp.server.ResourceContents;
-import io.quarkiverse.mcp.server.TextContent;
+import java.util.List;
 
 public class prompts_mcp_server {
 

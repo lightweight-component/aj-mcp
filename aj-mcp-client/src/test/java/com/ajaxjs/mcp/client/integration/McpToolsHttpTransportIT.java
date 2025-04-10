@@ -1,14 +1,12 @@
 package com.ajaxjs.mcp.client.integration;
 
-import com.ajaxjs.mcp.client.DefaultMcpClient;
+import com.ajaxjs.mcp.client.IMcpClient;
 import com.ajaxjs.mcp.client.McpClient;
 import com.ajaxjs.mcp.client.transport.McpTransport;
 import com.ajaxjs.mcp.client.transport.http.HttpMcpTransport;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -32,7 +30,7 @@ class McpToolsHttpTransportIT extends McpToolsTestBase {
                 .logResponses(true)
                 .build();
 
-        mcpClient = new DefaultMcpClient.Builder()
+        mcpClient = new McpClient.Builder()
                 .transport(transport)
                 .toolExecutionTimeout(Duration.ofSeconds(4))
                 .build();
@@ -53,14 +51,15 @@ class McpToolsHttpTransportIT extends McpToolsTestBase {
      */
     @Test
     void wrongUrl() throws Exception {
-        McpClient badClient = null;
+        IMcpClient badClient = null;
+
         try {
             McpTransport transport = new HttpMcpTransport.Builder()
                     .sseUrl("http://localhost:8080/WRONG")
                     .logRequests(true)
                     .logResponses(true)
                     .build();
-            badClient = new DefaultMcpClient.Builder()
+            badClient = new McpClient.Builder()
                     .transport(transport)
                     .toolExecutionTimeout(Duration.ofSeconds(4))
                     .build();

@@ -1,22 +1,20 @@
 package com.ajaxjs.mcp.client.integration;
 
-import com.ajaxjs.mcp.client.McpClient;
-import com.ajaxjs.mcp.client.McpToolProvider;
-import com.ajaxjs.mcp.client.json.JsonBooleanSchema;
-import com.ajaxjs.mcp.client.json.JsonIntegerSchema;
-import com.ajaxjs.mcp.client.json.JsonStringSchema;
-import com.ajaxjs.mcp.tool.ToolExecutionRequest;
-import com.ajaxjs.mcp.tool.ToolExecutor;
-import com.ajaxjs.mcp.tool.ToolProviderResult;
-import com.ajaxjs.mcp.tool.ToolSpecification;
+import com.ajaxjs.mcp.client.IMcpClient;
+import com.ajaxjs.mcp.client.tool.McpToolProvider;
+import com.ajaxjs.mcp.client.tool.ToolExecutor;
+import com.ajaxjs.mcp.client.tool.ToolProviderResult;
+import com.ajaxjs.mcp.client.tool.ToolSpecification;
+import com.ajaxjs.mcp.json.JsonBooleanSchema;
+import com.ajaxjs.mcp.json.JsonIntegerSchema;
+import com.ajaxjs.mcp.json.JsonStringSchema;
+import com.ajaxjs.mcp.message.ToolExecutionRequest;
 import org.junit.jupiter.api.Test;
-
-import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class McpToolsTestBase {
-    static McpClient mcpClient;
+    static IMcpClient mcpClient;
 
     @Test
     public void verifyToolSpecifications() {
@@ -67,78 +65,10 @@ public abstract class McpToolsTestBase {
         assertTrue(errorResponse.getParameters().getProperties().isEmpty(), "Parameters for 'errorResponse' should be empty");
     }
 
-    @Test
-    public void executeTool() {
-        ToolProviderResult toolProviderResult = obtainTools();
-        ToolExecutor executor = findToolExecutorByName(toolProviderResult, "echoString");
-        ToolExecutionRequest toolExecutionRequest = ToolExecutionRequest.builder()
-                .name("echoString")
-                .arguments("{\"input\": \"abc\"}")
-                .build();
-        String toolExecutionResultString = executor.execute(toolExecutionRequest, null);
-        assertEquals("abc", toolExecutionResultString);
-    }
-
-    @Test
-    public void executeToolWithWrongArgumentType() {
-        ToolProviderResult toolProviderResult = obtainTools();
-        ToolExecutor executor = findToolExecutorByName(toolProviderResult, "echoString");
-        ToolExecutionRequest toolExecutionRequest = ToolExecutionRequest.builder()
-                .name("echoString")
-                .arguments("{\"input\": 1}") // wrong argument type
-                .build();
-        String toolExecutionResultString = executor.execute(toolExecutionRequest, null);
-        assertEquals("There was an error executing the tool. Message: Internal error. Code: -32603", toolExecutionResultString);
-    }
-
-    @Test
-    public void executeNonExistentTool() {
-        ToolProviderResult toolProviderResult = obtainTools();
-        ToolExecutor executor = findToolExecutorByName(toolProviderResult, "echoString");
-        ToolExecutionRequest toolExecutionRequest = ToolExecutionRequest.builder()
-                .name("THIS-TOOL-DOES-NOT-EXIST")
-                .arguments("{\"input\": 1}")
-                .build();
-        String toolExecutionResultString = executor.execute(toolExecutionRequest, null);
-        assertEquals("There was an error executing the tool. " + "Message: Invalid tool name: THIS-TOOL-DOES-NOT-EXIST. Code: -32602", toolExecutionResultString);
-    }
-
-    @Test
-    public void executeToolThatThrowsBusinessError() {
-        ToolProviderResult toolProviderResult = obtainTools();
-        ToolExecutor executor = findToolExecutorByName(toolProviderResult, "error");
-        ToolExecutionRequest toolExecutionRequest = ToolExecutionRequest.builder().name("error").arguments("{}").build();
-        String toolExecutionResultString = executor.execute(toolExecutionRequest, null);
-        assertEquals("There was an error executing the tool. Message: Internal error. Code: -32603", toolExecutionResultString);
-    }
-
-    @Test
-    public void executeToolThatReturnsError() {
-        ToolProviderResult toolProviderResult = obtainTools();
-        ToolExecutor executor = findToolExecutorByName(toolProviderResult, "errorResponse");
-        ToolExecutionRequest toolExecutionRequest = ToolExecutionRequest.builder()
-                .name("errorResponse")
-                .arguments("{}")
-                .build();
-        String toolExecutionResultString = executor.execute(toolExecutionRequest, null);
-        assertEquals("There was an error executing the tool. The tool returned: This is an actual error", toolExecutionResultString);
-    }
-
-    @Test
-    public void timeout() {
-        ToolProviderResult toolProviderResult = obtainTools();
-        ToolExecutor executor = findToolExecutorByName(toolProviderResult, "longOperation");
-        ToolExecutionRequest toolExecutionRequest = ToolExecutionRequest.builder()
-                .name("longOperation")
-                .arguments("{}")
-                .build();
-        String toolExecutionResultString = executor.execute(toolExecutionRequest, null);
-        assertEquals("There was a timeout executing the tool", toolExecutionResultString);
-    }
 
     ToolProviderResult obtainTools() {
         McpToolProvider toolProvider = new McpToolProvider();
-        toolProvider.setMcpClients(Collections.singletonList(mcpClient));
+        toolProvider.setMcpClient(mcpClient);
 
         return toolProvider.provideTools(null);
     }

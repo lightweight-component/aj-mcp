@@ -1,10 +1,9 @@
 package com.ajaxjs.mcp.client;
 
-import com.ajaxjs.mcp.client.json.*;
-import com.ajaxjs.mcp.tool.ToolSpecification;
-import com.ajaxjs.mcp.tool.ToolSpecificationHelper;
+import com.ajaxjs.mcp.client.tool.ToolSpecification;
+import com.ajaxjs.mcp.common.JsonUtils;
+import com.ajaxjs.mcp.json.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.junit.jupiter.api.Test;
 
@@ -14,8 +13,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 class ToolSpecificationHelperTest {
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-
     @Test
     void toolWithSimpleParams() throws JsonProcessingException {
         String text =
@@ -64,8 +61,8 @@ class ToolSpecificationHelperTest {
                         "                      }\n" +
                         "                    } ]";
         // Parse JSON into ArrayNode and extract ToolSpecifications
-        ArrayNode json = OBJECT_MAPPER.readValue(text, ArrayNode.class);
-        List<ToolSpecification> toolSpecifications = ToolSpecificationHelper.toolSpecificationListFromMcpResponse(json);
+        ArrayNode json = JsonUtils.fromJson(text, ArrayNode.class);
+        List<ToolSpecification> toolSpecifications = McpClient.toolSpecificationListFromMcpResponse(json);
 
         // Validate the size of the tool specifications list
         assertEquals(1, toolSpecifications.size(), "Expected exactly one tool specification");
@@ -143,9 +140,9 @@ class ToolSpecificationHelperTest {
                 "                    }\n" +
                 "                  }\n" +
                 "                ]";
-        ArrayNode json = OBJECT_MAPPER.readValue(text, ArrayNode.class);
+        ArrayNode json = JsonUtils.fromJson(text, ArrayNode.class);
         // Extract ToolSpecifications from the JSON response
-        List<ToolSpecification> toolSpecifications = ToolSpecificationHelper.toolSpecificationListFromMcpResponse(json);
+        List<ToolSpecification> toolSpecifications = McpClient.toolSpecificationListFromMcpResponse(json);
 
         // Validate the size of the tool specifications list
         assertEquals(1, toolSpecifications.size(), "Expected exactly one tool specification");
@@ -190,9 +187,9 @@ class ToolSpecificationHelperTest {
                 "                        \"$schema\" : \"http://json-schema.org/draft-07/schema#\"\n" +
                 "                    }\n" +
                 "                }]";
-        ArrayNode json = OBJECT_MAPPER.readValue(text, ArrayNode.class);
+        ArrayNode json = JsonUtils.fromJson(text, ArrayNode.class);
         // Extract ToolSpecifications from the JSON response
-        List<ToolSpecification> toolSpecifications = ToolSpecificationHelper.toolSpecificationListFromMcpResponse(json);
+        List<ToolSpecification> toolSpecifications = McpClient.toolSpecificationListFromMcpResponse(json);
 
         // Validate the size of the tool specifications list
         assertEquals(1, toolSpecifications.size(), "Expected exactly one tool specification");

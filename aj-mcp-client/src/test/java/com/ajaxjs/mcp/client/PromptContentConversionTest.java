@@ -1,29 +1,20 @@
 package com.ajaxjs.mcp.client;
 
-import com.ajaxjs.mcp.client.transport.stdio.ProcessIOHandler;
-import com.ajaxjs.mcp.message.AiMessage;
-import com.ajaxjs.mcp.message.ChatMessage;
-import com.ajaxjs.mcp.message.UserMessage;
-import com.ajaxjs.mcp.prompt.GetPromptResult;
-import com.ajaxjs.mcp.prompt.PromptsHelper;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.ajaxjs.mcp.client.prompt.GetPromptResult;
+import com.ajaxjs.mcp.common.JsonUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-
 /**
- * Test for converting PromptMessage as returned from MCP servers to instances
- * of ChatMessage from the core langchain4j API.
+ * Test for converting PromptMessage as returned from MCP servers to instances of ChatMessage from the core langchain4j API.
  */
 public class PromptContentConversionTest {
     @Test
-    public void testUserMessageWithText() throws JsonProcessingException {
+    public void testUserMessageWithText() {
         // language=JSON
         String response = "{\"jsonrpc\":\"2.0\",\"id\":111,\"result\":{\"messages\":[{\"role\":\"user\",\"content\":{\"text\":\"Hello\",\"type\":\"text\"}}]}}";
-        JsonNode responseJsonNode = ProcessIOHandler.OBJECT_MAPPER.readTree(response);
-        GetPromptResult promptResponse = PromptsHelper.parsePromptContents(responseJsonNode);
+        JsonNode responseJsonNode = JsonUtils.json2Node(response);
+        GetPromptResult promptResponse = ClientPrompt.parsePromptContents(responseJsonNode);
 
 //        ChatMessage chatMessage = promptResponse.getMessages().get(0).toChatMessage();
 //        assertInstanceOf(UserMessage.class, chatMessage, "ChatMessage should be an instance of UserMessage");
@@ -31,11 +22,11 @@ public class PromptContentConversionTest {
     }
 
     @Test
-    public void testAiMessageWithText() throws JsonProcessingException {
+    public void testAiMessageWithText() {
         // language=JSON
         String response = "{\"jsonrpc\":\"2.0\",\"id\":123,\"result\":{\"messages\":[{\"role\":\"assistant\",\"content\":{\"text\":\"Hello\",\"type\":\"text\"}}]}}";
-        JsonNode responseJsonNode = ProcessIOHandler.OBJECT_MAPPER.readTree(response);
-        GetPromptResult promptResponse = PromptsHelper.parsePromptContents(responseJsonNode);
+        JsonNode responseJsonNode = JsonUtils.json2Node(response);
+        GetPromptResult promptResponse = ClientPrompt.parsePromptContents(responseJsonNode);
 
 //        ChatMessage chatMessage = promptResponse.getMessages().get(0).toChatMessage();
 //        assertInstanceOf(AiMessage.class, chatMessage, "ChatMessage should be an instance of AiMessage");
@@ -43,11 +34,11 @@ public class PromptContentConversionTest {
     }
 
     @Test
-    public void testUserMessageWithImage() throws JsonProcessingException {
+    public void testUserMessageWithImage() {
         // language=JSON
         String response = "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"messages\":[{\"role\":\"user\",\"content\":{\"data\":\"aaa\",\"mimeType\":\"image/png\",\"type\":\"image\"}}]}}";
-        JsonNode responseJsonNode = ProcessIOHandler.OBJECT_MAPPER.readTree(response);
-        GetPromptResult promptResponse = PromptsHelper.parsePromptContents(responseJsonNode);
+        JsonNode responseJsonNode = JsonUtils.json2Node(response);
+        GetPromptResult promptResponse = ClientPrompt.parsePromptContents(responseJsonNode);
 
 //        ChatMessage chatMessage = promptResponse.getMessages().get(0).toChatMessage();
 //        assertInstanceOf(UserMessage.class, chatMessage, "ChatMessage should be an instance of UserMessage");

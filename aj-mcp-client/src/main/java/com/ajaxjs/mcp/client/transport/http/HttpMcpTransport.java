@@ -2,39 +2,35 @@ package com.ajaxjs.mcp.client.transport.http;
 
 import com.ajaxjs.mcp.McpUtils;
 import com.ajaxjs.mcp.client.protocol.ClientMessage;
-import com.ajaxjs.mcp.client.protocol.InitializationNotification;
-import com.ajaxjs.mcp.client.protocol.InitializeRequest;
-import com.ajaxjs.mcp.client.transport.McpOperationHandler;
-import com.ajaxjs.mcp.client.transport.McpTransport;
+import com.ajaxjs.mcp.client.protocol.initialize.InitializationNotification;
+import com.ajaxjs.mcp.client.protocol.initialize.InitializeRequest;
+import com.ajaxjs.mcp.client.transport.BaseTransport;
+import com.ajaxjs.mcp.common.JsonUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import okhttp3.sse.EventSource;
 import okhttp3.sse.EventSources;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
 import java.time.Duration;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-
-public class HttpMcpTransport implements McpTransport {
-    private static final Logger log = LoggerFactory.getLogger(HttpMcpTransport.class);
+@Slf4j
+public class HttpMcpTransport extends BaseTransport {
     private final String sseUrl;
     private final OkHttpClient client;
     private final boolean logResponses;
     private final boolean logRequests;
     private EventSource mcpSseEventListener;
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     // this is obtained from the server after initializing the SSE channel
     private volatile String postUrl;
-    private volatile McpOperationHandler messageHandler;
 
     public HttpMcpTransport(Builder builder) {
         OkHttpClient.Builder httpClientBuilder = new OkHttpClient.Builder();
@@ -54,15 +50,17 @@ public class HttpMcpTransport implements McpTransport {
     }
 
     @Override
-    public void start(McpOperationHandler messageHandler) {
-        this.messageHandler = messageHandler;
+    public void start(Map<Long, CompletableFuture<JsonNode>> pendingOperations) {
+        setPendingOperations(pendingOperations);
+
         mcpSseEventListener = startSseChannel(logResponses);
     }
 
     @Override
     public CompletableFuture<JsonNode> initialize(InitializeRequest operation) {
-        Request httpRequest = null;
-        Request initializationNotification = null;
+        Request httpRequest;
+        Request initializationNotification;
+
         try {
             httpRequest = createRequest(operation);
             initializationNotification = createRequest(new InitializationNotification());
@@ -70,15 +68,15 @@ public class HttpMcpTransport implements McpTransport {
             return McpUtils.failedFuture(e);
         }
 
-        final Request finalInitializationNotification = initializationNotification;
+        Request finalInitializationNotification = initializationNotification;
+
         return execute(httpRequest, operation.getId()).thenCompose(originalResponse -> execute(finalInitializationNotification, null).thenCompose(nullNode -> CompletableFuture.completedFuture(originalResponse)));
     }
 
     @Override
     public CompletableFuture<JsonNode> executeOperationWithResponse(ClientMessage operation) {
         try {
-            Request httpRequest = createRequest(operation);
-            return execute(httpRequest, operation.getId());
+            return execute(createRequest(operation), operation.getId());
         } catch (JsonProcessingException e) {
             return McpUtils.failedFuture(e);
         }
@@ -97,7 +95,7 @@ public class HttpMcpTransport implements McpTransport {
     private CompletableFuture<JsonNode> execute(Request request, Long id) {
         CompletableFuture<JsonNode> future = new CompletableFuture<>();
         if (id != null)
-            messageHandler.startOperation(id, future);
+            startOperation(id, future);
 
         client.newCall(request).enqueue(new Callback() {
             @Override
@@ -106,7 +104,7 @@ public class HttpMcpTransport implements McpTransport {
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(Call call, Response response) {
                 int statusCode = response.code();
                 if (!isExpectedStatusCode(statusCode))
                     future.completeExceptionally(new RuntimeException("Unexpected status code: " + statusCode));
@@ -126,7 +124,7 @@ public class HttpMcpTransport implements McpTransport {
     private EventSource startSseChannel(boolean logResponses) {
         Request request = new Request.Builder().url(sseUrl).build();
         CompletableFuture<String> initializationFinished = new CompletableFuture<>();
-        SseEventListener listener = new SseEventListener(messageHandler, logResponses, initializationFinished);
+        SseEventListener listener = new SseEventListener(this, logResponses, initializationFinished);
         EventSource eventSource = EventSources.createFactory(client).newEventSource(request, listener);
 
         // wait for the SSE channel to be created, receive the POST url from the server, throw an exception if that failed
@@ -144,7 +142,7 @@ public class HttpMcpTransport implements McpTransport {
 
     private String buildAbsolutePostUrl(String relativePostUrl) {
         try {
-            return URI.create(this.sseUrl).resolve(relativePostUrl).toString();
+            return URI.create(sseUrl).resolve(relativePostUrl).toString();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -154,18 +152,22 @@ public class HttpMcpTransport implements McpTransport {
         return new Request.Builder()
                 .url(postUrl)
                 .header("Content-Type", "application/json")
-                .post(RequestBody.create(OBJECT_MAPPER.writeValueAsBytes(message)))
+                .post(RequestBody.create(JsonUtils.OBJECT_MAPPER.writeValueAsBytes(message)))
                 .build();
     }
 
     @Override
-    public void close() throws IOException {
+    public void checkHealth() {
+        // no transport-specific checks right now
+    }
+
+    @Override
+    public void close()  {
         if (mcpSseEventListener != null)
             mcpSseEventListener.cancel();
 
         if (client != null)
             client.dispatcher().executorService().shutdown();
-
     }
 
     public static class Builder {

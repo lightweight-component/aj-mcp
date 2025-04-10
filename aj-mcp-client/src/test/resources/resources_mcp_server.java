@@ -3,15 +3,7 @@
 //DEPS io.quarkiverse.mcp:quarkus-mcp-server-stdio:1.0.0.CR1
 //DEPS io.quarkiverse.mcp:quarkus-mcp-server-sse:1.0.0.CR1
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import io.quarkiverse.mcp.server.BlobResourceContents;
-import io.quarkiverse.mcp.server.RequestUri;
-import io.quarkiverse.mcp.server.Resource;
-import io.quarkiverse.mcp.server.ResourceTemplate;
-import io.quarkiverse.mcp.server.TextResourceContents;
+import io.quarkiverse.mcp.server.*;
 
 public class resources_mcp_server {
 
