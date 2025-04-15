@@ -5,7 +5,7 @@ import com.ajaxjs.mcp.client.prompt.Prompt;
 import com.ajaxjs.mcp.client.resource.ReadResourceResult;
 import com.ajaxjs.mcp.client.resource.Resource;
 import com.ajaxjs.mcp.client.resource.ResourceTemplate;
-import com.ajaxjs.mcp.client.tool.ToolSpecification;
+import com.ajaxjs.mcp.protocol.tools.ToolSpecification;
 import com.ajaxjs.mcp.message.ToolExecutionRequest;
 
 import java.util.List;

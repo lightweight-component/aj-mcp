@@ -1,5 +1,7 @@
 package com.ajaxjs.mcp.client.tool;
 
+import com.ajaxjs.mcp.protocol.tools.ToolSpecification;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -7,7 +9,6 @@ import java.util.Map;
  * Tool provider result
  */
 public class ToolProviderResult extends LinkedHashMap<ToolSpecification, ToolExecutor> {
-
     public ToolSpecification findToolSpecificationByName(String name) {
         for (ToolSpecification toolSpecification : keySet()) {
             if (toolSpecification.getName().equals(name))
@@ -22,8 +23,6 @@ public class ToolProviderResult extends LinkedHashMap<ToolSpecification, ToolExe
             if (entry.getKey().getName().equals(name))
                 return entry.getValue();
         }
-
-//        throw new NoSuchElementException("No value present for the given name: " + name);
 
         return null;
     }

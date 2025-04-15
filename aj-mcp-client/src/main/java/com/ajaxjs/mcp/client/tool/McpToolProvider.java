@@ -2,6 +2,7 @@ package com.ajaxjs.mcp.client.tool;
 
 
 import com.ajaxjs.mcp.client.IMcpClient;
+import com.ajaxjs.mcp.protocol.tools.ToolSpecification;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 

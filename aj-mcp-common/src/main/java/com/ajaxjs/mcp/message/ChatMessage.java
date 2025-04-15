@@ -9,7 +9,6 @@ package com.ajaxjs.mcp.message;
  * @see ToolExecutionResultMessage
  */
 public interface ChatMessage {
-
     /**
      * The type of the message.
      *

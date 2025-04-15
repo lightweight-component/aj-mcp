@@ -3,10 +3,10 @@ package com.ajaxjs.mcp.client;
 import com.ajaxjs.mcp.client.protocol.CancellationNotification;
 import com.ajaxjs.mcp.client.protocol.tool.CallToolRequest;
 import com.ajaxjs.mcp.client.protocol.tool.ListToolsRequest;
-import com.ajaxjs.mcp.client.tool.ToolSpecification;
 import com.ajaxjs.mcp.common.JsonUtils;
-import com.ajaxjs.mcp.json.*;
 import com.ajaxjs.mcp.message.ToolExecutionRequest;
+import com.ajaxjs.mcp.protocol.tools.JsonSchema;
+import com.ajaxjs.mcp.protocol.tools.ToolSpecification;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -65,7 +65,10 @@ public class McpClient extends ClientResource {
             if (tool.has("description"))
                 toolSpecification.setDescription(tool.get("description").asText());
 
-            toolSpecification.setParameters((JsonObjectSchema) jsonNodeToJsonSchemaElement(tool.get("inputSchema")));
+            JsonNode jsonNode = tool.get("inputSchema");
+            JsonSchema jsonSchema = JsonUtils.jsonNode2bean(jsonNode, JsonSchema.class);
+            toolSpecification.setInputSchema(jsonSchema);
+
             result.add(toolSpecification);
         }
 
@@ -102,93 +105,6 @@ public class McpClient extends ClientResource {
         }
 
         return extractResult(result);
-    }
-
-    /**
-     * Converts the 'inputSchema' element (inside the 'Tool' type in the MCP schema)
-     * to a JsonSchemaElement object that describes the tool's arguments.
-     */
-    static JsonSchemaElement jsonNodeToJsonSchemaElement(JsonNode node) {
-        String nodeType = node.get("type").asText();
-
-        switch (nodeType) {
-            case "object": {
-                JsonObjectSchema.JsonObjectSchemaBuilder builder = JsonObjectSchema.builder();
-                JsonNode required = node.get("required");
-//            if (required != null)
-//                builder.required(toStringArray((ArrayNode) required));
-
-                if (node.has("additionalProperties"))
-                    builder.additionalProperties(node.get("additionalProperties").asBoolean(false));
-
-                JsonNode description = node.get("description");
-                if (description != null)
-                    builder.description(description.asText());
-
-                JsonNode properties = node.get("properties");
-                if (properties != null) {
-                    ObjectNode propertiesObject = (ObjectNode) properties;
-//                for (Map.Entry<String, JsonNode> property : propertiesObject.properties())
-//                    builder.addProperty(property.getKey(), jsonNodeToJsonSchemaElement(property.getValue()));
-                }
-
-                return builder.build();
-            }
-            case "string":
-                if (node.has("enum")) {
-                    JsonEnumSchema.JsonEnumSchemaBuilder builder = JsonEnumSchema.builder();
-                    if (node.has("description"))
-                        builder.description(node.get("description").asText());
-
-//                builder.enumValues(toStringArray((ArrayNode) node.get("enum")));
-                    return builder.build();
-                } else {
-                    JsonStringSchema.JsonStringSchemaBuilder builder = JsonStringSchema.builder();
-                    if (node.has("description"))
-                        builder.description(node.get("description").asText());
-
-                    return builder.build();
-                }
-            case "number": {
-                JsonNumberSchema.JsonNumberSchemaBuilder builder = JsonNumberSchema.builder();
-                if (node.has("description"))
-                    builder.description(node.get("description").asText());
-
-                return builder.build();
-            }
-            case "integer": {
-                JsonIntegerSchema.JsonIntegerSchemaBuilder builder = JsonIntegerSchema.builder();
-                if (node.has("description"))
-                    builder.description(node.get("description").asText());
-
-                return builder.build();
-            }
-            case "boolean": {
-                JsonBooleanSchema.JsonBooleanSchemaBuilder builder = JsonBooleanSchema.builder();
-                if (node.has("description"))
-                    builder.description(node.get("description").asText());
-
-                return builder.build();
-            }
-            case "array": {
-                JsonArraySchema.JsonArraySchemaBuilder builder = JsonArraySchema.builder();
-                if (node.has("description"))
-                    builder.description(node.get("description").asText());
-
-                builder.items(jsonNodeToJsonSchemaElement(node.get("items")));
-                return builder.build();
-            }
-            default:
-                throw new IllegalArgumentException("Unknown element type: " + nodeType);
-        }
-    }
-
-    private static String[] toStringArray(ArrayNode jsonArray) {
-        String[] result = new String[jsonArray.size()];
-        for (int i = 0; i < jsonArray.size(); i++)
-            result[i] = jsonArray.get(i).asText();
-
-        return result;
     }
 
     private static final String EXECUTION_ERROR_MESSAGE = "There was an error executing the tool";

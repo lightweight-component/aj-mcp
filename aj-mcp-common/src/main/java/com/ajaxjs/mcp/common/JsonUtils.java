@@ -4,6 +4,7 @@ package com.ajaxjs.mcp.common;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,6 +24,7 @@ public class JsonUtils {
 
     static {
 //        objectMapper.registerModule(new JavaTimeModule()); // 用于处理 Java 8 时间日期类型（如 LocalDate、LocalDateTime 等）的序列化和反序列化。
+        OBJECT_MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);  // 配置忽略未知字段
         OBJECT_MAPPER.enable(JsonParser.Feature.STRICT_DUPLICATE_DETECTION); // 如果 JSON 中存在重复的键，将抛出异常
     }
 
@@ -228,6 +230,15 @@ public class JsonUtils {
             return OBJECT_MAPPER.readTree(json);
         } catch (IOException e) {
             log.warn("JSON string converts to node.", e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static <T> T jsonNode2bean(JsonNode jsonNode, Class<T> clazz) {
+        try {
+            return OBJECT_MAPPER.treeToValue(jsonNode, clazz);
+        } catch (JsonProcessingException e) {
+            log.warn("JsonNode converts to bean.", e);
             throw new RuntimeException(e);
         }
     }
