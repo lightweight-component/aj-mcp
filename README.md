@@ -27,6 +27,6 @@ Have Fun!
 
 ## Links
 
-[Tutorials](https://javadoc.io/doc/com.ajaxjs/mcp) | [Github](https://github.com/lightweight-component/aj-mcp) | [Gitcode](https://gitcode.com/lightweight-component/aj-mcp)
+[Tutorials](https://mcp.ajaxjs.com/) | [Github](https://github.com/lightweight-component/aj-mcp) | [Gitcode](https://gitcode.com/lightweight-component/aj-mcp)
 
 

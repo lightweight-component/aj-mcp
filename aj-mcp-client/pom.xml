@@ -17,15 +17,15 @@
 
     </properties>
 
-    <url>https://framework.ajaxjs.com/docs/aj/?section=net</url>
+    <url>https://mcp.ajaxjs.com/</url>
     <scm>
-        <url>https://github.com/lightweight-component/aj-net</url>
-        <connection>scm:git:https://github.com/lightweight-component/aj-net.git</connection>
+        <url>https://github.com/lightweight-component/aj-mcp/tree/master/aj-mcp-client/</url>
+        <connection>scm:git:https://github.com/lightweight-component/aj-mcp.git</connection>
     </scm>
 
     <issueManagement>
         <system>GitHub Issues</system>
-        <url>https://github.com/lightweight-component/aj-net/issues</url>
+        <url>https://github.com/lightweight-component/aj-mcp/issues</url>
     </issueManagement>
 
     <dependencies>
