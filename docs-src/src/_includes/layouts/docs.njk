@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+        <title>SqlMan/{{ title }}</title>
+        <meta name="description" content="{{description}}"/>
+        <meta name="keywords" content="SqlMan, document, java sql, java jdbc, java orm, jdbc tools, jdbc helper, {{tags}}"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/> 
+        {#     <link rel="preconnect" href="https://fonts.googleapis.com">
+                    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+                    <link
+                        href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@100..900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap"
+                        rel="stylesheet"> #}
+        <link rel="stylesheet" href="/style/docs/main.css"/>
+        <link rel="icon" type="image/png" href="/asset/favicon.png"/>
+        <script src="/asset/docs/js/common.js"></script>
+    </head>
+    <body>
+        <nav>
+            <div>
+                <div class="links">
+                    <a href="/">🏠 Home</a>
+                    |
+                                                        ⚙️ Source:
+                    <a target="_blank" href="https://github.com/lightweight-component/SqlMan">Github</a>/<a target="_blank" href="https://gitcode.com/lightweight-component/SqlMan">Gitcode</a>
+                    {# |
+                    <a href="/docs/common/contact">✉️ Contact</a> #}
+                    | <a  href="/docs/cn">Chinese Version</a>
+                </div>
+                <h1>
+                    <img src="/asset/favicon-2x.png" style="vertical-align: middle;height: 45px;margin-bottom: 6px;"/> SqlMan
+                </h1>
+                <h3>Lightweight Data Access Tools -- User Manual
+                </h3>
+            </div>
+        </nav>
+        <div>
+            <menu>
+                {# <h3>AJ Framework 简介</h3> #}
+                <ul>
+                    <li class="selected">
+                        <a href="/docs">Home</a>
+                    </li>
+                    <li>
+                        <a href="/docs/quick-start">Quick Start</a>
+                    </li>
+                    <li>
+                        <a href="/docs/setup">Setup</a>
+                    </li>
+                </ul>
+                <h3>Querying the Database</h3>
+                <ul>
+                    <li>
+                        <a href="/docs/query/query-concept">Query Concept</a>
+                    </li>
+                    <li>
+                        <a href="/docs/query/query-tutorial">Query Tutorial</a>
+                    </li>
+                    <li>
+                        <a href="/docs/query/query-paging">Paging Query</a>
+                    </li>
+                </ul>
+                <h3>Writing the data</h3>
+                <ul>
+                    <li>
+                        <a href="/docs/write/Create-Update-Delete">Create/Update/Delete</a></li>
+                    <li>
+                        <a href="/docs/write/batch">Batch Update</a>
+                    </li>
+                </ul>
+                <h3>Other Usage</h3>
+                <ul>
+                    <li>
+                        <a href="/docs/other/sql-xml">SQL in XML</a></li>
+                    <li>
+                        <a href="/docs/other/entity">No SQL but Entity</a>
+                    </li>
+                </ul>
+                <h3>Misc</h3>
+                <ul>
+                    <li><a href="/docs/common/versions">Release History</a></li>
+                    <li><a href="/docs/common/contact">Contact</a></li>
+                </ul>
+            </menu>
+            <article>
+                {{ content | safe }}
+            </article>
+        </div>
+        {% include "component/footer.njk" %}
+    </body>
+</html>

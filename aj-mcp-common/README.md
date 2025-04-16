@@ -17,7 +17,7 @@ Runs on Java8+. Maven:
 <dependency>
     <groupId>com.ajaxjs</groupId>
     <artifactId>aj-mcp-common</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
 </dependency>
 ```
 
