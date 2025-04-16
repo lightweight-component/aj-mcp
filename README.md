@@ -8,7 +8,7 @@
 
 # Lightweight Java MCP SDK: AJ-MCP
 
-AJ-MCP is a lightweight MCP SDK for Java. It provides a simple and powerful way to build MCP client and server. It supports Java8 and above.
+AJ-MCP is a lightweight MCP SDK for Java. It provides a simple and powerful way to build MCP [client](/aj-mcp-client) and [server](/aj-mcp-server). It supports Java8 and above.
 
 ## Why MCP?
 
