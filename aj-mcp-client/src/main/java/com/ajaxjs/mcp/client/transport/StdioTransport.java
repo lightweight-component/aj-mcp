@@ -97,7 +97,6 @@ public class StdioTransport extends BaseTransport {
         execute(JsonUtils.toJson(operation), null);
     }
 
-
     @Override
     public void checkHealth() {
         if (!process.isAlive())

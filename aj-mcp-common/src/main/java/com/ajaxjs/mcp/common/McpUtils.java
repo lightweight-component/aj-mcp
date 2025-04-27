@@ -1,10 +1,40 @@
-package com.ajaxjs.mcp;
+package com.ajaxjs.mcp.common;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class McpUtils {
+    /**
+     * Check whether the given {@code String} contains actual <em>text</em>.
+     * <p>More specifically, this method returns {@code true} if the
+     * {@code String} is not {@code null}, its length is greater than 0,
+     * and it contains at least one non-whitespace character.
+     *
+     * @param str the {@code String} to check (maybe {@code null})
+     * @return {@code true} if the {@code String} is not {@code null}, its
+     * length is greater than 0, and it does not contain whitespace only
+     * @see Character#isWhitespace
+     */
+    public static boolean hasText(String str) {
+        return (str != null && !str.isEmpty() && containsText(str));
+    }
+
+    public static boolean isEmptyText(String str) {
+        return !hasText(str);
+    }
+
+    private static boolean containsText(CharSequence str) {
+        int strLen = str.length();
+
+        for (int i = 0; i < strLen; i++) {
+            if (!Character.isWhitespace(str.charAt(i)))
+                return true;
+        }
+
+        return false;
+    }
+
     /**
      * Creates a HashMap with a specified expected number of entries.
      * The initial capacity and load factor are calculated to minimize resizing.

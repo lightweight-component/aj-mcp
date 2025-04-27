@@ -1,6 +1,6 @@
 //package com.ajaxjs.mcp.message;
 //
-//import com.ajaxjs.mcp.McpUtils;
+//import com.ajaxjs.mcp.common.McpUtils;
 //import dev.langchain4j.Experimental;
 //import dev.langchain4j.data.video.Video;
 //

@@ -12,8 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Represents a client that can communicate with an MCP server over a given transport protocol,
- * retrieve and execute tools using the server.
+ * Represents a client that can communicate with an MCP server over a given transport protocol, retrieve and execute tools using the server.
  */
 public interface IMcpClient extends AutoCloseable {
     /**

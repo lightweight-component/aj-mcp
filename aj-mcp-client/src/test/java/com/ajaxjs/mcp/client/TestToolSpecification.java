@@ -58,7 +58,6 @@ class TestToolSpecification {
 
     @Test
     void toolWithSimpleParams() {
-
         // Parse JSON into ArrayNode and extract ToolSpecifications
         ArrayNode json = JsonUtils.fromJson(toolText, ArrayNode.class);
         List<ToolSpecification> toolSpecifications = McpClient.toolSpecificationListFromMcpResponse(json);

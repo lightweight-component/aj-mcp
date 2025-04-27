@@ -1,6 +1,6 @@
 package com.ajaxjs.mcp.client.transport;
 
-import com.ajaxjs.mcp.McpUtils;
+import com.ajaxjs.mcp.common.McpUtils;
 import com.ajaxjs.mcp.client.protocol.ClientMessage;
 import com.ajaxjs.mcp.client.protocol.initialize.InitializationNotification;
 import com.ajaxjs.mcp.client.protocol.initialize.InitializeRequest;

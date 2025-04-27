@@ -1,8 +1,8 @@
 package com.ajaxjs.mcp.client;
 
-import com.ajaxjs.mcp.McpUtils;
+import com.ajaxjs.mcp.common.McpUtils;
 import com.ajaxjs.mcp.client.prompt.Prompt;
-import com.ajaxjs.mcp.client.protocol.initialize.InitializeParams;
+import com.ajaxjs.mcp.protocol.initialize.InitializeRequestParams;
 import com.ajaxjs.mcp.client.protocol.initialize.InitializeRequest;
 import com.ajaxjs.mcp.client.protocol.ping.PingRequest;
 import com.ajaxjs.mcp.client.resource.Resource;
@@ -97,17 +97,17 @@ public abstract class BaseMcpClient implements IMcpClient {
      *
      * @return Initialize Params
      */
-    private InitializeParams createInitializeParams() {
-        InitializeParams params = new InitializeParams();
+    private InitializeRequestParams createInitializeParams() {
+        InitializeRequestParams params = new InitializeRequestParams();
         params.setProtocolVersion(protocolVersion);
 
-        InitializeParams.ClientInfo clientInfo = new InitializeParams.ClientInfo();
+        InitializeRequestParams.ClientInfo clientInfo = new InitializeRequestParams.ClientInfo();
         clientInfo.setName(clientName);
         clientInfo.setVersion(clientVersion);
         params.setClientInfo(clientInfo);
 
-        InitializeParams.Capabilities capabilities = new InitializeParams.Capabilities();
-        InitializeParams.Capabilities.Roots roots = new InitializeParams.Capabilities.Roots();
+        InitializeRequestParams.Capabilities capabilities = new InitializeRequestParams.Capabilities();
+        InitializeRequestParams.Capabilities.Roots roots = new InitializeRequestParams.Capabilities.Roots();
         roots.setListChanged(false); // TODO: listChanged is not supported yet
         capabilities.setRoots(roots);
         params.setCapabilities(capabilities);

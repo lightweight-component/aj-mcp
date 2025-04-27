@@ -1,9 +1,7 @@
 package com.ajaxjs.mcp.client;
 
 
-import com.ajaxjs.mcp.McpUtils;
-import com.ajaxjs.mcp.client.IMcpClient;
-import com.ajaxjs.mcp.client.McpRole;
+import com.ajaxjs.mcp.common.McpUtils;
 import com.ajaxjs.mcp.client.prompt.*;
 import com.ajaxjs.mcp.client.resource.BlobResourceContents;
 import com.ajaxjs.mcp.client.resource.ResourceContents;

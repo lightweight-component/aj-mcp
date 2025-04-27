@@ -1,10 +1,15 @@
-package com.ajaxjs.mcp.client.protocol.initialize;
+package com.ajaxjs.mcp.protocol.initialize;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
+/**
+ * Protocol version supported
+ * Client capabilities
+ * Client implementation information
+ */
 @Data
-public class InitializeParams {
+public class InitializeRequestParams {
     private String protocolVersion;
 
     private Capabilities capabilities;
@@ -18,19 +23,20 @@ public class InitializeParams {
         @JsonInclude(JsonInclude.Include.NON_NULL)
         private Sampling sampling;
 
+        private Experimental experimental;
+
+        @Data
         public static class Roots {
             private boolean listChanged;
-
-            public boolean isListChanged() {
-                return listChanged;
-            }
-
-            public void setListChanged(final boolean listChanged) {
-                this.listChanged = listChanged;
-            }
         }
 
         public static class Sampling {
+        }
+
+        /**
+         * Describes support for non-standard experimental features
+         */
+        public static class Experimental {
         }
     }
 
