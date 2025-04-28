@@ -13,6 +13,11 @@ public class ServerConfig {
     private String name;
 
     /**
+     * The version of the server.
+     */
+    private String version;
+
+    /**
      * Supported protocol versions.
      */
     private List<String> protocolVersions = Collections.singletonList("2024-11-05");

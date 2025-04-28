@@ -1,8 +1,8 @@
 package com.ajaxjs.mcp.client;
 
-import com.ajaxjs.mcp.client.IMcpClient;
-import com.ajaxjs.mcp.client.resource.*;
+import com.ajaxjs.mcp.client.protocol.resource.*;
 import com.ajaxjs.mcp.common.McpException;
+import com.ajaxjs.mcp.protocol.resource.Resource;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

@@ -1,10 +1,10 @@
 package com.ajaxjs.mcp.client;
 
-import com.ajaxjs.mcp.client.prompt.GetPromptResult;
-import com.ajaxjs.mcp.client.prompt.Prompt;
-import com.ajaxjs.mcp.client.resource.ReadResourceResult;
-import com.ajaxjs.mcp.client.resource.Resource;
-import com.ajaxjs.mcp.client.resource.ResourceTemplate;
+import com.ajaxjs.mcp.client.protocol.prompt.GetPromptResult;
+import com.ajaxjs.mcp.protocol.prompt.PromptItem;
+import com.ajaxjs.mcp.client.protocol.resource.ReadResourceResult;
+import com.ajaxjs.mcp.protocol.resource.Resource;
+import com.ajaxjs.mcp.client.protocol.resource.ResourceTemplate;
 import com.ajaxjs.mcp.protocol.tools.ToolSpecification;
 import com.ajaxjs.mcp.message.ToolExecutionRequest;
 
@@ -45,7 +45,7 @@ public interface IMcpClient extends AutoCloseable {
     /**
      * Obtain a list of prompts available on the MCP server.
      */
-    List<Prompt> listPrompts();
+    List<PromptItem> listPrompts();
 
     /**
      * Render the contents of a prompt.

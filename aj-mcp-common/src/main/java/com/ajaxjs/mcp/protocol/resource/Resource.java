@@ -1,4 +1,4 @@
-package com.ajaxjs.mcp.client.resource;
+package com.ajaxjs.mcp.protocol.resource;
 
 import lombok.Data;
 

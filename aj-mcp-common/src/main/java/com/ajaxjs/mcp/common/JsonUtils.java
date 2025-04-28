@@ -4,10 +4,7 @@ package com.ajaxjs.mcp.common;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -24,6 +21,7 @@ public class JsonUtils {
 
     static {
 //        objectMapper.registerModule(new JavaTimeModule()); // 用于处理 Java 8 时间日期类型（如 LocalDate、LocalDateTime 等）的序列化和反序列化。
+        OBJECT_MAPPER.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         OBJECT_MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);  // 配置忽略未知字段
         OBJECT_MAPPER.enable(JsonParser.Feature.STRICT_DUPLICATE_DETECTION); // 如果 JSON 中存在重复的键，将抛出异常
     }

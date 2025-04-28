@@ -1,4 +1,4 @@
-package com.ajaxjs.mcp.client.protocol.tool;
+package com.ajaxjs.mcp.client.tool;
 
 import com.ajaxjs.mcp.client.protocol.ClientMessage;
 import com.ajaxjs.mcp.client.protocol.ClientMethod;

@@ -1,6 +1,6 @@
 package com.ajaxjs.mcp.client;
 
-import com.ajaxjs.mcp.client.prompt.GetPromptResult;
+import com.ajaxjs.mcp.client.protocol.prompt.GetPromptResult;
 import com.ajaxjs.mcp.common.JsonUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.Test;

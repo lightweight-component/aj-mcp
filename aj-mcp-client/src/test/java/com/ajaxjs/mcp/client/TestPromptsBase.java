@@ -1,11 +1,13 @@
 package com.ajaxjs.mcp.client;
 
 
+import com.ajaxjs.mcp.client.protocol.prompt.*;
 import com.ajaxjs.mcp.common.McpUtils;
-import com.ajaxjs.mcp.client.prompt.*;
-import com.ajaxjs.mcp.client.resource.BlobResourceContents;
-import com.ajaxjs.mcp.client.resource.ResourceContents;
+import com.ajaxjs.mcp.client.protocol.resource.BlobResourceContents;
+import com.ajaxjs.mcp.client.protocol.resource.ResourceContents;
 import com.ajaxjs.mcp.common.McpException;
+import com.ajaxjs.mcp.protocol.prompt.PromptItem;
+import com.ajaxjs.mcp.protocol.prompt.Role;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -23,7 +25,7 @@ public abstract class TestPromptsBase {
         assertEquals(1, prompt.getMessages().size(), "Expected exactly one message");
 
         PromptMessage message = prompt.getMessages().get(0);
-        assertEquals(McpRole.USER, message.getRole(), "Role should be USER");
+        assertEquals(Role.USER, message.getRole(), "Role should be USER");
         assertEquals("Hello", ((PromptTextContent) message.getContent()).getText(), "Text content should be 'Hello'");
     }
 
@@ -34,12 +36,12 @@ public abstract class TestPromptsBase {
         assertEquals(2, prompt.getMessages().size(), "Expected exactly two messages");
 
         PromptMessage message1 = prompt.getMessages().get(0);
-        assertEquals(McpRole.USER, message1.getRole(), "Role of message1 should be USER");
+        assertEquals(Role.USER, message1.getRole(), "Role of message1 should be USER");
         assertEquals(PromptContent.Type.TEXT, message1.getContent().getType(), "Type of message1 content should be TEXT");
         assertEquals("first", ((PromptTextContent) message1.getContent()).getText(), "Text content of message1 should be 'first'");
 
         PromptMessage message2 = prompt.getMessages().get(1);
-        assertEquals(McpRole.USER, message2.getRole(), "Role of message2 should be USER");
+        assertEquals(Role.USER, message2.getRole(), "Role of message2 should be USER");
         assertEquals(PromptContent.Type.TEXT, message2.getContent().getType(), "Type of message2 content should be TEXT");
         assertEquals("second", ((PromptTextContent) message2.getContent()).getText(), "Text content of message2 should be 'second'");
     }
@@ -51,7 +53,7 @@ public abstract class TestPromptsBase {
         assertEquals(1, prompt.getMessages().size(), "Expected exactly one message");
 
         PromptMessage message = prompt.getMessages().get(0);
-        assertEquals(McpRole.USER, message.getRole(), "Role should be USER");
+        assertEquals(Role.USER, message.getRole(), "Role should be USER");
         assertEquals(PromptContent.Type.IMAGE, message.getContent().getType(), "Content type should be IMAGE");
 
         PromptImageContent imageContent = (PromptImageContent) message.getContent();
@@ -66,7 +68,7 @@ public abstract class TestPromptsBase {
         assertEquals(1, prompt.getMessages().size(), "Expected exactly one message");
 
         PromptMessage message = prompt.getMessages().get(0);
-        assertEquals(McpRole.USER, message.getRole(), "Role should be USER");
+        assertEquals(Role.USER, message.getRole(), "Role should be USER");
         assertEquals(PromptContent.Type.TEXT, message.getContent().getType(), "Content type should be TEXT");
 
         PromptTextContent textContent = (PromptTextContent) message.getContent();
@@ -83,7 +85,7 @@ public abstract class TestPromptsBase {
         GetPromptResult prompt = mcpClient.getPrompt("embeddedBinaryResource", new HashMap<>());
         PromptMessage message = prompt.getMessages().get(0);
 
-        assertEquals(McpRole.USER, message.getRole(), "Role should be USER");
+        assertEquals(Role.USER, message.getRole(), "Role should be USER");
         assertEquals(PromptContent.Type.RESOURCE, message.getContent().getType(), "Content type should be RESOURCE");
         assertTrue(message.getContent() instanceof EmbeddedResource, "Content should be an instance of EmbeddedResource");
 
@@ -96,8 +98,8 @@ public abstract class TestPromptsBase {
         assertEquals("application/octet-stream", blob.getMimeType(), "MIME type should be 'application/octet-stream'");
     }
 
-    private Prompt findPromptByName(String name, List<Prompt> promptRefs) {
-        for (Prompt promptRef : promptRefs) {
+    private PromptItem findPromptByName(String name, List<PromptItem> promptRefs) {
+        for (PromptItem promptRef : promptRefs) {
             if (promptRef.getName().equals(name))
                 return promptRef;
         }

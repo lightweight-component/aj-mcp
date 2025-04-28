@@ -1,4 +1,4 @@
-package com.ajaxjs.mcp.client.prompt;
+package com.ajaxjs.mcp.protocol.prompt;
 
 import lombok.Data;
 

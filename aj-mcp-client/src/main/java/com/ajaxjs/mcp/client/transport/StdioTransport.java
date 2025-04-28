@@ -1,9 +1,10 @@
 package com.ajaxjs.mcp.client.transport;
 
 import com.ajaxjs.mcp.client.protocol.ClientMessage;
-import com.ajaxjs.mcp.client.protocol.initialize.InitializationNotification;
-import com.ajaxjs.mcp.client.protocol.initialize.InitializeRequest;
 import com.ajaxjs.mcp.common.JsonUtils;
+import com.ajaxjs.mcp.protocol.McpRequest;
+import com.ajaxjs.mcp.protocol.initialize.InitializationNotification;
+import com.ajaxjs.mcp.protocol.initialize.InitializeRequest;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
@@ -93,8 +94,18 @@ public class StdioTransport extends BaseTransport {
     }
 
     @Override
+    public CompletableFuture<JsonNode> executeOperationWithResponse(McpRequest request) {
+        return execute(JsonUtils.toJson(request), request.getId());
+    }
+
+    @Override
     public void executeOperationWithoutResponse(ClientMessage operation) {
         execute(JsonUtils.toJson(operation), null);
+    }
+
+    @Override
+    public void executeOperationWithoutResponse(McpRequest request) {
+        execute(JsonUtils.toJson(request), null);
     }
 
     @Override

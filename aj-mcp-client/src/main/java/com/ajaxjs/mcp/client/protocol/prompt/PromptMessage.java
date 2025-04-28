@@ -1,10 +1,10 @@
-package com.ajaxjs.mcp.client.prompt;
+package com.ajaxjs.mcp.client.protocol.prompt;
 
-import com.ajaxjs.mcp.client.McpRole;
 import com.ajaxjs.mcp.message.AiMessage;
 import com.ajaxjs.mcp.message.ChatMessage;
 import com.ajaxjs.mcp.message.Content;
 import com.ajaxjs.mcp.message.UserMessage;
+import com.ajaxjs.mcp.protocol.prompt.Role;
 import lombok.Data;
 
 /**
@@ -14,7 +14,7 @@ import lombok.Data;
 
 @Data
 public class PromptMessage {
-    McpRole role;
+    Role role;
 
     PromptContent content;
 
@@ -26,10 +26,10 @@ public class PromptMessage {
      *
      * @throws UnsupportedOperationException if the role is 'assistant' and the content is something other than text.
      */
-    public ChatMessage toChatMessage(McpRole role, PromptContent content) {
-        if (role.equals(McpRole.USER))
+    public ChatMessage toChatMessage(Role role, PromptContent content) {
+        if (role.equals(Role.USER))
             return UserMessage.userMessage(content.toContent());
-        else if (role.equals(McpRole.ASSISTANT)) {
+        else if (role.equals(Role.ASSISTANT)) {
             Content convertedContent = content.toContent();
 
             if (convertedContent instanceof PromptTextContent) {

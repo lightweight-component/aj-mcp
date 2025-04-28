@@ -1,5 +1,6 @@
 package com.ajaxjs.mcp.protocol.initialize;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 /**
@@ -17,14 +18,17 @@ public class InitializeResponseResult {
 
     @Data
     public static class Capabilities {
+        @JsonInclude(JsonInclude.Include.NON_NULL)
         private Prompts prompts;
 
+        @JsonInclude(JsonInclude.Include.NON_NULL)
         private Resources resources;
 
         private Tools tools;
 
-        private Logging logging;
+        private Logging logging = new Logging();
 
+        @JsonInclude(JsonInclude.Include.NON_NULL)
         private Experimental experimental;
 
         /**
@@ -32,6 +36,9 @@ public class InitializeResponseResult {
          */
         @Data
         public static class Prompts {
+            /**
+             * listChanged indicates whether the server will emit notifications when the list of available prompts changes.
+             */
             private boolean listChanged;
         }
 

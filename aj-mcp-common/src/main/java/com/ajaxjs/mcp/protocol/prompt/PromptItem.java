@@ -1,11 +1,14 @@
-package com.ajaxjs.mcp.client.prompt;
+package com.ajaxjs.mcp.protocol.prompt;
 
 import lombok.Data;
 
 import java.util.List;
 
+/**
+ * Prompt item in the list
+ */
 @Data
-public class Prompt {
+public class PromptItem {
     String name;
 
     String description;

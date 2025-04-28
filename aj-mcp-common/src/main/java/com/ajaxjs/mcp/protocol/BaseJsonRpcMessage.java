@@ -1,5 +1,6 @@
 package com.ajaxjs.mcp.protocol;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 @Data
@@ -14,5 +15,6 @@ public class BaseJsonRpcMessage {
     /**
      * id，可以为 null
      */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     protected Long id;
 }

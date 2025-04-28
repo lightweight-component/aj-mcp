@@ -1,4 +1,4 @@
-package com.ajaxjs.mcp.client.prompt;
+package com.ajaxjs.mcp.client.protocol.prompt;
 
 import com.ajaxjs.mcp.message.Content;
 import com.fasterxml.jackson.annotation.JsonProperty;

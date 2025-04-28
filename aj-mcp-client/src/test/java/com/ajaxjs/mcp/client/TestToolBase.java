@@ -17,6 +17,7 @@ public abstract class TestToolBase {
     void testInitializeAndCapabilities() {
         McpToolProvider toolProvider = new McpToolProvider();
         toolProvider.setMcpClient(mcpClient);
+        mcpClient.checkHealth();
     }
 
     @Test

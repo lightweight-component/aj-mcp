@@ -1,7 +1,7 @@
 package com.ajaxjs.mcp.client;
 
-import com.ajaxjs.mcp.client.prompt.GetPromptResult;
-import com.ajaxjs.mcp.client.prompt.Prompt;
+import com.ajaxjs.mcp.client.protocol.prompt.GetPromptResult;
+import com.ajaxjs.mcp.protocol.prompt.PromptItem;
 import com.ajaxjs.mcp.client.protocol.prompt.GetPromptRequest;
 import com.ajaxjs.mcp.client.protocol.prompt.ListPromptsRequest;
 import com.ajaxjs.mcp.common.IllegalResponseException;
@@ -25,7 +25,7 @@ public abstract class ClientPrompt extends BaseMcpClient {
     }
 
     @Override
-    public List<Prompt> listPrompts() {
+    public List<PromptItem> listPrompts() {
         if (promptRefs.get() == null)
             obtainPromptList();
 
@@ -72,16 +72,16 @@ public abstract class ClientPrompt extends BaseMcpClient {
         }
     }
 
-    static List<Prompt> parsePromptRefs(JsonNode mcpMessage) {
+    static List<PromptItem> parsePromptRefs(JsonNode mcpMessage) {
         McpException.checkForErrors(mcpMessage);
 
         if (mcpMessage.has("result")) {
             JsonNode resultNode = mcpMessage.get("result");
 
             if (resultNode.has("prompts")) {
-                List<Prompt> promptRefs = new ArrayList<>();
+                List<PromptItem> promptRefs = new ArrayList<>();
                 for (JsonNode promptNode : resultNode.get("prompts"))
-                    promptRefs.add(JsonUtils.convertValue(promptNode, Prompt.class));
+                    promptRefs.add(JsonUtils.convertValue(promptNode, PromptItem.class));
 
                 return promptRefs;
             } else {

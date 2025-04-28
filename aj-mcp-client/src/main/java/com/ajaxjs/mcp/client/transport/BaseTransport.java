@@ -1,6 +1,6 @@
 package com.ajaxjs.mcp.client.transport;
 
-import com.ajaxjs.mcp.client.protocol.ping.PingResponse;
+import com.ajaxjs.mcp.protocol.utils.ping.PingRequest;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,7 +36,11 @@ public abstract class BaseTransport implements McpTransport {
                     String method = message.get("method").asText();
 
                     if (method.equals("ping")) {
-                        executeOperationWithoutResponse(new PingResponse(messageId));
+//                        PingResponse resp = new PingResponse();
+//                        resp.setId(messageId);
+                        PingRequest req = new PingRequest();
+                        req.setId(messageId);
+                        executeOperationWithoutResponse(req);
                         return;
                     }
                 }

@@ -1,4 +1,4 @@
-package com.ajaxjs.mcp.client.resource;
+package com.ajaxjs.mcp.client.protocol.resource;
 
 /**
  * A holder for either a 'McpTextResourceContents' or 'McpBlobResourceContents'

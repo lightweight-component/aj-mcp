@@ -1,15 +1,10 @@
 package com.ajaxjs.mcp.protocol;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
-@AllArgsConstructor
-public class McpRequest {
-    private Long id;
-
+@EqualsAndHashCode(callSuper = true)
+public class McpRequest extends BaseJsonRpcMessage {
     private String method;
-
-    private JsonNode jsonNode;
 }

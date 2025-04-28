@@ -1,13 +1,13 @@
 package com.ajaxjs.mcp.client;
 
 import com.ajaxjs.mcp.common.McpUtils;
-import com.ajaxjs.mcp.client.prompt.Prompt;
+import com.ajaxjs.mcp.protocol.initialize.InitializeRequest;
+import com.ajaxjs.mcp.protocol.prompt.PromptItem;
 import com.ajaxjs.mcp.protocol.initialize.InitializeRequestParams;
-import com.ajaxjs.mcp.client.protocol.initialize.InitializeRequest;
-import com.ajaxjs.mcp.client.protocol.ping.PingRequest;
-import com.ajaxjs.mcp.client.resource.Resource;
-import com.ajaxjs.mcp.client.resource.ResourceTemplate;
+import com.ajaxjs.mcp.protocol.resource.Resource;
+import com.ajaxjs.mcp.client.protocol.resource.ResourceTemplate;
 import com.ajaxjs.mcp.client.transport.McpTransport;
+import com.ajaxjs.mcp.protocol.utils.ping.PingRequest;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 
@@ -58,7 +58,7 @@ public abstract class BaseMcpClient implements IMcpClient {
 
     final AtomicReference<List<ResourceTemplate>> resourceTemplateRefs = new AtomicReference<>();
 
-    final AtomicReference<List<Prompt>> promptRefs = new AtomicReference<>();
+    final AtomicReference<List<PromptItem>> promptRefs = new AtomicReference<>();
 
     public BaseMcpClient(Builder builder) {
         clientName = McpUtils.getOrDefault(builder.clientName, "aj-mcp");
@@ -74,7 +74,9 @@ public abstract class BaseMcpClient implements IMcpClient {
         transport.start(pendingOperations);
 
         long operationId = idGenerator.getAndIncrement();
-        InitializeRequest request = new InitializeRequest(operationId);
+//        InitializeRequest request = new InitializeRequest(operationId);
+        InitializeRequest request = new InitializeRequest();
+        request.setId(operationId);
         request.setParams(createInitializeParams());
 
         try {
@@ -119,7 +121,9 @@ public abstract class BaseMcpClient implements IMcpClient {
     public void checkHealth() {
         transport.checkHealth();
         long operationId = idGenerator.getAndIncrement();
-        PingRequest ping = new PingRequest(operationId);
+//        PingRequest ping = new PingRequest(operationId);
+        PingRequest ping = new PingRequest();
+        ping.setId(operationId);
 
         try {
             CompletableFuture<JsonNode> resultFuture = transport.executeOperationWithResponse(ping);

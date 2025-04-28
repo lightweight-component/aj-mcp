@@ -1,12 +1,10 @@
 package com.ajaxjs.mcp.client;
 
-import com.ajaxjs.mcp.client.protocol.resource.ListResourceTemplatesRequest;
-import com.ajaxjs.mcp.client.protocol.resource.ListResourcesRequest;
-import com.ajaxjs.mcp.client.protocol.resource.ReadResourceRequest;
-import com.ajaxjs.mcp.client.resource.*;
+import com.ajaxjs.mcp.client.protocol.resource.*;
 import com.ajaxjs.mcp.common.IllegalResponseException;
 import com.ajaxjs.mcp.common.JsonUtils;
 import com.ajaxjs.mcp.common.McpException;
+import com.ajaxjs.mcp.protocol.resource.Resource;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 

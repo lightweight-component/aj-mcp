@@ -1,7 +1,7 @@
-package com.ajaxjs.mcp.client.prompt;
+package com.ajaxjs.mcp.client.protocol.prompt;
 
-import com.ajaxjs.mcp.client.resource.ResourceContents;
-import com.ajaxjs.mcp.client.resource.TextResourceContents;
+import com.ajaxjs.mcp.client.protocol.resource.ResourceContents;
+import com.ajaxjs.mcp.client.protocol.resource.TextResourceContents;
 import com.ajaxjs.mcp.message.Content;
 import com.ajaxjs.mcp.message.TextContent;
 import lombok.Data;
