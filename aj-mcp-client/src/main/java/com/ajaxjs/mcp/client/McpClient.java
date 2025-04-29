@@ -1,12 +1,12 @@
 package com.ajaxjs.mcp.client;
 
-import com.ajaxjs.mcp.client.protocol.CancellationNotification;
 import com.ajaxjs.mcp.client.tool.CallToolRequest;
 import com.ajaxjs.mcp.client.tool.ListToolsRequest;
 import com.ajaxjs.mcp.common.JsonUtils;
 import com.ajaxjs.mcp.message.ToolExecutionRequest;
 import com.ajaxjs.mcp.protocol.tools.JsonSchema;
 import com.ajaxjs.mcp.protocol.tools.ToolSpecification;
+import com.ajaxjs.mcp.protocol.utils.CancellationNotification;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -88,7 +88,7 @@ public class McpClient extends ClientResource {
             resultFuture = transport.executeOperationWithResponse(operation);
             result = resultFuture.get(timeoutMillis, TimeUnit.MILLISECONDS);
         } catch (TimeoutException timeout) {
-            transport.executeOperationWithoutResponse(new CancellationNotification(operationId, "Timeout"));
+            transport.executeOperationWithoutResponse(new CancellationNotification(String.valueOf(operationId), "Timeout"));
 
             ObjectNode resultTimeout = JsonNodeFactory.instance.objectNode();
             resultTimeout.putObject("result")

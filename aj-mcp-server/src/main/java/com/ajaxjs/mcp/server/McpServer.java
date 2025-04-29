@@ -22,22 +22,28 @@ public class McpServer extends McpServerPrompt {
         transport.start();
     }
 
-    public McpResponse processMessage(McpRequestRaw request) {
-        switch (request.getMethod()) {
-            case Methods.INITIALIZE:
-                JsonNode jsonNode = request.getJsonNode();
+    public void scanPackage() {
 
-                return initialize(request.getId(), jsonNode);
+    }
+
+    public McpResponse processMessage(McpRequestRaw requestRaw) {
+        switch (requestRaw.getMethod()) {
+            case Methods.INITIALIZE:
+                JsonNode jsonNode = requestRaw.getJsonNode();
+                return initialize(requestRaw.getId(), jsonNode);
+            case Methods.PROMPTS_LIST:
+                return promptList(requestRaw);
             case Methods.PING:
+
 //                McpResponse resp = new McpResponse();
 //                resp.setId(request.getId());
 //                resp.setResult(new HashMap<>());
                 PingResponse resp = new PingResponse();
-                resp.setId(request.getId());
+                resp.setId(requestRaw.getId());
 
                 return resp;
             default:
-                throw new JsonRpcErrorException(request.getId(), JsonRpcErrorCode.METHOD_NOT_FOUND, "Method " + request.getMethod() + " not found.");
+                throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.METHOD_NOT_FOUND, "Method " + requestRaw.getMethod() + " not found.");
         }
     }
 }
