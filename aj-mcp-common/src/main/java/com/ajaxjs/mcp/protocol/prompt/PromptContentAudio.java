@@ -1,5 +1,6 @@
 package com.ajaxjs.mcp.protocol.prompt;
 
+import com.ajaxjs.mcp.protocol.McpConstant;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -18,4 +19,8 @@ public class PromptContentAudio extends PromptContent {
      * MimeType, like "audio/wav"
      */
     String mimeType;
+
+    public PromptContentAudio() {
+        this.type = McpConstant.PromptContentType.AUDIO;
+    }
 }

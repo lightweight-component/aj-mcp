@@ -1,15 +1,16 @@
 package com.ajaxjs.mcp.protocol.prompt;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
+import lombok.Data;
 
 /**
  * Prompt Detail
  */
+@Data
 public class PromptMessage {
     /**
      * Either “user” or “assistant” to indicate the speaker
      */
-    Role role;
+    private Role role;
 
-    PromptContent content;
+    private PromptContent content;
 }

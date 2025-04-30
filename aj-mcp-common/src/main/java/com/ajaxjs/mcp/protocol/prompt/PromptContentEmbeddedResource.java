@@ -1,5 +1,6 @@
 package com.ajaxjs.mcp.protocol.prompt;
 
+import com.ajaxjs.mcp.protocol.McpConstant;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -33,4 +34,9 @@ public class PromptContentEmbeddedResource extends PromptContent {
          */
         String text;
     }
+
+    public PromptContentEmbeddedResource() {
+        this.type = McpConstant.PromptContentType.RESOURCE;
+    }
 }
+

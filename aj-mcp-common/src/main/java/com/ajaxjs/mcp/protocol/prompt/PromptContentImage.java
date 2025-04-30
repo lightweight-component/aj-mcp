@@ -1,5 +1,6 @@
 package com.ajaxjs.mcp.protocol.prompt;
 
+import com.ajaxjs.mcp.protocol.McpConstant;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -18,4 +19,8 @@ public class PromptContentImage extends PromptContent {
      * MimeType, like "image/png"
      */
     String mimeType;
+
+    public PromptContentImage() {
+        this.type = McpConstant.PromptContentType.IMAGE;
+    }
 }

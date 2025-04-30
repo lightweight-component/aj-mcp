@@ -17,4 +17,13 @@ public interface McpConstant {
         public static final String PROMPTS_LIST = "prompts/list";
         public static final String PROMPTS_GET = "prompts/get";
     }
+
+    interface PromptContentType {
+        String TEXT = "text";
+        String IMAGE = "image";
+
+        String AUDIO = "audio";
+
+        String RESOURCE = "resource";
+    }
 }

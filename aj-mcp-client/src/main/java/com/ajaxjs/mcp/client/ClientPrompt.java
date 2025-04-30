@@ -1,12 +1,12 @@
 package com.ajaxjs.mcp.client;
 
-import com.ajaxjs.mcp.client.protocol.prompt.GetPromptResult;
-import com.ajaxjs.mcp.protocol.prompt.PromptItem;
 import com.ajaxjs.mcp.client.protocol.prompt.GetPromptRequest;
-import com.ajaxjs.mcp.client.protocol.prompt.ListPromptsRequest;
+import com.ajaxjs.mcp.client.protocol.prompt.GetPromptResult;
 import com.ajaxjs.mcp.common.IllegalResponseException;
 import com.ajaxjs.mcp.common.JsonUtils;
 import com.ajaxjs.mcp.common.McpException;
+import com.ajaxjs.mcp.protocol.prompt.GetPromptRequestList;
+import com.ajaxjs.mcp.protocol.prompt.PromptItem;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 
@@ -56,19 +56,21 @@ public abstract class ClientPrompt extends BaseMcpClient {
         if (promptRefs.get() != null)
             return;
 
-        ListPromptsRequest operation = new ListPromptsRequest(idGenerator.getAndIncrement());
+        GetPromptRequestList request = new GetPromptRequestList();
+        request.setId(idGenerator.getAndIncrement());
+
         long timeoutMillis = requestTimeout.toMillis() == 0 ? Integer.MAX_VALUE : requestTimeout.toMillis();
         JsonNode result;
         CompletableFuture<JsonNode> resultFuture;
 
         try {
-            resultFuture = transport.executeOperationWithResponse(operation);
+            resultFuture = transport.executeOperationWithResponse(request);
             result = resultFuture.get(timeoutMillis, TimeUnit.MILLISECONDS);
             promptRefs.set(parsePromptRefs(result));
         } catch (ExecutionException | InterruptedException | TimeoutException e) {
             throw new RuntimeException(e);
         } finally {
-            pendingOperations.remove(operation.getId());
+            pendingOperations.remove(request.getId());
         }
     }
 

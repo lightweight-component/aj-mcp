@@ -1,6 +1,6 @@
 package com.ajaxjs.mcp.protocol.prompt;
 
-import com.ajaxjs.mcp.protocol.McpRequestRaw;
+import com.ajaxjs.mcp.protocol.McpRequest;
 import com.ajaxjs.mcp.protocol.utils.pagination.Cursor;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
@@ -14,7 +14,7 @@ import static com.ajaxjs.mcp.protocol.McpConstant.Methods.PROMPTS_LIST;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class GetPromptRequestList extends McpRequestRaw {
+public class GetPromptRequestList extends McpRequest {
     String method = PROMPTS_LIST;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)

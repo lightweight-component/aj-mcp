@@ -52,7 +52,7 @@ public abstract class BaseMcpClient implements IMcpClient {
 
     final Map<Long, CompletableFuture<JsonNode>> pendingOperations = new ConcurrentHashMap<>();
 
-    final AtomicLong idGenerator = new AtomicLong(0);
+    final AtomicLong idGenerator = new AtomicLong(1);
 
     final AtomicReference<List<Resource>> resourceRefs = new AtomicReference<>();
 
