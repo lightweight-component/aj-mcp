@@ -1,12 +1,12 @@
 package com.ajaxjs.mcp.client;
 
-import com.ajaxjs.mcp.client.protocol.prompt.GetPromptResult;
-import com.ajaxjs.mcp.protocol.prompt.PromptItem;
 import com.ajaxjs.mcp.client.protocol.resource.ReadResourceResult;
-import com.ajaxjs.mcp.protocol.resource.Resource;
-import com.ajaxjs.mcp.client.protocol.resource.ResourceTemplate;
+import com.ajaxjs.mcp.protocol.resource.ResourceTemplate;
+import com.ajaxjs.mcp.client.tool.ToolExecutionRequest;
+import com.ajaxjs.mcp.protocol.prompt.GetPromptResult;
+import com.ajaxjs.mcp.protocol.prompt.PromptItem;
+import com.ajaxjs.mcp.protocol.resource.ResourceItem;
 import com.ajaxjs.mcp.protocol.tools.ToolSpecification;
-import com.ajaxjs.mcp.message.ToolExecutionRequest;
 
 import java.util.List;
 import java.util.Map;
@@ -29,7 +29,7 @@ public interface IMcpClient extends AutoCloseable {
     /**
      * Obtains the current list of resources available on the MCP server.
      */
-    List<Resource> listResources();
+    List<ResourceItem> listResources();
 
     /**
      * Obtains the current list of resource templates (dynamic resources) available on the MCP server.
@@ -50,7 +50,7 @@ public interface IMcpClient extends AutoCloseable {
     /**
      * Render the contents of a prompt.
      */
-    GetPromptResult getPrompt(String name, Map<String, Object> arguments);
+    GetPromptResult.PromptResultDetail getPrompt(String name, Map<String, Object> arguments);
 
     /**
      * Performs a health check that returns normally if the MCP server is reachable and

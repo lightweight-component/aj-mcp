@@ -1,6 +1,6 @@
 package com.ajaxjs.mcp.server;
 
-import com.ajaxjs.mcp.protocol.McpRequestRaw;
+import com.ajaxjs.mcp.protocol.McpRequestRawInfo;
 import com.ajaxjs.mcp.protocol.McpResponse;
 import com.ajaxjs.mcp.protocol.utils.ping.PingResponse;
 import com.ajaxjs.mcp.server.error.JsonRpcErrorCode;
@@ -26,15 +26,16 @@ public class McpServer extends McpServerPrompt {
 
     }
 
-    public McpResponse processMessage(McpRequestRaw requestRaw) {
+    public McpResponse processMessage(McpRequestRawInfo requestRaw) {
         switch (requestRaw.getMethod()) {
             case Methods.INITIALIZE:
                 JsonNode jsonNode = requestRaw.getJsonNode();
                 return initialize(requestRaw.getId(), jsonNode);
             case Methods.PROMPTS_LIST:
                 return promptList(requestRaw);
+            case Methods.PROMPTS_GET:
+                return promptGet(requestRaw);
             case Methods.PING:
-
 //                McpResponse resp = new McpResponse();
 //                resp.setId(request.getId());
 //                resp.setResult(new HashMap<>());
@@ -46,4 +47,6 @@ public class McpServer extends McpServerPrompt {
                 throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.METHOD_NOT_FOUND, "Method " + requestRaw.getMethod() + " not found.");
         }
     }
+
+
 }

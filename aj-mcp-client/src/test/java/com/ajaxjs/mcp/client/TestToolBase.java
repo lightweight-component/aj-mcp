@@ -4,7 +4,7 @@ import com.ajaxjs.mcp.client.tool.McpToolProvider;
 import com.ajaxjs.mcp.client.tool.ToolExecutor;
 import com.ajaxjs.mcp.client.tool.ToolProviderResult;
 import com.ajaxjs.mcp.protocol.tools.ToolSpecification;
-import com.ajaxjs.mcp.message.ToolExecutionRequest;
+import com.ajaxjs.mcp.client.tool.ToolExecutionRequest;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

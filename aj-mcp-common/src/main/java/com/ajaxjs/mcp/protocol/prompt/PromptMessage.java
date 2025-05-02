@@ -1,5 +1,6 @@
 package com.ajaxjs.mcp.protocol.prompt;
 
+import com.ajaxjs.mcp.protocol.common.Content;
 import lombok.Data;
 
 /**
@@ -12,5 +13,5 @@ public class PromptMessage {
      */
     private Role role;
 
-    private PromptContent content;
+    private Content content;
 }

@@ -4,8 +4,8 @@ import com.ajaxjs.mcp.common.McpUtils;
 import com.ajaxjs.mcp.protocol.initialize.InitializeRequest;
 import com.ajaxjs.mcp.protocol.prompt.PromptItem;
 import com.ajaxjs.mcp.protocol.initialize.InitializeRequestParams;
-import com.ajaxjs.mcp.protocol.resource.Resource;
-import com.ajaxjs.mcp.client.protocol.resource.ResourceTemplate;
+import com.ajaxjs.mcp.protocol.resource.ResourceItem;
+import com.ajaxjs.mcp.protocol.resource.ResourceTemplate;
 import com.ajaxjs.mcp.client.transport.McpTransport;
 import com.ajaxjs.mcp.protocol.utils.ping.PingRequest;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -54,7 +54,7 @@ public abstract class BaseMcpClient implements IMcpClient {
 
     final AtomicLong idGenerator = new AtomicLong(1);
 
-    final AtomicReference<List<Resource>> resourceRefs = new AtomicReference<>();
+    final AtomicReference<List<ResourceItem>> resourceRefs = new AtomicReference<>();
 
     final AtomicReference<List<ResourceTemplate>> resourceTemplateRefs = new AtomicReference<>();
 

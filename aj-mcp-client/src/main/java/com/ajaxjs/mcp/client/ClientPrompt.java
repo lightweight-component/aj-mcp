@@ -1,11 +1,12 @@
 package com.ajaxjs.mcp.client;
 
-import com.ajaxjs.mcp.client.protocol.prompt.GetPromptRequest;
-import com.ajaxjs.mcp.client.protocol.prompt.GetPromptResult;
 import com.ajaxjs.mcp.common.IllegalResponseException;
 import com.ajaxjs.mcp.common.JsonUtils;
 import com.ajaxjs.mcp.common.McpException;
-import com.ajaxjs.mcp.protocol.prompt.GetPromptRequestList;
+import com.ajaxjs.mcp.protocol.McpConstant;
+import com.ajaxjs.mcp.protocol.prompt.GetPromptRequest;
+import com.ajaxjs.mcp.protocol.prompt.GetPromptListRequest;
+import com.ajaxjs.mcp.protocol.prompt.GetPromptResult;
 import com.ajaxjs.mcp.protocol.prompt.PromptItem;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
@@ -32,41 +33,21 @@ public abstract class ClientPrompt extends BaseMcpClient {
         return promptRefs.get();
     }
 
-    @Override
-    public GetPromptResult getPrompt(String name, Map<String, Object> arguments) {
-        long operationId = idGenerator.getAndIncrement();
-        GetPromptRequest operation = new GetPromptRequest(operationId, name, arguments);
-        long timeoutMillis = requestTimeout.toMillis() == 0 ? Integer.MAX_VALUE : requestTimeout.toMillis();
-        JsonNode result;
-        CompletableFuture<JsonNode> resultFuture;
-
-        try {
-            resultFuture = transport.executeOperationWithResponse(operation);
-            result = resultFuture.get(timeoutMillis, TimeUnit.MILLISECONDS);
-
-            return parsePromptContents(result);
-        } catch (ExecutionException | InterruptedException | TimeoutException e) {
-            throw new RuntimeException(e);
-        } finally {
-            pendingOperations.remove(operationId);
-        }
-    }
-
     private synchronized void obtainPromptList() {
         if (promptRefs.get() != null)
             return;
 
-        GetPromptRequestList request = new GetPromptRequestList();
+        GetPromptListRequest request = new GetPromptListRequest();
         request.setId(idGenerator.getAndIncrement());
 
         long timeoutMillis = requestTimeout.toMillis() == 0 ? Integer.MAX_VALUE : requestTimeout.toMillis();
-        JsonNode result;
-        CompletableFuture<JsonNode> resultFuture;
 
         try {
-            resultFuture = transport.executeOperationWithResponse(request);
-            result = resultFuture.get(timeoutMillis, TimeUnit.MILLISECONDS);
-            promptRefs.set(parsePromptRefs(result));
+            CompletableFuture<JsonNode> resultFuture = transport.executeOperationWithResponse(request);
+            JsonNode result = resultFuture.get(timeoutMillis, TimeUnit.MILLISECONDS);
+
+            List<PromptItem> promptItems = parsePromptRefs(result);
+            promptRefs.set(promptItems);
         } catch (ExecutionException | InterruptedException | TimeoutException e) {
             throw new RuntimeException(e);
         } finally {
@@ -77,13 +58,13 @@ public abstract class ClientPrompt extends BaseMcpClient {
     static List<PromptItem> parsePromptRefs(JsonNode mcpMessage) {
         McpException.checkForErrors(mcpMessage);
 
-        if (mcpMessage.has("result")) {
-            JsonNode resultNode = mcpMessage.get("result");
+        if (mcpMessage.has(McpConstant.RESPONSE_RESULT)) {
+            JsonNode resultNode = mcpMessage.get(McpConstant.RESPONSE_RESULT);
 
             if (resultNode.has("prompts")) {
                 List<PromptItem> promptRefs = new ArrayList<>();
                 for (JsonNode promptNode : resultNode.get("prompts"))
-                    promptRefs.add(JsonUtils.convertValue(promptNode, PromptItem.class));
+                    promptRefs.add(JsonUtils.jsonNode2bean(promptNode, PromptItem.class));
 
                 return promptRefs;
             } else {
@@ -96,8 +77,30 @@ public abstract class ClientPrompt extends BaseMcpClient {
         }
     }
 
-    public static GetPromptResult parsePromptContents(JsonNode mcpMessage) {
-        McpException.checkForErrors(mcpMessage);
-        return JsonUtils.convertValue(mcpMessage.get("result"), GetPromptResult.class);
+    @Override
+    public GetPromptResult.PromptResultDetail getPrompt(String name, Map<String, Object> arguments) {
+        long operationId = idGenerator.getAndIncrement();
+
+        GetPromptRequest.Params params = new GetPromptRequest.Params();
+        params.setName(name);
+        params.setArguments(arguments);
+
+        GetPromptRequest request = new GetPromptRequest(); // seems to be useless
+        request.setId(operationId);
+        request.setParams(params);
+
+        long timeoutMillis = requestTimeout.toMillis() == 0 ? Integer.MAX_VALUE : requestTimeout.toMillis();
+
+        try {
+            CompletableFuture<JsonNode> resultFuture = transport.executeOperationWithResponse(request);
+            JsonNode result = resultFuture.get(timeoutMillis, TimeUnit.MILLISECONDS);
+            McpException.checkForErrors(result);
+
+            return JsonUtils.jsonNode2bean(result.get(McpConstant.RESPONSE_RESULT), GetPromptResult.PromptResultDetail.class);
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+            throw new RuntimeException(e);
+        } finally {
+            pendingOperations.remove(operationId);
+        }
     }
 }

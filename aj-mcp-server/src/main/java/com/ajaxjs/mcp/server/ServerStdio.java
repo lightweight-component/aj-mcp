@@ -1,7 +1,7 @@
 package com.ajaxjs.mcp.server;
 
 import com.ajaxjs.mcp.common.JsonUtils;
-import com.ajaxjs.mcp.protocol.McpRequestRaw;
+import com.ajaxjs.mcp.protocol.McpRequestRawInfo;
 import com.ajaxjs.mcp.server.error.JsonRpcErrorCode;
 import com.ajaxjs.mcp.server.error.JsonRpcErrorException;
 import com.ajaxjs.mcp.transport.McpTransportSync;
@@ -49,7 +49,7 @@ public class ServerStdio implements McpTransportSync {
             String line;
             while (running.get() && (line = reader.readLine()) != null) {
                 try {
-                    McpRequestRaw request = McpServerInitialize.jsonRpcValidate(line); // 解析输入消息
+                    McpRequestRawInfo request = McpServerInitialize.jsonRpcValidate(line); // 解析输入消息
                     String response = JsonUtils.toJson(server.processMessage(request));  // 处理消息并生成响应
                     writer.println(response);    // 发送响应
                     writer.flush();
@@ -58,7 +58,7 @@ public class ServerStdio implements McpTransportSync {
                     writer.flush();
                 } catch (Exception e) {
                     log.warn("消息处理错误: {}", e.getMessage());
-                    JsonRpcErrorException jsonErr = new JsonRpcErrorException(JsonRpcErrorCode.INVALID_REQUEST, e.getMessage());
+                    JsonRpcErrorException jsonErr = new JsonRpcErrorException(JsonRpcErrorCode.INTERNAL_ERROR, e.getMessage());
                     writer.println(jsonErr.toJson());
                     writer.flush();
                 }

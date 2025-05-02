@@ -11,6 +11,7 @@ import lombok.Data;
  * Can be generated automatically from methods annotated with Tool using ToolSpecifications helper.
  */
 @Data
+@Deprecated
 public class ToolSpecification {
     /**
      * A unique identifier for the tool. This name is used when calling the tool.

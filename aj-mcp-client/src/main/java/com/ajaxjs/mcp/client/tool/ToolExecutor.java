@@ -1,7 +1,5 @@
 package com.ajaxjs.mcp.client.tool;
 
-import com.ajaxjs.mcp.message.ToolExecutionRequest;
-
 /**
  * A low-level executor/handler of a {@link ToolExecutionRequest}.
  */

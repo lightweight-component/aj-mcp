@@ -1,10 +1,12 @@
 package com.ajaxjs.mcp.common;
 
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.introspect.VisibilityChecker;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -24,6 +26,7 @@ public class JsonUtils {
         OBJECT_MAPPER.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         OBJECT_MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);  // 配置忽略未知字段
         OBJECT_MAPPER.enable(JsonParser.Feature.STRICT_DUPLICATE_DETECTION); // 如果 JSON 中存在重复的键，将抛出异常
+//        OBJECT_MAPPER.setVisibility(VisibilityChecker.Std.defaultInstance().withFieldVisibility(JsonAutoDetect.Visibility.NONE));// 配置 ObjectMapper 忽略父类字段
     }
 
     /**

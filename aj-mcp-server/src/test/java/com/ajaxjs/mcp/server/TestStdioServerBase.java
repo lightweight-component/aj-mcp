@@ -1,5 +1,6 @@
 package com.ajaxjs.mcp.server;
 
+import com.ajaxjs.mcp.server.feature.FeatureMgr;
 import com.ajaxjs.mcp.server.model.ServerConfig;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,6 +28,9 @@ class TestStdioServerBase {
     }
 
     static void callServer() {
+        FeatureMgr mgr = new FeatureMgr();
+        mgr.init("com.ajaxjs.mcp.server.testcase");
+
         McpServer server = new McpServer();
         server.setTransport(new ServerStdio(server));
         ServerConfig serverConfig = new ServerConfig();

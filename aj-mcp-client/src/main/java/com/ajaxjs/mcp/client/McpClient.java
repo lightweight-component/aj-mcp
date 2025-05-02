@@ -3,7 +3,7 @@ package com.ajaxjs.mcp.client;
 import com.ajaxjs.mcp.client.tool.CallToolRequest;
 import com.ajaxjs.mcp.client.tool.ListToolsRequest;
 import com.ajaxjs.mcp.common.JsonUtils;
-import com.ajaxjs.mcp.message.ToolExecutionRequest;
+import com.ajaxjs.mcp.client.tool.ToolExecutionRequest;
 import com.ajaxjs.mcp.protocol.tools.JsonSchema;
 import com.ajaxjs.mcp.protocol.tools.ToolSpecification;
 import com.ajaxjs.mcp.protocol.utils.CancellationNotification;

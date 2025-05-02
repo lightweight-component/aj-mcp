@@ -4,7 +4,7 @@ import com.ajaxjs.mcp.common.JsonUtils;
 import com.ajaxjs.mcp.common.McpUtils;
 import com.ajaxjs.mcp.protocol.BaseJsonRpcMessage;
 import com.ajaxjs.mcp.protocol.McpConstant;
-import com.ajaxjs.mcp.protocol.McpRequestRaw;
+import com.ajaxjs.mcp.protocol.McpRequestRawInfo;
 import com.ajaxjs.mcp.protocol.McpResponse;
 import com.ajaxjs.mcp.protocol.initialize.InitializeRequest;
 import com.ajaxjs.mcp.protocol.initialize.InitializeRequestParams;
@@ -21,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Data
@@ -28,6 +29,18 @@ public abstract class McpServerInitialize implements McpConstant {
     ServerConfig serverConfig;
 
     McpTransportSync transport;
+
+    static <T> T getStore(Map<String, T> map, String name) {
+        if (map.isEmpty())
+            throw new NullPointerException("Store 未初始化");
+
+        T store = map.get(name);
+
+        if (store == null)
+            throw new NullPointerException("找不到 " + name + " store.");
+
+        return store;
+    }
 
     McpResponse initialize(Long id, JsonNode jsonNode) {
         InitializeRequest initializeRequest;
@@ -78,7 +91,7 @@ public abstract class McpServerInitialize implements McpConstant {
         return resp;
     }
 
-    static McpRequestRaw jsonRpcValidate(String inputJson) {
+    static McpRequestRawInfo jsonRpcValidate(String inputJson) {
         inputJson = inputJson.trim();
         if (!inputJson.startsWith("{") || !inputJson.endsWith("}")) // 先简单判断一下是否合法的 JSON
             throw new JsonRpcErrorException(JsonRpcErrorCode.INVALID_REQUEST, "Unable to parse the JSON message");
@@ -121,6 +134,6 @@ public abstract class McpServerInitialize implements McpConstant {
         if (McpUtils.isEmptyText(method))
             throw new JsonRpcErrorException(JsonRpcErrorCode.METHOD_NOT_FOUND, "Method not found.");
 
-        return new McpRequestRaw(id, method, jsonNode);
+        return new McpRequestRawInfo(id, method, jsonNode);
     }
 }

@@ -4,7 +4,8 @@ import com.ajaxjs.mcp.client.protocol.resource.*;
 import com.ajaxjs.mcp.common.IllegalResponseException;
 import com.ajaxjs.mcp.common.JsonUtils;
 import com.ajaxjs.mcp.common.McpException;
-import com.ajaxjs.mcp.protocol.resource.Resource;
+import com.ajaxjs.mcp.protocol.resource.ResourceItem;
+import com.ajaxjs.mcp.protocol.resource.ResourceTemplate;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,7 +23,7 @@ public abstract class ClientResource extends ClientPrompt {
     }
 
     @Override
-    public List<Resource> listResources() {
+    public List<ResourceItem> listResources() {
         if (resourceRefs.get() == null)
             obtainResourceList();
 
@@ -96,17 +97,17 @@ public abstract class ClientResource extends ClientPrompt {
         }
     }
 
-    public static List<Resource> parseResourceRefs(JsonNode mcpMessage) {
+    public static List<ResourceItem> parseResourceRefs(JsonNode mcpMessage) {
         McpException.checkForErrors(mcpMessage);
 
         if (mcpMessage.has("result")) {
             JsonNode resultNode = mcpMessage.get("result");
 
             if (resultNode.has("resources")) {
-                List<Resource> resourceRefs = new ArrayList<>();
+                List<ResourceItem> resourceRefs = new ArrayList<>();
 
                 for (JsonNode resourceNode : resultNode.get("resources"))
-                    resourceRefs.add(JsonUtils.convertValue(resourceNode, Resource.class));
+                    resourceRefs.add(JsonUtils.convertValue(resourceNode, ResourceItem.class));
 
                 return resourceRefs;
             } else {
