@@ -27,10 +27,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * <p>
  * There is a default content encoder registered; it encodes the returned value as JSON.
  *
- * @see ToolResponse
- * @see ToolArg
- * @see ToolResponseEncoder
- * @see ContentEncoder
  */
 @Retention(RUNTIME)
 @Target(METHOD)
@@ -44,6 +40,8 @@ public @interface Tool {
      * Each tool must have a unique name. By default, the name is derived from the name of the annotated method.
      */
     String name() default ELEMENT_NAME;
+
+    String value() default "";
 
     /**
      * An optional description.

@@ -1,11 +1,11 @@
 package com.ajaxjs.mcp.client;
 
-import com.ajaxjs.mcp.client.protocol.resource.ReadResourceResult;
-import com.ajaxjs.mcp.protocol.resource.ResourceTemplate;
 import com.ajaxjs.mcp.client.tool.ToolExecutionRequest;
 import com.ajaxjs.mcp.protocol.prompt.GetPromptResult;
 import com.ajaxjs.mcp.protocol.prompt.PromptItem;
+import com.ajaxjs.mcp.protocol.resource.GetResourceResult;
 import com.ajaxjs.mcp.protocol.resource.ResourceItem;
+import com.ajaxjs.mcp.protocol.resource.ResourceTemplate;
 import com.ajaxjs.mcp.protocol.tools.ToolSpecification;
 
 import java.util.List;
@@ -40,7 +40,7 @@ public interface IMcpClient extends AutoCloseable {
      * Retrieves the contents of the resource with the specified URI. This also
      * works for dynamic resources (templates).
      */
-    ReadResourceResult readResource(String uri);
+    GetResourceResult.ResourceResultDetail readResource(String uri);
 
     /**
      * Obtain a list of prompts available on the MCP server.

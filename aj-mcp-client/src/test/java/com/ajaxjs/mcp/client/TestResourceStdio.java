@@ -12,7 +12,7 @@ class TestResourceStdio extends TestResourceBase {
     @BeforeAll
     static void setup() {
         McpTransport transport = StdioTransport.builder()
-                .command(Arrays.asList("C:\\ai\\gitee\\mcp-gitee.exe", "-token", "2da9aaae1a086618ec1bb576479c8780"))
+                .command(Arrays.asList("java", "-jar", "C:\\code\\ajaxjs\\aj-mcp\\samples\\server-stdio\\target\\my-app-jar-with-dependencies.jar"))
                 .logEvents(true)
                 .build();
 

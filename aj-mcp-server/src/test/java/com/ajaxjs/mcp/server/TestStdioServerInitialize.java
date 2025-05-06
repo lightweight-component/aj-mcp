@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class TestStdioServer extends TestStdioServerBase {
+class TestStdioServerInitialize extends TestStdioServerBase {
     @Test
     void testErr() {
         setIn("{\"jsonrpc\": \"1.0\"}\n");

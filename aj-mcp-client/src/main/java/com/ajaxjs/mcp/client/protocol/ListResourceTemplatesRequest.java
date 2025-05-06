@@ -1,9 +1,8 @@
-package com.ajaxjs.mcp.client.protocol.resource;
+package com.ajaxjs.mcp.client.protocol;
 
-import com.ajaxjs.mcp.client.protocol.ClientMessage;
-import com.ajaxjs.mcp.client.protocol.ClientMethod;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+@Deprecated
 public class ListResourceTemplatesRequest extends ClientMessage {
     @JsonInclude
     public final ClientMethod method = ClientMethod.RESOURCES_TEMPLATES_LIST;

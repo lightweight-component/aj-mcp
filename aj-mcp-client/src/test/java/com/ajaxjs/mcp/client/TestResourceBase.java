@@ -1,9 +1,7 @@
 package com.ajaxjs.mcp.client;
 
-import com.ajaxjs.mcp.client.protocol.resource.*;
 import com.ajaxjs.mcp.common.McpException;
-import com.ajaxjs.mcp.protocol.resource.ResourceItem;
-import com.ajaxjs.mcp.protocol.resource.ResourceTemplate;
+import com.ajaxjs.mcp.protocol.resource.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -22,8 +20,8 @@ public abstract class TestResourceBase {
         assertNotNull(blob, "Resource 'blob' should not be null");
         assertEquals("blob", blob.getName(), "Name mismatch for 'blob'");
         assertEquals("file:///blob", blob.getUri(), "URI mismatch for 'blob'");
-        assertEquals("text/blob", blob.getMimeType(), "MIME type mismatch for 'blob'");
-        assertEquals("A nice blob", blob.getDescription(), "Description mismatch for 'blob'");
+        assertEquals("image/jpg", blob.getMimeType(), "MIME type mismatch for 'blob'");
+        assertEquals("A nice pic", blob.getDescription(), "Description mismatch for 'blob'");
 
         ResourceItem text = getResourceRef("text", resourceList);
         assertNotNull(text, "Resource 'text' should not be null");
@@ -35,57 +33,53 @@ public abstract class TestResourceBase {
 
     @Test
     public void readTextResource() {
-        ReadResourceResult response = mcpClient.readResource("file:///text");
+        GetResourceResult.ResourceResultDetail response = mcpClient.readResource("file:///text");
         assertEquals(1, response.getContents().size(), "Expected exactly one content");
 
-        ResourceContents contents = response.getContents().get(0);
-        assertEquals(ResourceContents.Type.TEXT, contents.getType(), "Content type should be TEXT");
+        ResourceContent contents = response.getContents().get(0);
 
-        TextResourceContents textContents = (TextResourceContents) contents;
+        ResourceContentText textContents = (ResourceContentText) contents;
         assertEquals("file:///text", textContents.getUri(), "URI should be 'file:///text'");
-        assertEquals("text", textContents.getText(), "Text content should be 'text'");
+        assertEquals("text888", textContents.getText(), "Text content should be 'text'");
     }
 
-    //    @Test
+    @Test
     public void readBlobResource() {
-        ReadResourceResult response = mcpClient.readResource("file:///blob");
+        GetResourceResult.ResourceResultDetail response = mcpClient.readResource("file:///blob");
         assertEquals(1, response.getContents().size(), "Expected exactly one content");
 
-        ResourceContents contents = response.getContents().get(0);
-        assertEquals(ResourceContents.Type.BLOB, contents.getType(), "Content type should be BLOB");
+        ResourceContent contents = response.getContents().get(0);
 
-        BlobResourceContents blobContents = (BlobResourceContents) contents;
+        ResourceContentBinary blobContents = (ResourceContentBinary) contents;
         assertEquals("file:///blob", blobContents.getUri(), "URI should be 'file:///blob'");
         assertEquals("blob", blobContents.getBlob(), "Blob content should be 'blob'");
     }
 
-    //    @Test
+    @Test
     public void readTextResourceFromTemplate() {
-        ReadResourceResult response = mcpClient.readResource("file:///text-template/hello");
+        GetResourceResult.ResourceResultDetail response = mcpClient.readResource("file:///text-template/hello");
         assertEquals(1, response.getContents().size(), "Expected exactly one content");
 
-        ResourceContents contents = response.getContents().get(0);
-        assertEquals(ResourceContents.Type.TEXT, contents.getType(), "Content type should be TEXT");
+        ResourceContent contents = response.getContents().get(0);
 
-        TextResourceContents textContents = (TextResourceContents) contents;
+        ResourceContentText textContents = (ResourceContentText) contents;
         assertEquals("file:///text-template/hello", textContents.getUri(), "URI should be 'file:///text-template/hello'");
         assertEquals("text hello", textContents.getText(), "Text content should be 'text hello'");
     }
 
-    //    @Test
+    @Test
     public void readBlobResourceFromTemplate() {
-        ReadResourceResult response = mcpClient.readResource("file:///blob-template/hello");
+        GetResourceResult.ResourceResultDetail response = mcpClient.readResource("file:///blob-template/hello");
         assertEquals(1, response.getContents().size(), "Expected exactly one content");
 
-        ResourceContents contents = response.getContents().get(0);
-        assertEquals(ResourceContents.Type.BLOB, contents.getType(), "Content type should be BLOB");
+        ResourceContent contents = response.getContents().get(0);
 
-        BlobResourceContents blobContents = (BlobResourceContents) contents;
+        ResourceContentBinary blobContents = (ResourceContentBinary) contents;
         assertEquals("file:///blob-template/hello", blobContents.getUri(), "URI should be 'file:///blob-template/hello'");
         assertEquals("blob hello", blobContents.getBlob(), "Blob content should be 'blob hello'");
     }
 
-    //    @Test
+    @Test
     public void readNonExistentResource() {
         assertThrows(McpException.class, () -> mcpClient.readResource("file:///i-do-not-exist"), "Expected McpException to be thrown for non-existent resource");
     }

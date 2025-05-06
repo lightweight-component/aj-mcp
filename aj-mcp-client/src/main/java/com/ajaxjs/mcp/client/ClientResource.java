@@ -1,11 +1,10 @@
 package com.ajaxjs.mcp.client;
 
-import com.ajaxjs.mcp.client.protocol.resource.*;
+import com.ajaxjs.mcp.client.protocol.ListResourceTemplatesRequest;
 import com.ajaxjs.mcp.common.IllegalResponseException;
 import com.ajaxjs.mcp.common.JsonUtils;
 import com.ajaxjs.mcp.common.McpException;
-import com.ajaxjs.mcp.protocol.resource.ResourceItem;
-import com.ajaxjs.mcp.protocol.resource.ResourceTemplate;
+import com.ajaxjs.mcp.protocol.resource.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,16 +30,20 @@ public abstract class ClientResource extends ClientPrompt {
     }
 
     @Override
-    public ReadResourceResult readResource(String uri) {
+    public GetResourceResult.ResourceResultDetail readResource(String uri) {
         long operationId = idGenerator.getAndIncrement();
-        ReadResourceRequest operation = new ReadResourceRequest(operationId, uri);
+//        ReadResourceRequest operation = new ReadResourceRequest(operationId, uri);
+
+        GetResourceRequest request = new GetResourceRequest();
+        request.setId(operationId);
+        request.setParams(new GetResourceRequest.Params(uri));
+
         long timeoutMillis = requestTimeout.toMillis() == 0 ? Integer.MAX_VALUE : requestTimeout.toMillis();
-        JsonNode result;
-        CompletableFuture<JsonNode> resultFuture;
 
         try {
-            resultFuture = transport.executeOperationWithResponse(operation);
-            result = resultFuture.get(timeoutMillis, TimeUnit.MILLISECONDS);
+            CompletableFuture<JsonNode> resultFuture = transport.executeOperationWithResponse(request);
+            JsonNode result = resultFuture.get(timeoutMillis, TimeUnit.MILLISECONDS);
+
             return parseResourceContents(result);
         } catch (ExecutionException | InterruptedException | TimeoutException e) {
             throw new RuntimeException(e);
@@ -61,19 +64,19 @@ public abstract class ClientResource extends ClientPrompt {
         if (resourceRefs.get() != null)
             return;
 
-        ListResourcesRequest operation = new ListResourcesRequest(idGenerator.getAndIncrement());
+        GetResourceListRequest request = new GetResourceListRequest();
+        request.setId(idGenerator.getAndIncrement());
+
         long timeoutMillis = requestTimeout.toMillis() == 0 ? Integer.MAX_VALUE : requestTimeout.toMillis();
-        JsonNode result;
-        CompletableFuture<JsonNode> resultFuture;
 
         try {
-            resultFuture = transport.executeOperationWithResponse(operation);
-            result = resultFuture.get(timeoutMillis, TimeUnit.MILLISECONDS);
+            CompletableFuture<JsonNode> resultFuture = transport.executeOperationWithResponse(request);
+            JsonNode result = resultFuture.get(timeoutMillis, TimeUnit.MILLISECONDS);
             resourceRefs.set(parseResourceRefs(result));
         } catch (ExecutionException | InterruptedException | TimeoutException e) {
             throw new RuntimeException(e);
         } finally {
-            pendingOperations.remove(operation.getId());
+            pendingOperations.remove(request.getId());
         }
     }
 
@@ -83,12 +86,10 @@ public abstract class ClientResource extends ClientPrompt {
 
         ListResourceTemplatesRequest operation = new ListResourceTemplatesRequest(idGenerator.getAndIncrement());
         long timeoutMillis = requestTimeout.toMillis() == 0 ? Integer.MAX_VALUE : requestTimeout.toMillis();
-        JsonNode result;
-        CompletableFuture<JsonNode> resultFuture;
 
         try {
-            resultFuture = transport.executeOperationWithResponse(operation);
-            result = resultFuture.get(timeoutMillis, TimeUnit.MILLISECONDS);
+            CompletableFuture<JsonNode> resultFuture = transport.executeOperationWithResponse(operation);
+            JsonNode result = resultFuture.get(timeoutMillis, TimeUnit.MILLISECONDS);
             resourceTemplateRefs.set(parseResourceTemplateRefs(result));
         } catch (ExecutionException | InterruptedException | TimeoutException e) {
             throw new RuntimeException(e);
@@ -100,8 +101,8 @@ public abstract class ClientResource extends ClientPrompt {
     public static List<ResourceItem> parseResourceRefs(JsonNode mcpMessage) {
         McpException.checkForErrors(mcpMessage);
 
-        if (mcpMessage.has("result")) {
-            JsonNode resultNode = mcpMessage.get("result");
+        if (mcpMessage.has(RESPONSE_RESULT)) {
+            JsonNode resultNode = mcpMessage.get(RESPONSE_RESULT);
 
             if (resultNode.has("resources")) {
                 List<ResourceItem> resourceRefs = new ArrayList<>();
@@ -120,26 +121,36 @@ public abstract class ClientResource extends ClientPrompt {
         }
     }
 
-    public static ReadResourceResult parseResourceContents(JsonNode mcpMessage) {
+    public static GetResourceResult.ResourceResultDetail parseResourceContents(JsonNode mcpMessage) {
         McpException.checkForErrors(mcpMessage);
 
-        if (mcpMessage.has("result")) {
-            JsonNode resultNode = mcpMessage.get("result");
+        if (mcpMessage.has(RESPONSE_RESULT)) {
+            JsonNode resultNode = mcpMessage.get(RESPONSE_RESULT);
             if (resultNode.has("contents")) {
-                List<ResourceContents> resourceContentsList = new ArrayList<>();
+                List<ResourceContent> resourceContentsList = new ArrayList<>();
 
                 for (JsonNode resourceNode : resultNode.get("contents")) {
                     String uri = resourceNode.get("uri").asText();
                     String mimeType = resourceNode.get("mimeType") != null ? resourceNode.get("mimeType").asText() : null;
 
                     if (resourceNode.has("text")) {
-                        resourceContentsList.add(new TextResourceContents(uri, resourceNode.get("text").asText(), mimeType));
+                        ResourceContentText content = new ResourceContentText();
+                        content.setUri(uri);
+                        content.setMimeType(mimeType);
+                        content.setText(resourceNode.get("text").asText());
+
+                        resourceContentsList.add(content);
                     } else if (resourceNode.has("blob")) {
-                        resourceContentsList.add(new BlobResourceContents(uri, resourceNode.get("blob").asText(), mimeType));
+                        ResourceContentBinary content = new ResourceContentBinary();
+                        content.setUri(uri);
+                        content.setMimeType(mimeType);
+                        content.setBlob(resourceNode.get("blob").asText());
+
+                        resourceContentsList.add(content);
                     }
                 }
 
-                return new ReadResourceResult(resourceContentsList);
+                return new GetResourceResult.ResourceResultDetail(resourceContentsList);
             } else {
                 log.warn("Result does not contain 'contents' element: {}", resultNode);
                 throw new IllegalResponseException("Result does not contain 'resources' element");
@@ -153,8 +164,8 @@ public abstract class ClientResource extends ClientPrompt {
     public static List<ResourceTemplate> parseResourceTemplateRefs(JsonNode mcpMessage) {
         McpException.checkForErrors(mcpMessage);
 
-        if (mcpMessage.has("result")) {
-            JsonNode resultNode = mcpMessage.get("result");
+        if (mcpMessage.has(RESPONSE_RESULT)) {
+            JsonNode resultNode = mcpMessage.get(RESPONSE_RESULT);
 
             if (resultNode.has("resourceTemplates")) {
                 List<ResourceTemplate> resourceTemplateRefs = new ArrayList<>();

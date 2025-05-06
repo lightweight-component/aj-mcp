@@ -1,6 +1,7 @@
 package com.ajaxjs.mcp.protocol.resource;
 
 import com.ajaxjs.mcp.protocol.McpResponse;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -15,6 +16,7 @@ public class GetResourceResult extends McpResponse {
     private ResourceResultDetail result;
 
     @Data
+    @AllArgsConstructor
     public static class ResourceResultDetail {
         List<ResourceContent> contents;
     }

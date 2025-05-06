@@ -3,6 +3,7 @@ package com.ajaxjs.mcp.server.feature;
 import com.ajaxjs.mcp.common.McpUtils;
 import com.ajaxjs.mcp.protocol.prompt.PromptArgument;
 import com.ajaxjs.mcp.protocol.prompt.PromptItem;
+import com.ajaxjs.mcp.protocol.resource.ResourceItem;
 import com.ajaxjs.mcp.server.feature.annotation.*;
 import com.ajaxjs.mcp.server.feature.model.ServerStorePrompt;
 import com.ajaxjs.mcp.server.feature.model.ServerStoreResource;
@@ -18,6 +19,12 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class FeatureMgr {
+    public static final Map<String, ServerStorePrompt> PROMPT_STORE = new ConcurrentHashMap<>();
+
+    public static final Map<String, ServerStoreResource> RESOURCE_STORE = new ConcurrentHashMap<>();
+
+    public static final Map<String, ServerStoreTool> TOOL_STORE = new ConcurrentHashMap<>();
+
     public void init(String packageName) {
         Set<Class<?>> classesWithAnnotation;
 
@@ -40,13 +47,12 @@ public class FeatureMgr {
                     Resource resource = method.getAnnotation(Resource.class);
 
                     if (resource != null) {
-                        addResource(resource);
+                        addResource(resource, method, instance);
                     } else {
                         Tool tool = method.getAnnotation(Tool.class);
 
-                        if (tool != null) {
-                            addTool(tool);
-                        }
+                        if (tool != null)
+                            addTool(tool, method, instance);
                     }
                 }
             }
@@ -63,17 +69,28 @@ public class FeatureMgr {
         }
     }
 
-    private void addTool(Tool tool) {
+    private void addTool(Tool tool, Method method, Object instance) {
+        ServerStoreTool store = new ServerStoreTool();
+        store.setMethod(method);
+        store.setInstance(instance);
+
+        TOOL_STORE.put(tool.name(), store);
     }
 
-    private void addResource(Resource resource) {
+    private void addResource(Resource resource, Method method, Object instance) {
+        ResourceItem resourceItem = new ResourceItem();
+        resourceItem.setUri(resource.uri());
+        resourceItem.setName(resource.value().isEmpty() ? method.getName() : resource.value());
+        resourceItem.setDescription(resource.description());
+        resourceItem.setMimeType(resource.mimeType());
+
+        ServerStoreResource store = new ServerStoreResource();
+        store.setMethod(method);
+        store.setInstance(instance);
+        store.setResource(resourceItem);
+
+        RESOURCE_STORE.put(resource.uri(), store);
     }
-
-    public static final Map<String, ServerStorePrompt> PROMPT_STORE = new ConcurrentHashMap<>();
-
-    public static final Map<String, ServerStoreResource> RESOURCE_STORE = new ConcurrentHashMap<>();
-
-    public static final Map<String, ServerStoreTool> TOOL_STORE = new ConcurrentHashMap<>();
 
     private void addPrompt(Prompt prompt, Method method, Object instance) {
         String promptName = prompt.value().isEmpty() ? method.getName() : prompt.value();

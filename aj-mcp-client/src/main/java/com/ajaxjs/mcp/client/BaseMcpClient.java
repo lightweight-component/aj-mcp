@@ -1,6 +1,7 @@
 package com.ajaxjs.mcp.client;
 
 import com.ajaxjs.mcp.common.McpUtils;
+import com.ajaxjs.mcp.protocol.McpConstant;
 import com.ajaxjs.mcp.protocol.initialize.InitializeRequest;
 import com.ajaxjs.mcp.protocol.prompt.PromptItem;
 import com.ajaxjs.mcp.protocol.initialize.InitializeRequestParams;
@@ -23,7 +24,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * Base Class for MCP Client, mainly doing the initialize job.
  */
 @Slf4j
-public abstract class BaseMcpClient implements IMcpClient {
+public abstract class BaseMcpClient implements IMcpClient, McpConstant {
     final McpTransport transport;
 
     /**

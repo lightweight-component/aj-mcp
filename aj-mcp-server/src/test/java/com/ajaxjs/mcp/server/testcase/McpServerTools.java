@@ -1,12 +1,13 @@
-import io.quarkiverse.mcp.server.TextContent;
-import io.quarkiverse.mcp.server.Tool;
-import io.quarkiverse.mcp.server.ToolArg;
-import io.quarkiverse.mcp.server.ToolResponse;
+package com.ajaxjs.mcp.server.testcase;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.ajaxjs.mcp.server.feature.annotation.McpService;
+import com.ajaxjs.mcp.server.feature.annotation.Tool;
+import com.ajaxjs.mcp.server.feature.annotation.ToolArg;
+
 import java.util.concurrent.TimeUnit;
-public class tools_mcp_server {
+
+@McpService
+public class McpServerTools {
     @Tool(description = "Echoes a string")
     public String echoString(@ToolArg(description = "The string to be echoed") String input) {
         return input;
@@ -19,7 +20,7 @@ public class tools_mcp_server {
 
     @Tool(description = "Echoes a boolean")
     public String echoBoolean(@ToolArg(description = "The boolean to be echoed") Boolean input) {
-        return Boolean.valueOf(input).toString();
+        return input.toString();
     }
 
     @Tool(description = "Takes 10 seconds to complete")
@@ -33,11 +34,11 @@ public class tools_mcp_server {
         throw new RuntimeException("business error");
     }
 
-    @Tool(description = "Returns a response as an error")
-    public ToolResponse errorResponse() throws Exception {
-        List<TextContent> lst = new ArrayList<>();
-        lst.add(new TextContent("This is an actual error"));
-        return new ToolResponse(true, lst);
-    }
-
+//    @Tool(description = "Returns a response as an error")
+//    public ToolResponse errorResponse() throws Exception {
+//        List<TextContent> lst = new ArrayList<>();
+//        lst.add(new TextContent("This is an actual error"));
+//
+//        return new ToolResponse(true, lst);
+//    }
 }

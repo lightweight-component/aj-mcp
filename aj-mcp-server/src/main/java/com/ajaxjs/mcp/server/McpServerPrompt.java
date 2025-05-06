@@ -24,8 +24,8 @@ public abstract class McpServerPrompt extends McpServerResource {
         GetPromptListRequest request = new GetPromptListRequest();
         request.setId(requestRaw.getId());
 
-        if (jsonNode.has("params"))
-            request.setParams(JsonUtils.jsonNode2bean(jsonNode.get("params"), Cursor.class));
+        if (jsonNode.has(PARAMS))
+            request.setParams(JsonUtils.jsonNode2bean(jsonNode.get(PARAMS), Cursor.class));
 
         // get info from RAM
         if (FeatureMgr.PROMPT_STORE.isEmpty())
@@ -47,7 +47,7 @@ public abstract class McpServerPrompt extends McpServerResource {
 
     McpResponse promptGet(McpRequestRawInfo requestRaw) {
         JsonNode jsonNode = requestRaw.getJsonNode();
-        JsonNode paramsNode = jsonNode.get("params");
+        JsonNode paramsNode = jsonNode.get(PARAMS);
 
         if (paramsNode == null)
             throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_PARAMS, "params is required");
@@ -89,13 +89,13 @@ public abstract class McpServerPrompt extends McpServerResource {
         }
         // execute prompt method
         Method method = store.getMethod();
-        Object returedValue;
+        Object returnedValue;
 
         try {
             if (argValues == null)
-                returedValue = method.invoke(store.getInstance());
+                returnedValue = method.invoke(store.getInstance());
             else
-                returedValue = method.invoke(store.getInstance(), argValues);
+                returnedValue = method.invoke(store.getInstance(), argValues);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } catch (InvocationTargetException e) {
@@ -104,11 +104,10 @@ public abstract class McpServerPrompt extends McpServerResource {
 
         List<PromptMessage> promptMessages = null;
 
-        if (returedValue instanceof PromptMessage) {
-            promptMessages = Collections.singletonList((PromptMessage) returedValue);
-        } else if (returedValue instanceof List) {
-            promptMessages = (List<PromptMessage>) returedValue;
-        }
+        if (returnedValue instanceof PromptMessage)
+            promptMessages = Collections.singletonList((PromptMessage) returnedValue);
+         else if (returnedValue instanceof List)
+            promptMessages = (List<PromptMessage>) returnedValue;
 
         GetPromptResult.PromptResultDetail promptResultDetail = new GetPromptResult.PromptResultDetail();
         promptResultDetail.setDescription(prompt.getDescription());
@@ -139,6 +138,4 @@ public abstract class McpServerPrompt extends McpServerResource {
 
         return result;
     }
-
-
 }
