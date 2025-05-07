@@ -1,5 +1,6 @@
 package com.ajaxjs.mcp.protocol.tools;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import java.util.List;
@@ -17,5 +18,6 @@ public class JsonSchema {
 
     List<String> required;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     Boolean additionalProperties;
 }

@@ -13,13 +13,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Target(ElementType.PARAMETER)
 public @interface ToolArg {
-    /**
-     * Constant value for {@link #name()} indicating that the annotated element's name should be used as-is.
-     */
-    String ELEMENT_NAME = "<<element name>>";
-
-    String name() default ELEMENT_NAME;
-
     String value() default "";
 
     String description() default "";

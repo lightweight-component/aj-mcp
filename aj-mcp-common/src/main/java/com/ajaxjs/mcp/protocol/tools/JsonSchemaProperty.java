@@ -2,7 +2,7 @@ package com.ajaxjs.mcp.protocol.tools;
 
 import lombok.Data;
 
-import java.util.Map;
+//import java.util.Map;
 
 /**
  * The properties of Json Schema are actually parameters.
@@ -13,6 +13,6 @@ public class JsonSchemaProperty {
 
     private String description;
 
-    private Map<String, JsonSchemaProperty> properties;
+//    private Map<String, JsonSchemaProperty> properties;
 
 }

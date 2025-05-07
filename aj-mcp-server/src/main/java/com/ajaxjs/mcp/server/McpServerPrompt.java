@@ -87,6 +87,7 @@ public abstract class McpServerPrompt extends McpServerResource {
 
             argValues = extractValues(arguments, paramOrder);
         }
+
         // execute prompt method
         Method method = store.getMethod();
         Object returnedValue;

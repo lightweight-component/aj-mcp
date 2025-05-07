@@ -17,7 +17,7 @@ public class CallToolResult extends McpResponse {
 
     @Data
     public static class CallToolResultDetail {
-        Boolean isError;
+        Boolean isError = false;
 
         List<Content> content;
     }

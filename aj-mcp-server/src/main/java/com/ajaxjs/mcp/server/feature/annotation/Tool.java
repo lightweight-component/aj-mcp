@@ -31,16 +31,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Target(METHOD)
 public @interface Tool {
-    /**
-     * Constant value for {@link #name()} indicating that the annotated element's name should be used as-is.
-     */
-    String ELEMENT_NAME = "<<element name>>";
-
-    /**
-     * Each tool must have a unique name. By default, the name is derived from the name of the annotated method.
-     */
-    String name() default ELEMENT_NAME;
-
     String value() default "";
 
     /**
