@@ -40,6 +40,7 @@ public interface McpConstant {
 
     interface ContentType {
         String TEXT = "text";
+
         String IMAGE = "image";
 
         String AUDIO = "audio";

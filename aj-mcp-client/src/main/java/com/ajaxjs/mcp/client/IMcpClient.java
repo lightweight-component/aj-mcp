@@ -1,12 +1,12 @@
 package com.ajaxjs.mcp.client;
 
-import com.ajaxjs.mcp.client.tool.ToolExecutionRequest;
 import com.ajaxjs.mcp.protocol.prompt.GetPromptResult;
 import com.ajaxjs.mcp.protocol.prompt.PromptItem;
 import com.ajaxjs.mcp.protocol.resource.GetResourceResult;
 import com.ajaxjs.mcp.protocol.resource.ResourceItem;
 import com.ajaxjs.mcp.protocol.resource.ResourceTemplate;
-import com.ajaxjs.mcp.protocol.tools.ToolSpecification;
+import com.ajaxjs.mcp.protocol.tools.CallToolRequest;
+import com.ajaxjs.mcp.protocol.tools.ToolItem;
 
 import java.util.List;
 import java.util.Map;
@@ -17,17 +17,32 @@ import java.util.Map;
 public interface IMcpClient extends AutoCloseable {
     /**
      * Obtains a list of tools from the MCP server.
+     *
+     * @return The list of tools
      */
-    List<ToolSpecification> listTools();
+    List<ToolItem> listTools();
 
     /**
-     * Executes a tool on the MCP server and returns the result as a String.
-     * Currently, this expects a tool execution to only contain text-based results.
+     * Calls a tool on the MCP server and returns the result as a String.
+     *
+     * @param request The tool request
+     * @return The tool result
      */
-    String executeTool(ToolExecutionRequest executionRequest);
+    String callTool(CallToolRequest request);
+
+    /***
+     * Calls a tool on the MCP server and returns the result as a String.
+     *
+     * @param name The name of the tool to call
+     * @param arguments The arguments to pass to the tool
+     * @return The tool result
+     */
+    String callTool(String name, String arguments);
 
     /**
      * Obtains the current list of resources available on the MCP server.
+     *
+     * @return The list of resources
      */
     List<ResourceItem> listResources();
 
@@ -37,8 +52,11 @@ public interface IMcpClient extends AutoCloseable {
     List<ResourceTemplate> listResourceTemplates();
 
     /**
-     * Retrieves the contents of the resource with the specified URI. This also
-     * works for dynamic resources (templates).
+     * Retrieves the contents of the resource with the specified URI.
+     * This also works for dynamic resources (templates).
+     *
+     * @param uri The URI of the resource to retrieve.
+     * @return Resource contents.
      */
     GetResourceResult.ResourceResultDetail readResource(String uri);
 

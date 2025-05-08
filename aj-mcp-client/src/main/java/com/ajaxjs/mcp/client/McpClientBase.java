@@ -1,13 +1,13 @@
 package com.ajaxjs.mcp.client;
 
+import com.ajaxjs.mcp.client.transport.McpTransport;
 import com.ajaxjs.mcp.common.McpUtils;
 import com.ajaxjs.mcp.protocol.McpConstant;
 import com.ajaxjs.mcp.protocol.initialize.InitializeRequest;
-import com.ajaxjs.mcp.protocol.prompt.PromptItem;
 import com.ajaxjs.mcp.protocol.initialize.InitializeRequestParams;
+import com.ajaxjs.mcp.protocol.prompt.PromptItem;
 import com.ajaxjs.mcp.protocol.resource.ResourceItem;
 import com.ajaxjs.mcp.protocol.resource.ResourceTemplate;
-import com.ajaxjs.mcp.client.transport.McpTransport;
 import com.ajaxjs.mcp.protocol.utils.ping.PingRequest;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * Base Class for MCP Client, mainly doing the initialize job.
  */
 @Slf4j
-public abstract class BaseMcpClient implements IMcpClient, McpConstant {
+public abstract class McpClientBase implements IMcpClient, McpConstant {
     final McpTransport transport;
 
     /**
@@ -61,7 +61,7 @@ public abstract class BaseMcpClient implements IMcpClient, McpConstant {
 
     final AtomicReference<List<PromptItem>> promptRefs = new AtomicReference<>();
 
-    public BaseMcpClient(Builder builder) {
+    public McpClientBase(Builder builder) {
         clientName = McpUtils.getOrDefault(builder.clientName, "aj-mcp");
         clientVersion = McpUtils.getOrDefault(builder.clientVersion, "1.0");
         protocolVersion = McpUtils.getOrDefault(builder.protocolVersion, "2024-11-05");
@@ -152,27 +152,27 @@ public abstract class BaseMcpClient implements IMcpClient, McpConstant {
         private String protocolVersion;
         private Duration toolExecutionTimeout;
 
-        public BaseMcpClient.Builder transport(McpTransport transport) {
+        public McpClientBase.Builder transport(McpTransport transport) {
             this.transport = transport;
             return this;
         }
 
-        public BaseMcpClient.Builder clientName(String clientName) {
+        public McpClientBase.Builder clientName(String clientName) {
             this.clientName = clientName;
             return this;
         }
 
-        public BaseMcpClient.Builder clientVersion(String clientVersion) {
+        public McpClientBase.Builder clientVersion(String clientVersion) {
             this.clientVersion = clientVersion;
             return this;
         }
 
-        public BaseMcpClient.Builder protocolVersion(String protocolVersion) {
+        public McpClientBase.Builder protocolVersion(String protocolVersion) {
             this.protocolVersion = protocolVersion;
             return this;
         }
 
-        public BaseMcpClient.Builder toolExecutionTimeout(Duration toolExecutionTimeout) {
+        public McpClientBase.Builder toolExecutionTimeout(Duration toolExecutionTimeout) {
             this.toolExecutionTimeout = toolExecutionTimeout;
             return this;
         }

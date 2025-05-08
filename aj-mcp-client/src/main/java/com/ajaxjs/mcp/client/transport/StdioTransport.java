@@ -1,6 +1,5 @@
 package com.ajaxjs.mcp.client.transport;
 
-import com.ajaxjs.mcp.client.protocol.ClientMessage;
 import com.ajaxjs.mcp.common.JsonUtils;
 import com.ajaxjs.mcp.protocol.McpRequest;
 import com.ajaxjs.mcp.protocol.initialize.InitializationNotification;
@@ -89,18 +88,8 @@ public class StdioTransport extends BaseTransport {
     }
 
     @Override
-    public CompletableFuture<JsonNode> executeOperationWithResponse(ClientMessage operation) {
-        return execute(JsonUtils.toJson(operation), operation.getId());
-    }
-
-    @Override
     public CompletableFuture<JsonNode> executeOperationWithResponse(McpRequest request) {
         return execute(JsonUtils.toJson(request), request.getId());
-    }
-
-    @Override
-    public void executeOperationWithoutResponse(ClientMessage operation) {
-        execute(JsonUtils.toJson(operation), null);
     }
 
     @Override

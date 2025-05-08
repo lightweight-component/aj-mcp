@@ -1,5 +1,6 @@
 package com.ajaxjs.mcp.client;
 
+import com.ajaxjs.mcp.client.gitee.TestToolStdio;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -14,7 +15,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 @Slf4j
 public class McpServerHelper {
-    static Process startServerHttp() {
+    public static Process startServerHttp() {
         skipTestsIfServerNotAvailable();
         String[] command = new String[]{TestToolStdio.getConfig().get("cmd_path"), "-transport", "sse"};
         log.info("Starting the MCP server using command: {}", Arrays.toString(command));
@@ -31,14 +32,14 @@ public class McpServerHelper {
         return process;
     }
 
-    static String getPathToScript(String script) {
+    public static String getPathToScript(String script) {
         return ClassLoader.getSystemResource(script)
                 .getFile()
                 .substring(System.getProperty("os.name").toLowerCase().contains("windows") ? 1 : 0)
                 .replace("/", File.separator);
     }
 
-    static void skipTestsIfServerNotAvailable() {
+    public static void skipTestsIfServerNotAvailable() {
         String command = TestToolStdio.getConfig().get("cmd_path");
 
         try {

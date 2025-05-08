@@ -4,8 +4,8 @@ import com.ajaxjs.mcp.common.IllegalResponseException;
 import com.ajaxjs.mcp.common.JsonUtils;
 import com.ajaxjs.mcp.common.McpException;
 import com.ajaxjs.mcp.protocol.McpConstant;
-import com.ajaxjs.mcp.protocol.prompt.GetPromptRequest;
 import com.ajaxjs.mcp.protocol.prompt.GetPromptListRequest;
+import com.ajaxjs.mcp.protocol.prompt.GetPromptRequest;
 import com.ajaxjs.mcp.protocol.prompt.GetPromptResult;
 import com.ajaxjs.mcp.protocol.prompt.PromptItem;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -20,8 +20,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 @Slf4j
-public abstract class ClientPrompt extends BaseMcpClient {
-    public ClientPrompt(Builder builder) {
+public abstract class McpClientPrompt extends McpClientBase {
+    public McpClientPrompt(Builder builder) {
         super(builder);
     }
 

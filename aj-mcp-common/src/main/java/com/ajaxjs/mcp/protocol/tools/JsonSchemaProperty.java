@@ -13,6 +13,7 @@ public class JsonSchemaProperty {
 
     private String description;
 
+// for complexParameter
 //    private Map<String, JsonSchemaProperty> properties;
 
 }

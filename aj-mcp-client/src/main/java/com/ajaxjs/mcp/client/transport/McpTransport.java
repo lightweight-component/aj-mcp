@@ -1,6 +1,5 @@
 package com.ajaxjs.mcp.client.transport;
 
-import com.ajaxjs.mcp.client.protocol.ClientMessage;
 import com.ajaxjs.mcp.protocol.McpRequest;
 import com.ajaxjs.mcp.protocol.initialize.InitializeRequest;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -37,14 +36,11 @@ public interface McpTransport extends Closeable {
     /**
      * Executes an operation that expects a response from the server.
      */
-    CompletableFuture<JsonNode> executeOperationWithResponse(ClientMessage request);
     CompletableFuture<JsonNode> executeOperationWithResponse(McpRequest request);
 
     /**
      * Sends a message that does not expect a response from the server. The 'id' field of the message should be null.
      */
-    void executeOperationWithoutResponse(ClientMessage request);
-
     void executeOperationWithoutResponse(McpRequest request);
 
     /**

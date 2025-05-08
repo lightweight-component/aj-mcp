@@ -1,7 +1,9 @@
-package com.ajaxjs.mcp.client;
+package com.ajaxjs.mcp.client.gitee;
 
-import com.ajaxjs.mcp.client.transport.McpTransport;
+import com.ajaxjs.mcp.client.McpClientBase;
+import com.ajaxjs.mcp.client.IMcpClient;
 import com.ajaxjs.mcp.client.transport.HttpMcpTransport;
+import com.ajaxjs.mcp.client.transport.McpTransport;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -26,7 +28,7 @@ class TestToolSse extends TestToolBase {
                 .logResponses(true)
                 .build();
 
-        mcpClient = new McpClient.Builder()
+        mcpClient = new McpClientBase.Builder()
                 .transport(transport)
                 .toolExecutionTimeout(Duration.ofSeconds(4))
                 .build();
@@ -54,7 +56,7 @@ class TestToolSse extends TestToolBase {
                     .logRequests(true)
                     .logResponses(true)
                     .build();
-            badClient = new McpClient.Builder()
+            badClient = new McpClientBase.Builder()
                     .transport(transport)
                     .toolExecutionTimeout(Duration.ofSeconds(4))
                     .build();

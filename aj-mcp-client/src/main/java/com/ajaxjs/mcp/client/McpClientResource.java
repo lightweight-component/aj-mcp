@@ -1,6 +1,5 @@
 package com.ajaxjs.mcp.client;
 
-import com.ajaxjs.mcp.client.protocol.ListResourceTemplatesRequest;
 import com.ajaxjs.mcp.common.IllegalResponseException;
 import com.ajaxjs.mcp.common.JsonUtils;
 import com.ajaxjs.mcp.common.McpException;
@@ -16,8 +15,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 @Slf4j
-public abstract class ClientResource extends ClientPrompt {
-    public ClientResource(Builder builder) {
+public abstract class McpClientResource extends McpClientPrompt {
+    public McpClientResource(Builder builder) {
         super(builder);
     }
 
@@ -32,8 +31,6 @@ public abstract class ClientResource extends ClientPrompt {
     @Override
     public GetResourceResult.ResourceResultDetail readResource(String uri) {
         long operationId = idGenerator.getAndIncrement();
-//        ReadResourceRequest operation = new ReadResourceRequest(operationId, uri);
-
         GetResourceRequest request = new GetResourceRequest();
         request.setId(operationId);
         request.setParams(new GetResourceRequest.Params(uri));
@@ -84,17 +81,18 @@ public abstract class ClientResource extends ClientPrompt {
         if (resourceTemplateRefs.get() != null)
             return;
 
-        ListResourceTemplatesRequest operation = new ListResourceTemplatesRequest(idGenerator.getAndIncrement());
+        GetResourceTemplateListRequest request = new GetResourceTemplateListRequest();
+        request.setId(idGenerator.getAndIncrement());
         long timeoutMillis = requestTimeout.toMillis() == 0 ? Integer.MAX_VALUE : requestTimeout.toMillis();
 
         try {
-            CompletableFuture<JsonNode> resultFuture = transport.executeOperationWithResponse(operation);
+            CompletableFuture<JsonNode> resultFuture = transport.executeOperationWithResponse(request);
             JsonNode result = resultFuture.get(timeoutMillis, TimeUnit.MILLISECONDS);
             resourceTemplateRefs.set(parseResourceTemplateRefs(result));
         } catch (ExecutionException | InterruptedException | TimeoutException e) {
             throw new RuntimeException(e);
         } finally {
-            pendingOperations.remove(operation.getId());
+            pendingOperations.remove(request.getId());
         }
     }
 
@@ -133,11 +131,11 @@ public abstract class ClientResource extends ClientPrompt {
                     String uri = resourceNode.get("uri").asText();
                     String mimeType = resourceNode.get("mimeType") != null ? resourceNode.get("mimeType").asText() : null;
 
-                    if (resourceNode.has("text")) {
+                    if (resourceNode.has(ContentType.TEXT)) {
                         ResourceContentText content = new ResourceContentText();
                         content.setUri(uri);
                         content.setMimeType(mimeType);
-                        content.setText(resourceNode.get("text").asText());
+                        content.setText(resourceNode.get(ContentType.TEXT).asText());
 
                         resourceContentsList.add(content);
                     } else if (resourceNode.has("blob")) {

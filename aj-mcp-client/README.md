@@ -8,7 +8,7 @@
 
 # Lightweight Java MCP Client
 
-AJ-MCP Client is a lightweight MCP Client for Java.  It provides a simple and powerful way to build MCP client. It supports Java8 and above.
+AJ-MCP Client is a lightweight MCP Client for Java. It provides a simple and powerful way to build MCP client. It supports Java8 and above.
 
 ## Source code
 

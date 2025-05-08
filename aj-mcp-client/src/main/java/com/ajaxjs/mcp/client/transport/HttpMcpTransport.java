@@ -1,8 +1,8 @@
 package com.ajaxjs.mcp.client.transport;
 
-import com.ajaxjs.mcp.common.McpUtils;
-import com.ajaxjs.mcp.client.protocol.ClientMessage;
+
 import com.ajaxjs.mcp.common.JsonUtils;
+import com.ajaxjs.mcp.common.McpUtils;
 import com.ajaxjs.mcp.protocol.BaseJsonRpcMessage;
 import com.ajaxjs.mcp.protocol.McpRequest;
 import com.ajaxjs.mcp.protocol.initialize.InitializationNotification;
@@ -119,31 +119,11 @@ public class HttpMcpTransport extends BaseTransport {
     }
 
     @Override
-    public CompletableFuture<JsonNode> executeOperationWithResponse(ClientMessage operation) {
-        try {
-            return execute(createRequest(operation), operation.getId());
-        } catch (JsonProcessingException e) {
-            return McpUtils.failedFuture(e);
-        }
-    }
-
-
-    @Override
     public CompletableFuture<JsonNode> executeOperationWithResponse(McpRequest request) {
         try {
             return execute(createRequest(request), request.getId());
         } catch (JsonProcessingException e) {
             return McpUtils.failedFuture(e);
-        }
-    }
-
-    @Override
-    public void executeOperationWithoutResponse(ClientMessage operation) {
-        try {
-            Request httpRequest = createRequest(operation);
-            execute(httpRequest, null);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -205,11 +185,6 @@ public class HttpMcpTransport extends BaseTransport {
         }
 
         return eventSource;
-    }
-
-    private Request createRequest(ClientMessage message) throws JsonProcessingException {
-        return new Request.Builder().url(postUrl).header("Content-Type", "application/json")
-                .post(RequestBody.create(JsonUtils.OBJECT_MAPPER.writeValueAsBytes(message))).build();
     }
 
     private Request createRequest(BaseJsonRpcMessage message) throws JsonProcessingException {

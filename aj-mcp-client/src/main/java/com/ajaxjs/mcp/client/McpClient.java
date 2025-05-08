@@ -1,11 +1,11 @@
 package com.ajaxjs.mcp.client;
 
-import com.ajaxjs.mcp.client.tool.CallToolRequest;
-import com.ajaxjs.mcp.client.tool.ListToolsRequest;
+
 import com.ajaxjs.mcp.common.JsonUtils;
-import com.ajaxjs.mcp.client.tool.ToolExecutionRequest;
+import com.ajaxjs.mcp.protocol.tools.CallToolRequest;
+import com.ajaxjs.mcp.protocol.tools.GetToolListRequest;
 import com.ajaxjs.mcp.protocol.tools.JsonSchema;
-import com.ajaxjs.mcp.protocol.tools.ToolSpecification;
+import com.ajaxjs.mcp.protocol.tools.ToolItem;
 import com.ajaxjs.mcp.protocol.utils.CancellationNotification;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -25,41 +25,41 @@ import java.util.stream.StreamSupport;
 
 /**
  * MCP Client
- * This class impl
- * TODO: currently we request a new list of tools every time, so we should add support for the `ToolListChangedNotification` message, and then we can cache the list
+ * TODO: currently we request a new list of tools every time,
+ * so we should add support for the `ToolListChangedNotification` message, and then we can cache the list
  */
 @Slf4j
-public class McpClient extends ClientResource {
+public class McpClient extends McpClientResource {
     public McpClient(Builder builder) {
         super(builder);
         initialize();
     }
 
     @Override
-    public List<ToolSpecification> listTools() {
-        ListToolsRequest operation = new ListToolsRequest(idGenerator.getAndIncrement());
-        CompletableFuture<JsonNode> resultFuture = transport.executeOperationWithResponse(operation);
+    public List<ToolItem> listTools() {
+        GetToolListRequest request = new GetToolListRequest();
+        request.setId(idGenerator.getAndIncrement());
         JsonNode result;
 
         try {
-            result = resultFuture.get();
+            result = transport.executeOperationWithResponse(request).get();
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
         } finally {
-            pendingOperations.remove(operation.getId());
+            pendingOperations.remove(request.getId());
         }
 
-        return toolSpecificationListFromMcpResponse((ArrayNode) result.get("result").get("tools"));
+        return toolListFromMcpResponse((ArrayNode) result.get(RESPONSE_RESULT).get("tools"));
     }
 
     /**
      * Converts the 'tools' element from a ListToolsResult MCP message to a list of ToolSpecification objects.
      */
-    static List<ToolSpecification> toolSpecificationListFromMcpResponse(ArrayNode array) {
-        List<ToolSpecification> result = new ArrayList<>(array.size());
+    public static List<ToolItem> toolListFromMcpResponse(ArrayNode array) {
+        List<ToolItem> result = new ArrayList<>(array.size());
 
         for (JsonNode tool : array) {
-            ToolSpecification toolSpecification = new ToolSpecification();
+            ToolItem toolSpecification = new ToolItem();
             toolSpecification.setName(tool.get("name").asText());
 
             if (tool.has("description"))
@@ -76,26 +76,22 @@ public class McpClient extends ClientResource {
     }
 
     @Override
-    public String executeTool(ToolExecutionRequest executionRequest) {
-        ObjectNode arguments = executionRequest.getArguments() == null ? null : JsonUtils.fromJson(executionRequest.getArguments(), ObjectNode.class);
+    public String callTool(CallToolRequest request) {
         long operationId = idGenerator.getAndIncrement();
-        CallToolRequest operation = new CallToolRequest(operationId, executionRequest.getName(), arguments);
         long timeoutMillis = requestTimeout.toMillis() == 0 ? Integer.MAX_VALUE : requestTimeout.toMillis();
-        CompletableFuture<JsonNode> resultFuture;
+
+        request.setId(operationId);
         JsonNode result;
 
         try {
-            resultFuture = transport.executeOperationWithResponse(operation);
+            CompletableFuture<JsonNode> resultFuture = transport.executeOperationWithResponse(request);
             result = resultFuture.get(timeoutMillis, TimeUnit.MILLISECONDS);
         } catch (TimeoutException timeout) {
             transport.executeOperationWithoutResponse(new CancellationNotification(String.valueOf(operationId), "Timeout"));
-
             ObjectNode resultTimeout = JsonNodeFactory.instance.objectNode();
-            resultTimeout.putObject("result")
-                    .putArray("content")
-                    .addObject()
-                    .put("type", "text")
-                    .put("text", "There was a timeout executing the tool");
+            resultTimeout.putObject(RESPONSE_RESULT)
+                    .putArray("content").addObject().put("type", ContentType.TEXT)
+                    .put(ContentType.TEXT, "There was a timeout executing the tool");
 
             return extractResult(resultTimeout);
         } catch (ExecutionException | InterruptedException e) {
@@ -107,14 +103,19 @@ public class McpClient extends ClientResource {
         return extractResult(result);
     }
 
+    @Override
+    public String callTool(String name, String arguments) {
+        return callTool(new CallToolRequest(name, arguments));
+    }
+
     private static final String EXECUTION_ERROR_MESSAGE = "There was an error executing the tool";
 
     /**
      * Extracts a response from a CallToolResult message. This may be an error response.
      */
     public static String extractResult(JsonNode result) {
-        if (result.has("result")) {
-            JsonNode resultNode = result.get("result");
+        if (result.has(RESPONSE_RESULT)) {
+            JsonNode resultNode = result.get(RESPONSE_RESULT);
 
             if (resultNode.has("content")) {
                 String content = extractSuccessfulResult((ArrayNode) resultNode.get("content"));
@@ -144,10 +145,10 @@ public class McpClient extends ClientResource {
         Stream<JsonNode> contentStream = StreamSupport.stream(contents.spliterator(), false);
 
         return contentStream.map(content -> {
-            if (!content.get("type").asText().equals("text"))
+            if (!content.get("type").asText().equals(ContentType.TEXT))
                 throw new RuntimeException("Unsupported content type: " + content.get("type"));
 
-            return content.get("text").asText();
+            return content.get(ContentType.TEXT).asText();
         }).collect(Collectors.joining("\n"));
     }
 

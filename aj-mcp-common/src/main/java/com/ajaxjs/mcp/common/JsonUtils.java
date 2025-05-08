@@ -1,12 +1,10 @@
 package com.ajaxjs.mcp.common;
 
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.*;
-import com.fasterxml.jackson.databind.introspect.VisibilityChecker;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -122,7 +120,7 @@ public class JsonUtils {
      * @param <T>     Generic parameter, represents the type of JavaBean
      * @return Returns a LinkedHashMap containing String keys and JavaBean values of the specified type
      */
-    public static <T> LinkedHashMap<String, T> json2sortMap(String jsonStr, Class<T> clazz) {
+    public static <T> Map<String, T> json2sortMap(String jsonStr, Class<T> clazz) {
         JavaType type = OBJECT_MAPPER.getTypeFactory().constructParametricType(LinkedHashMap.class, String.class, clazz);
 
         return fromJson(jsonStr, type);

@@ -1,6 +1,5 @@
 package com.ajaxjs.mcp.client.transport;
 
-import com.ajaxjs.mcp.client.transport.McpTransport;
 import com.ajaxjs.mcp.common.JsonUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.AllArgsConstructor;
