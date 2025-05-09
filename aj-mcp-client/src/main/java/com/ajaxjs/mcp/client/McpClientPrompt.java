@@ -103,4 +103,9 @@ public abstract class McpClientPrompt extends McpClientBase {
             pendingOperations.remove(operationId);
         }
     }
+
+    @Override
+    public GetPromptResult.PromptResultDetail getPrompt(String name, String arguments) {
+        return getPrompt(name, JsonUtils.json2map(arguments));
+    }
 }

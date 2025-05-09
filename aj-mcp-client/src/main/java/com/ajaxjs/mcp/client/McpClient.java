@@ -2,6 +2,7 @@ package com.ajaxjs.mcp.client;
 
 
 import com.ajaxjs.mcp.common.JsonUtils;
+import com.ajaxjs.mcp.protocol.prompt.GetPromptResult;
 import com.ajaxjs.mcp.protocol.tools.CallToolRequest;
 import com.ajaxjs.mcp.protocol.tools.GetToolListRequest;
 import com.ajaxjs.mcp.protocol.tools.JsonSchema;

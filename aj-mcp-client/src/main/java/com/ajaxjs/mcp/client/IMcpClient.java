@@ -48,6 +48,8 @@ public interface IMcpClient extends AutoCloseable {
 
     /**
      * Obtains the current list of resource templates (dynamic resources) available on the MCP server.
+     *
+     * @return The list of resource templates
      */
     List<ResourceTemplate> listResourceTemplates();
 
@@ -62,13 +64,28 @@ public interface IMcpClient extends AutoCloseable {
 
     /**
      * Obtain a list of prompts available on the MCP server.
+     *
+     * @return The list of prompts
      */
     List<PromptItem> listPrompts();
 
     /**
      * Render the contents of a prompt.
+     *
+     * @param name      The name of the prompt to render.
+     * @param arguments The arguments to pass to the prompt.
+     * @return The prompt result.
      */
     GetPromptResult.PromptResultDetail getPrompt(String name, Map<String, Object> arguments);
+
+    /**
+     * Render the contents of a prompt.
+     *
+     * @param name      The name of the prompt to render.
+     * @param arguments The arguments to pass to the prompt.
+     * @return The prompt result.
+     */
+    GetPromptResult.PromptResultDetail getPrompt(String name, String arguments);
 
     /**
      * Performs a health check that returns normally if the MCP server is reachable and
