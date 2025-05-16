@@ -20,6 +20,7 @@ import java.util.function.Function;
  */
 @Slf4j
 @Data
+@Deprecated
 public class McpToolProvider {
     /**
      * The list of MCP clients to use for retrieving tools.

@@ -1,6 +1,5 @@
 package com.ajaxjs.mcp.client;
 
-import com.ajaxjs.mcp.common.IllegalResponseException;
 import com.ajaxjs.mcp.common.JsonUtils;
 import com.ajaxjs.mcp.common.McpException;
 import com.ajaxjs.mcp.protocol.resource.*;
@@ -38,14 +37,14 @@ public abstract class McpClientResource extends McpClientPrompt {
         long timeoutMillis = requestTimeout.toMillis() == 0 ? Integer.MAX_VALUE : requestTimeout.toMillis();
 
         try {
-            CompletableFuture<JsonNode> resultFuture = transport.executeOperationWithResponse(request);
+            CompletableFuture<JsonNode> resultFuture = transport.sendRequestWithResponse(request);
             JsonNode result = resultFuture.get(timeoutMillis, TimeUnit.MILLISECONDS);
 
             return parseResourceContents(result);
         } catch (ExecutionException | InterruptedException | TimeoutException e) {
             throw new RuntimeException(e);
         } finally {
-            pendingOperations.remove(operationId);
+            pendingRequests.remove(operationId);
         }
     }
 
@@ -67,13 +66,13 @@ public abstract class McpClientResource extends McpClientPrompt {
         long timeoutMillis = requestTimeout.toMillis() == 0 ? Integer.MAX_VALUE : requestTimeout.toMillis();
 
         try {
-            CompletableFuture<JsonNode> resultFuture = transport.executeOperationWithResponse(request);
+            CompletableFuture<JsonNode> resultFuture = transport.sendRequestWithResponse(request);
             JsonNode result = resultFuture.get(timeoutMillis, TimeUnit.MILLISECONDS);
             resourceRefs.set(parseResourceRefs(result));
         } catch (ExecutionException | InterruptedException | TimeoutException e) {
             throw new RuntimeException(e);
         } finally {
-            pendingOperations.remove(request.getId());
+            pendingRequests.remove(request.getId());
         }
     }
 
@@ -86,13 +85,13 @@ public abstract class McpClientResource extends McpClientPrompt {
         long timeoutMillis = requestTimeout.toMillis() == 0 ? Integer.MAX_VALUE : requestTimeout.toMillis();
 
         try {
-            CompletableFuture<JsonNode> resultFuture = transport.executeOperationWithResponse(request);
+            CompletableFuture<JsonNode> resultFuture = transport.sendRequestWithResponse(request);
             JsonNode result = resultFuture.get(timeoutMillis, TimeUnit.MILLISECONDS);
             resourceTemplateRefs.set(parseResourceTemplateRefs(result));
         } catch (ExecutionException | InterruptedException | TimeoutException e) {
             throw new RuntimeException(e);
         } finally {
-            pendingOperations.remove(request.getId());
+            pendingRequests.remove(request.getId());
         }
     }
 
@@ -111,11 +110,11 @@ public abstract class McpClientResource extends McpClientPrompt {
                 return resourceRefs;
             } else {
                 log.warn("Result does not contain 'resources' element: {}", resultNode);
-                throw new IllegalResponseException("Result does not contain 'resources' element");
+                throw new IllegalStateException("Result does not contain 'resources' element");
             }
         } else {
             log.warn("Result does not contain 'result' element: {}", mcpMessage);
-            throw new IllegalResponseException("Result does not contain 'result' element");
+            throw new IllegalStateException("Result does not contain 'result' element");
         }
     }
 
@@ -151,11 +150,11 @@ public abstract class McpClientResource extends McpClientPrompt {
                 return new GetResourceResult.ResourceResultDetail(resourceContentsList);
             } else {
                 log.warn("Result does not contain 'contents' element: {}", resultNode);
-                throw new IllegalResponseException("Result does not contain 'resources' element");
+                throw new IllegalStateException("Result does not contain 'resources' element");
             }
         } else {
             log.warn("Result does not contain 'result' element: {}", mcpMessage);
-            throw new IllegalResponseException("Result does not contain 'result' element");
+            throw new IllegalStateException("Result does not contain 'result' element");
         }
     }
 
@@ -174,11 +173,11 @@ public abstract class McpClientResource extends McpClientPrompt {
                 return resourceTemplateRefs;
             } else {
                 log.warn("Result does not contain 'resourceTemplates' element: {}", resultNode);
-                throw new IllegalResponseException("Result does not contain 'resourceTemplates' element");
+                throw new IllegalStateException("Result does not contain 'resourceTemplates' element");
             }
         } else {
             log.warn("Result does not contain 'result' element: {}", mcpMessage);
-            throw new IllegalResponseException("Result does not contain 'result' element");
+            throw new IllegalStateException("Result does not contain 'result' element");
         }
     }
 }

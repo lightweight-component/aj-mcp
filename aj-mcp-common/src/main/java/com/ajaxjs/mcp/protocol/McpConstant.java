@@ -50,5 +50,9 @@ public interface McpConstant {
 
     String RESPONSE_RESULT = "result";
 
+    String ID = "id";
+
     String PARAMS = "params";
+
+    String METHOD = "method";
 }

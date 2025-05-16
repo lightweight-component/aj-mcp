@@ -1,6 +1,5 @@
 package com.ajaxjs.mcp.client.transport;
 
-
 import com.ajaxjs.mcp.common.JsonUtils;
 import com.ajaxjs.mcp.common.McpUtils;
 import com.ajaxjs.mcp.protocol.BaseJsonRpcMessage;
@@ -10,6 +9,7 @@ import com.ajaxjs.mcp.protocol.initialize.InitializeRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import okhttp3.sse.EventSource;
@@ -28,7 +28,8 @@ import java.util.stream.StreamSupport;
 
 @Slf4j
 @Data
-public class HttpMcpTransport extends BaseTransport {
+@EqualsAndHashCode(callSuper = true)
+public class HttpMcpTransport extends McpTransport {
     private final String sseUrl;
 
     private OkHttpClient client;
@@ -96,8 +97,8 @@ public class HttpMcpTransport extends BaseTransport {
     }
 
     @Override
-    public void start(Map<Long, CompletableFuture<JsonNode>> pendingOperations) {
-        setPendingOperations(pendingOperations);
+    public void start(Map<Long, CompletableFuture<JsonNode>> pendingRequest) {
+        setPendingRequests(pendingRequest);
 
         mcpSseEventListener = startSseChannel(logResponses);
     }
@@ -119,7 +120,7 @@ public class HttpMcpTransport extends BaseTransport {
     }
 
     @Override
-    public CompletableFuture<JsonNode> executeOperationWithResponse(McpRequest request) {
+    public CompletableFuture<JsonNode> sendRequestWithResponse(McpRequest request) {
         try {
             return execute(createRequest(request), request.getId());
         } catch (JsonProcessingException e) {
@@ -128,7 +129,7 @@ public class HttpMcpTransport extends BaseTransport {
     }
 
     @Override
-    public void executeOperationWithoutResponse(McpRequest request) {
+    public void sendRequestWithoutResponse(McpRequest request) {
         try {
             Request httpRequest = createRequest(request);
             execute(httpRequest, null);
@@ -140,7 +141,7 @@ public class HttpMcpTransport extends BaseTransport {
     private CompletableFuture<JsonNode> execute(Request request, Long id) {
         CompletableFuture<JsonNode> future = new CompletableFuture<>();
         if (id != null)
-            startOperation(id, future);
+            saveRequest(id, future);
 
         client.newCall(request).enqueue(new Callback() {
             @Override

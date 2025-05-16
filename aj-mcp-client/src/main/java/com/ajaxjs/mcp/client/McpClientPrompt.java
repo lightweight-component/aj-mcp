@@ -1,6 +1,5 @@
 package com.ajaxjs.mcp.client;
 
-import com.ajaxjs.mcp.common.IllegalResponseException;
 import com.ajaxjs.mcp.common.JsonUtils;
 import com.ajaxjs.mcp.common.McpException;
 import com.ajaxjs.mcp.protocol.McpConstant;
@@ -43,7 +42,7 @@ public abstract class McpClientPrompt extends McpClientBase {
         long timeoutMillis = requestTimeout.toMillis() == 0 ? Integer.MAX_VALUE : requestTimeout.toMillis();
 
         try {
-            CompletableFuture<JsonNode> resultFuture = transport.executeOperationWithResponse(request);
+            CompletableFuture<JsonNode> resultFuture = transport.sendRequestWithResponse(request);
             JsonNode result = resultFuture.get(timeoutMillis, TimeUnit.MILLISECONDS);
 
             List<PromptItem> promptItems = parsePromptRefs(result);
@@ -51,7 +50,7 @@ public abstract class McpClientPrompt extends McpClientBase {
         } catch (ExecutionException | InterruptedException | TimeoutException e) {
             throw new RuntimeException(e);
         } finally {
-            pendingOperations.remove(request.getId());
+            pendingRequests.remove(request.getId());
         }
     }
 
@@ -69,11 +68,11 @@ public abstract class McpClientPrompt extends McpClientBase {
                 return promptRefs;
             } else {
                 log.warn("Result does not contain 'prompts' element: {}", resultNode);
-                throw new IllegalResponseException("Result does not contain 'prompts' element");
+                throw new IllegalStateException("Result does not contain 'prompts' element");
             }
         } else {
             log.warn("Result does not contain 'result' element: {}", mcpMessage);
-            throw new IllegalResponseException("Result does not contain 'result' element");
+            throw new IllegalStateException("Result does not contain 'result' element");
         }
     }
 
@@ -92,7 +91,7 @@ public abstract class McpClientPrompt extends McpClientBase {
         long timeoutMillis = requestTimeout.toMillis() == 0 ? Integer.MAX_VALUE : requestTimeout.toMillis();
 
         try {
-            CompletableFuture<JsonNode> resultFuture = transport.executeOperationWithResponse(request);
+            CompletableFuture<JsonNode> resultFuture = transport.sendRequestWithResponse(request);
             JsonNode result = resultFuture.get(timeoutMillis, TimeUnit.MILLISECONDS);
             McpException.checkForErrors(result);
 
@@ -100,7 +99,7 @@ public abstract class McpClientPrompt extends McpClientBase {
         } catch (ExecutionException | InterruptedException | TimeoutException e) {
             throw new RuntimeException(e);
         } finally {
-            pendingOperations.remove(operationId);
+            pendingRequests.remove(operationId);
         }
     }
 

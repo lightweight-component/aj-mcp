@@ -2,7 +2,6 @@ package com.ajaxjs.mcp.client;
 
 
 import com.ajaxjs.mcp.common.JsonUtils;
-import com.ajaxjs.mcp.protocol.prompt.GetPromptResult;
 import com.ajaxjs.mcp.protocol.tools.CallToolRequest;
 import com.ajaxjs.mcp.protocol.tools.GetToolListRequest;
 import com.ajaxjs.mcp.protocol.tools.JsonSchema;
@@ -43,11 +42,11 @@ public class McpClient extends McpClientResource {
         JsonNode result;
 
         try {
-            result = transport.executeOperationWithResponse(request).get();
+            result = transport.sendRequestWithResponse(request).get();
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
         } finally {
-            pendingOperations.remove(request.getId());
+            pendingRequests.remove(request.getId());
         }
 
         return toolListFromMcpResponse((ArrayNode) result.get(RESPONSE_RESULT).get("tools"));
@@ -85,10 +84,10 @@ public class McpClient extends McpClientResource {
         JsonNode result;
 
         try {
-            CompletableFuture<JsonNode> resultFuture = transport.executeOperationWithResponse(request);
+            CompletableFuture<JsonNode> resultFuture = transport.sendRequestWithResponse(request);
             result = resultFuture.get(timeoutMillis, TimeUnit.MILLISECONDS);
         } catch (TimeoutException timeout) {
-            transport.executeOperationWithoutResponse(new CancellationNotification(String.valueOf(operationId), "Timeout"));
+            transport.sendRequestWithoutResponse(new CancellationNotification(String.valueOf(operationId), "Timeout"));
             ObjectNode resultTimeout = JsonNodeFactory.instance.objectNode();
             resultTimeout.putObject(RESPONSE_RESULT)
                     .putArray("content").addObject().put("type", ContentType.TEXT)
@@ -98,7 +97,7 @@ public class McpClient extends McpClientResource {
         } catch (ExecutionException | InterruptedException e) {
             throw new RuntimeException(e);
         } finally {
-            pendingOperations.remove(operationId);
+            pendingRequests.remove(operationId);
         }
 
         return extractResult(result);

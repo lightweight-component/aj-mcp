@@ -115,7 +115,7 @@ public abstract class McpServerInitialize implements McpConstant {
             throw new JsonRpcErrorException(JsonRpcErrorCode.INVALID_REQUEST, "Invalid jsonrpc version: " + jsonrpc);
 
         // id 必填
-        JsonNode idNode = jsonNode.get("id");
+        JsonNode idNode = jsonNode.get(ID);
 
         if (idNode == null)
             throw new JsonRpcErrorException(JsonRpcErrorCode.INVALID_REQUEST, "Empty id.");
@@ -124,7 +124,7 @@ public abstract class McpServerInitialize implements McpConstant {
         if (id == 0L)
             id = null;
 
-        JsonNode methodNode = jsonNode.get("method");
+        JsonNode methodNode = jsonNode.get(METHOD);
 
         if (methodNode == null)
             throw new JsonRpcErrorException(JsonRpcErrorCode.METHOD_NOT_FOUND, "Method not found.");

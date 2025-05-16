@@ -51,7 +51,7 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
      */
     final Duration requestTimeout;
 
-    final Map<Long, CompletableFuture<JsonNode>> pendingOperations = new ConcurrentHashMap<>();
+    final Map<Long, CompletableFuture<JsonNode>> pendingRequests = new ConcurrentHashMap<>();
 
     final AtomicLong idGenerator = new AtomicLong(1);
 
@@ -65,17 +65,13 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
         clientName = McpUtils.getOrDefault(builder.clientName, "aj-mcp");
         clientVersion = McpUtils.getOrDefault(builder.clientVersion, "1.0");
         protocolVersion = McpUtils.getOrDefault(builder.protocolVersion, "2024-11-05");
-
         transport = Objects.requireNonNull(builder.transport, "transport required");
-
         requestTimeout = McpUtils.getOrDefault(builder.toolExecutionTimeout, Duration.ofSeconds(60));
     }
 
     public void initialize() {
-        transport.start(pendingOperations);
-
+        transport.start(pendingRequests);
         long operationId = idGenerator.getAndIncrement();
-//        InitializeRequest request = new InitializeRequest(operationId);
         InitializeRequest request = new InitializeRequest();
         request.setId(operationId);
         request.setParams(createInitializeParams());
@@ -91,7 +87,7 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
             log.warn("InterruptedException when initializing MCP", e);
             throw new RuntimeException(e);
         } finally {
-            pendingOperations.remove(operationId);
+            pendingRequests.remove(operationId);
         }
     }
 
@@ -127,12 +123,12 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
         ping.setId(operationId);
 
         try {
-            CompletableFuture<JsonNode> resultFuture = transport.executeOperationWithResponse(ping);
+            CompletableFuture<JsonNode> resultFuture = transport.sendRequestWithResponse(ping);
             resultFuture.get(requestTimeout.toMillis(), TimeUnit.MILLISECONDS);
         } catch (ExecutionException | InterruptedException | TimeoutException e) {
             throw new RuntimeException(e);
         } finally {
-            pendingOperations.remove(operationId);
+            pendingRequests.remove(operationId);
         }
     }
 
