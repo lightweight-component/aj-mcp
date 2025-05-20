@@ -18,6 +18,17 @@ import java.util.Collections;
 import java.util.List;
 
 public abstract class McpServerResource extends McpServerInitialize {
+    /**
+     * Retrieves a list of resources based on the request information.
+     * This method first checks if the request contains parameters, and if so, sets these parameters.
+     * It then obtains resource information from the RAM (Resource Access Management) system.
+     * If the resource store has not been initialized, it throws a NullPointerException.
+     * Finally, it constructs and returns the resource list result.
+     *
+     * @param requestRaw The raw information of the request, containing the necessary information to retrieve the resource list.
+     * @return Returns the resource list response object, containing the list of resources.
+     * @throws NullPointerException If the resource store has not been initialized, this exception is thrown.
+     */
     McpResponse resourceList(McpRequestRawInfo requestRaw) {
         JsonNode jsonNode = requestRaw.getJsonNode();
         GetResourceListRequest request = new GetResourceListRequest();
@@ -44,6 +55,16 @@ public abstract class McpServerResource extends McpServerInitialize {
         return result;
     }
 
+    /**
+     * Reads resource information based on the request.
+     * This method interprets the request parameters, retrieves the corresponding resource from the server store,
+     * and invokes the resource's method to obtain the resource content. It then packages and returns the result.
+     *
+     * @param requestRaw The raw information of the resource read request, containing the request ID and parameters.
+     * @return Returns the read resource information, including the request ID and resource content.
+     * @throws JsonRpcErrorException If the request parameters are invalid, throws a custom JSON RPC error exception.
+     * @throws RuntimeException      If there is an exception invoking the resource method, throws a runtime exception.
+     */
     McpResponse resourceRead(McpRequestRawInfo requestRaw) {
         JsonNode jsonNode = requestRaw.getJsonNode();
         JsonNode paramsNode = jsonNode.get(PARAMS);

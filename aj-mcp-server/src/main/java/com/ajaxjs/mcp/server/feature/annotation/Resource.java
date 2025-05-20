@@ -1,6 +1,8 @@
 package com.ajaxjs.mcp.server.feature.annotation;
 
 
+import com.ajaxjs.mcp.protocol.McpConstant;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
@@ -26,14 +28,14 @@ public @interface Resource {
      *
      * @return A human-readable name for this resource.
      */
-    String value() default "";
+    String value() default McpConstant.EMPTY_STR;
 
     /**
      * A description of what this resource represents.
      *
      * @return A description of what this resource represents.
      */
-    String description() default "";
+    String description() default McpConstant.EMPTY_STR;
 
     /**
      * The URI of this resource.
@@ -47,6 +49,6 @@ public @interface Resource {
      *
      * @return The MIME type of this resource, if known.
      */
-    String mimeType() default "";
+    String mimeType() default McpConstant.EMPTY_STR;
 
 }

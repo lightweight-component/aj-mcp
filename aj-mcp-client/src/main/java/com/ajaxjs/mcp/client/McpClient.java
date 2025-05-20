@@ -4,6 +4,7 @@ package com.ajaxjs.mcp.client;
 import com.ajaxjs.mcp.client.transport.McpTransport;
 import com.ajaxjs.mcp.client.transport.StdioTransport;
 import com.ajaxjs.mcp.common.JsonUtils;
+import com.ajaxjs.mcp.protocol.McpConstant;
 import com.ajaxjs.mcp.protocol.tools.CallToolRequest;
 import com.ajaxjs.mcp.protocol.tools.GetToolListRequest;
 import com.ajaxjs.mcp.protocol.tools.JsonSchema;
@@ -183,7 +184,7 @@ public class McpClient extends McpClientResource {
     private static String extractError(JsonNode errorNode) {
         String errorMessage = "";
         if (errorNode.get("message") != null)
-            errorMessage = errorNode.get("message").asText("");
+            errorMessage = errorNode.get("message").asText(McpConstant.EMPTY_STR);
 
         Integer errorCode = null;
         if (errorNode.get("code") != null)

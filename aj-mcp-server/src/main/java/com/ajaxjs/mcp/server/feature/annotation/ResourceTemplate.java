@@ -1,5 +1,7 @@
 package com.ajaxjs.mcp.server.feature.annotation;
 
+import com.ajaxjs.mcp.protocol.McpConstant;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
@@ -15,23 +17,18 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target(METHOD)
 public @interface ResourceTemplate {
     /**
-     * Constant value for {@link #name()} indicating that the annotated element's name should be used as-is.
-     */
-    String ELEMENT_NAME = "<<element name>>";
-
-    /**
      * The human-readable name for this resource template.
      *
      * @return The human-readable name for this resource template.
      */
-    String name() default ELEMENT_NAME;
+    String name() default McpConstant.EMPTY_STR;
 
     /**
      * The description of what this resource template represents.
      *
      * @return The description of what this resource template represents.
      */
-    String description() default "";
+    String description() default McpConstant.EMPTY_STR;
 
     /**
      * The Level 1 URI template that can be used to construct resource URIs.
@@ -47,5 +44,5 @@ public @interface ResourceTemplate {
      *
      * @return The MIME type of this resource template.
      */
-    String mimeType() default "";
+    String mimeType() default McpConstant.EMPTY_STR;
 }

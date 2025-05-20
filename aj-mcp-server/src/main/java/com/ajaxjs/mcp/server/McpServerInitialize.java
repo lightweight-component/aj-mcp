@@ -10,9 +10,9 @@ import com.ajaxjs.mcp.protocol.initialize.InitializeRequest;
 import com.ajaxjs.mcp.protocol.initialize.InitializeRequestParams;
 import com.ajaxjs.mcp.protocol.initialize.InitializeResponse;
 import com.ajaxjs.mcp.protocol.initialize.InitializeResponseResult;
+import com.ajaxjs.mcp.server.common.ServerConfig;
 import com.ajaxjs.mcp.server.error.JsonRpcErrorCode;
 import com.ajaxjs.mcp.server.error.JsonRpcErrorException;
-import com.ajaxjs.mcp.server.common.ServerConfig;
 import com.ajaxjs.mcp.transport.McpTransportSync;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -30,6 +30,18 @@ public abstract class McpServerInitialize implements McpConstant {
 
     McpTransportSync transport;
 
+    /**
+     * Retrieves a store object by name from the given map.
+     * This method is used to fetch a specific store object by its name from a map of string to generic type T.
+     * It first checks if the map is null, and throws an exception if so.
+     * Then it attempts to get the store object from the map. If the object with the specified name is not found, another exception is thrown.
+     * If the store object is found, it is returned to the caller.
+     *
+     * @param map  The map from String to objects of generic type T, representing the collection of stores
+     * @param name The name of the store to retrieve
+     * @return the store object of type T; if the map is empty or the store is not found, an exception is thrown
+     * @throws NullPointerException if the map is null or the store with the specified name is not found
+     */
     static <T> T getStore(Map<String, T> map, String name) {
         if (map.isEmpty())
             throw new NullPointerException("Store is NOT in initialized");
@@ -42,6 +54,16 @@ public abstract class McpServerInitialize implements McpConstant {
         return store;
     }
 
+    /**
+     * Initializes the connection with the client and returns the server configuration information.
+     * <p>
+     * This method receives a client ID and request parameters in JsonNode format, converts the JsonNode to an InitializeRequest object,
+     * processes the requested protocol version, and returns the server information and capabilities in InitializeResponse.
+     *
+     * @param id       Client request identifier
+     * @param jsonNode Client request parameters in JsonNode format
+     * @return Returns the initialization response object containing the server configuration information
+     */
     McpResponse initialize(Long id, JsonNode jsonNode) {
         InitializeRequest initializeRequest;
 
@@ -91,6 +113,15 @@ public abstract class McpServerInitialize implements McpConstant {
         return resp;
     }
 
+    /**
+     * Validates and parses a JSON-RPC request.
+     * This method is primarily used to verify that the input JSON string conforms to the JSON-RPC specification,
+     * and to extract the necessary information from the request.
+     *
+     * @param inputJson The input JSON string, which should contain complete JSON-RPC request information
+     * @return An McpRequestRawInfo object containing the request ID, method name, and raw JSON data
+     * @throws JsonRpcErrorException If the input JSON string does not conform to the specification or is missing required fields, this exception is thrown
+     */
     static McpRequestRawInfo jsonRpcValidate(String inputJson) {
         inputJson = inputJson.trim();
         if (!inputJson.startsWith("{") || !inputJson.endsWith("}")) // 先简单判断一下是否合法的 JSON

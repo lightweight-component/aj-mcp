@@ -12,6 +12,7 @@ public class App {
 
         McpServer server = new McpServer();
         server.setTransport(new ServerStdio(server));
+
         ServerConfig serverConfig = new ServerConfig();
         serverConfig.setName("MY_MCP_Server");
         serverConfig.setVersion("1.0");

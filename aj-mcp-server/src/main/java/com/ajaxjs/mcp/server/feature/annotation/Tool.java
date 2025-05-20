@@ -1,5 +1,7 @@
 package com.ajaxjs.mcp.server.feature.annotation;
 
+import com.ajaxjs.mcp.protocol.McpConstant;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.util.List;
@@ -29,13 +31,13 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Target(METHOD)
 public @interface Tool {
-    String value() default "";
+    String value() default McpConstant.EMPTY_STR;
 
     /**
      * An optional description.
      *
      * @return description
      */
-    String description() default "";
+    String description() default McpConstant.EMPTY_STR;
 
 }

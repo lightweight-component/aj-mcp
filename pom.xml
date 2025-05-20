@@ -15,6 +15,5 @@
         <module>samples/server/server-stdio</module>
         <module>samples/server/spring</module>
         <module>samples/server/tomcat</module>
-        <module>samples/server/server-sse</module>
     </modules>
 </project>

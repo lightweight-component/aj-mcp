@@ -1,5 +1,7 @@
 package com.ajaxjs.mcp.server.feature.annotation;
 
+import com.ajaxjs.mcp.protocol.McpConstant;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -13,9 +15,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Target(ElementType.PARAMETER)
 public @interface ToolArg {
-    String value() default "";
+    String value() default McpConstant.EMPTY_STR;
 
-    String description() default "";
+    String description() default McpConstant.EMPTY_STR;
 
     /**
      * An argument is required by default. However, if the annotated type is {@link Optional} and no annotation value is set

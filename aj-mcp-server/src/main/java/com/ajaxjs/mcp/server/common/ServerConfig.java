@@ -5,6 +5,9 @@ import lombok.Data;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Config object
+ */
 @Data
 public class ServerConfig {
     /**

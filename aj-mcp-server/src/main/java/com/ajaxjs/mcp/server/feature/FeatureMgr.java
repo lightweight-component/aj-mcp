@@ -25,6 +25,12 @@ public class FeatureMgr {
 
     public static final Map<String, ServerStoreTool> TOOL_STORE = new ConcurrentHashMap<>();
 
+    /**
+     * Initializes all classes with a specific annotation within the given package name.
+     * This method is primarily responsible for scanning all classes within the specified package and executing the corresponding processing logic based on method annotations in those classes.
+     *
+     * @param packageName The name of the package to scan
+     */
     public void init(String packageName) {
         Set<Class<?>> classesWithAnnotation;
 
@@ -69,6 +75,20 @@ public class FeatureMgr {
         }
     }
 
+    /**
+     * Adds a tool method to the tool store.
+     * <p>
+     * This method is responsible for adding methods annotated with @Tool, along with their associated metadata, to the tool store. It performs the following steps:
+     * 1. Retrieves the tool name and description
+     * 2. Collects and processes method parameters to generate a JSON schema for input data
+     * 3. Creates and configures a ToolItem object
+     * 4. Creates and configures a ServerStoreTool object
+     * 5. Adds the ServerStoreTool object to the tool store
+     *
+     * @param tool     The instance of the class annotated with @Tool
+     * @param method   The method that is marked as a tool
+     * @param instance The instance object to which the method belongs
+     */
     private void addTool(Tool tool, Method method, Object instance) {
         String toolName = tool.value().isEmpty() ? method.getName() : tool.value();
         String description = McpUtils.isEmptyText(tool.description()) ? null : tool.description();
@@ -77,7 +97,7 @@ public class FeatureMgr {
         List<String> required = new ArrayList<>();
         boolean hasArgs = false;
         Parameter[] parameters = method.getParameters();
-        List<String> paramsOrder=null;
+        List<String> paramsOrder = null;
 
         if (parameters != null) {
             paramsOrder = new ArrayList<>();
@@ -120,6 +140,13 @@ public class FeatureMgr {
         TOOL_STORE.put(toolName, store);
     }
 
+    /**
+     * Maps Java parameter types to JavaScript types.
+     * This method is primarily used to convert between Java types and JavaScript types, ensuring correct data handling on the front end.
+     *
+     * @param parameter The parameter object of a Java method, used to obtain type information about the parameter
+     * @return A string representing the corresponding JavaScript type
+     */
     public static String mapJavaTypeToJsType(Parameter parameter) {
         // 获取参数的类型
         Class<?> type = parameter.getType();
@@ -138,9 +165,7 @@ public class FeatureMgr {
                 return "Number";
             else if (type == Boolean.class)
                 return "Boolean";
-            else if (type == Character.class)
-                return "string";
-            else if (type == String.class)
+            else if (type == Character.class || type == String.class)
                 return "string";
         }
 
@@ -148,6 +173,17 @@ public class FeatureMgr {
         return "Object";
     }
 
+    /**
+     * Adds resource information to the resource store.
+     * <p>
+     * This method is responsible for encapsulating the given resource information, method, and instance object into resource items and server storage resource objects,
+     * then storing them in the resource store. This method demonstrates how to associate metadata with business logic components,
+     * making it easier to access and use this information in subsequent processing.
+     *
+     * @param resource The resource annotation containing metadata about the resource
+     * @param method   The method object of the class to which the resource belongs
+     * @param instance The instance object of the class to which the resource belongs
+     */
     private void addResource(Resource resource, Method method, Object instance) {
         ResourceItem resourceItem = new ResourceItem();
         resourceItem.setUri(resource.uri());
@@ -163,6 +199,16 @@ public class FeatureMgr {
         RESOURCE_STORE.put(resource.uri(), store);
     }
 
+    /**
+     * Adds a prompt to the prompt store.
+     * <p>
+     * This method is responsible for building a prompt item from a method and instance, and storing it in the prompt store.
+     * It processes the method's annotations to extract prompt-related information, including the prompt's name, description, and arguments.
+     *
+     * @param prompt   The annotation instance containing the prompt definition.
+     * @param method   The method where the prompt is defined.
+     * @param instance The instance of the class containing the method.
+     */
     private void addPrompt(Prompt prompt, Method method, Object instance) {
         String promptName = prompt.value().isEmpty() ? method.getName() : prompt.value();
         String description = prompt.description();

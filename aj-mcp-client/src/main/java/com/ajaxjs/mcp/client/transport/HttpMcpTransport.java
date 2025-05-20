@@ -3,6 +3,7 @@ package com.ajaxjs.mcp.client.transport;
 import com.ajaxjs.mcp.common.JsonUtils;
 import com.ajaxjs.mcp.common.McpUtils;
 import com.ajaxjs.mcp.protocol.BaseJsonRpcMessage;
+import com.ajaxjs.mcp.protocol.McpConstant;
 import com.ajaxjs.mcp.protocol.McpRequest;
 import com.ajaxjs.mcp.protocol.initialize.InitializationNotification;
 import com.ajaxjs.mcp.protocol.initialize.InitializeRequest;
@@ -66,7 +67,7 @@ public class HttpMcpTransport extends McpTransport {
 
                     try {
                         if (request.body() == null)
-                            body = "";
+                            body = McpConstant.EMPTY_STR;
                         else {
                             request.body().writeTo(buffer);
                             body = buffer.readUtf8();

@@ -55,4 +55,6 @@ public interface McpConstant {
     String PARAMS = "params";
 
     String METHOD = "method";
+
+    String EMPTY_STR = "";
 }

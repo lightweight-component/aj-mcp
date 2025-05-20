@@ -1,5 +1,7 @@
 package com.ajaxjs.mcp.server.feature.annotation;
 
+import com.ajaxjs.mcp.protocol.McpConstant;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -19,13 +21,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target(ElementType.PARAMETER)
 public @interface CompleteArg {
     /**
-     * Constant value for {@link #name()} indicating that the annotated element's name should be used as-is.
-     */
-    String ELEMENT_NAME = "<<element name>>";
-
-    /**
+     * The name of the completed argument
+     *
      * @return the name of the completed argument
      */
-    String name() default ELEMENT_NAME;
+    String name() default McpConstant.EMPTY_STR;
 
 }

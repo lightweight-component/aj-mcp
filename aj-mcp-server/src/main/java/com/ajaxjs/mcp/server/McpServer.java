@@ -37,15 +37,20 @@ public class McpServer extends McpServerPrompt {
         transport.start();
     }
 
+    /**
+     * Handles received message requests.
+     * Invokes the corresponding processing logic based on the method.
+     *
+     * @param requestRaw The raw request information, including the method, ID, and data
+     * @return A response object depending on the requested method
+     * @throws JsonRpcErrorException If the requested method is not found, this exception is thrown
+     */
     public McpResponse processMessage(McpRequestRawInfo requestRaw) {
         switch (requestRaw.getMethod()) {
             case Methods.INITIALIZE:
                 JsonNode jsonNode = requestRaw.getJsonNode();
                 return initialize(requestRaw.getId(), jsonNode);
             case Methods.PING:
-//                McpResponse resp = new McpResponse();
-//                resp.setId(request.getId());
-//                resp.setResult(new HashMap<>());
                 PingResponse resp = new PingResponse();
                 resp.setId(requestRaw.getId());
 
@@ -67,6 +72,15 @@ public class McpServer extends McpServerPrompt {
         }
     }
 
+    /**
+     * Processes the tool list request from the client and returns the list of tools.
+     * This method first checks if the request contains parameters, and if so, sets them.
+     * Then it retrieves the list of tools from the resource store and constructs the response containing the list of tools.
+     *
+     * @param requestRaw The raw information of the client's request, containing the request ID and possibly parameters.
+     * @return Returns the response object containing the list of tools.
+     * @throws NullPointerException If the resource store is not initialized.
+     */
     McpResponse toolList(McpRequestRawInfo requestRaw) {
         JsonNode jsonNode = requestRaw.getJsonNode();
         GetResourceListRequest request = new GetResourceListRequest();
@@ -93,6 +107,20 @@ public class McpServer extends McpServerPrompt {
         return result;
     }
 
+    /**
+     * Calls a tool using the provided request information.
+     * <p>
+     * This method processes the request to call a tool by parsing the request parameters,
+     * validating them against the tool's input schema, and then invoking the tool's method
+     * with the provided arguments. It handles errors such as invalid parameters and
+     * runtime exceptions during method invocation.
+     *
+     * @param requestRaw The raw information of the tool call request, containing the necessary
+     *                   information to make the call, such as parameters and request ID.
+     * @return Returns a response object containing the result of the tool call.
+     * @throws JsonRpcErrorException If the parameters are invalid or missing required arguments.
+     * @throws RuntimeException      If an exception occurs during method invocation.
+     */
     McpResponse toolCall(McpRequestRawInfo requestRaw) {
         JsonNode jsonNode = requestRaw.getJsonNode();
         JsonNode paramsNode = jsonNode.get(PARAMS);
@@ -175,7 +203,14 @@ public class McpServer extends McpServerPrompt {
         return result;
     }
 
-
+    /**
+     * Converts the given value to the target type.
+     *
+     * @param value      The value to be converted, must not be null
+     * @param targetType The target type, supported types include: "string", "number", "boolean"
+     * @return The converted value
+     * @throws IllegalArgumentException if value or targetType is null, or if the conversion is not possible
+     */
     public static Object convertToType(Object value, String targetType) {
         if (value == null || targetType == null)
             throw new IllegalArgumentException("Value or targetType cannot be null");

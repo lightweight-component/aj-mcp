@@ -19,6 +19,14 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class McpServerPrompt extends McpServerResource {
+    /**
+     * Processes the prompt list request.
+     * This method parses the request, retrieves prompt information from the RAM, and constructs the response.
+     *
+     * @param requestRaw The raw information of the request, containing the necessary data for the request.
+     * @return Returns the {@link McpResponse} object containing the prompt list.
+     * @throws NullPointerException If the prompt store in the RAM is not initialized.
+     */
     McpResponse promptList(McpRequestRawInfo requestRaw) {
         JsonNode jsonNode = requestRaw.getJsonNode();
         GetPromptListRequest request = new GetPromptListRequest();
@@ -45,10 +53,19 @@ public abstract class McpServerPrompt extends McpServerResource {
         return result;
     }
 
+    /**
+     * Processes the get prompt request and returns the corresponding prompt information.
+     *
+     * @param requestRaw The raw information of the get prompt request, containing the request ID and parameters.
+     * @return Returns the {@link McpResponse} object containing the prompt information.
+     * @throws JsonRpcErrorException If the request parameters are invalid or missing necessary fields.
+     * @throws RuntimeException      If there is an exception invoking the prompt method.
+     */
     McpResponse promptGet(McpRequestRawInfo requestRaw) {
         JsonNode jsonNode = requestRaw.getJsonNode();
         JsonNode paramsNode = jsonNode.get(PARAMS);
 
+        // Check if the params field exists, if not, throw an exception indicating invalid parameters.
         if (paramsNode == null)
             throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_PARAMS, "params is required");
 
@@ -107,7 +124,7 @@ public abstract class McpServerPrompt extends McpServerResource {
 
         if (returnedValue instanceof PromptMessage)
             promptMessages = Collections.singletonList((PromptMessage) returnedValue);
-         else if (returnedValue instanceof List)
+        else if (returnedValue instanceof List)
             promptMessages = (List<PromptMessage>) returnedValue;
 
         GetPromptResult.PromptResultDetail promptResultDetail = new GetPromptResult.PromptResultDetail();
