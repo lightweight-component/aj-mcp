@@ -16,6 +16,11 @@ import java.util.Map;
  */
 public interface IMcpClient extends AutoCloseable {
     /**
+     * Initializes the client by sending an initialization request to the MCP server.
+     */
+    void initialize();
+
+    /**
      * Obtains a list of tools from the MCP server.
      *
      * @return The list of tools

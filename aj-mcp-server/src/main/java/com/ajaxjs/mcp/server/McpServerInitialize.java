@@ -12,7 +12,7 @@ import com.ajaxjs.mcp.protocol.initialize.InitializeResponse;
 import com.ajaxjs.mcp.protocol.initialize.InitializeResponseResult;
 import com.ajaxjs.mcp.server.error.JsonRpcErrorCode;
 import com.ajaxjs.mcp.server.error.JsonRpcErrorException;
-import com.ajaxjs.mcp.server.model.ServerConfig;
+import com.ajaxjs.mcp.server.common.ServerConfig;
 import com.ajaxjs.mcp.transport.McpTransportSync;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -32,12 +32,12 @@ public abstract class McpServerInitialize implements McpConstant {
 
     static <T> T getStore(Map<String, T> map, String name) {
         if (map.isEmpty())
-            throw new NullPointerException("Store 未初始化");
+            throw new NullPointerException("Store is NOT in initialized");
 
         T store = map.get(name);
 
         if (store == null)
-            throw new NullPointerException("找不到 " + name + " store.");
+            throw new NullPointerException("The " + name + " store is NOT found.");
 
         return store;
     }

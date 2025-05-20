@@ -8,8 +8,8 @@ public enum Role {
     /**
      * To allow case-insensitive deserialization
      *
-     * @param key
-     * @return
+     * @param key Key
+     * @return Role
      */
     @JsonCreator
     public static Role fromString(String key) {

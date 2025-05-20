@@ -29,7 +29,7 @@ public abstract class McpServerPrompt extends McpServerResource {
 
         // get info from RAM
         if (FeatureMgr.PROMPT_STORE.isEmpty())
-            throw new NullPointerException("Store 未初始化");
+            throw new NullPointerException("Store is NOT initialized");
 
         List<PromptItem> prompts = new ArrayList<>();
         for (String name : FeatureMgr.PROMPT_STORE.keySet()) {

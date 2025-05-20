@@ -16,6 +16,8 @@ public @interface Prompt {
 
     /**
      * An optional description.
+     *
+     * @return description
      */
     String description() default "";
 }

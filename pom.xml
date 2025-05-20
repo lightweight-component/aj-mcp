@@ -12,7 +12,9 @@
         <module>aj-mcp-client</module>
         <module>aj-mcp-server</module>
         <module>samples/client</module>
-        <module>samples/server-sse</module>
-        <module>samples/server-stdio</module>
+        <module>samples/server/server-stdio</module>
+        <module>samples/server/spring</module>
+        <module>samples/server/tomcat</module>
+        <module>samples/server/server-sse</module>
     </modules>
 </project>

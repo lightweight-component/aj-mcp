@@ -1,7 +1,6 @@
 package com.ajaxjs.mcp.client;
 
 import com.ajaxjs.mcp.client.transport.McpTransport;
-import com.ajaxjs.mcp.common.McpUtils;
 import com.ajaxjs.mcp.protocol.McpConstant;
 import com.ajaxjs.mcp.protocol.initialize.InitializeRequest;
 import com.ajaxjs.mcp.protocol.initialize.InitializeRequestParams;
@@ -10,12 +9,13 @@ import com.ajaxjs.mcp.protocol.resource.ResourceItem;
 import com.ajaxjs.mcp.protocol.resource.ResourceTemplate;
 import com.ajaxjs.mcp.protocol.utils.ping.PingRequest;
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.Builder;
+import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
@@ -24,32 +24,35 @@ import java.util.concurrent.atomic.AtomicReference;
  * Base Class for MCP Client, mainly doing the initialize job.
  */
 @Slf4j
+@SuperBuilder
 public abstract class McpClientBase implements IMcpClient, McpConstant {
-    final McpTransport transport;
+    McpTransport transport;
 
     /**
      * Sets the name that the client will use to identify itself to the MCP server in the initialization message.
      */
-    final String clientName;
+    @Builder.Default
+    String clientName = "aj-mcp";
 
     /**
      * Sets the version string that the client will use to identify itself to the MCP server in the initialization message. The default value is "1.0".
      */
-    final String clientVersion;
+    @Builder.Default
+    String clientVersion = "1.0";
 
     /**
      * Sets the protocol version that the client will advertise in the
      * initialization message. The default value right now is "2024-11-05", but will change over time in later versions.
      */
-    final String protocolVersion;
+    @Builder.Default
+    String protocolVersion = "2024-11-05";
 
     /**
-     * Sets the timeout for tool execution.
-     * This value applies to each tool execution individually.
-     * The default value is 60 seconds.
-     * A value of zero means no timeout.
+     * Sets the timeout for tool execution. This value applies to each tool execution individually.
+     * The default value is 60 seconds. A value of zero means no timeout.
      */
-    final Duration requestTimeout;
+    @Builder.Default
+    Duration requestTimeout = Duration.ofSeconds(60);
 
     final Map<Long, CompletableFuture<JsonNode>> pendingRequests = new ConcurrentHashMap<>();
 
@@ -61,14 +64,7 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
 
     final AtomicReference<List<PromptItem>> promptRefs = new AtomicReference<>();
 
-    public McpClientBase(Builder builder) {
-        clientName = McpUtils.getOrDefault(builder.clientName, "aj-mcp");
-        clientVersion = McpUtils.getOrDefault(builder.clientVersion, "1.0");
-        protocolVersion = McpUtils.getOrDefault(builder.protocolVersion, "2024-11-05");
-        transport = Objects.requireNonNull(builder.transport, "transport required");
-        requestTimeout = McpUtils.getOrDefault(builder.toolExecutionTimeout, Duration.ofSeconds(60));
-    }
-
+    @Override
     public void initialize() {
         transport.start(pendingRequests);
         long operationId = idGenerator.getAndIncrement();
@@ -118,7 +114,6 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
     public void checkHealth() {
         transport.checkHealth();
         long operationId = idGenerator.getAndIncrement();
-//        PingRequest ping = new PingRequest(operationId);
         PingRequest ping = new PingRequest();
         ping.setId(operationId);
 
@@ -138,43 +133,6 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
             transport.close();
         } catch (Exception e) {
             log.warn("Cannot close MCP transport", e);
-        }
-    }
-
-    public static class Builder {
-        private McpTransport transport;
-        private String clientName;
-        private String clientVersion;
-        private String protocolVersion;
-        private Duration toolExecutionTimeout;
-
-        public McpClientBase.Builder transport(McpTransport transport) {
-            this.transport = transport;
-            return this;
-        }
-
-        public McpClientBase.Builder clientName(String clientName) {
-            this.clientName = clientName;
-            return this;
-        }
-
-        public McpClientBase.Builder clientVersion(String clientVersion) {
-            this.clientVersion = clientVersion;
-            return this;
-        }
-
-        public McpClientBase.Builder protocolVersion(String protocolVersion) {
-            this.protocolVersion = protocolVersion;
-            return this;
-        }
-
-        public McpClientBase.Builder toolExecutionTimeout(Duration toolExecutionTimeout) {
-            this.toolExecutionTimeout = toolExecutionTimeout;
-            return this;
-        }
-
-        public McpClient build() {
-            return new McpClient(this);
         }
     }
 }

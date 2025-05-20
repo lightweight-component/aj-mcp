@@ -5,7 +5,6 @@ import com.ajaxjs.mcp.client.transport.StdioTransport;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 
-import java.time.Duration;
 import java.util.Arrays;
 
 class TestToolStdio extends TestToolBase {
@@ -16,9 +15,8 @@ class TestToolStdio extends TestToolBase {
                 .logEvents(true)
                 .build();
 
-        mcpClient = new McpClient.Builder()
+        mcpClient = McpClient.builder()
                 .transport(transport)
-                .toolExecutionTimeout(Duration.ofSeconds(4))
                 .build();
     }
 

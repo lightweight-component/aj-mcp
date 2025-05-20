@@ -1,7 +1,7 @@
 package com.ajaxjs.mcp.server;
 
 import com.ajaxjs.mcp.server.feature.FeatureMgr;
-import com.ajaxjs.mcp.server.model.ServerConfig;
+import com.ajaxjs.mcp.server.common.ServerConfig;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 

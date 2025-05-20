@@ -8,6 +8,7 @@ import com.ajaxjs.mcp.protocol.prompt.GetPromptRequest;
 import com.ajaxjs.mcp.protocol.prompt.GetPromptResult;
 import com.ajaxjs.mcp.protocol.prompt.PromptItem;
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -19,11 +20,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 @Slf4j
+@SuperBuilder
 public abstract class McpClientPrompt extends McpClientBase {
-    public McpClientPrompt(Builder builder) {
-        super(builder);
-    }
-
     @Override
     public List<PromptItem> listPrompts() {
         if (promptRefs.get() == null)

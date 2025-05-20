@@ -7,7 +7,7 @@ import java.util.Map;
 
 /**
  * The 'Tool' object from the MCP protocol schema.
- * For trust & safety and security, clients MUST consider tool annotations to be untrusted unless they come from trusted servers.
+ * For trust and safety and security, clients MUST consider tool annotations to be untrusted unless they come from trusted servers.
  * Describes a tool that language model can execute.
  * <p>
  * Represents a tool that the server provides. Tools enable servers to expose executable functionality to the system.

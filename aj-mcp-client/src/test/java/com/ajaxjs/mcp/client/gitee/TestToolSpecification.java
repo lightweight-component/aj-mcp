@@ -163,7 +163,6 @@ class TestToolSpecification {
 
     @Test
     void toolWithNoParams() {
-
         ArrayNode json = JsonUtils.fromJson(noParamsText, ArrayNode.class);
         // Extract ToolSpecifications from the JSON response
         List<ToolItem> toolSpecifications = McpClient.toolListFromMcpResponse(json);

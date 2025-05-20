@@ -15,12 +15,11 @@ import java.util.function.Function;
 /**
  * A tool provider backed by one or more MCP clients.
  * Usage:
- * Function<CallToolRequest, String> executor = obtainTools().findToolExecutorByName("echoString");
+ * Function{CallToolRequest, String} executor = obtainTools().findToolExecutorByName("echoString");
  * String toolExecutionResultString = executor.apply(new CallToolRequest("echoString", "{\"input\": \"hi\"}"));
  */
 @Slf4j
 @Data
-@Deprecated
 public class McpToolProvider {
     /**
      * The list of MCP clients to use for retrieving tools.

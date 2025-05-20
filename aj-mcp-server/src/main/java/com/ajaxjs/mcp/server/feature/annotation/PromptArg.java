@@ -20,6 +20,8 @@ public @interface PromptArg {
     /**
      * An argument is required by default. However, if the annotated type is {@link Optional} and no annotation value is set
      * explicitly then the argument is not required.
+     *
+     * @return true if the argument is required, false otherwise
      */
     boolean required() default true;
 }

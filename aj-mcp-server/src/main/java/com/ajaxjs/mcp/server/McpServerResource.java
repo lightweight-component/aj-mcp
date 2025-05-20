@@ -28,7 +28,7 @@ public abstract class McpServerResource extends McpServerInitialize {
 
         // get info from RAM
         if (FeatureMgr.RESOURCE_STORE.isEmpty())
-            throw new NullPointerException("Store 未初始化");
+            throw new NullPointerException("Store is NOT initialized");
 
         List<ResourceItem> resources = new ArrayList<>();
         for (String name : FeatureMgr.RESOURCE_STORE.keySet()) {
@@ -74,9 +74,5 @@ public abstract class McpServerResource extends McpServerInitialize {
         result.setResult(new GetResourceResult.ResourceResultDetail(contents));
 
         return result;
-    }
-
-    public static void autoSet(ResourceContent content) {
-
     }
 }

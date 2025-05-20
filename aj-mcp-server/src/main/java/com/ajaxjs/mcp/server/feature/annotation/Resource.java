@@ -4,7 +4,6 @@ package com.ajaxjs.mcp.server.feature.annotation;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
@@ -23,22 +22,30 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target(METHOD)
 public @interface Resource {
     /**
-     * "A human-readable name for this resource."
+     * A human-readable name for this resource.
+     *
+     * @return A human-readable name for this resource.
      */
     String value() default "";
 
     /**
-     * "A description of what this resource represents."
+     * A description of what this resource represents.
+     *
+     * @return A description of what this resource represents.
      */
     String description() default "";
 
     /**
-     * "The URI of this resource."
+     * The URI of this resource.
+     *
+     * @return The URI of this resource.
      */
     String uri();
 
     /**
-     * "The MIME type of this resource, if known."
+     * The MIME type of this resource, if known.
+     *
+     * @return The MIME type of this resource, if known.
      */
     String mimeType() default "";
 

@@ -4,6 +4,7 @@ import com.ajaxjs.mcp.common.JsonUtils;
 import com.ajaxjs.mcp.common.McpException;
 import com.ajaxjs.mcp.protocol.resource.*;
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -14,11 +15,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 @Slf4j
+@SuperBuilder
 public abstract class McpClientResource extends McpClientPrompt {
-    public McpClientResource(Builder builder) {
-        super(builder);
-    }
-
     @Override
     public List<ResourceItem> listResources() {
         if (resourceRefs.get() == null)
@@ -56,6 +54,22 @@ public abstract class McpClientResource extends McpClientPrompt {
         return resourceTemplateRefs.get();
     }
 
+    /**
+     * Synchronously obtains the list of resources.
+     * This method ensures that the resource references are initialized only once by checking if they already exist.
+     * If the resource references are already available, it returns immediately without making a new request.
+     * <p>
+     * A new request is created with a unique ID to fetch the resource list. It uses a timeout mechanism to handle long waits.
+     * The method sends the request and waits for the response using CompletableFuture.
+     * Once the result is received, it parses the response and sets the parsed resource references.
+     * <p>
+     * If an error occurs during the request (execution exception, interruption, or timeout),
+     * a RuntimeException is thrown to propagate the failure.
+     * <p>
+     * Finally, the pending request ID is removed to clean up internal state, regardless of success or failure.
+     *
+     * @throws RuntimeException if the request execution, interruption, or timeout occurs
+     */
     private synchronized void obtainResourceList() {
         if (resourceRefs.get() != null)
             return;
@@ -95,6 +109,15 @@ public abstract class McpClientResource extends McpClientPrompt {
         }
     }
 
+    /**
+     * Parses resource content from an MCP message and constructs a ResourceResultDetail object.
+     * This method checks for errors in the provided JsonNode and processes its structure to extract resource content.
+     *
+     * @param mcpMessage The JSON node representing the MCP message containing resource content.
+     * @return A GetResourceResult.ResourceResultDetail object populated with parsed resource content details.
+     * @throws McpException          If the MCP message contains error information.
+     * @throws IllegalStateException If the message structure is invalid (e.g., missing required fields).
+     */
     public static List<ResourceItem> parseResourceRefs(JsonNode mcpMessage) {
         McpException.checkForErrors(mcpMessage);
 

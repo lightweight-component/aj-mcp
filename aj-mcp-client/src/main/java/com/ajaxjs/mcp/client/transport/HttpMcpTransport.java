@@ -215,6 +215,9 @@ public class HttpMcpTransport extends McpTransport {
 
         /**
          * The initial URL where to connect to the server and request an SSE channel.
+         *
+         * @param sseUrl The SSE URL.
+         * @return Builder
          */
         public Builder sseUrl(String sseUrl) {
             this.sseUrl = sseUrl;

@@ -40,6 +40,8 @@ public class McpUtils {
      * The initial capacity and load factor are calculated to minimize resizing.
      *
      * @param expectedSize the expected number of entries in the map
+     * @param <K>          Key
+     * @param <V>          Value
      * @return a new HashMap with optimal initial capacity and load factor
      */
     public static <K, V> Map<K, V> mapOf(int expectedSize) {

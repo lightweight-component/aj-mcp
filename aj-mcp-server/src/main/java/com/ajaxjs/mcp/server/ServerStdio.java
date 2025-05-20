@@ -72,7 +72,6 @@ public class ServerStdio implements McpTransportSync {
 
     @Override
     public void handle(JsonNode message) {
-
     }
 
     @Override

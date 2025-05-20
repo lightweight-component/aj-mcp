@@ -33,7 +33,7 @@ import java.util.Map;
 @EqualsAndHashCode(callSuper = true)
 public class McpServer extends McpServerPrompt {
     public void start() {
-        log.info("MCP 服务器已启动，等待输入...");
+        log.info("MCP Server started, waiting for input...");
         transport.start();
     }
 
@@ -77,7 +77,7 @@ public class McpServer extends McpServerPrompt {
 
         // get info from RAM
         if (FeatureMgr.TOOL_STORE.isEmpty())
-            throw new NullPointerException("Store 未初始化");
+            throw new NullPointerException("Store is NOT initialized.");
 
         List<ToolItem> tools = new ArrayList<>();
 

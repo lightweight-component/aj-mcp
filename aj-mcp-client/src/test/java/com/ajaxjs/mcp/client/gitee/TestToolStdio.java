@@ -1,6 +1,6 @@
 package com.ajaxjs.mcp.client.gitee;
 
-import com.ajaxjs.mcp.client.McpClientBase;
+import com.ajaxjs.mcp.client.McpClient;
 import com.ajaxjs.mcp.client.transport.McpTransport;
 import com.ajaxjs.mcp.client.transport.StdioTransport;
 import org.junit.jupiter.api.AfterAll;
@@ -8,7 +8,6 @@ import org.junit.jupiter.api.BeforeAll;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.Duration;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,9 +22,8 @@ public class TestToolStdio extends TestToolBase {
                 .logEvents(true)
                 .build();
 
-        mcpClient = new McpClientBase.Builder()
+        mcpClient = McpClient.builder()
                 .transport(transport)
-                .toolExecutionTimeout(Duration.ofSeconds(4))
                 .build();
     }
 

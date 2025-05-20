@@ -1,14 +1,12 @@
 package com.ajaxjs.mcp.client.gitee;
 
-import com.ajaxjs.mcp.client.McpClientBase;
 import com.ajaxjs.mcp.client.IMcpClient;
+import com.ajaxjs.mcp.client.McpClient;
 import com.ajaxjs.mcp.client.transport.HttpMcpTransport;
 import com.ajaxjs.mcp.client.transport.McpTransport;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import java.time.Duration;
 
 import static com.ajaxjs.mcp.client.McpServerHelper.skipTestsIfServerNotAvailable;
 import static com.ajaxjs.mcp.client.McpServerHelper.startServerHttp;
@@ -28,9 +26,8 @@ class TestToolSse extends TestToolBase {
                 .logResponses(true)
                 .build();
 
-        mcpClient = new McpClientBase.Builder()
+        mcpClient = McpClient.builder()
                 .transport(transport)
-                .toolExecutionTimeout(Duration.ofSeconds(4))
                 .build();
     }
 
@@ -56,18 +53,15 @@ class TestToolSse extends TestToolBase {
                     .logRequests(true)
                     .logResponses(true)
                     .build();
-            badClient = new McpClientBase.Builder()
+            badClient = McpClient.builder()
                     .transport(transport)
-                    .toolExecutionTimeout(Duration.ofSeconds(4))
                     .build();
             fail("Expected an exception");
         } catch (Exception e) {
-
             // ok
         } finally {
-            if (badClient != null) {
+            if (badClient != null)
                 badClient.close();
-            }
         }
     }
 }
