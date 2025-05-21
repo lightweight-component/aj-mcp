@@ -1,6 +1,5 @@
 package com.ajaxjs.mcp.protocol.initialize;
 
-import com.ajaxjs.mcp.protocol.BaseJsonRpcMessage;
 import com.ajaxjs.mcp.protocol.McpResponse;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

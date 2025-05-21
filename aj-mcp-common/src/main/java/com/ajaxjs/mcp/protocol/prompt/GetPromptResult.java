@@ -17,7 +17,7 @@ public class GetPromptResult extends McpResponse {
     @Data
     public static class PromptResultDetail {
         String description;
-        
+
         List<PromptMessage> messages;
     }
 }

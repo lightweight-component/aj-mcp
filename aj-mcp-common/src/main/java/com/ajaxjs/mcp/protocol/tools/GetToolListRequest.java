@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import static com.ajaxjs.mcp.protocol.McpConstant.Methods.RESOURCES_LIST;
 import static com.ajaxjs.mcp.protocol.McpConstant.Methods.TOOLS_LIST;
 
 /**

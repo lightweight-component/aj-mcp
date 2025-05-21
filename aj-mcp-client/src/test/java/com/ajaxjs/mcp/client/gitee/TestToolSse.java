@@ -20,7 +20,8 @@ class TestToolSse extends TestToolBase {
     static void setup() {
         skipTestsIfServerNotAvailable();
         process = startServerHttp();
-        McpTransport transport = new HttpMcpTransport.Builder()
+
+        McpTransport transport = HttpMcpTransport.builder()
                 .sseUrl("http://localhost:8000/sse")
                 .logRequests(true)
                 .logResponses(true)
@@ -29,6 +30,8 @@ class TestToolSse extends TestToolBase {
         mcpClient = McpClient.builder()
                 .transport(transport)
                 .build();
+
+        mcpClient.initialize();
     }
 
     @AfterAll
@@ -48,11 +51,16 @@ class TestToolSse extends TestToolBase {
         IMcpClient badClient = null;
 
         try {
-            McpTransport transport = new HttpMcpTransport.Builder()
+            McpTransport transport = HttpMcpTransport.builder()
                     .sseUrl("http://localhost:8000/WRONG")
                     .logRequests(true)
                     .logResponses(true)
                     .build();
+//            McpTransport transport = new HttpMcpTransport.Builder()
+//                    .sseUrl("http://localhost:8000/WRONG")
+//                    .logRequests(true)
+//                    .logResponses(true)
+//                    .build();
             badClient = McpClient.builder()
                     .transport(transport)
                     .build();

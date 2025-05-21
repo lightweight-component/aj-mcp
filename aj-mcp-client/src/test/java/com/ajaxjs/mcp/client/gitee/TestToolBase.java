@@ -6,6 +6,7 @@ import com.ajaxjs.mcp.protocol.tools.CallToolRequest;
 import com.ajaxjs.mcp.protocol.tools.ToolItem;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -15,12 +16,20 @@ public abstract class TestToolBase {
     static IMcpClient mcpClient;
 
     @Test
+    public void resourceList() {
+        List<ToolItem> tools = mcpClient.listTools();
+        System.out.println(tools);
+    }
+
+    @Test
     void verifyToolSpecifications() {
+
         ToolItem listUserRepos = obtainTools().findToolByName("list_user_repos");
 
         System.out.println(listUserRepos.getDescription());
         assertNotNull(listUserRepos, "Tool 'list_user_repos' should not be null");
     }
+
 
     @Test
     public void executeTool() {

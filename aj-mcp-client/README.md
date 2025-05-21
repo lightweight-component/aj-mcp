@@ -19,6 +19,7 @@ AJ-MCP Client is a lightweight MCP Client for Java. It provides a simple and pow
 [Tutorials](https://javadoc.io/doc/com.ajaxjs/aj-mcp) | [Java Documents](https://javadoc.io/doc/com.ajaxjs/aj-mcp-client)
 
 ## Install
+
 Runs on Java8+. Maven:
 
 ```xml

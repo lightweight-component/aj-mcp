@@ -113,8 +113,6 @@ public abstract class McpTransport implements McpConstant, Closeable {
                     String method = message.get(METHOD).asText();
 
                     if (method.equals("ping")) {
-//                        PingResponse resp = new PingResponse();
-//                        resp.setId(messageId);
                         PingRequest req = new PingRequest();
                         req.setId(messageId);
                         sendRequestWithoutResponse(req);

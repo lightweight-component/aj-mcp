@@ -9,8 +9,7 @@ import com.ajaxjs.mcp.protocol.initialize.InitializationNotification;
 import com.ajaxjs.mcp.protocol.initialize.InitializeRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import okhttp3.sse.EventSource;
@@ -27,66 +26,98 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+/**
+ * Implements transport for MCP (Microservice Communication Protocol) using HTTP and SSE (Server-Sent Events).
+ * This class is responsible for managing the connection with the server, sending requests, and handling responses.
+ */
 @Slf4j
-@Data
-@EqualsAndHashCode(callSuper = true)
 public class HttpMcpTransport extends McpTransport {
-    private final String sseUrl;
+    /**
+     * The URL for the SSE (Server-Sent Events) connection.
+     */
+    private String sseUrl;
 
+    /**
+     * The HTTP client used for making requests.
+     */
     private OkHttpClient client;
 
+    /**
+     * Flag indicating whether to log server responses.
+     */
     private boolean logResponses;
 
+    /**
+     * Flag indicating whether to log client requests.
+     */
     private boolean logRequests;
 
+    /**
+     * The event listener for SSE events.
+     */
     private EventSource mcpSseEventListener;
 
-    // this is obtained from the server after initializing the SSE channel
+    /**
+     * The URL for posting messages to the server.
+     * This is obtained from the server after initializing the SSE channel.
+     */
     private volatile String postUrl;
 
+    /**
+     * Constructor for creating an instance with only the SSE URL.
+     *
+     * @param sseUrl The SSE URL.
+     */
     public HttpMcpTransport(String sseUrl) {
         this.sseUrl = sseUrl;
     }
 
-    public HttpMcpTransport(Builder builder) {
+    @Builder
+    public HttpMcpTransport(String sseUrl, boolean logResponses, boolean logRequests) {
+        this.sseUrl = sseUrl;
+        Objects.requireNonNull(this.sseUrl, "Missing SSE endpoint URL");
+
+        this.logRequests = logRequests;
+        this.logResponses = logResponses;
+
         OkHttpClient.Builder httpClientBuilder = new OkHttpClient.Builder();
-        Duration timeout = McpUtils.getOrDefault(builder.timeout, Duration.ofSeconds(60));
+        Duration timeout = Duration.ofSeconds(60);
         httpClientBuilder.callTimeout(timeout);
         httpClientBuilder.connectTimeout(timeout);
         httpClientBuilder.readTimeout(timeout);
         httpClientBuilder.writeTimeout(timeout);
-        this.logRequests = builder.logRequests;
 
-        if (builder.logRequests)
-            httpClientBuilder.addInterceptor(new Interceptor() {
-                @Override
-                public Response intercept(Chain chain) throws IOException {
-                    Request request = chain.request();
-                    String body;
-                    Buffer buffer = new Buffer();
+        if (logRequests)
+            httpClientBuilder.addInterceptor(chain -> {
+                Request request = chain.request();
+                String body;
+                Buffer buffer = new Buffer();
 
-                    try {
-                        if (request.body() == null)
-                            body = McpConstant.EMPTY_STR;
-                        else {
-                            request.body().writeTo(buffer);
-                            body = buffer.readUtf8();
-                        }
-
-                        log.debug("Request:\n- method: {}\n- url: {}\n- headers: {}\n- body: {}", request.method(), request.url(), getHeaders(request.headers()), body);
-                    } catch (Exception e) {
-                        log.warn("Error while logging request: {}", e.getMessage());
+                try {
+                    if (request.body() == null)
+                        body = McpConstant.EMPTY_STR;
+                    else {
+                        request.body().writeTo(buffer);
+                        body = buffer.readUtf8();
                     }
 
-                    return chain.proceed(request);
+                    log.debug("Request:\n- method: {}\n- url: {}\n- headers: {}\n- body: {}", request.method(), request.url(), getHeaders(request.headers()), body);
+                } catch (Exception e) {
+                    log.warn("Error while logging request: {}", e.getMessage());
                 }
+
+                return chain.proceed(request);
             });
 
-        this.logResponses = builder.logResponses;
-        sseUrl = Objects.requireNonNull(builder.sseUrl, "Missing SSE endpoint URL");
-        client = httpClientBuilder.build();
+        this.client = httpClientBuilder.build();
     }
 
+    /**
+     * Extracts headers from a request into a string format.
+     *
+     * @param headers The headers to extract.
+     * @return A string representation of the headers.
+     */
     static String getHeaders(Headers headers) {
         return StreamSupport.stream(headers.spliterator(), false)
                 .map(header -> {
@@ -97,29 +128,45 @@ public class HttpMcpTransport extends McpTransport {
                 .collect(Collectors.joining(", "));
     }
 
+    /**
+     * Starts the transport by initiating the SSE channel.
+     *
+     * @param pendingRequest A map of pending requests.
+     */
     @Override
     public void start(Map<Long, CompletableFuture<JsonNode>> pendingRequest) {
         setPendingRequests(pendingRequest);
-
         mcpSseEventListener = startSseChannel(logResponses);
     }
 
+    /**
+     * Initializes the connection with the server.
+     *
+     * @param request The initialization request.
+     * @return A CompletableFuture that completes with the response.
+     */
     @Override
-    public CompletableFuture<JsonNode> initialize(InitializeRequest operation) {
+    public CompletableFuture<JsonNode> initialize(InitializeRequest request) {
         Request httpRequest;
         Request initializationNotification;
 
         try {
-            httpRequest = createRequest(operation);
+            httpRequest = createRequest(request);
             initializationNotification = createRequest(new InitializationNotification());
         } catch (JsonProcessingException e) {
             return McpUtils.failedFuture(e);
         }
 
-        return execute(httpRequest, operation.getId()).thenCompose(originalResponse -> execute(initializationNotification, null)
+        return execute(httpRequest, request.getId()).thenCompose(originalResponse -> execute(initializationNotification, null)
                 .thenCompose(nullNode -> CompletableFuture.completedFuture(originalResponse)));
     }
 
+    /**
+     * Sends a request to the server and waits for a response.
+     *
+     * @param request The request to send.
+     * @return A CompletableFuture that completes with the response.
+     */
     @Override
     public CompletableFuture<JsonNode> sendRequestWithResponse(McpRequest request) {
         try {
@@ -129,6 +176,11 @@ public class HttpMcpTransport extends McpTransport {
         }
     }
 
+    /**
+     * Sends a request to the server without waiting for a response.
+     *
+     * @param request The request to send.
+     */
     @Override
     public void sendRequestWithoutResponse(McpRequest request) {
         try {
@@ -139,6 +191,13 @@ public class HttpMcpTransport extends McpTransport {
         }
     }
 
+    /**
+     * Executes an HTTP request asynchronously.
+     *
+     * @param request The HTTP request to execute.
+     * @param id      The ID of the request.
+     * @return A CompletableFuture that completes with the response.
+     */
     private CompletableFuture<JsonNode> execute(Request request, Long id) {
         CompletableFuture<JsonNode> future = new CompletableFuture<>();
         if (id != null)
@@ -166,19 +225,31 @@ public class HttpMcpTransport extends McpTransport {
         return future;
     }
 
+    /**
+     * Checks if the HTTP status code indicates success.
+     *
+     * @param statusCode The HTTP status code.
+     * @return True if the status code is in the 200-299 range, false otherwise.
+     */
     private boolean isExpectedStatusCode(int statusCode) {
         return statusCode >= 200 && statusCode < 300;
     }
 
+    /**
+     * Starts the SSE channel and waits for the initialization to complete.
+     *
+     * @param logResponses Flag indicating whether to log responses.
+     * @return The EventSource object representing the SSE channel.
+     */
     private EventSource startSseChannel(boolean logResponses) {
         Request request = new Request.Builder().url(sseUrl).build();
         CompletableFuture<String> initializationFinished = new CompletableFuture<>();
         SseEventListener listener = new SseEventListener(this, logResponses, initializationFinished);
         EventSource eventSource = EventSources.createFactory(client).newEventSource(request, listener);
+        int timeout = client.callTimeoutMillis() > 0 ? client.callTimeoutMillis() : Integer.MAX_VALUE;
 
         // wait for the SSE channel to be created, receive the POST url from the server, throw an exception if that failed
         try {
-            int timeout = client.callTimeoutMillis() > 0 ? client.callTimeoutMillis() : Integer.MAX_VALUE;
             String relativePostUrl = initializationFinished.get(timeout, TimeUnit.MILLISECONDS);
             postUrl = URI.create(sseUrl).resolve(relativePostUrl).toString();
             log.debug("Received the server's POST URL: {}", postUrl);
@@ -189,16 +260,29 @@ public class HttpMcpTransport extends McpTransport {
         return eventSource;
     }
 
+    /**
+     * Creates an HTTP request from a BaseJsonRpcMessage.
+     *
+     * @param message The message to create the request from.
+     * @return The HTTP request.
+     * @throws JsonProcessingException If there's an error processing the JSON.
+     */
     private Request createRequest(BaseJsonRpcMessage message) throws JsonProcessingException {
         return new Request.Builder().url(postUrl).header("Content-Type", "application/json")
                 .post(RequestBody.create(JsonUtils.OBJECT_MAPPER.writeValueAsBytes(message))).build();
     }
 
+    /**
+     * Placeholder for health checks. Currently not implemented.
+     */
     @Override
     public void checkHealth() {
         // no transport-specific checks right now
     }
 
+    /**
+     * Closes the transport, canceling the SSE channel and shutting down the HTTP client.
+     */
     @Override
     public void close() {
         if (mcpSseEventListener != null)
@@ -206,42 +290,5 @@ public class HttpMcpTransport extends McpTransport {
 
         if (client != null)
             client.dispatcher().executorService().shutdown();
-    }
-
-    public static class Builder {
-        private String sseUrl;
-        private Duration timeout;
-        private boolean logRequests = false;
-        private boolean logResponses = false;
-
-        /**
-         * The initial URL where to connect to the server and request an SSE channel.
-         *
-         * @param sseUrl The SSE URL.
-         * @return Builder
-         */
-        public Builder sseUrl(String sseUrl) {
-            this.sseUrl = sseUrl;
-            return this;
-        }
-
-        public Builder timeout(Duration timeout) {
-            this.timeout = timeout;
-            return this;
-        }
-
-        public Builder logRequests(boolean logRequests) {
-            this.logRequests = logRequests;
-            return this;
-        }
-
-        public Builder logResponses(boolean logResponses) {
-            this.logResponses = logResponses;
-            return this;
-        }
-
-        public HttpMcpTransport build() {
-            return new HttpMcpTransport(this);
-        }
     }
 }

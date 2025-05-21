@@ -1,7 +1,6 @@
 package com.ajaxjs.mcp.protocol.tools;
 
 import com.ajaxjs.mcp.protocol.McpResponse;
-import com.ajaxjs.mcp.protocol.prompt.PromptItem;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

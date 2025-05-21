@@ -10,10 +10,9 @@
 
 AJ-MCP is a lightweight MCP SDK for Java. It provides a simple and powerful way to build MCP [client](/aj-mcp-client) and [server](/aj-mcp-server). It supports Java8 and above.
 
-## Current Progress
-
-- MCP Client is 90% completed.
-- MCP Server is not yet implemented, but it is in progress.
+- Support Java 8 and above, and supports Spring Boot 2.x.
+- Lightweight, easy to use, and easy to extend.
+- Zero dependencies except JVM and OKHttp.
 
 ## Why MCP?
 
