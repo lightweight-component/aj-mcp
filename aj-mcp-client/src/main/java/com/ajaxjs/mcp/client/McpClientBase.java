@@ -73,7 +73,7 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
         request.setParams(createInitializeParams());
 
         try {
-            CompletableFuture<JsonNode> future = transport.initialize(request);
+            CompletableFuture<JsonNode> future = transport.initialize(request); // here is almost a synchronous call
             JsonNode capabilities = future.get();
             log.info("MCP server capabilities: {}", capabilities.get("result"));
         } catch (ExecutionException e) {

@@ -27,6 +27,10 @@ public class StandaloneTomcat {
         Tomcat.addServlet(context, "sseServlet", new SseServlet());
         context.addServletMappingDecoded("/sse", "sseServlet");
 
+        // Register Message servlet
+        Tomcat.addServlet(context, "messageServlet", new MessageServlet());
+        context.addServletMappingDecoded("/message", "messageServlet");
+
         tomcat.start();
         tomcat.getServer().await();
     }

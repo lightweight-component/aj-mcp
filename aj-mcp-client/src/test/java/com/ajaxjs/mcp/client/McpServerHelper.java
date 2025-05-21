@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 @Slf4j
 public class McpServerHelper {
-    public static Process startServerHttp() {
+    public static Process startGiteeServerHttp() {
         skipTestsIfServerNotAvailable();
         String[] command = new String[]{TestToolStdio.getConfig().get("cmd_path"), "-transport", "sse"};
         log.info("Starting the MCP server using command: {}", Arrays.toString(command));
@@ -24,6 +24,40 @@ public class McpServerHelper {
         try {
             process = new ProcessBuilder().command(command).inheritIO().start();
             waitForPort(8000, 12);
+            log.info("MCP server has started");
+        } catch (IOException | InterruptedException | TimeoutException e) {
+            throw new RuntimeException(e);
+        }
+
+        return process;
+    }
+
+    public static Process startServerHttp() {
+        skipTestsIfServerNotAvailable();
+        String[] command = new String[]{"java", "-jar", "D:\\code\\ajaxjs\\aj-mcp\\samples\\server\\tomcat\\target\\mcp-demo-tomcat-1.0.ja"};
+        log.info("Starting the MCP server using command: {}", Arrays.toString(command));
+        Process process;
+
+        try {
+            process = new ProcessBuilder().command(command).inheritIO().start();
+            waitForPort(8080, 12);
+            log.info("MCP server has started");
+        } catch (IOException | InterruptedException | TimeoutException e) {
+            throw new RuntimeException(e);
+        }
+
+        return process;
+    }
+
+    public static Process startServerHttpLocal() {
+        skipTestsIfServerNotAvailable();
+        String[] command = new String[]{"java", "-jar", "D:\\code\\ajaxjs\\aj-mcp\\samples\\server\\tomcat\\target\\mcp-demo-tomcat-1.0.jar"};
+        log.info("Starting the MCP server using command: {}", Arrays.toString(command));
+        Process process;
+
+        try {
+            process = new ProcessBuilder().command(command).inheritIO().start();
+            waitForPort(8080, 12);
             log.info("MCP server has started");
         } catch (IOException | InterruptedException | TimeoutException e) {
             throw new RuntimeException(e);

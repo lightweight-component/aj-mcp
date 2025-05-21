@@ -74,9 +74,8 @@ public class HttpMcpTransport extends McpTransport {
 
     @Builder
     public HttpMcpTransport(String sseUrl, boolean logResponses, boolean logRequests) {
+        Objects.requireNonNull(sseUrl, "Missing SSE endpoint URL");
         this.sseUrl = sseUrl;
-        Objects.requireNonNull(this.sseUrl, "Missing SSE endpoint URL");
-
         this.logRequests = logRequests;
         this.logResponses = logResponses;
 
@@ -124,8 +123,7 @@ public class HttpMcpTransport extends McpTransport {
                     String headerKey = header.component1();
                     String headerValue = header.component2();
                     return String.format("[%s: %s]", headerKey, headerValue);
-                })
-                .collect(Collectors.joining(", "));
+                }).collect(Collectors.joining(", "));
     }
 
     /**
@@ -170,7 +168,8 @@ public class HttpMcpTransport extends McpTransport {
     @Override
     public CompletableFuture<JsonNode> sendRequestWithResponse(McpRequest request) {
         try {
-            return execute(createRequest(request), request.getId());
+            Request req= createRequest(request);
+            return execute(req, request.getId());
         } catch (JsonProcessingException e) {
             return McpUtils.failedFuture(e);
         }

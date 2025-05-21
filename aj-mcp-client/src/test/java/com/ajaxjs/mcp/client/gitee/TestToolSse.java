@@ -9,7 +9,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static com.ajaxjs.mcp.client.McpServerHelper.skipTestsIfServerNotAvailable;
-import static com.ajaxjs.mcp.client.McpServerHelper.startServerHttp;
+import static com.ajaxjs.mcp.client.McpServerHelper.startGiteeServerHttp;
 import static org.junit.jupiter.api.Assertions.fail;
 
 
@@ -19,7 +19,7 @@ class TestToolSse extends TestToolBase {
     @BeforeAll
     static void setup() {
         skipTestsIfServerNotAvailable();
-        process = startServerHttp();
+        process = startGiteeServerHttp();
 
         McpTransport transport = HttpMcpTransport.builder()
                 .sseUrl("http://localhost:8000/sse")

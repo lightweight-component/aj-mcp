@@ -17,15 +17,23 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.ajaxjs</groupId>
+            <artifactId>aj-mcp-server</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-core</artifactId>
             <version>8.5.99</version> <!-- Latest 8.5.x version at time of writing -->
         </dependency>
+
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-jasper</artifactId>
             <version>8.5.99</version>
         </dependency>
+
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
