@@ -1,7 +1,5 @@
 package com.ajaxjs.mcp.transport;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 import java.io.Closeable;
 
 /**
@@ -10,7 +8,13 @@ import java.io.Closeable;
 public interface McpTransportSync extends Closeable {
     void start();
 
-    void handle(JsonNode message);
+    /**
+     * Handle the message from client, it's JSON string, then do the business, finally return the result to client as Json string.
+     *
+     * @param rawJson The message from client, it's JSON string.
+     * @return The result to client as Json string
+     */
+    String handle(String rawJson);
 
     void initialize();
 }

@@ -168,7 +168,7 @@ public class HttpMcpTransport extends McpTransport {
     @Override
     public CompletableFuture<JsonNode> sendRequestWithResponse(McpRequest request) {
         try {
-            Request req= createRequest(request);
+            Request req = createRequest(request);
             return execute(req, request.getId());
         } catch (JsonProcessingException e) {
             return McpUtils.failedFuture(e);
@@ -202,6 +202,8 @@ public class HttpMcpTransport extends McpTransport {
         if (id != null)
             saveRequest(id, future);
 
+        log.info("pending request to {}", request.url());
+
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -213,7 +215,7 @@ public class HttpMcpTransport extends McpTransport {
                 int statusCode = response.code();
 
                 if (!isExpectedStatusCode(statusCode))
-                    future.completeExceptionally(new RuntimeException("Unexpected status code: " + statusCode));
+                    future.completeExceptionally(new RuntimeException("HTTP return ERROR! Unexpected status code: " + statusCode));
 
                 // For messages with null ID, we don't wait for a response in the SSE channel
                 if (id == null)

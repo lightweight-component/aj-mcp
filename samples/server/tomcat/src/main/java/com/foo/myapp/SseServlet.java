@@ -5,8 +5,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class SseServlet extends HttpServlet {
+    Map<String, PrintWriter> connections = new ConcurrentHashMap<>();
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("text/event-stream");
@@ -18,25 +23,44 @@ public class SseServlet extends HttpServlet {
 
         if ("/sse".equals(req.getRequestURI())) {
             PrintWriter writer = resp.getWriter();
-            writer.write("id: " + 1 + "\n");
-            writer.write("event: endpoint\n"); // This is the "type"
-            String endpointPath = "message";
-//            String json = JsonUtils.toJson(McpUtils.mapOf("kk", "endpointd"));
+            writer.write("event: endpoint\n");
+
+            String uuid = UUID.randomUUID().toString();
+            String endpointPath = "message?uuid=" + uuid;
+
+            connections.put(uuid, writer);
             writer.write("data: " + endpointPath + "\n\n");
             writer.flush();
-        } else {
 
-            // Example: sending 5 events, 1 per second
-            for (int i = 1; i <= 5; i++) {
-                resp.getWriter().write("data: Event " + i + "\n\n");
-                resp.getWriter().flush();
-
+            // Periodically send heartbeat messages
+            while (!Thread.interrupted()) {
                 try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException ignored) {
+                    // Send a heartbeat
+                    writer.write("data: ping\n\n");
+                    writer.flush();
+
+                    // Simulate periodic updates (every 15 seconds)
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                 }
             }
+        } else {
+
             // Optionally close the stream, or leave open for continuous events
         }
+    }
+
+    public void returnMessage(String uuid, String data) {
+        PrintWriter writer = connections.get(uuid);
+
+        if (writer == null)
+            throw new IllegalStateException("Connection id: " + uuid + " is not found.");
+
+//        writer.write("id: " + 2 + "\n");
+        writer.write("event: message\n");
+        String endpointPath = "message";
+        writer.write("data: " + data + "\n\n");
+        writer.flush();
     }
 }

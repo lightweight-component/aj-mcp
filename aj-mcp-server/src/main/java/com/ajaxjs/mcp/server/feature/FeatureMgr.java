@@ -11,13 +11,16 @@ import com.ajaxjs.mcp.server.feature.annotation.*;
 import com.ajaxjs.mcp.server.feature.model.ServerStorePrompt;
 import com.ajaxjs.mcp.server.feature.model.ServerStoreResource;
 import com.ajaxjs.mcp.server.feature.model.ServerStoreTool;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Slf4j
 public class FeatureMgr {
     public static final Map<String, ServerStorePrompt> PROMPT_STORE = new ConcurrentHashMap<>();
 
@@ -33,12 +36,15 @@ public class FeatureMgr {
      */
     public void init(String packageName) {
         Set<Class<?>> classesWithAnnotation;
+        log.info("Starting scanning the package of " + packageName);
 
         try {
             classesWithAnnotation = PackageAnnotationScanner.findClassesWithAnnotation(packageName, McpService.class);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            log.warn("Error while scanning for classes with @McpService annotation", e);
+            throw new UncheckedIOException(e);
         } catch (ClassNotFoundException e) {
+            log.warn("Error while scanning for classes with @McpService annotation, class not found.", e);
             throw new RuntimeException(e);
         }
 
@@ -69,8 +75,10 @@ public class FeatureMgr {
         try {
             return clazz.newInstance();
         } catch (InstantiationException e) {
+            log.warn("Error while instantiating class", e);
             throw new RuntimeException(e);
         } catch (IllegalAccessException e) {
+            log.warn("Error while instantiating class, illegal accessing.", e);
             throw new RuntimeException(e);
         }
     }
@@ -138,6 +146,7 @@ public class FeatureMgr {
         store.setParamsOrder(paramsOrder);
 
         TOOL_STORE.put(toolName, store);
+        log.info("Added tool: " + toolName);
     }
 
     /**
@@ -197,6 +206,7 @@ public class FeatureMgr {
         store.setResource(resourceItem);
 
         RESOURCE_STORE.put(resource.uri(), store);
+        log.info("Added resource: " + resource.uri());
     }
 
     /**
@@ -258,5 +268,6 @@ public class FeatureMgr {
         store.setPrompt(promptItem);
 
         PROMPT_STORE.put(promptName, store);
+        log.info("Added prompt: {}", promptName);
     }
 }

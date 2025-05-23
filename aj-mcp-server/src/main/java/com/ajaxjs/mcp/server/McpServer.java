@@ -67,6 +67,11 @@ public class McpServer extends McpServerPrompt {
                 return toolList(requestRaw);
             case Methods.TOOLS_CALL:
                 return toolCall(requestRaw);
+            case Methods.NOTIFICATION_INITIALIZED: // TODO: it seems should not return anything
+                PingResponse respEmpty = new PingResponse();
+                respEmpty.setId(0L);
+
+                return respEmpty;
             default:
                 throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.METHOD_NOT_FOUND, "Method " + requestRaw.getMethod() + " not found.");
         }

@@ -1,30 +1,37 @@
 package com.foo.myapp;
 
+import com.ajaxjs.mcp.server.McpServer;
+import com.ajaxjs.mcp.transport.McpTransportSync;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 
 public class MessageServlet extends HttpServlet {
+    McpServer server;
+
+    SseServlet sseServlet;
+
+    public MessageServlet(McpServer server, SseServlet sseServlet) {
+        this.server = server;
+        this.sseServlet = sseServlet;
+    }
+
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        resp.setContentType("text/event-stream");
-        resp.setCharacterEncoding("UTF-8");
-        resp.setHeader("Cache-Control", "no-cache");
-        resp.setHeader("Connection", "keep-alive");
+        String uuid = req.getParameter("uuid");
+
+        if (uuid == null || uuid.isEmpty())
+            throw new IllegalArgumentException("The parameter 'uuid' is required.");
 
         String body = getBody(req);
         System.out.println(body);
 
-        PrintWriter writer = resp.getWriter();
-        writer.write("id: " + 1 + "\n");
-        writer.write("event: message\n"); // This is the "type"
-        String endpointPath = "aaaaaaaaaaaaaa";
-//            String json = JsonUtils.toJson(McpUtils.mapOf("kk", "endpointd"));
-        writer.write("data: " + endpointPath + "\n\n");
-        writer.flush();
+        McpTransportSync transport = server.getTransport();
+        String data = transport.handle(body);
+        sseServlet.returnMessage(uuid, data);
     }
 
     static String getBody(HttpServletRequest req) throws IOException {

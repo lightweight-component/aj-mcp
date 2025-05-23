@@ -147,13 +147,17 @@ public abstract class McpServerInitialize implements McpConstant {
 
         // id 必填
         JsonNode idNode = jsonNode.get(ID);
+        Long id = null;
 
-        if (idNode == null)
-            throw new JsonRpcErrorException(JsonRpcErrorCode.INVALID_REQUEST, "Empty id.");
+//        if (idNode == null)
+//            throw new JsonRpcErrorException(JsonRpcErrorCode.INVALID_REQUEST, "Empty id.");
 
-        Long id = idNode.asLong();
-        if (id == 0L)
-            id = null;
+//        Long id = idNode.asLong();
+//        if (id == 0L)
+//            id = null;
+
+        if (idNode != null)
+            id = idNode.asLong();
 
         JsonNode methodNode = jsonNode.get(METHOD);
 

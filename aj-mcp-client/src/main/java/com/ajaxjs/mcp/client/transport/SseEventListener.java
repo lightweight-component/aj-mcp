@@ -43,13 +43,14 @@ public class SseEventListener extends EventSourceListener {
      */
     @Override
     public void onEvent(EventSource eventSource, String id, String type, String data) {
+        log.info("Event: {}, data: {}", type, data);
         if ("message".equals(type)) {
             if (logEvents)
                 log.info("> {}", data);
 
             JsonNode jsonNode = JsonUtils.json2Node(data);
             transport.handle(jsonNode);
-        } else if (type.equals("endpoint")) {
+        } else if ("endpoint".equals(type)) {
             if (initializationFinished.isDone()) {
                 log.warn("Received endpoint event after initialization");
                 return;

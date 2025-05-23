@@ -2,10 +2,10 @@ package com.ajaxjs.mcp.server;
 
 import com.ajaxjs.mcp.common.JsonUtils;
 import com.ajaxjs.mcp.protocol.McpRequestRawInfo;
+import com.ajaxjs.mcp.protocol.McpResponse;
 import com.ajaxjs.mcp.server.error.JsonRpcErrorCode;
 import com.ajaxjs.mcp.server.error.JsonRpcErrorException;
 import com.ajaxjs.mcp.transport.McpTransportSync;
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -49,8 +49,9 @@ public class ServerStdio implements McpTransportSync {
             String line;
             while (running.get() && (line = reader.readLine()) != null) {
                 try {
-                    McpRequestRawInfo request = McpServerInitialize.jsonRpcValidate(line); // 解析输入消息
-                    String response = JsonUtils.toJson(server.processMessage(request));  // 处理消息并生成响应
+//                    McpRequestRawInfo request = McpServerInitialize.jsonRpcValidate(line); // 解析输入消息
+//                    String response = JsonUtils.toJson(server.processMessage(request));  // 处理消息并生成响应
+                    String response = handle(line);
                     writer.println(response);    // 发送响应
                     writer.flush();
                 } catch (JsonRpcErrorException e) {
@@ -71,7 +72,11 @@ public class ServerStdio implements McpTransportSync {
     }
 
     @Override
-    public void handle(JsonNode message) {
+    public String handle(String rawJson) {
+        McpRequestRawInfo request = McpServerInitialize.jsonRpcValidate(rawJson); // 解析输入消息
+        McpResponse mcpResponse = server.processMessage(request);
+
+        return JsonUtils.toJson(mcpResponse);  // 处理消息并生成响应
     }
 
     @Override
