@@ -17,7 +17,8 @@ public class StandaloneTomcat {
         mgr.init("com.foo.myapp");
 
         McpServer server = new McpServer();
-        server.setTransport(new ServerSse(server));
+        ServerSse serverSse = new ServerSse(server);
+        server.setTransport(serverSse);
 
         ServerConfig serverConfig = new ServerConfig();
         serverConfig.setName("MY_MCP_Server");
@@ -37,17 +38,13 @@ public class StandaloneTomcat {
         String docBase = new File(".").getAbsolutePath();
         Context context = tomcat.addContext(contextPath, docBase);
 
-        // Register servlet
-        Tomcat.addServlet(context, "helloServlet", new HelloServlet());
-        context.addServletMappingDecoded("/hello", "helloServlet");
-
         // Register SSE servlet
-        SseServlet sseServlet = new SseServlet();
+        SseServlet sseServlet = new SseServlet(serverSse);
         Tomcat.addServlet(context, "sseServlet", sseServlet);
         context.addServletMappingDecoded("/sse", "sseServlet");
 
         // Register Message servlet
-        Tomcat.addServlet(context, "messageServlet", new MessageServlet(server, sseServlet));
+        Tomcat.addServlet(context, "messageServlet", new MessageServlet(serverSse));
         context.addServletMappingDecoded("/message", "messageServlet");
 
         // Configure connectionTimeout and keepAliveTimeout

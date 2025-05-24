@@ -1,7 +1,6 @@
 package com.foo.myapp;
 
-import com.ajaxjs.mcp.server.McpServer;
-import com.ajaxjs.mcp.transport.McpTransportSync;
+import com.ajaxjs.mcp.server.ServerSse;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -10,13 +9,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 
 public class MessageServlet extends HttpServlet {
-    McpServer server;
+    ServerSse serverSse;
 
-    SseServlet sseServlet;
-
-    public MessageServlet(McpServer server, SseServlet sseServlet) {
-        this.server = server;
-        this.sseServlet = sseServlet;
+    public MessageServlet(ServerSse serverSse) {
+        this.serverSse = serverSse;
     }
 
     @Override
@@ -28,10 +24,8 @@ public class MessageServlet extends HttpServlet {
 
         String body = getBody(req);
         System.out.println(body);
-
-        McpTransportSync transport = server.getTransport();
-        String data = transport.handle(body);
-        sseServlet.returnMessage(uuid, data);
+        String data = serverSse.handle(body);
+        serverSse.returnMessage(uuid, data);
     }
 
     static String getBody(HttpServletRequest req) throws IOException {
