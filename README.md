@@ -33,4 +33,5 @@ Have Fun!
 
 [Tutorials](https://mcp.ajaxjs.com/) | [Github](https://github.com/lightweight-component/aj-mcp) | [Gitcode](https://gitcode.com/lightweight-component/aj-mcp)
 
-
+## Helpful links for MCP
+[Awesome MCP Servers](https://mcplab.cc/zh) | [TypeScript SDK](https://github.com/modelcontextprotocol/typescript-sdk) | [MCP Documentation](https://modelcontextprotocol.io)

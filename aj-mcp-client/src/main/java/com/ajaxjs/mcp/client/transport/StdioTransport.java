@@ -20,11 +20,11 @@ public class StdioTransport extends McpTransport {
 
     private final Map<String, String> environment;
 
+    private boolean logEvents;
+
     private Process process;
 
     private PrintStream out;
-
-    private boolean logEvents;
 
     @Override
     public void start(Map<Long, CompletableFuture<JsonNode>> pendingRequest) {

@@ -9,6 +9,10 @@ var _hmt = _hmt || [];
 
 document.addEventListener('DOMContentLoaded', function () {
     var arr = location.pathname.split('/');
+
+    if (arr.length == 3)
+        arr.unshift('');
+
     if (arr && arr.length > 3) {
         arr.pop();
 
