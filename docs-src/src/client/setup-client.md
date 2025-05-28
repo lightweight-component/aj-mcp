@@ -1,7 +1,7 @@
 ---
 title: MCP Client SDK Setup
 subTitle: 2024-12-05 by Frank Cheung
-description: TODO
+description: MCP Client SDK Setup
 date: 2022-01-05
 tags:
   - client setup
@@ -127,6 +127,8 @@ try(IMcpClient mcpClient2 = McpClient.builder().transport(transport).build()){
 }
 ```
 The MCP Client follows a layered architecture with a clean separation between the interface definition and its implementation. The client relies on the transport layer for actual communication with the server, abstracting the communication details to support different transport mechanisms.
+
+
 <style>
 table th:nth-child(2) {
  min-width: 400px;

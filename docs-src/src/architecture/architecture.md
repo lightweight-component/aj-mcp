@@ -1,7 +1,7 @@
 ---
 title: Architecture
 subTitle: 2024-12-05 by Frank Cheung
-description: TODO
+description: Architecture
 date: 2022-01-05
 tags:
   - Architecture

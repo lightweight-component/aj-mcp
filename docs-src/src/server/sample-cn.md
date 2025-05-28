@@ -1,14 +1,14 @@
 ---
-title: MCP Server SDK Setup
+title: MCP Server SDK 演示程序
 subTitle: 2024-12-05 by Frank Cheung
-description: MCP Server SDK Setup
+description: MCP Server SDK 演示程序
 date: 2022-01-05
 tags:
-  - MCP Server SDK Setup
-layout: layouts/docs.njk
+  - MCP Server SDK 演示程序
+layout: layouts/docs-cn.njk
 ---
 
-# MCP Server SDK Setup
+# MCP Server SDK 演示程序
 
 ## Install Dependency
 
@@ -55,7 +55,7 @@ McpTransport transport = StdioTransport.builder()
 .build();
 ```
 
-If you want to check out the fully logs of the client, you can set `logEvents` to `true`. This is good for debugging or learning the MCP protocol, to get more
+If you want to check out the fully logs of the client, you can set `logEvents` to `true`. This is good for learning the MCP protocol, to get more
 about the JSON messages of this protocol.
 
 ## Configure SDK

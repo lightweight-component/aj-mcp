@@ -1,14 +1,14 @@
 ---
-title: Contact Us
+title: MCP Server SDK Usage
 subTitle: 2024-12-05 by Frank Cheung
-description: TODO
+description: MCP Server SDK Usage
 date: 2022-01-05
 tags:
-  - last one
+  - MCP Server SDK Usage
 layout: layouts/docs.njk
 ---
 
-# MCP Client SDK Usage
+# MCP Server SDK Usage
 
 ## Install Dependency
 

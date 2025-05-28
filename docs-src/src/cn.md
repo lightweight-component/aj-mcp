@@ -1,61 +1,57 @@
 ---
-title: Docs Home
+title: 用户手册 首页
 subTitle: 2024-12-05 by Frank Cheung
-description: TODO
+description: 用户手册 首页
 date: 2022-01-05
 tags:
-  - last one
+  - 用户手册
 layout: layouts/docs-cn.njk
 ---
-# Welcome to AJ-MCP's Docs Center
 
-This is a Java helper library for data manipulation of RDBMS (Databases), from low-level SQL operations to advanced low-code rapid development integration. First of all, it encapsulates common JDBC operations while retaining the original SQL statement input (SQL can be stored in XML or Java annotations); Secondly, it provides convenient CRUD (Create, Read, Update, Delete) operations for Java entities, eliminating the need to write SQL; Finally, it offers a rapid development platform that integrates the features of the former two, allowing the generation of API interfaces with just SQL statements, making it more user-friendly.
+# 欢迎使用 AJ MCP SDK 用户手册
 
-<!-- 
-封装了 JDBC 常见的操作，保留原始的 SQL 语句输入（SQL 可以保存在 XML 或者 Java 注解）；其次，针对 Java 实体提供便捷的增删改查操作，这时基本不用写 SQL；最后，提供一个快速开发平台，集成前二者的特色，只须提供 SQL 语句即可生成 API 接口，更易用。
-简化 JDBC 调用处理，抽取出重复代码，以便开发人员只专注于与数据库相关的操作：查询与更新。 -->
+AJ MCP SDK 是 **模型上下文协议**（MCP）的一个实现。MCP 是一种开放协议，旨在实现大型语言模型（LLM）应用与外部数据源和工具之间的无缝集成。本 SDK 提供了声明式的 API，使开发者能够轻松地在自己的应用程序中实现 MCP 服务器功能。
 
-### Some of the advantages of using SqlMan are:
+## 为什么选择 AJ MCP SDK？
 
-- Familiar way for you:
-    - `sql().input('SELECT * FROM table WHERE id=?', 1).query()` -- Highly compatible with Spring JdbcTemplate/Apache DBUtils.
-    - Multiple lines of SQL written in XML -- Highly compatible with MyBatis Mapper.
-    - `@Insert`、`@Update`、`@Delete`、`@Query` annotations -- Highly compatible with JPA.
-    - Automatically populate JavaBean properties from ResultSets. You don't need to manually copy column values into bean instances by calling setter methods. Each row of the ResultSet can be represented by one fully populated bean instance. Besides, Map type is optional.
-- Core philosophy centers around SQL. Enhanced SQL logic, supporting dynamic SQL (IF/ForEach).
-- Built-in common CRUD//Paging functionality, allowing simple systems to write 0% SQL, and saving 50% of the workload in complex projects.
-- Offers a rich set of extension features, with 80% of the functionality being customizable and expandable.
-<!-- - LowCode Platform ready for advanced integration,  [check it out!](low-code) -->
+与其他 MCP SDK 相比，AJ MCP SDK 被设计得更轻量、更易于使用。它基于 Java 8 构建，为开发者提供了简单直观的 API 来实现 MCP 服务器功能。SDK 的体积小巧，便于集成到你的应用程序中。
 
-### SqlMan is designed to be:
-<!-- 近乎偏执的简单哲学 -->
-- Small - Almost obsessively simple philosophy. You should be able to understand the whole package in a short amount of time.
-- Transparent - SqlMan doesn't do any magic behind the scenes. You give it a query, it executes it and cleans up for you.
-- Fast - You don't need to create a million temporary objects to work with SqlMan.
+### 为什么还在使用 Java 8？
 
+MCP 是一个基于协议的框架，因此应具有更强的通用性，满足更广泛的市场需求。
 
-<!-- 设计原则
+目前 Java 领域中开发 MCP 的情况如下：
 
-    小 - SqlMan 库的体积很小，只有较少的类，因此易于理解和使用。
-    透明 - SqlMan 库在后台没有做太多工作，它只需查询并执行。
-    快速 - SqlMan 库类不会创建许多背景对象，并且在数据库操作执行中速度非常快。 -->
+| 框架名称                | 所需 JDK 版本 |
+|---------------------|-----------|
+| 官方 Java MCP SDK     | jdk17+    |
+| Spring AI MCP       | jdk17+    |
+| Quarkus MCP 服务器     | jdk17+    |
+| langchain4j-mcp 客户端 | jdk11+    |
 
-### SqlMan is NOT:
+考虑到仍有大量服务器运行在 JDK 8 上，使用 Java 8 开发 MCP（或 MCP 服务器）对于确保广泛兼容性和灵活性至关重要——这才是 MCP 真正意义上的自由。
 
-- An Object/Relational bridge - there are plenty of good O/R tools already. SqlMan is for developers looking to use JDBC without all the mundane pieces.
-- Does not provide a functional-style chained call, as the author believes that readability is poor and debugging is inconvenient.
-<!--     A Data Access Object (DAO) framework - SqlMan can be used to build a DAO framework though.
-    An object oriented abstraction of general database objects like a Table, Column, or PrimaryKey. -->
-- A heavyweight framework of any kind - the goal here is to be a straightforward and easy to use JDBC helper library.
+## 更多信息
 
+如需了解各组件的具体使用方法，请参阅以下页面：
 
-## Source Code
-Under GNU GENERAL PUBLIC LICENSE v3.0.
- 
-- Github: [https://github.com/lightweight-component/SqlMan](https://github.com/lightweight-component/SqlMan)
-- Gitcode: [https://gitcode.com/lightweight-component/SqlMan](https://gitcode.com/lightweight-component/SqlMan), for Chinese users faster access.
+- [架构说明](architecture)
+- [客户端 SDK](client)
+- [服务端 SDK](server)
 
+## 源代码
 
-## Links
+本项目采用 GNU GENERAL PUBLIC LICENSE v3.0 协议开源。
 
-[Website](https://sqlman.ajaxjs.com) | [Documents](https://sqlman.ajaxjs.com/docs)  | [JavaDoc](https://github.com/lightweight-component/SqlMan)
+- GitHub 地址：[https://github.com/lightweight-component/aj-mcp](https://github.com/lightweight-component/aj-mcp)
+- GitCode 地址（适合中国用户快速访问）：[https://gitcode.com/lightweight-component/aj-mcp](https://gitcode.com/lightweight-component/aj-mcp)
+
+## 相关链接
+
+[官网](https://mcp.ajaxjs.com) | [DeepWiki 页面](https://deepwiki.com/lightweight-component/aj-mcp)
+
+## JavaDoc 文档
+
+- [aj-mcp-common](https://javadoc.io/doc/com.ajaxjs/aj-mcp-common)
+- [aj-mcp-client](https://javadoc.io/doc/com.ajaxjs/aj-mcp-client)
+- [aj-mcp-server](https://javadoc.io/doc/com.ajaxjs/aj-mcp-server)

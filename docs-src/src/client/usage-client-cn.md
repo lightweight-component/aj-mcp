@@ -1,18 +1,18 @@
 ---
-title: MCP Server SDK Setup
+title: MCP Client SDK 用法指南
 subTitle: 2024-12-05 by Frank Cheung
-description: MCP Server SDK Setup
+description:  MCP Client SDK 用法指南
 date: 2022-01-05
 tags:
-  - MCP Server SDK Setup
-layout: layouts/docs.njk
+  - MCP Client SDK 用法指南
+layout: layouts/docs-cn.njk
 ---
 
-# MCP Server SDK Setup
+# MCP Client SDK 用法指南
 
 ## Install Dependency
 
-We’ll need the AJ MCP SDK for making API requests. Install them with:
+We’ll need the AJ MCP SDK for making API requests. Install it with Maven:
 
 ```xml
 
@@ -55,7 +55,7 @@ McpTransport transport = StdioTransport.builder()
 .build();
 ```
 
-If you want to check out the fully logs of the client, you can set `logEvents` to `true`. This is good for debugging or learning the MCP protocol, to get more
+If you want to check out the fully logs of the client, you can set `logEvents` to `true`. This is good for learning the MCP protocol, to get more
 about the JSON messages of this protocol.
 
 ## Configure SDK
