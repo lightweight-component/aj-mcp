@@ -99,7 +99,7 @@ McpClient mcpClient=McpClient.builder()
 | protocolVersion | 设置客户端在初始化消息中声明的协议版本。当前默认值为 "2024-11-05"，但在后续版本中可能会有所更改。 | String   | 2024-11-05               |
 | requestTimeout  | 设置工具执行的超时时间。此值适用于每个工具执行。默认值为 60 秒，值为 0 表示没有超时。          | Duration | `Duration.ofSeconds(60)` |
 
-对于使用 SSE 的情况，在创建 McpClient 后，应立即调用 `mcpClient.initialize();`。
+请注意，在创建 McpClient 后，应立即调用 `mcpClient.initialize();`。关于初始化工作将在下一小节介绍。
 
 ```java
 McpClient mcpClient=McpClient.builder()

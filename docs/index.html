@@ -1,1 +1,147 @@
-hi
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+        <title>AJ MCP SDK/Home</title>
+        <meta name="description" content="A lightweight Java 8 Model Context Protocol (MCP) SDK. TODO"/>
+        <meta name="keywords" content="mcp, mcp sdk, java mcp, mcp client, mcp server, java8 mcp, last one"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <link rel="stylesheet" href="/asset/style/main.css"/>
+        <link rel="icon" type="image/png" href="/asset/favicon.ico"/>
+        <script src="/asset/common.js"></script>
+    </head>
+    <body>
+        <nav>
+            <div>
+                <div class="links">
+                    <a href="/">🏠 Home</a>
+                    | ⚙️ Source:
+                    <a target="_blank" href="https://github.com/lightweight-component/aj-mcp">Github</a>/<a target="_blank" href="https://gitcode.com/lightweight-component/aj-mcp">Gitcode</a>
+                    |
+                    <a href="/cn">Chinese Version</a>
+                </div>
+                <h1>AJ MCP SDK</h1>
+                <h3>User Manual</h3>
+            </div>
+        </nav>
+        <div>
+            <menu>
+                
+                <ul>
+                    <li class="selected">
+                        <a href="/">Home</a>
+                    </li>
+                    <li>
+                        <a href="/architecture/index">Architecture</a>
+                    </li>
+                </ul>
+                <h3>MCP Client SDK</h3>
+                <ul>
+                    <li>
+                        <a href="/client/setup-client">Client SDK Setup</a>
+                    </li>
+                    <li>
+                       <a href="/client/initialization">Initialization</a>
+                    </li>
+                    <li>
+                       <a href="/client/resource">Resources Usage</a>
+                    </li>
+                     <li>
+                       <a href="/client/prompt">Prompts Usage</a>
+                    </li>
+                     <li>
+                       <a href="/client/tool">Tools Usage</a>
+                    </li>
+                </ul>
+                <h3>MCP Server SDK</h3>
+                <ul>
+                      <li>
+                           <a href="/server/usage-server">Server SDK Usage</a>
+                      </li>
+                      <li>
+                           <a href="/server/res-server">Resources Usage</a>
+                      </li>
+                      <li>
+                           <a href="/server/pro-server">Prompts Usage</a>
+                      </li>
+                      <li>
+                             <a href="/server/tool-server">Tools Usage</a>
+                       </li>
+                      <li>
+                         <a href="/server/sample">Integration Samples</a>
+                      </li>
+                </ul>
+
+                <h3>Misc</h3>
+                <ul>
+                    <li><a href="/misc/contact">Contact</a></li>
+                    
+                </ul>
+            </menu>
+            <article>
+                <h1>Welcome to the User Manual of AJ MCP SDK</h1>
+<p>The AJ MCP SDK is an implementation of the Model Context Protocol (MCP), an open protocol designed to enable seamless integration between Large
+Language Model (LLM) applications and external data sources and tools. This SDK provides the declarative APIs that make it easy for developers to
+implement MCP server features in your applications.</p>
+<h2>Why AJ MCP SDK?</h2>
+<p>Compared to the other MCP SDKs, AJ MCP SDK is designed to be lightweight and easy to use. It is built on top of the Java 8, and provides a simple and
+intuitive API for developers to implement MCP server features. The size of the SDK is small, making it easy to integrate into your application.</p>
+<h3>Why still Java8?</h3>
+<p>MCP is a protocol-based framework and should therefore be more universally applicable. It should address a broader range of market demands.</p>
+<p>Currently, the situation with developing MCP in Java is:</p>
+<table>
+<thead>
+<tr>
+<th>Framework</th>
+<th>requires JDK</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Official Java MCP SDK</td>
+<td>jdk17+</td>
+</tr>
+<tr>
+<td>Spring AI MCP</td>
+<td>jdk17+</td>
+</tr>
+<tr>
+<td>Quarkus MCP server</td>
+<td>jdk17+</td>
+</tr>
+<tr>
+<td>langchain4j-mcp client</td>
+<td>jdk11+</td>
+</tr>
+</tbody>
+</table>
+<p>Given that a large number of servers still run on JDK 8, the ability to develop MCP (or MCP Server) with Java 8 is essential to ensure broad compatibility and flexibility — that’s what real freedom for MCP means.</p>
+<h2>Further</h2>
+<p>For specific information about working with individual components,
+please see dedicated pages on <a href="architecture">Architecture</a>, <a href="client">Client SDK</a>, <a href="server">Server SDK</a>.</p>
+<h2>Source Code</h2>
+<p>Under GNU GENERAL PUBLIC LICENSE v3.0.</p>
+<ul>
+<li>Github: <a href="https://github.com/lightweight-component/aj-mcp">https://github.com/lightweight-component/aj-mcp</a></li>
+<li>Gitcode: <a href="https://gitcode.com/lightweight-component/aj-mcp">https://gitcode.com/lightweight-component/aj-mcp</a>, for Chinese users faster access.</li>
+</ul>
+<h2>Links</h2>
+<p><a href="https://mcp.ajaxjs.com">Website</a> | <a href="https://deepwiki.com/lightweight-component/aj-mcp">DeepWiki</a></p>
+<h2>JavaDoc</h2>
+<ul>
+<li><a href="https://javadoc.io/doc/com.ajaxjs/aj-mcp-common">aj-mcp-common</a></li>
+<li><a href="https://javadoc.io/doc/com.ajaxjs/aj-mcp-client">aj-mcp-client</a></li>
+<li><a href="https://javadoc.io/doc/com.ajaxjs/aj-mcp-server">aj-mcp-server</a></li>
+</ul>
+
+            </article>
+        </div>
+        <footer>
+            AJ MCP SDK, a part of
+            <a href="https://framework.ajaxjs.com" target="_blank">AJ-Framework</a>
+            open source. Mail:frank@ajaxjs.com, visit
+            <a href="https://blog.csdn.net/zhangxin09" target="_blank">my blog(In Chinese)</a>. <br/> <br/> Copyright © 2025 Frank Cheung. All rights reserved.
+        </footer>
+    </body>
+</html>

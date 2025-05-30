@@ -23,7 +23,6 @@ public abstract class TestToolBase {
 
     @Test
     void verifyToolSpecifications() {
-
         ToolItem listUserRepos = obtainTools().findToolByName("list_user_repos");
 
         System.out.println(listUserRepos.getDescription());

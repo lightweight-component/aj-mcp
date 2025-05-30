@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+        <title>AJ MCP SDK/架构原理</title>
+        <meta name="description" content="轻量级的 Java 8 Model Context Protocol (MCP) SDK. 架构原理"/>
+        <meta name="keywords" content="mcp, mcp sdk, java mcp, mcp client, mcp server, java8 mcp, Architecture,架构原理"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <link rel="stylesheet" href="/asset/style/main.css"/>
+        <link rel="icon" type="image/png" href="/asset/favicon.ico"/>
+        <script src="/asset/common.js"></script>
+    </head>
+    <body>
+        <nav>
+            <div>
+                <div class="links">
+                    <a href="/">🏠 首页</a>
+                    | ⚙️ 源码:
+                    <a target="_blank" href="https://github.com/lightweight-component/aj-mcp">Github</a>/<a target="_blank" href="https://gitcode.com/lightweight-component/aj-mcp">Gitcode</a>
+                    |
+                    <a href="/">英文版本</a>
+                </div>
+                <h1>AJ MCP SDK</h1>
+                <h3>用户手册</h3>
+            </div>
+        </nav>
+        <div>
+            <menu>
+                
+                <ul>
+                    <li class="selected">
+                        <a href="/cn">首页</a>
+                    </li>
+                    <li>
+                        <a href="/architecture/index-cn">架构原理</a>
+                    </li>
+                </ul>
+                <h3>MCP 客户端 SDK</h3>
+                <ul>
+                    <li>
+                        <a href="/client/setup-client-cn">安装与配置</a>
+                    </li>
+                    <li>
+                       <a href="/client/initialization-cn">初始化</a>
+                    </li>
+                    <li>
+                       <a href="/client/resource-cn">Resources 用法</a>
+                    </li>
+                     <li>
+                       <a href="/client/prompt-cn">Prompts 用法</a>
+                    </li>
+                     <li>
+                       <a href="/client/tool-cn">Tools 用法</a>
+                    </li>
+                </ul>
+                <h3>MCP 服务端 SDK</h3>
+                <ul>
+                      <li>
+                           <a href="/server/usage-server-cn">Server SDK 用法指南</a>
+                      </li>
+                      <li>
+                           <a href="/server/res-server-cn">Resources 用法</a>
+                      </li>
+                      <li>
+                           <a href="/server/pro-server-cn">Prompts 用法</a>
+                      </li>
+                      <li>
+                             <a href="/server/tool-server-cn">Tools 用法</a>
+                       </li>
+                      <li>
+                         <a href="/server/sample-cn">整合例子</a>
+                      </li>
+                </ul>
+
+                <h3>其他</h3>
+                <ul>
+                    <li><a href="/misc/contact-cn">联系方式</a></li>
+                    
+                </ul>
+            </menu>
+            <article>
+                <h1>MCP 客户端与服务器架构</h1>
+<h2>什么是模型上下文协议（MCP）？</h2>
+<p><a href="https://modelcontextprotocol.io/introduction">模型上下文协议（Model Context Protocol, MCP）</a> 使 AI 应用能够访问外部工具、数据源和提示信息。它在 AI 模型与外部世界之间架起了一座桥梁，使语言模型能够与应用程序特定的资源和功能进行交互。</p>
+<p>MCP 提供了以下核心能力：</p>
+<ul>
+<li><strong>工具（Tools）</strong>：LLM 应用程序可以调用的功能</li>
+<li><strong>资源（Resources）</strong>：LLM 应用程序可以访问的数据</li>
+<li><strong>提示词（Prompts）</strong>：用于 LLM 交互的模板</li>
+<li><strong>通知（Notifications）</strong>：服务器与客户端之间的基于事件的通信</li>
+</ul>
+<p>简而言之，MCP 为 LLM 应用提供了丰富多样的上下文，使其能够与外部资源和工具进行交互。</p>
+<h2>架构说明</h2>
+<p>AJ MCP SDK 的结构围绕几个核心组件构建，这些组件协同工作以实现 MCP 规范：</p>
+<p><img src="/asset/imgs/a-1.jpg" alt="架构图"></p>
+<p>该架构采用客户端-服务器模型，并支持灵活的传输方式。客户端可以通过 HTTP（带 Server-Sent Events）或标准 I/O 管道使用 JSON-RPC 与服务器进行交互。</p>
+
+            </article>
+        </div>
+        <footer>
+             AJ-Util，开源框架 <a href="https://framework.ajaxjs.com" target="_blank">AJ-Framework</a> 的一部分。联系方式：
+             frank@ajaxjs.com，<a href="https://blog.csdn.net/zhangxin09" target="_blank">作者博客</a>
+             <br />
+             <br />
+             Copyright © 2025 Frank Cheung. All rights reserved.
+         </footer>
+    </body>
+</html>

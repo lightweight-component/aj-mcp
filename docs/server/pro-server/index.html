@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+        <title>AJ MCP SDK/MCP Server SDK Prompts Development</title>
+        <meta name="description" content="A lightweight Java 8 Model Context Protocol (MCP) SDK. MCP Server SDK Prompts Development"/>
+        <meta name="keywords" content="mcp, mcp sdk, java mcp, mcp client, mcp server, java8 mcp, Prompts Development"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <link rel="stylesheet" href="/asset/style/main.css"/>
+        <link rel="icon" type="image/png" href="/asset/favicon.ico"/>
+        <script src="/asset/common.js"></script>
+    </head>
+    <body>
+        <nav>
+            <div>
+                <div class="links">
+                    <a href="/">🏠 Home</a>
+                    | ⚙️ Source:
+                    <a target="_blank" href="https://github.com/lightweight-component/aj-mcp">Github</a>/<a target="_blank" href="https://gitcode.com/lightweight-component/aj-mcp">Gitcode</a>
+                    |
+                    <a href="/cn">Chinese Version</a>
+                </div>
+                <h1>AJ MCP SDK</h1>
+                <h3>User Manual</h3>
+            </div>
+        </nav>
+        <div>
+            <menu>
+                
+                <ul>
+                    <li class="selected">
+                        <a href="/">Home</a>
+                    </li>
+                    <li>
+                        <a href="/architecture/index">Architecture</a>
+                    </li>
+                </ul>
+                <h3>MCP Client SDK</h3>
+                <ul>
+                    <li>
+                        <a href="/client/setup-client">Client SDK Setup</a>
+                    </li>
+                    <li>
+                       <a href="/client/initialization">Initialization</a>
+                    </li>
+                    <li>
+                       <a href="/client/resource">Resources Usage</a>
+                    </li>
+                     <li>
+                       <a href="/client/prompt">Prompts Usage</a>
+                    </li>
+                     <li>
+                       <a href="/client/tool">Tools Usage</a>
+                    </li>
+                </ul>
+                <h3>MCP Server SDK</h3>
+                <ul>
+                      <li>
+                           <a href="/server/usage-server">Server SDK Usage</a>
+                      </li>
+                      <li>
+                           <a href="/server/res-server">Resources Usage</a>
+                      </li>
+                      <li>
+                           <a href="/server/pro-server">Prompts Usage</a>
+                      </li>
+                      <li>
+                             <a href="/server/tool-server">Tools Usage</a>
+                       </li>
+                      <li>
+                         <a href="/server/sample">Integration Samples</a>
+                      </li>
+                </ul>
+
+                <h3>Misc</h3>
+                <ul>
+                    <li><a href="/misc/contact">Contact</a></li>
+                    
+                </ul>
+            </menu>
+            <article>
+                <h1>Prompts Development</h1>
+<p>AJ-MCP uses annotations to define prompts within <code>@McpService</code> classes. The <code>@Prompt</code> annotation marks methods that serve as prompt handlers, while
+<code>@PromptArg</code> defines parameters for interactive prompts.</p>
+<p>Simple prompts return a single <code>PromptMessage</code> with text content. The <code>@Prompt</code> annotation requires a description and the method returns a configured
+message with role and content.</p>
+<pre><code class="language-java">@Prompt(description = &quot;Basic simple prompt&quot;)
+public PromptMessage basic(){
+        PromptMessage message=new PromptMessage();
+        message.setRole(Role.USER);
+        message.setContent(new ContentText(&quot;Hello&quot;));
+
+        return message;
+        }
+</code></pre>
+<h2>Multi-Message Prompts</h2>
+<p>Prompts can return multiple messages by returning a <code>List&lt;PromptMessage&gt;</code>. This enables creating conversation-style prompts with multiple turns or
+role-based interactions.</p>
+<pre><code class="language-java">@Prompt(description = &quot;Prompt that returns two messages&quot;)
+public List&lt;PromptMessage&gt; multi(){
+        PromptMessage message1=new PromptMessage();
+        message1.setRole(Role.USER);
+        message1.setContent(new ContentText(&quot;first&quot;));
+
+        PromptMessage message2=new PromptMessage();
+        message2.setRole(Role.USER);
+        message2.setContent(new ContentText(&quot;second&quot;));
+
+        return Arrays.asList(message1,message2);
+        }   
+</code></pre>
+<h2>Parameterized Prompts</h2>
+<p>Prompts can accept parameters using the <code>@PromptArg</code> annotation. Parameters become available to clients when listing prompts and are passed when
+retrieving the prompt.</p>
+<pre><code class="language-java">@Prompt(description = &quot;Parametrized prompt&quot;)
+public PromptMessage parametrized(@PromptArg(description = &quot;The name&quot;) String name){
+        PromptMessage message=new PromptMessage();
+        message.setRole(Role.USER);
+        message.setContent(new ContentText(&quot;Hello &quot;+name));
+
+        return message;
+        }
+</code></pre>
+<h2>Content Types and Rich Media</h2>
+<p>Prompts support multiple content types beyond text, including images and embedded resources. Each content type has specific properties and encoding
+requirements.</p>
+<table>
+<thead>
+<tr>
+<th>Content Type</th>
+<th>Class</th>
+<th>Key Properties</th>
+<th>Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Text</td>
+<td>ContentText</td>
+<td>text</td>
+<td>Simple text messages</td>
+</tr>
+<tr>
+<td>Image</td>
+<td>ContentImage</td>
+<td>data, mimeType</td>
+<td>Base64-encoded images</td>
+</tr>
+<tr>
+<td>Embedded Resource</td>
+<td>ContentEmbeddedResource</td>
+<td>resource.uri, resource.mimeType</td>
+<td>Binary data references</td>
+</tr>
+</tbody>
+</table>
+<h2>Protocol Data Structures</h2>
+<p>The prompt system uses specific protocol structures for communication between client and server.</p>
+<table>
+<thead>
+<tr>
+<th>Class</th>
+<th>Purpose</th>
+<th>Key Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PromptItem</td>
+<td>Prompt metadata for listing</td>
+<td>name, description, arguments</td>
+</tr>
+<tr>
+<td>PromptMessage</td>
+<td>Individual message content</td>
+<td>role, content</td>
+</tr>
+<tr>
+<td>GetPromptResult</td>
+<td>Response wrapper</td>
+<td>result.description, result.messages</td>
+</tr>
+<tr>
+<td>PromptArgument</td>
+<td>Parameter definition</td>
+<td>name, description, required</td>
+</tr>
+</tbody>
+</table>
+<h2>Role Enumeration</h2>
+<p>The Role enum defines message roles in prompt conversations:</p>
+<ul>
+<li>USER - Messages from the user perspective</li>
+<li>ASSISTANT - Messages from the AI assistant perspective</li>
+<li>SYSTEM - System-level instructions or context</li>
+</ul>
+
+            </article>
+        </div>
+        <footer>
+            AJ MCP SDK, a part of
+            <a href="https://framework.ajaxjs.com" target="_blank">AJ-Framework</a>
+            open source. Mail:frank@ajaxjs.com, visit
+            <a href="https://blog.csdn.net/zhangxin09" target="_blank">my blog(In Chinese)</a>. <br/> <br/> Copyright © 2025 Frank Cheung. All rights reserved.
+        </footer>
+    </body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+        <title>AJ MCP SDK/Initializing the Protocol</title>
+        <meta name="description" content="轻量级的 Java 8 Model Context Protocol (MCP) SDK. Initializing the Protocol"/>
+        <meta name="keywords" content="mcp, mcp sdk, java mcp, mcp client, mcp server, java8 mcp, initialization"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <link rel="stylesheet" href="/asset/style/main.css"/>
+        <link rel="icon" type="image/png" href="/asset/favicon.ico"/>
+        <script src="/asset/common.js"></script>
+    </head>
+    <body>
+        <nav>
+            <div>
+                <div class="links">
+                    <a href="/">🏠 首页</a>
+                    | ⚙️ 源码:
+                    <a target="_blank" href="https://github.com/lightweight-component/aj-mcp">Github</a>/<a target="_blank" href="https://gitcode.com/lightweight-component/aj-mcp">Gitcode</a>
+                    |
+                    <a href="/">英文版本</a>
+                </div>
+                <h1>AJ MCP SDK</h1>
+                <h3>用户手册</h3>
+            </div>
+        </nav>
+        <div>
+            <menu>
+                
+                <ul>
+                    <li class="selected">
+                        <a href="/cn">首页</a>
+                    </li>
+                    <li>
+                        <a href="/architecture/index-cn">架构原理</a>
+                    </li>
+                </ul>
+                <h3>MCP 客户端 SDK</h3>
+                <ul>
+                    <li>
+                        <a href="/client/setup-client-cn">安装与配置</a>
+                    </li>
+                    <li>
+                       <a href="/client/initialization-cn">初始化</a>
+                    </li>
+                    <li>
+                       <a href="/client/resource-cn">Resources 用法</a>
+                    </li>
+                     <li>
+                       <a href="/client/prompt-cn">Prompts 用法</a>
+                    </li>
+                     <li>
+                       <a href="/client/tool-cn">Tools 用法</a>
+                    </li>
+                </ul>
+                <h3>MCP 服务端 SDK</h3>
+                <ul>
+                      <li>
+                           <a href="/server/usage-server-cn">Server SDK 用法指南</a>
+                      </li>
+                      <li>
+                           <a href="/server/res-server-cn">Resources 用法</a>
+                      </li>
+                      <li>
+                           <a href="/server/pro-server-cn">Prompts 用法</a>
+                      </li>
+                      <li>
+                             <a href="/server/tool-server-cn">Tools 用法</a>
+                       </li>
+                      <li>
+                         <a href="/server/sample-cn">整合例子</a>
+                      </li>
+                </ul>
+
+                <h3>其他</h3>
+                <ul>
+                    <li><a href="/misc/contact-cn">联系方式</a></li>
+                    
+                </ul>
+            </menu>
+            <article>
+                <h1>协议初始化</h1>
+<p>创建客户端后，在与服务器通信前，需要先进行初始化。也就是说，在发起任何请求之前，必须先调用 <code>initialize()</code> 方法初始化协议。<br>
+<code>initialize();</code> 方法会初始化传输通道并设置通知处理。</p>
+<p>Initialize 方法的步骤如下：</p>
+<ol>
+<li>向服务器发送初始化请求</li>
+<li>保存服务器的能力信息</li>
+<li>发送 “initialized” 通知</li>
+<li>标记客户端为已初始化状态</li>
+</ol>
+<p>初始化成功后，客户端才能向服务器发起其他请求。</p>
+<p>因此，在创建完 McpClient 后，应立即调用 <code>initialize();</code> 方法。</p>
+<pre><code class="language-java">McpClient mcpClient = McpClient.builder()
+        .clientName(&quot;my-host&quot;)
+        .clientVersion(&quot;1.2&quot;)
+        .transport(sseTransport)
+        .build();
+
+mcpClient.initialize();
+</code></pre>
+
+            </article>
+        </div>
+        <footer>
+             AJ-Util，开源框架 <a href="https://framework.ajaxjs.com" target="_blank">AJ-Framework</a> 的一部分。联系方式：
+             frank@ajaxjs.com，<a href="https://blog.csdn.net/zhangxin09" target="_blank">作者博客</a>
+             <br />
+             <br />
+             Copyright © 2025 Frank Cheung. All rights reserved.
+         </footer>
+    </body>
+</html>

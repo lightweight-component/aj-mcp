@@ -26,10 +26,16 @@ We’ll need the AJ MCP SDK for making API requests. Install them with:
 We can find the latest version:
 [![Maven Central](https://img.shields.io/maven-central/v/com.ajaxjs/aj-mcp-client?label=Latest%20Release)](https://central.sonatype.com/artifact/com.ajaxjs/aj-mcp-client)
 
+## Concepts
+
 The client SDK implementation consists of two main components:
 
 - Transport: Manages the subprocess and handles low-level message exchange.
 - MCP Client: Provides a high-level API for using the transport, implementing the MCP protocol.
+
+To start using the MCP client, you must first these two main components:
+first to create a appropriate transport instance, and then to create a client instance with that transport.
+The client supports different transport mechanisms, primarily Server-Sent Events (SSE) and standard I/O (stdio).
 
 ## Setup the Transport
 
@@ -78,11 +84,9 @@ McpTransport transport = HttpMcpTransport.builder()
 
 The `sseUrl` is required. It specifies the URL of the SSE endpoint where the MCP server is listening for incoming connections.
 
-
 ## McpClient
 
 The MCP Client serves as a bridge between local applications and remote tool implementations.
-
 
 ``` java
 McpClient mcpClient = McpClient.builder()
@@ -105,7 +109,8 @@ All properties are listing below:
 | protocolVersion | Sets the protocol version that the client will advertise in the initialization message. The default value right now is "2024-11-05", but will change over time in later versions. | String        | 2024-11-05               |
 | requestTimeout  | Sets the timeout for tool execution. This value applies to each tool execution individually. The default value is 60 seconds. A value of zero means no timeout.                   | Duration      | `Duration.ofSeconds(60)` |
 
-For the case of using SSE, after creating the McpClient, you should call `mcpClient.initialize();` right away.
+Please note that after creating the McpClient, you should call `mcpClient.initialize();` right away.
+We'll talk about the initialization of MCP in next section.
 
 ``` java
 McpClient mcpClient = McpClient.builder()
@@ -126,7 +131,9 @@ try(IMcpClient mcpClient2 = McpClient.builder().transport(transport).build()){
    throw new RuntimeException(e);
 }
 ```
-The MCP Client follows a layered architecture with a clean separation between the interface definition and its implementation. The client relies on the transport layer for actual communication with the server, abstracting the communication details to support different transport mechanisms.
+
+The MCP Client follows a layered architecture with a clean separation between the interface definition and its implementation. The client relies on
+the transport layer for actual communication with the server, abstracting the communication details to support different transport mechanisms.
 
 
 <style>

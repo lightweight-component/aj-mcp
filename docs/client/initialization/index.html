@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+        <title>AJ MCP SDK/Initializing the Protocol</title>
+        <meta name="description" content="A lightweight Java 8 Model Context Protocol (MCP) SDK. Initializing the Protocol"/>
+        <meta name="keywords" content="mcp, mcp sdk, java mcp, mcp client, mcp server, java8 mcp, initialization"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <link rel="stylesheet" href="/asset/style/main.css"/>
+        <link rel="icon" type="image/png" href="/asset/favicon.ico"/>
+        <script src="/asset/common.js"></script>
+    </head>
+    <body>
+        <nav>
+            <div>
+                <div class="links">
+                    <a href="/">🏠 Home</a>
+                    | ⚙️ Source:
+                    <a target="_blank" href="https://github.com/lightweight-component/aj-mcp">Github</a>/<a target="_blank" href="https://gitcode.com/lightweight-component/aj-mcp">Gitcode</a>
+                    |
+                    <a href="/cn">Chinese Version</a>
+                </div>
+                <h1>AJ MCP SDK</h1>
+                <h3>User Manual</h3>
+            </div>
+        </nav>
+        <div>
+            <menu>
+                
+                <ul>
+                    <li class="selected">
+                        <a href="/">Home</a>
+                    </li>
+                    <li>
+                        <a href="/architecture/index">Architecture</a>
+                    </li>
+                </ul>
+                <h3>MCP Client SDK</h3>
+                <ul>
+                    <li>
+                        <a href="/client/setup-client">Client SDK Setup</a>
+                    </li>
+                    <li>
+                       <a href="/client/initialization">Initialization</a>
+                    </li>
+                    <li>
+                       <a href="/client/resource">Resources Usage</a>
+                    </li>
+                     <li>
+                       <a href="/client/prompt">Prompts Usage</a>
+                    </li>
+                     <li>
+                       <a href="/client/tool">Tools Usage</a>
+                    </li>
+                </ul>
+                <h3>MCP Server SDK</h3>
+                <ul>
+                      <li>
+                           <a href="/server/usage-server">Server SDK Usage</a>
+                      </li>
+                      <li>
+                           <a href="/server/res-server">Resources Usage</a>
+                      </li>
+                      <li>
+                           <a href="/server/pro-server">Prompts Usage</a>
+                      </li>
+                      <li>
+                             <a href="/server/tool-server">Tools Usage</a>
+                       </li>
+                      <li>
+                         <a href="/server/sample">Integration Samples</a>
+                      </li>
+                </ul>
+
+                <h3>Misc</h3>
+                <ul>
+                    <li><a href="/misc/contact">Contact</a></li>
+                    
+                </ul>
+            </menu>
+            <article>
+                <h1>Initializing the Protocol</h1>
+<p>After creating a client, you need to initialize it before using it to communicate with the server,
+that means, before making any requests, you must initialize the protocol by calling the <code>initialize()</code> method.
+The <code>initialize();</code> method initializes the transport and sets up notification handling.</p>
+<p>The Initialize method:</p>
+<ol>
+<li>Sends an initialize request to the server</li>
+<li>Stores the server's capabilities</li>
+<li>Sends an &quot;initialized&quot; notification</li>
+<li>Marks the client as initialized</li>
+</ol>
+<p>After successful initialization, the client can make other requests to the server.</p>
+<p>After creating the McpClient, you should call the <code>initialize();</code> right away.</p>
+<pre><code class="language-java">McpClient mcpClient = McpClient.builder()
+        .clientName(&quot;my-host&quot;)
+        .clientVersion(&quot;1.2&quot;)
+        .transport(sseTransport)
+        .build();
+        
+mcpClient.initialize();
+</code></pre>
+
+            </article>
+        </div>
+        <footer>
+            AJ MCP SDK, a part of
+            <a href="https://framework.ajaxjs.com" target="_blank">AJ-Framework</a>
+            open source. Mail:frank@ajaxjs.com, visit
+            <a href="https://blog.csdn.net/zhangxin09" target="_blank">my blog(In Chinese)</a>. <br/> <br/> Copyright © 2025 Frank Cheung. All rights reserved.
+        </footer>
+    </body>
+</html>

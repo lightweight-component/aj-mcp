@@ -1,82 +1,126 @@
 ---
-title: MCP Server SDK Sample
+title: MCP Server SDK Integration Samples
 subTitle: 2024-12-05 by Frank Cheung
-description: MCP Server SDK Sample
+description: MCP Server SDK Integration Samples
 date: 2022-01-05
 tags:
-  - MCP Server SDK Sample
+  - Integration
+  - Samples
 layout: layouts/docs.njk
 ---
 
-# MCP Server SDK Sample
+# MCP Server SDK Integration Samples
 
-## Install Dependency
+The source code repository of this project contains two integration samples: one is a standalone Tomcat server with a simple MCP service,
+and the other is a Spring Boot application with a MCP service.
 
-We’ll need the AJ MCP SDK for making API requests. Install them with:
+## Tomcat Application Integration
 
-```xml
+The Tomcat deployment shows a complete server setup pattern:
 
-<dependency>
-    <groupId>com.ajaxjs</groupId>
-    <artifactId>aj-mcp-server</artifactId>
-    <version>1.1</version>
-</dependency>
+```java
+package com.foo.myapp;
+
+
+import com.ajaxjs.mcp.server.McpServer;
+import com.ajaxjs.mcp.server.ServerSse;
+import com.ajaxjs.mcp.server.common.ServerConfig;
+import com.ajaxjs.mcp.server.feature.FeatureMgr;
+import org.apache.catalina.Context;
+import org.apache.catalina.connector.Connector;
+import org.apache.catalina.startup.Tomcat;
+
+import java.io.File;
+
+public class StandaloneTomcat {
+    public static void main(String[] args) throws Exception {
+        FeatureMgr mgr = new FeatureMgr();
+        mgr.init("com.foo.myapp");
+
+        McpServer server = new McpServer();
+        ServerSse serverSse = new ServerSse(server);
+        server.setTransport(serverSse);
+
+        ServerConfig serverConfig = new ServerConfig();
+        serverConfig.setName("MY_MCP_Server");
+        serverConfig.setVersion("1.0");
+        server.setServerConfig(serverConfig);
+
+        server.start();
+
+        Tomcat tomcat = new Tomcat();
+        tomcat.setPort(8080);
+
+        // Set base directory (for temp files)
+        tomcat.setBaseDir(".");
+
+        // Create a context (no web.xml required)
+        String contextPath = "";
+        String docBase = new File(".").getAbsolutePath();
+        Context context = tomcat.addContext(contextPath, docBase);
+
+        // Register SSE servlet
+        SseServlet sseServlet = new SseServlet(serverSse);
+        Tomcat.addServlet(context, "sseServlet", sseServlet);
+        context.addServletMappingDecoded("/sse", "sseServlet");
+
+        // Register Message servlet
+        Tomcat.addServlet(context, "messageServlet", new MessageServlet(serverSse));
+        context.addServletMappingDecoded("/message", "messageServlet");
+
+        // Configure connectionTimeout and keepAliveTimeout
+        Connector connector = tomcat.getConnector();
+        connector.setProperty("connectionTimeout", "60000"); // 20 seconds
+        connector.setProperty("keepAliveTimeout", "60000"); // 30 seconds
+        connector.setProperty("maxKeepAliveRequests", "100"); // Optional: Max requests per connection
+
+        tomcat.start();
+        tomcat.getServer().await();
+    }
+}
 ```
 
-We can find the latest version:
-[![Maven Central](https://img.shields.io/maven-central/v/com.ajaxjs/aj-mcp-client?label=Latest%20Release)](https://central.sonatype.com/artifact/com.ajaxjs/aj-mcp-client)
+## Spring Application Integration
 
-## Setup the Transport
+The Spring configuration demonstrates dependency injection setup `Config.java:12-29`, where the ServerSse bean is configured with the same pattern but
+managed by Spring's container.
 
-First, we need to create the transport. There are two types of transport you can choose from for your application, depending on the type of your MCP
-server.
+```java
+package com.foo.myapp;
 
-### Stdio Transport
+import com.ajaxjs.mcp.server.McpServer;
+import com.ajaxjs.mcp.server.ServerSse;
+import com.ajaxjs.mcp.server.common.ServerConfig;
+import com.ajaxjs.mcp.server.feature.FeatureMgr;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-'Stdio' stands for Standard Input/Output, by using command line to interact between the programme and human in short. But here is between the MCP
-Client
-and the MCP Server. Usually, we use stdio for the local application, such as a `*.exe` programme or a Java Jar programme, and so on.
+@Configuration
+public class Config {
+    @Bean
+    public ServerSse serverSse() {
+        FeatureMgr mgr = new FeatureMgr();
+        mgr.init("com.foo.myapp");
 
-``` java
-// The MCP server is a Java programme, runs on stdio.
-McpTransport transport = StdioTransport.builder()
-    .command(Arrays.asList("java", "-jar", "C:\\app\\my-app-jar-with-dependencies.jar"))
-    .logEvents(true)
-    .build();
+        McpServer server = new McpServer();
+        ServerSse serverSse = new ServerSse(server);
+        server.setTransport(serverSse);
+
+        ServerConfig serverConfig = new ServerConfig();
+        serverConfig.setName("MY_MCP_Server");
+        serverConfig.setVersion("1.0");
+        server.setServerConfig(serverConfig);
+
+        server.start();
+
+        return serverSse;
+    }
+}
 ```
 
-Let's take a look at a `.exe` programme as an example:
+## Design Note
 
-``` java
-// The MCP server is an executable programme, runs on stdio.
-McpTransport transport = StdioTransport.builder()
-.command("C:\\app\\my-app.exe", "-token", "dd4df2sx32ds"))
-.logEvents(true)
-.build();
-```
+For Mcp server over SSE, there are two endpoints that should be known:
 
-If you want to check out the fully logs of the client, you can set `logEvents` to `true`. This is good for learning the MCP protocol, to get more
-about the JSON messages of this protocol.
-
-## Configure SDK
-
-| Property        | Note                                                                                                                                                                              | Type of value | Example of value         |
-|-----------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------|--------------------------|
-| clientName      | Sets the name that the client will use to identify itself to the MCP server in the initialization message.                                                                        | String        | myapp/foo-app            |
-| clientVersion   | Sets the version string that the client will use to identify itself to the MCP server in the initialization message. The default value is "1.0".                                  | String        | 1.0/2.1.2                |
-| protocolVersion | Sets the protocol version that the client will advertise in the initialization message. The default value right now is "2024-11-05", but will change over time in later versions. | String        | 2024-11-05               |
-| requestTimeout  | Sets the timeout for tool execution. This value applies to each tool execution individually. The default value is 60 seconds. A value of zero means no timeout.                   | Duration      | `Duration.ofSeconds(60)` |
-
-<style>
-table th:nth-child(2) {
- min-width: 400px;
-}
-table th:nth-child(3), table td:nth-child(3) {
- min-width: 120px!important;
- width: 120px;
-}
-
-table td:nth-child(2) {
- text-align: left;
-}
-</style>
+    SSE Url, this is the endpoint that the client will first connect to, which is at time of initialization. In this initialization, it'll return a POST Url(The second endpoint) form the server.
+    POST Url, this is the real endpoint for the MCP business, client will send the request to this endpoint and the server will return the response by this endpoint. It's an SSE endpoint.

@@ -83,6 +83,9 @@ public abstract class McpTransport implements McpConstant, Closeable {
      * @param future The request going to send
      */
     public void saveRequest(Long id, CompletableFuture<JsonNode> future) {
+        if (pendingRequests == null)
+            throw new UnsupportedOperationException("MCP Client is NOT initialized");
+
         pendingRequests.put(id, future);
     }
 

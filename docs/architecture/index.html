@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+        <title>AJ MCP SDK/Architecture</title>
+        <meta name="description" content="A lightweight Java 8 Model Context Protocol (MCP) SDK. Architecture"/>
+        <meta name="keywords" content="mcp, mcp sdk, java mcp, mcp client, mcp server, java8 mcp, Architecture"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <link rel="stylesheet" href="/asset/style/main.css"/>
+        <link rel="icon" type="image/png" href="/asset/favicon.ico"/>
+        <script src="/asset/common.js"></script>
+    </head>
+    <body>
+        <nav>
+            <div>
+                <div class="links">
+                    <a href="/">🏠 Home</a>
+                    | ⚙️ Source:
+                    <a target="_blank" href="https://github.com/lightweight-component/aj-mcp">Github</a>/<a target="_blank" href="https://gitcode.com/lightweight-component/aj-mcp">Gitcode</a>
+                    |
+                    <a href="/cn">Chinese Version</a>
+                </div>
+                <h1>AJ MCP SDK</h1>
+                <h3>User Manual</h3>
+            </div>
+        </nav>
+        <div>
+            <menu>
+                
+                <ul>
+                    <li class="selected">
+                        <a href="/">Home</a>
+                    </li>
+                    <li>
+                        <a href="/architecture/index">Architecture</a>
+                    </li>
+                </ul>
+                <h3>MCP Client SDK</h3>
+                <ul>
+                    <li>
+                        <a href="/client/setup-client">Client SDK Setup</a>
+                    </li>
+                    <li>
+                       <a href="/client/initialization">Initialization</a>
+                    </li>
+                    <li>
+                       <a href="/client/resource">Resources Usage</a>
+                    </li>
+                     <li>
+                       <a href="/client/prompt">Prompts Usage</a>
+                    </li>
+                     <li>
+                       <a href="/client/tool">Tools Usage</a>
+                    </li>
+                </ul>
+                <h3>MCP Server SDK</h3>
+                <ul>
+                      <li>
+                           <a href="/server/usage-server">Server SDK Usage</a>
+                      </li>
+                      <li>
+                           <a href="/server/res-server">Resources Usage</a>
+                      </li>
+                      <li>
+                           <a href="/server/pro-server">Prompts Usage</a>
+                      </li>
+                      <li>
+                             <a href="/server/tool-server">Tools Usage</a>
+                       </li>
+                      <li>
+                         <a href="/server/sample">Integration Samples</a>
+                      </li>
+                </ul>
+
+                <h3>Misc</h3>
+                <ul>
+                    <li><a href="/misc/contact">Contact</a></li>
+                    
+                </ul>
+            </menu>
+            <article>
+                <h1>MCP Client and Server Architecture</h1>
+<h2>What is the Model Context Protocol?</h2>
+<p>The <a href="https://modelcontextprotocol.io/introduction">Model Context Protocol (MCP)</a> enables AI applications to access external tools, data sources, and
+prompts. It serves as a bridge between AI models and the outside world, allowing language models to interact with application-specific resources and
+functionality.</p>
+<p>MCP provides several core capabilities:</p>
+<ul>
+<li>Tools: Functions that can be invoked by LLM applications</li>
+<li>Resources: Data that can be accessed by LLM applications</li>
+<li>Prompts: Templates for LLM interactions</li>
+<li>Notifications: Event-based communication between server and client</li>
+</ul>
+<p>In short, MCP provides the rich and diverse context for LLM applications to interact with external resources and tools.</p>
+<h2>Architecture</h2>
+<p>The AJ MCP SDK is structured around several core components that work together to implement the MCP specification:</p>
+<p><img src="/asset/imgs/a-1.jpg" alt=""></p>
+<p>The architecture follows a client-server model with flexible transport options. The client interacts with the server using JSON-RPC over either HTTP (
+with Server-Sent Events) or standard I/O pipes.</p>
+
+            </article>
+        </div>
+        <footer>
+            AJ MCP SDK, a part of
+            <a href="https://framework.ajaxjs.com" target="_blank">AJ-Framework</a>
+            open source. Mail:frank@ajaxjs.com, visit
+            <a href="https://blog.csdn.net/zhangxin09" target="_blank">my blog(In Chinese)</a>. <br/> <br/> Copyright © 2025 Frank Cheung. All rights reserved.
+        </footer>
+    </body>
+</html>

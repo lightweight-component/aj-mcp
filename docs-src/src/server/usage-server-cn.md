@@ -7,15 +7,13 @@ tags:
   - MCP Server SDK 用法指南
 layout: layouts/docs-cn.njk
 ---
+# MCP 服务器 SDK 使用说明
 
-# MCP Server SDK 用法指南
+## MCP 服务器 SDK 安装
 
-## Install Dependency
-
-We’ll need the AJ MCP SDK for making API requests. Install them with:
+添加如下依赖以构建 MCP 服务器：
 
 ```xml
-
 <dependency>
     <groupId>com.ajaxjs</groupId>
     <artifactId>aj-mcp-server</artifactId>
@@ -23,60 +21,95 @@ We’ll need the AJ MCP SDK for making API requests. Install them with:
 </dependency>
 ```
 
-We can find the latest version:
-[![Maven Central](https://img.shields.io/maven-central/v/com.ajaxjs/aj-mcp-client?label=Latest%20Release)](https://central.sonatype.com/artifact/com.ajaxjs/aj-mcp-client)
+可在此处查看最新版本：
+[![Maven Central](https://img.shields.io/maven-central/v/com.ajaxjs/aj-mcp-server?label=Latest%20Release)](https://central.sonatype.com/artifact/com.ajaxjs/aj-mcp-client)
 
-## Setup the Transport
+服务端模块包含：
 
-First, we need to create the transport. There are two types of transport you can choose from for your application, depending on the type of your MCP
-server.
+- `McpServer` 核心处理引擎
+- 基于注解的功能发现管理器 `FeatureMgr`
+- `@Tool`、`@Resource`、`@Prompt` 等注解
+- HTTP/SSE 与标准输入输出（Stdio）传输实现
 
-### Stdio Transport
+## 创建服务器
 
-'Stdio' stands for Standard Input/Output, by using command line to interact between the programme and human in short. But here is between the MCP
-Client
-and the MCP Server. Usually, we use stdio for the local application, such as a `*.exe` programme or a Java Jar programme, and so on.
+要创建 MCP 服务器，需要以下步骤：
 
-``` java
-// The MCP server is a Java programme, runs on stdio.
-McpTransport transport = StdioTransport.builder()
-    .command(Arrays.asList("java", "-jar", "C:\\app\\my-app-jar-with-dependencies.jar"))
-    .logEvents(true)
-    .build();
+1. 定义服务类：创建带有 `@McpService` 注解的类
+2. 注解方法：使用 `@Tool`、`@Prompt` 或 `@Resource` 等注解标记方法
+3. 初始化功能管理器：扫描包以发现注解
+4. 配置传输层：设置 HTTP/SSE 或 Stdio 传输，并配置相关服务器参数
+5. 启动服务器：调用 `server.start()`
+
+## 创建 MCP 服务类
+
+AJ-MCP 通过注解扫描自动发现、注册和管理 MCP 功能（工具、资源、提示）。开发者只需在带有 `@McpService` 注解的类中，使用 `@Tool`、`@Resource` 或 `@Prompt` 注解标记方法，即可暴露相应功能。
+
+```java
+@McpService
+public class MyServerFeatures {
+    @Tool(description = "回显字符串")
+    public String echoString(@ToolArg(description = "输入字符串") String input) {
+        return input;
+    }
+
+    @Prompt(description = "基础问候提示")
+    public PromptMessage greeting(@PromptArg(description = "姓名") String name) {
+        PromptMessage message = new PromptMessage();
+        message.setRole(Role.USER);
+        message.setContent(new ContentText("Hello " + name));
+        return message;
+    }
+}
 ```
 
-Let's take a look at a `.exe` programme as an example:
+## 服务器功能管理
 
-``` java
-// The MCP server is an executable programme, runs on stdio.
-McpTransport transport = StdioTransport.builder()
-.command("C:\\app\\my-app.exe", "-token", "dd4df2sx32ds"))
-.logEvents(true)
-.build();
+功能管理系统通过集中式的 `FeatureMgr` 类进行，负责包扫描、注解处理与功能存储。系统使用反射机制发现被注解的方法，并将功能元数据存储于并发哈希表中，确保运行时线程安全访问。
+
+### 注解体系
+
+注解体系围绕几个核心注解展开，用于标记类和方法以供 MCP 识别和暴露：
+
+| 注解         | 目标      | 作用描述                      |
+|--------------|-----------|-------------------------------|
+| @McpService  | 类        | 标记服务发现类                |
+| @Tool        | 方法      | 将方法暴露为 MCP 工具         |
+| @ToolArg     | 参数      | 定义工具方法参数              |
+| @Resource    | 方法      | 将方法暴露为 MCP 资源         |
+| @Prompt      | 方法      | 将方法暴露为 MCP 提示         |
+| @PromptArg   | 参数      | 定义提示方法参数              |
+
+服务端配置通过 `FeatureMgr.init()` 注解驱动功能发现，自动扫描并注册含有 `@McpService` 注解且包含 `@Tool`、`@Resource`、`@Prompt` 方法的类。
+
+### 初始化功能管理器
+
+`FeatureMgr.init()` 方法负责整个注解发现流程。它首先扫描指定包下带有 `@McpService` 注解的类。
+
+```java
+FeatureMgr mgr = new FeatureMgr();
+mgr.init("com.foo.myproduct");
 ```
 
-If you want to check out the fully logs of the client, you can set `logEvents` to `true`. This is good for learning the MCP protocol, to get more
-about the JSON messages of this protocol.
+## 服务器配置
 
-## Configure SDK
+包扫描初始化功能管理器后，可进行服务器配置，包括：
 
-| Property        | Note                                                                                                                                                                              | Type of value | Example of value         |
-|-----------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------|--------------------------|
-| clientName      | Sets the name that the client will use to identify itself to the MCP server in the initialization message.                                                                        | String        | myapp/foo-app            |
-| clientVersion   | Sets the version string that the client will use to identify itself to the MCP server in the initialization message. The default value is "1.0".                                  | String        | 1.0/2.1.2                |
-| protocolVersion | Sets the protocol version that the client will advertise in the initialization message. The default value right now is "2024-11-05", but will change over time in later versions. | String        | 2024-11-05               |
-| requestTimeout  | Sets the timeout for tool execution. This value applies to each tool execution individually. The default value is 60 seconds. A value of zero means no timeout.                   | Duration      | `Duration.ofSeconds(60)` |
+- 创建服务器实例并设置传输层
+- 配置服务器名称与版本号
+- 设置连接超时等参数
 
-<style>
-table th:nth-child(2) {
- min-width: 400px;
-}
-table th:nth-child(3), table td:nth-child(3) {
- min-width: 120px!important;
- width: 120px;
-}
+服务器配置由 `ServerConfig` 类管理，包含服务端元数据。初始化时还会进行协议版本协商，返回所支持的最高版本，或与客户端请求一致的版本。
 
-table td:nth-child(2) {
- text-align: left;
-}
-</style>
+```java
+FeatureMgr mgr = new FeatureMgr();
+mgr.init("com.foo.myproduct");
+
+McpServer server = new McpServer();
+server.setTransport(new ServerStdio(server));
+
+ServerConfig serverConfig = new ServerConfig();
+serverConfig.setName("MY_MCP_Server");
+serverConfig.setVersion("1.0");
+server.setServerConfig(serverConfig);
+```

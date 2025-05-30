@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+        <title>AJ MCP SDK/MCP Server SDK Integration Samples</title>
+        <meta name="description" content="A lightweight Java 8 Model Context Protocol (MCP) SDK. MCP Server SDK Integration Samples"/>
+        <meta name="keywords" content="mcp, mcp sdk, java mcp, mcp client, mcp server, java8 mcp, Integration,Samples"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <link rel="stylesheet" href="/asset/style/main.css"/>
+        <link rel="icon" type="image/png" href="/asset/favicon.ico"/>
+        <script src="/asset/common.js"></script>
+    </head>
+    <body>
+        <nav>
+            <div>
+                <div class="links">
+                    <a href="/">🏠 Home</a>
+                    | ⚙️ Source:
+                    <a target="_blank" href="https://github.com/lightweight-component/aj-mcp">Github</a>/<a target="_blank" href="https://gitcode.com/lightweight-component/aj-mcp">Gitcode</a>
+                    |
+                    <a href="/cn">Chinese Version</a>
+                </div>
+                <h1>AJ MCP SDK</h1>
+                <h3>User Manual</h3>
+            </div>
+        </nav>
+        <div>
+            <menu>
+                
+                <ul>
+                    <li class="selected">
+                        <a href="/">Home</a>
+                    </li>
+                    <li>
+                        <a href="/architecture/index">Architecture</a>
+                    </li>
+                </ul>
+                <h3>MCP Client SDK</h3>
+                <ul>
+                    <li>
+                        <a href="/client/setup-client">Client SDK Setup</a>
+                    </li>
+                    <li>
+                       <a href="/client/initialization">Initialization</a>
+                    </li>
+                    <li>
+                       <a href="/client/resource">Resources Usage</a>
+                    </li>
+                     <li>
+                       <a href="/client/prompt">Prompts Usage</a>
+                    </li>
+                     <li>
+                       <a href="/client/tool">Tools Usage</a>
+                    </li>
+                </ul>
+                <h3>MCP Server SDK</h3>
+                <ul>
+                      <li>
+                           <a href="/server/usage-server">Server SDK Usage</a>
+                      </li>
+                      <li>
+                           <a href="/server/res-server">Resources Usage</a>
+                      </li>
+                      <li>
+                           <a href="/server/pro-server">Prompts Usage</a>
+                      </li>
+                      <li>
+                             <a href="/server/tool-server">Tools Usage</a>
+                       </li>
+                      <li>
+                         <a href="/server/sample">Integration Samples</a>
+                      </li>
+                </ul>
+
+                <h3>Misc</h3>
+                <ul>
+                    <li><a href="/misc/contact">Contact</a></li>
+                    
+                </ul>
+            </menu>
+            <article>
+                <h1>MCP Server SDK Integration Samples</h1>
+<p>The source code repository of this project contains two integration samples: one is a standalone Tomcat server with a simple MCP service,
+and the other is a Spring Boot application with a MCP service.</p>
+<h2>Tomcat Application Integration</h2>
+<p>The Tomcat deployment shows a complete server setup pattern:</p>
+<pre><code class="language-java">package com.foo.myapp;
+
+
+import com.ajaxjs.mcp.server.McpServer;
+import com.ajaxjs.mcp.server.ServerSse;
+import com.ajaxjs.mcp.server.common.ServerConfig;
+import com.ajaxjs.mcp.server.feature.FeatureMgr;
+import org.apache.catalina.Context;
+import org.apache.catalina.connector.Connector;
+import org.apache.catalina.startup.Tomcat;
+
+import java.io.File;
+
+public class StandaloneTomcat {
+    public static void main(String[] args) throws Exception {
+        FeatureMgr mgr = new FeatureMgr();
+        mgr.init(&quot;com.foo.myapp&quot;);
+
+        McpServer server = new McpServer();
+        ServerSse serverSse = new ServerSse(server);
+        server.setTransport(serverSse);
+
+        ServerConfig serverConfig = new ServerConfig();
+        serverConfig.setName(&quot;MY_MCP_Server&quot;);
+        serverConfig.setVersion(&quot;1.0&quot;);
+        server.setServerConfig(serverConfig);
+
+        server.start();
+
+        Tomcat tomcat = new Tomcat();
+        tomcat.setPort(8080);
+
+        // Set base directory (for temp files)
+        tomcat.setBaseDir(&quot;.&quot;);
+
+        // Create a context (no web.xml required)
+        String contextPath = &quot;&quot;;
+        String docBase = new File(&quot;.&quot;).getAbsolutePath();
+        Context context = tomcat.addContext(contextPath, docBase);
+
+        // Register SSE servlet
+        SseServlet sseServlet = new SseServlet(serverSse);
+        Tomcat.addServlet(context, &quot;sseServlet&quot;, sseServlet);
+        context.addServletMappingDecoded(&quot;/sse&quot;, &quot;sseServlet&quot;);
+
+        // Register Message servlet
+        Tomcat.addServlet(context, &quot;messageServlet&quot;, new MessageServlet(serverSse));
+        context.addServletMappingDecoded(&quot;/message&quot;, &quot;messageServlet&quot;);
+
+        // Configure connectionTimeout and keepAliveTimeout
+        Connector connector = tomcat.getConnector();
+        connector.setProperty(&quot;connectionTimeout&quot;, &quot;60000&quot;); // 20 seconds
+        connector.setProperty(&quot;keepAliveTimeout&quot;, &quot;60000&quot;); // 30 seconds
+        connector.setProperty(&quot;maxKeepAliveRequests&quot;, &quot;100&quot;); // Optional: Max requests per connection
+
+        tomcat.start();
+        tomcat.getServer().await();
+    }
+}
+</code></pre>
+<h2>Spring Application Integration</h2>
+<p>The Spring configuration demonstrates dependency injection setup <code>Config.java:12-29</code>, where the ServerSse bean is configured with the same pattern but
+managed by Spring's container.</p>
+<pre><code class="language-java">package com.foo.myapp;
+
+import com.ajaxjs.mcp.server.McpServer;
+import com.ajaxjs.mcp.server.ServerSse;
+import com.ajaxjs.mcp.server.common.ServerConfig;
+import com.ajaxjs.mcp.server.feature.FeatureMgr;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class Config {
+    @Bean
+    public ServerSse serverSse() {
+        FeatureMgr mgr = new FeatureMgr();
+        mgr.init(&quot;com.foo.myapp&quot;);
+
+        McpServer server = new McpServer();
+        ServerSse serverSse = new ServerSse(server);
+        server.setTransport(serverSse);
+
+        ServerConfig serverConfig = new ServerConfig();
+        serverConfig.setName(&quot;MY_MCP_Server&quot;);
+        serverConfig.setVersion(&quot;1.0&quot;);
+        server.setServerConfig(serverConfig);
+
+        server.start();
+
+        return serverSse;
+    }
+}
+</code></pre>
+<h2>Design Note</h2>
+<p>For Mcp server over SSE, there are two endpoints that should be known:</p>
+<p>SSE Url, this is the endpoint that the client will first connect to, which is at time of initialization. In this initialization, it'll return a POST Url(The second endpoint) form the server.
+POST Url, this is the real endpoint for the MCP business, client will send the request to this endpoint and the server will return the response by this endpoint. It's an SSE endpoint.</p>
+
+            </article>
+        </div>
+        <footer>
+            AJ MCP SDK, a part of
+            <a href="https://framework.ajaxjs.com" target="_blank">AJ-Framework</a>
+            open source. Mail:frank@ajaxjs.com, visit
+            <a href="https://blog.csdn.net/zhangxin09" target="_blank">my blog(In Chinese)</a>. <br/> <br/> Copyright © 2025 Frank Cheung. All rights reserved.
+        </footer>
+    </body>
+</html>

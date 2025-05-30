@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+        <title>AJ MCP SDK/MCP Server SDK Resources Development</title>
+        <meta name="description" content="A lightweight Java 8 Model Context Protocol (MCP) SDK. MCP Server SDK Resources Development"/>
+        <meta name="keywords" content="mcp, mcp sdk, java mcp, mcp client, mcp server, java8 mcp, Resources Development"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <link rel="stylesheet" href="/asset/style/main.css"/>
+        <link rel="icon" type="image/png" href="/asset/favicon.ico"/>
+        <script src="/asset/common.js"></script>
+    </head>
+    <body>
+        <nav>
+            <div>
+                <div class="links">
+                    <a href="/">🏠 Home</a>
+                    | ⚙️ Source:
+                    <a target="_blank" href="https://github.com/lightweight-component/aj-mcp">Github</a>/<a target="_blank" href="https://gitcode.com/lightweight-component/aj-mcp">Gitcode</a>
+                    |
+                    <a href="/cn">Chinese Version</a>
+                </div>
+                <h1>AJ MCP SDK</h1>
+                <h3>User Manual</h3>
+            </div>
+        </nav>
+        <div>
+            <menu>
+                
+                <ul>
+                    <li class="selected">
+                        <a href="/">Home</a>
+                    </li>
+                    <li>
+                        <a href="/architecture/index">Architecture</a>
+                    </li>
+                </ul>
+                <h3>MCP Client SDK</h3>
+                <ul>
+                    <li>
+                        <a href="/client/setup-client">Client SDK Setup</a>
+                    </li>
+                    <li>
+                       <a href="/client/initialization">Initialization</a>
+                    </li>
+                    <li>
+                       <a href="/client/resource">Resources Usage</a>
+                    </li>
+                     <li>
+                       <a href="/client/prompt">Prompts Usage</a>
+                    </li>
+                     <li>
+                       <a href="/client/tool">Tools Usage</a>
+                    </li>
+                </ul>
+                <h3>MCP Server SDK</h3>
+                <ul>
+                      <li>
+                           <a href="/server/usage-server">Server SDK Usage</a>
+                      </li>
+                      <li>
+                           <a href="/server/res-server">Resources Usage</a>
+                      </li>
+                      <li>
+                           <a href="/server/pro-server">Prompts Usage</a>
+                      </li>
+                      <li>
+                             <a href="/server/tool-server">Tools Usage</a>
+                       </li>
+                      <li>
+                         <a href="/server/sample">Integration Samples</a>
+                      </li>
+                </ul>
+
+                <h3>Misc</h3>
+                <ul>
+                    <li><a href="/misc/contact">Contact</a></li>
+                    
+                </ul>
+            </menu>
+            <article>
+                <h1>MCP Server SDK Feature Management</h1>
+<p>The AJ-MCP annotation system provides a declarative approach to exposing Java methods as MCP (Model Context Protocol) tools, resources, and prompts.
+This system uses Java annotations to automatically discover and register functionality, eliminating the need for manual configuration or registration
+code.</p>
+<h2>Resources Development</h2>
+<p>Resources are exposed through the <code>@Resource</code> annotation on methods within <code>@McpService</code> classes. The annotation system automatically discovers and
+registers resources during server initialization.</p>
+<p>The <code>@Resource</code> annotation exposes methods as MCP resources with the following properties:</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>uri</td>
+<td>Yes</td>
+<td>Unique identifier for the resource</td>
+</tr>
+<tr>
+<td>description</td>
+<td>No</td>
+<td>Human-readable description</td>
+</tr>
+<tr>
+<td>mimeType</td>
+<td>No</td>
+<td>MIME type of the resource content</td>
+</tr>
+<tr>
+<td>value</td>
+<td>No</td>
+<td>Human-readable name (defaults to empty)</td>
+</tr>
+</tbody>
+</table>
+<h3>Resource Content Types</h3>
+<h4>Text Resources</h4>
+<p>Text resources return <code>ResourceContentText</code> objects containing plain text or structured text data.</p>
+<pre><code class="language-java">@Resource(uri = &quot;file:///text&quot;, description = &quot;A nice piece of text&quot;, mimeType = &quot;text/plain&quot;)
+public ResourceContentText text(){
+        ResourceContentText content=new ResourceContentText();
+        content.setUri(&quot;file:///text&quot;);
+        content.setMimeType(&quot;text/plain&quot;);
+        content.setText(&quot;text888&quot;);
+        return content;
+        }
+</code></pre>
+<h4>Binary Resources</h4>
+<p>Binary resources return <code>ResourceContentBinary</code> objects containing Base64-encoded binary data.</p>
+<pre><code class="language-java">@Resource(uri = &quot;file:///blob&quot;, description = &quot;A nice pic&quot;, mimeType = &quot;image/jpg&quot;)
+public ResourceContentBinary blob(){
+        String base64EncodedImage=ServerUtils.encodeImageToBase64(&quot;bird-eye.jpg&quot;);
+
+        ResourceContentBinary content=new ResourceContentBinary();
+        content.setUri(&quot;file:///blob&quot;);
+        content.setMimeType(&quot;image/jpg&quot;);
+        content.setBlob(base64EncodedImage);
+
+        return content;
+        }
+</code></pre>
+<h3>Resource Templates</h3>
+<p>The <code>@ResourceTemplate</code> annotation supports dynamic resources with parameterized URIs following RFC 6570 URI template syntax.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>uriTemplate</td>
+<td>Yes</td>
+<td>RFC 6570 Level 1 URI template</td>
+</tr>
+<tr>
+<td>name</td>
+<td>No</td>
+<td>Human-readable name</td>
+</tr>
+<tr>
+<td>description</td>
+<td>No</td>
+<td>Template description</td>
+</tr>
+<tr>
+<td>mimeType</td>
+<td>No</td>
+<td>Content MIME type</td>
+</tr>
+</tbody>
+</table>
+<p>Property Required Description
+uriTemplate Yes RFC 6570 Level 1 URI template
+name No Human-readable name
+description No Template description
+mimeType No Content MIME type</p>
+<p>Template methods accept parameters that correspond to template variables in the URI pattern.</p>
+
+            </article>
+        </div>
+        <footer>
+            AJ MCP SDK, a part of
+            <a href="https://framework.ajaxjs.com" target="_blank">AJ-Framework</a>
+            open source. Mail:frank@ajaxjs.com, visit
+            <a href="https://blog.csdn.net/zhangxin09" target="_blank">my blog(In Chinese)</a>. <br/> <br/> Copyright © 2025 Frank Cheung. All rights reserved.
+        </footer>
+    </body>
+</html>

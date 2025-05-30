@@ -1,6 +1,5 @@
 package com.ajaxjs.mcp.client;
 
-
 import com.ajaxjs.mcp.client.transport.McpTransport;
 import com.ajaxjs.mcp.client.transport.StdioTransport;
 import com.ajaxjs.mcp.common.JsonUtils;

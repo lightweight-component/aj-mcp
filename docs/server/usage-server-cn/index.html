@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+        <title>AJ MCP SDK/MCP Server SDK 用法指南</title>
+        <meta name="description" content="轻量级的 Java 8 Model Context Protocol (MCP) SDK. MCP Server SDK 用法指南"/>
+        <meta name="keywords" content="mcp, mcp sdk, java mcp, mcp client, mcp server, java8 mcp, MCP Server SDK 用法指南"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <link rel="stylesheet" href="/asset/style/main.css"/>
+        <link rel="icon" type="image/png" href="/asset/favicon.ico"/>
+        <script src="/asset/common.js"></script>
+    </head>
+    <body>
+        <nav>
+            <div>
+                <div class="links">
+                    <a href="/">🏠 首页</a>
+                    | ⚙️ 源码:
+                    <a target="_blank" href="https://github.com/lightweight-component/aj-mcp">Github</a>/<a target="_blank" href="https://gitcode.com/lightweight-component/aj-mcp">Gitcode</a>
+                    |
+                    <a href="/">英文版本</a>
+                </div>
+                <h1>AJ MCP SDK</h1>
+                <h3>用户手册</h3>
+            </div>
+        </nav>
+        <div>
+            <menu>
+                
+                <ul>
+                    <li class="selected">
+                        <a href="/cn">首页</a>
+                    </li>
+                    <li>
+                        <a href="/architecture/index-cn">架构原理</a>
+                    </li>
+                </ul>
+                <h3>MCP 客户端 SDK</h3>
+                <ul>
+                    <li>
+                        <a href="/client/setup-client-cn">安装与配置</a>
+                    </li>
+                    <li>
+                       <a href="/client/initialization-cn">初始化</a>
+                    </li>
+                    <li>
+                       <a href="/client/resource-cn">Resources 用法</a>
+                    </li>
+                     <li>
+                       <a href="/client/prompt-cn">Prompts 用法</a>
+                    </li>
+                     <li>
+                       <a href="/client/tool-cn">Tools 用法</a>
+                    </li>
+                </ul>
+                <h3>MCP 服务端 SDK</h3>
+                <ul>
+                      <li>
+                           <a href="/server/usage-server-cn">Server SDK 用法指南</a>
+                      </li>
+                      <li>
+                           <a href="/server/res-server-cn">Resources 用法</a>
+                      </li>
+                      <li>
+                           <a href="/server/pro-server-cn">Prompts 用法</a>
+                      </li>
+                      <li>
+                             <a href="/server/tool-server-cn">Tools 用法</a>
+                       </li>
+                      <li>
+                         <a href="/server/sample-cn">整合例子</a>
+                      </li>
+                </ul>
+
+                <h3>其他</h3>
+                <ul>
+                    <li><a href="/misc/contact-cn">联系方式</a></li>
+                    
+                </ul>
+            </menu>
+            <article>
+                <h1>MCP 服务器 SDK 使用说明</h1>
+<h2>MCP 服务器 SDK 安装</h2>
+<p>添加如下依赖以构建 MCP 服务器：</p>
+<pre><code class="language-xml">&lt;dependency&gt;
+    &lt;groupId&gt;com.ajaxjs&lt;/groupId&gt;
+    &lt;artifactId&gt;aj-mcp-server&lt;/artifactId&gt;
+    &lt;version&gt;1.1&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+<p>可在此处查看最新版本：
+<a href="https://central.sonatype.com/artifact/com.ajaxjs/aj-mcp-client"><img src="https://img.shields.io/maven-central/v/com.ajaxjs/aj-mcp-server?label=Latest%20Release" alt="Maven Central"></a></p>
+<p>服务端模块包含：</p>
+<ul>
+<li><code>McpServer</code> 核心处理引擎</li>
+<li>基于注解的功能发现管理器 <code>FeatureMgr</code></li>
+<li><code>@Tool</code>、<code>@Resource</code>、<code>@Prompt</code> 等注解</li>
+<li>HTTP/SSE 与标准输入输出（Stdio）传输实现</li>
+</ul>
+<h2>创建服务器</h2>
+<p>要创建 MCP 服务器，需要以下步骤：</p>
+<ol>
+<li>定义服务类：创建带有 <code>@McpService</code> 注解的类</li>
+<li>注解方法：使用 <code>@Tool</code>、<code>@Prompt</code> 或 <code>@Resource</code> 等注解标记方法</li>
+<li>初始化功能管理器：扫描包以发现注解</li>
+<li>配置传输层：设置 HTTP/SSE 或 Stdio 传输，并配置相关服务器参数</li>
+<li>启动服务器：调用 <code>server.start()</code></li>
+</ol>
+<h2>创建 MCP 服务类</h2>
+<p>AJ-MCP 通过注解扫描自动发现、注册和管理 MCP 功能（工具、资源、提示）。开发者只需在带有 <code>@McpService</code> 注解的类中，使用 <code>@Tool</code>、<code>@Resource</code> 或 <code>@Prompt</code> 注解标记方法，即可暴露相应功能。</p>
+<pre><code class="language-java">@McpService
+public class MyServerFeatures {
+    @Tool(description = &quot;回显字符串&quot;)
+    public String echoString(@ToolArg(description = &quot;输入字符串&quot;) String input) {
+        return input;
+    }
+
+    @Prompt(description = &quot;基础问候提示&quot;)
+    public PromptMessage greeting(@PromptArg(description = &quot;姓名&quot;) String name) {
+        PromptMessage message = new PromptMessage();
+        message.setRole(Role.USER);
+        message.setContent(new ContentText(&quot;Hello &quot; + name));
+        return message;
+    }
+}
+</code></pre>
+<h2>服务器功能管理</h2>
+<p>功能管理系统通过集中式的 <code>FeatureMgr</code> 类进行，负责包扫描、注解处理与功能存储。系统使用反射机制发现被注解的方法，并将功能元数据存储于并发哈希表中，确保运行时线程安全访问。</p>
+<h3>注解体系</h3>
+<p>注解体系围绕几个核心注解展开，用于标记类和方法以供 MCP 识别和暴露：</p>
+<table>
+<thead>
+<tr>
+<th>注解</th>
+<th>目标</th>
+<th>作用描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>@McpService</td>
+<td>类</td>
+<td>标记服务发现类</td>
+</tr>
+<tr>
+<td>@Tool</td>
+<td>方法</td>
+<td>将方法暴露为 MCP 工具</td>
+</tr>
+<tr>
+<td>@ToolArg</td>
+<td>参数</td>
+<td>定义工具方法参数</td>
+</tr>
+<tr>
+<td>@Resource</td>
+<td>方法</td>
+<td>将方法暴露为 MCP 资源</td>
+</tr>
+<tr>
+<td>@Prompt</td>
+<td>方法</td>
+<td>将方法暴露为 MCP 提示</td>
+</tr>
+<tr>
+<td>@PromptArg</td>
+<td>参数</td>
+<td>定义提示方法参数</td>
+</tr>
+</tbody>
+</table>
+<p>服务端配置通过 <code>FeatureMgr.init()</code> 注解驱动功能发现，自动扫描并注册含有 <code>@McpService</code> 注解且包含 <code>@Tool</code>、<code>@Resource</code>、<code>@Prompt</code> 方法的类。</p>
+<h3>初始化功能管理器</h3>
+<p><code>FeatureMgr.init()</code> 方法负责整个注解发现流程。它首先扫描指定包下带有 <code>@McpService</code> 注解的类。</p>
+<pre><code class="language-java">FeatureMgr mgr = new FeatureMgr();
+mgr.init(&quot;com.foo.myproduct&quot;);
+</code></pre>
+<h2>服务器配置</h2>
+<p>包扫描初始化功能管理器后，可进行服务器配置，包括：</p>
+<ul>
+<li>创建服务器实例并设置传输层</li>
+<li>配置服务器名称与版本号</li>
+<li>设置连接超时等参数</li>
+</ul>
+<p>服务器配置由 <code>ServerConfig</code> 类管理，包含服务端元数据。初始化时还会进行协议版本协商，返回所支持的最高版本，或与客户端请求一致的版本。</p>
+<pre><code class="language-java">FeatureMgr mgr = new FeatureMgr();
+mgr.init(&quot;com.foo.myproduct&quot;);
+
+McpServer server = new McpServer();
+server.setTransport(new ServerStdio(server));
+
+ServerConfig serverConfig = new ServerConfig();
+serverConfig.setName(&quot;MY_MCP_Server&quot;);
+serverConfig.setVersion(&quot;1.0&quot;);
+server.setServerConfig(serverConfig);
+</code></pre>
+
+            </article>
+        </div>
+        <footer>
+             AJ-Util，开源框架 <a href="https://framework.ajaxjs.com" target="_blank">AJ-Framework</a> 的一部分。联系方式：
+             frank@ajaxjs.com，<a href="https://blog.csdn.net/zhangxin09" target="_blank">作者博客</a>
+             <br />
+             <br />
+             Copyright © 2025 Frank Cheung. All rights reserved.
+         </footer>
+    </body>
+</html>

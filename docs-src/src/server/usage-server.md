@@ -10,9 +10,9 @@ layout: layouts/docs.njk
 
 # MCP Server SDK Usage
 
-## Install Dependency
+## MCP Server SDK Setup
 
-We’ll need the AJ MCP SDK for making API requests. Install them with:
+Add this dependency to build MCP servers:
 
 ```xml
 
@@ -24,59 +24,104 @@ We’ll need the AJ MCP SDK for making API requests. Install them with:
 ```
 
 We can find the latest version:
-[![Maven Central](https://img.shields.io/maven-central/v/com.ajaxjs/aj-mcp-client?label=Latest%20Release)](https://central.sonatype.com/artifact/com.ajaxjs/aj-mcp-client)
+[![Maven Central](https://img.shields.io/maven-central/v/com.ajaxjs/aj-mcp-server?label=Latest%20Release)](https://central.sonatype.com/artifact/com.ajaxjs/aj-mcp-client)
 
-## Setup the Transport
+The server module includes:
 
-First, we need to create the transport. There are two types of transport you can choose from for your application, depending on the type of your MCP
-server.
+- `McpServer` core processing engine
+- `FeatureMgr` for annotation-based feature discovery
+- `@Tool`, `@Resource`, `@Prompt` annotations
+- Transport implementations for HTTP/SSE and Stdio
 
-### Stdio Transport
+## Creating a Server
 
-'Stdio' stands for Standard Input/Output, by using command line to interact between the programme and human in short. But here is between the MCP
-Client
-and the MCP Server. Usually, we use stdio for the local application, such as a `*.exe` programme or a Java Jar programme, and so on.
+To create an MCP server, you need to:
 
-``` java
-// The MCP server is a Java programme, runs on stdio.
-McpTransport transport = StdioTransport.builder()
-    .command(Arrays.asList("java", "-jar", "C:\\app\\my-app-jar-with-dependencies.jar"))
-    .logEvents(true)
-    .build();
+1. Define Service Classes: Create classes annotated with `@McpService`
+1. Annotate Methods: Use `@Tool`, `@Prompt`, or `@Resource` annotations
+1. Initialize Feature Manager: Scan packages for annotations
+1. Configure Transport: Set up HTTP/SSE or Stdio transport, and some details of server
+1. Start Server: Call `server.start()`
+
+## Creating MCP Service Class
+
+AJ-MCP automatically discovers, registers, and manages MCP features (tools, resources, and prompts) through annotation-based scanning.
+This system enables developers to expose functionality simply by annotating methods with `@Tool`, `@Resource`, or `@Prompt` annotations within classes
+marked with `@McpService`.
+
+```java
+
+@McpService
+public class MyServerFeatures {
+    @Tool(description = "Echoes a string")
+    public String echoString(@ToolArg(description = "Input string") String input) {
+        return input;
+    }
+
+    @Prompt(description = "Basic greeting prompt")
+    public PromptMessage greeting(@PromptArg(description = "Name") String name) {
+        PromptMessage message = new PromptMessage();
+        message.setRole(Role.USER);
+        message.setContent(new ContentText("Hello " + name));
+        return message;
+    }
+}
 ```
 
-Let's take a look at a `.exe` programme as an example:
+## Server  Feature Management
 
-``` java
-// The MCP server is an executable programme, runs on stdio.
-McpTransport transport = StdioTransport.builder()
-.command("C:\\app\\my-app.exe", "-token", "dd4df2sx32ds"))
-.logEvents(true)
-.build();
+The Feature Management system operates through a centralized `FeatureMgr` class that coordinates package scanning, annotation processing, and feature
+storage.The system uses reflection to discover annotated methods and stores feature metadata in concurrent hash maps for thread-safe runtime access.
+
+### Annotation System
+
+The annotation system is built around several key annotations that mark classes and methods for MCP exposure:
+
+| Annotation  | Target    | Purpose                             |
+|-------------|-----------|-------------------------------------|
+| @McpService | Class     | Marks a class for service discovery |
+| @Tool       | Method    | Exposes a method as an MCP tool     |
+| @ToolArg    | Parameter | Defines tool method parameters      |
+| @Resource   | Method    | Exposes a method as an MCP resource |
+| @Prompt     | Method    | Exposes a method as an MCP prompt   |
+| @PromptArg  | Parameter | Defines prompt method parameters    |
+
+Server configuration includes annotation-driven feature discovery through `FeatureMgr.init()` with package scanning `FeatureMgr`. This automatically
+discovers and registers `@McpService` annotated classes containing `@Tool`, `@Resource`, and `@Prompt` methods.
+
+### Initialize Feature Manager
+
+The `FeatureMgr.init()` method orchestrates the entire annotation discovery process. It begins by scanning specified packages for classes annotated
+with `@McpService`.
+
+```java
+FeatureMgr mgr=new FeatureMgr();
+        mgr.init("com.foo.myproduct");.
 ```
 
-If you want to check out the fully logs of the client, you can set `logEvents` to `true`. This is good for learning the MCP protocol, to get more
-about the JSON messages of this protocol.
+## Server Configuration
 
-## Configure SDK
+After feature manager initialization with package scanning, we can configure the server with:
 
-| Property        | Note                                                                                                                                                                              | Type of value | Example of value         |
-|-----------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------|--------------------------|
-| clientName      | Sets the name that the client will use to identify itself to the MCP server in the initialization message.                                                                        | String        | myapp/foo-app            |
-| clientVersion   | Sets the version string that the client will use to identify itself to the MCP server in the initialization message. The default value is "1.0".                                  | String        | 1.0/2.1.2                |
-| protocolVersion | Sets the protocol version that the client will advertise in the initialization message. The default value right now is "2024-11-05", but will change over time in later versions. | String        | 2024-11-05               |
-| requestTimeout  | Sets the timeout for tool execution. This value applies to each tool execution individually. The default value is 60 seconds. A value of zero means no timeout.                   | Duration      | `Duration.ofSeconds(60)` |
+- Server instance creation with transport layer setup
+- Server configuration with name and version
+- Connection timeout settings
 
-<style>
-table th:nth-child(2) {
- min-width: 400px;
-}
-table th:nth-child(3), table td:nth-child(3) {
- min-width: 120px!important;
- width: 120px;
-}
+Server configuration is handled through the ServerConfig class, which contains essential server metadata `McpServerInitialize`. The configuration
+includes server name, version, and supported protocol versions `McpServerInitialize`.
 
-table td:nth-child(2) {
- text-align: left;
-}
-</style>
+During initialization, the server processes protocol version negotiation where it responds with the highest supported version or matches the client's
+requested version if supported `McpServerInitialize`.
+
+```java
+FeatureMgr mgr=new FeatureMgr();
+        mgr.init("com.foo.myproduct");
+
+        McpServer server=new McpServer();
+        server.setTransport(new ServerStdio(server));
+
+        ServerConfig serverConfig=new ServerConfig();
+        serverConfig.setName("MY_MCP_Server");
+        serverConfig.setVersion("1.0");
+        server.setServerConfig(serverConfig);
+```

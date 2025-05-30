@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+        <title>AJ MCP SDK/MCP Server SDK Usage</title>
+        <meta name="description" content="A lightweight Java 8 Model Context Protocol (MCP) SDK. MCP Server SDK Usage"/>
+        <meta name="keywords" content="mcp, mcp sdk, java mcp, mcp client, mcp server, java8 mcp, MCP Server SDK Usage"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <link rel="stylesheet" href="/asset/style/main.css"/>
+        <link rel="icon" type="image/png" href="/asset/favicon.ico"/>
+        <script src="/asset/common.js"></script>
+    </head>
+    <body>
+        <nav>
+            <div>
+                <div class="links">
+                    <a href="/">🏠 Home</a>
+                    | ⚙️ Source:
+                    <a target="_blank" href="https://github.com/lightweight-component/aj-mcp">Github</a>/<a target="_blank" href="https://gitcode.com/lightweight-component/aj-mcp">Gitcode</a>
+                    |
+                    <a href="/cn">Chinese Version</a>
+                </div>
+                <h1>AJ MCP SDK</h1>
+                <h3>User Manual</h3>
+            </div>
+        </nav>
+        <div>
+            <menu>
+                
+                <ul>
+                    <li class="selected">
+                        <a href="/">Home</a>
+                    </li>
+                    <li>
+                        <a href="/architecture/index">Architecture</a>
+                    </li>
+                </ul>
+                <h3>MCP Client SDK</h3>
+                <ul>
+                    <li>
+                        <a href="/client/setup-client">Client SDK Setup</a>
+                    </li>
+                    <li>
+                       <a href="/client/initialization">Initialization</a>
+                    </li>
+                    <li>
+                       <a href="/client/resource">Resources Usage</a>
+                    </li>
+                     <li>
+                       <a href="/client/prompt">Prompts Usage</a>
+                    </li>
+                     <li>
+                       <a href="/client/tool">Tools Usage</a>
+                    </li>
+                </ul>
+                <h3>MCP Server SDK</h3>
+                <ul>
+                      <li>
+                           <a href="/server/usage-server">Server SDK Usage</a>
+                      </li>
+                      <li>
+                           <a href="/server/res-server">Resources Usage</a>
+                      </li>
+                      <li>
+                           <a href="/server/pro-server">Prompts Usage</a>
+                      </li>
+                      <li>
+                             <a href="/server/tool-server">Tools Usage</a>
+                       </li>
+                      <li>
+                         <a href="/server/sample">Integration Samples</a>
+                      </li>
+                </ul>
+
+                <h3>Misc</h3>
+                <ul>
+                    <li><a href="/misc/contact">Contact</a></li>
+                    
+                </ul>
+            </menu>
+            <article>
+                <h1>MCP Server SDK Usage</h1>
+<h2>MCP Server SDK Setup</h2>
+<p>Add this dependency to build MCP servers:</p>
+<pre><code class="language-xml">
+&lt;dependency&gt;
+    &lt;groupId&gt;com.ajaxjs&lt;/groupId&gt;
+    &lt;artifactId&gt;aj-mcp-server&lt;/artifactId&gt;
+    &lt;version&gt;1.1&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+<p>We can find the latest version:
+<a href="https://central.sonatype.com/artifact/com.ajaxjs/aj-mcp-client"><img src="https://img.shields.io/maven-central/v/com.ajaxjs/aj-mcp-server?label=Latest%20Release" alt="Maven Central"></a></p>
+<p>The server module includes:</p>
+<ul>
+<li><code>McpServer</code> core processing engine</li>
+<li><code>FeatureMgr</code> for annotation-based feature discovery</li>
+<li><code>@Tool</code>, <code>@Resource</code>, <code>@Prompt</code> annotations</li>
+<li>Transport implementations for HTTP/SSE and Stdio</li>
+</ul>
+<h2>Creating a Server</h2>
+<p>To create an MCP server, you need to:</p>
+<ol>
+<li>Define Service Classes: Create classes annotated with <code>@McpService</code></li>
+<li>Annotate Methods: Use <code>@Tool</code>, <code>@Prompt</code>, or <code>@Resource</code> annotations</li>
+<li>Initialize Feature Manager: Scan packages for annotations</li>
+<li>Configure Transport: Set up HTTP/SSE or Stdio transport, and some details of server</li>
+<li>Start Server: Call <code>server.start()</code></li>
+</ol>
+<h2>Creating MCP Service Class</h2>
+<p>AJ-MCP automatically discovers, registers, and manages MCP features (tools, resources, and prompts) through annotation-based scanning.
+This system enables developers to expose functionality simply by annotating methods with <code>@Tool</code>, <code>@Resource</code>, or <code>@Prompt</code> annotations within classes
+marked with <code>@McpService</code>.</p>
+<pre><code class="language-java">
+@McpService
+public class MyServerFeatures {
+    @Tool(description = &quot;Echoes a string&quot;)
+    public String echoString(@ToolArg(description = &quot;Input string&quot;) String input) {
+        return input;
+    }
+
+    @Prompt(description = &quot;Basic greeting prompt&quot;)
+    public PromptMessage greeting(@PromptArg(description = &quot;Name&quot;) String name) {
+        PromptMessage message = new PromptMessage();
+        message.setRole(Role.USER);
+        message.setContent(new ContentText(&quot;Hello &quot; + name));
+        return message;
+    }
+}
+</code></pre>
+<h2>Server  Feature Management</h2>
+<p>The Feature Management system operates through a centralized <code>FeatureMgr</code> class that coordinates package scanning, annotation processing, and feature
+storage.The system uses reflection to discover annotated methods and stores feature metadata in concurrent hash maps for thread-safe runtime access.</p>
+<h3>Annotation System</h3>
+<p>The annotation system is built around several key annotations that mark classes and methods for MCP exposure:</p>
+<table>
+<thead>
+<tr>
+<th>Annotation</th>
+<th>Target</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>@McpService</td>
+<td>Class</td>
+<td>Marks a class for service discovery</td>
+</tr>
+<tr>
+<td>@Tool</td>
+<td>Method</td>
+<td>Exposes a method as an MCP tool</td>
+</tr>
+<tr>
+<td>@ToolArg</td>
+<td>Parameter</td>
+<td>Defines tool method parameters</td>
+</tr>
+<tr>
+<td>@Resource</td>
+<td>Method</td>
+<td>Exposes a method as an MCP resource</td>
+</tr>
+<tr>
+<td>@Prompt</td>
+<td>Method</td>
+<td>Exposes a method as an MCP prompt</td>
+</tr>
+<tr>
+<td>@PromptArg</td>
+<td>Parameter</td>
+<td>Defines prompt method parameters</td>
+</tr>
+</tbody>
+</table>
+<p>Server configuration includes annotation-driven feature discovery through <code>FeatureMgr.init()</code> with package scanning <code>FeatureMgr</code>. This automatically
+discovers and registers <code>@McpService</code> annotated classes containing <code>@Tool</code>, <code>@Resource</code>, and <code>@Prompt</code> methods.</p>
+<h3>Initialize Feature Manager</h3>
+<p>The <code>FeatureMgr.init()</code> method orchestrates the entire annotation discovery process. It begins by scanning specified packages for classes annotated
+with <code>@McpService</code>.</p>
+<pre><code class="language-java">FeatureMgr mgr=new FeatureMgr();
+        mgr.init(&quot;com.foo.myproduct&quot;);.
+</code></pre>
+<h2>Server Configuration</h2>
+<p>After feature manager initialization with package scanning, we can configure the server with:</p>
+<ul>
+<li>Server instance creation with transport layer setup</li>
+<li>Server configuration with name and version</li>
+<li>Connection timeout settings</li>
+</ul>
+<p>Server configuration is handled through the ServerConfig class, which contains essential server metadata <code>McpServerInitialize</code>. The configuration
+includes server name, version, and supported protocol versions <code>McpServerInitialize</code>.</p>
+<p>During initialization, the server processes protocol version negotiation where it responds with the highest supported version or matches the client's
+requested version if supported <code>McpServerInitialize</code>.</p>
+<pre><code class="language-java">FeatureMgr mgr=new FeatureMgr();
+        mgr.init(&quot;com.foo.myproduct&quot;);
+
+        McpServer server=new McpServer();
+        server.setTransport(new ServerStdio(server));
+
+        ServerConfig serverConfig=new ServerConfig();
+        serverConfig.setName(&quot;MY_MCP_Server&quot;);
+        serverConfig.setVersion(&quot;1.0&quot;);
+        server.setServerConfig(serverConfig);
+</code></pre>
+
+            </article>
+        </div>
+        <footer>
+            AJ MCP SDK, a part of
+            <a href="https://framework.ajaxjs.com" target="_blank">AJ-Framework</a>
+            open source. Mail:frank@ajaxjs.com, visit
+            <a href="https://blog.csdn.net/zhangxin09" target="_blank">my blog(In Chinese)</a>. <br/> <br/> Copyright © 2025 Frank Cheung. All rights reserved.
+        </footer>
+    </body>
+</html>

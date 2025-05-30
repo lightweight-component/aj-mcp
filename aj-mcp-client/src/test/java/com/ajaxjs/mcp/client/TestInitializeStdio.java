@@ -14,14 +14,14 @@ class TestInitializeStdio extends TestInitializeBase {
     @BeforeAll
     static void setup() {
         mcpClient = McpClient.createStdioMcpClient("java", "-jar",
-                "C:\\code\\ajaxjs\\aj-mcp\\samples\\server-stdio\\target\\my-app-jar-with-dependencies.jar");
+                "C:\\code\\ajaxjs\\aj-mcp\\samples\\server\\server-stdio\\target\\my-app-jar-with-dependencies.jar");
     }
 
     @Test
     void testConfig() {
         McpTransport transport = StdioTransport.builder()
                 .command(Arrays.asList("java", "-jar",
-                        "C:\\code\\ajaxjs\\aj-mcp\\samples\\server-stdio\\target\\my-app-jar-with-dependencies.jar"))
+                        "C:\\code\\ajaxjs\\aj-mcp\\samples\\server\\server-stdio\\target\\my-app-jar-with-dependencies.jar"))
                 .logEvents(true)
                 .build();
 

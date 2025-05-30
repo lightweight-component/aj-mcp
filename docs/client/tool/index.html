@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+        <title>AJ MCP SDK/Working with Tools</title>
+        <meta name="description" content="A lightweight Java 8 Model Context Protocol (MCP) SDK. Working with Tools"/>
+        <meta name="keywords" content="mcp, mcp sdk, java mcp, mcp client, mcp server, java8 mcp, Tools"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <link rel="stylesheet" href="/asset/style/main.css"/>
+        <link rel="icon" type="image/png" href="/asset/favicon.ico"/>
+        <script src="/asset/common.js"></script>
+    </head>
+    <body>
+        <nav>
+            <div>
+                <div class="links">
+                    <a href="/">🏠 Home</a>
+                    | ⚙️ Source:
+                    <a target="_blank" href="https://github.com/lightweight-component/aj-mcp">Github</a>/<a target="_blank" href="https://gitcode.com/lightweight-component/aj-mcp">Gitcode</a>
+                    |
+                    <a href="/cn">Chinese Version</a>
+                </div>
+                <h1>AJ MCP SDK</h1>
+                <h3>User Manual</h3>
+            </div>
+        </nav>
+        <div>
+            <menu>
+                
+                <ul>
+                    <li class="selected">
+                        <a href="/">Home</a>
+                    </li>
+                    <li>
+                        <a href="/architecture/index">Architecture</a>
+                    </li>
+                </ul>
+                <h3>MCP Client SDK</h3>
+                <ul>
+                    <li>
+                        <a href="/client/setup-client">Client SDK Setup</a>
+                    </li>
+                    <li>
+                       <a href="/client/initialization">Initialization</a>
+                    </li>
+                    <li>
+                       <a href="/client/resource">Resources Usage</a>
+                    </li>
+                     <li>
+                       <a href="/client/prompt">Prompts Usage</a>
+                    </li>
+                     <li>
+                       <a href="/client/tool">Tools Usage</a>
+                    </li>
+                </ul>
+                <h3>MCP Server SDK</h3>
+                <ul>
+                      <li>
+                           <a href="/server/usage-server">Server SDK Usage</a>
+                      </li>
+                      <li>
+                           <a href="/server/res-server">Resources Usage</a>
+                      </li>
+                      <li>
+                           <a href="/server/pro-server">Prompts Usage</a>
+                      </li>
+                      <li>
+                             <a href="/server/tool-server">Tools Usage</a>
+                       </li>
+                      <li>
+                         <a href="/server/sample">Integration Samples</a>
+                      </li>
+                </ul>
+
+                <h3>Misc</h3>
+                <ul>
+                    <li><a href="/misc/contact">Contact</a></li>
+                    
+                </ul>
+            </menu>
+            <article>
+                <h1>Working with Tools</h1>
+<p>The tool system in AJ MCP provides a structured way to define callable functions that clients can discover and invoke.
+Each tool has a name, description, and a JSON Schema that defines its expected input parameters.
+The tool system is designed to make it easy for LLMs to understand what tools are available and how to use them.</p>
+<h2>Listing Tools</h2>
+<p>To list available tools:</p>
+<pre><code class="language-java">List&lt;ToolItem&gt; tools = mcpClient.listTools();
+assertEquals(7, tools.size());
+</code></pre>
+<h2>Calling Tools</h2>
+<p>To call a tool:</p>
+<pre><code class="language-java">String toolExecutionResultString = mcpClient.callTool(&quot;echoString&quot;, &quot;{\&quot;input\&quot;: \&quot;hi\&quot;}&quot;);
+assertEquals(&quot;hi&quot;, toolExecutionResultString);
+</code></pre>
+<p>The <code>callTool()</code> method returns a CallToolResult containing the tool's response, which may include text, images, or other content types.</p>
+<!--
+For tools that send progress notifications, you can provide a ProgressToken in the request metadata. You'll need to register a notification handler to
+receive these updates.
+
+## Handling Notifications
+
+The client can receive notifications from the server using the OnNotification method:
+
+client.OnNotification(func(notification mcp.JSONRPCNotification) {
+// Handle notification
+if notification.Method == "notifications/progress" {
+// Handle progress notification
+}
+})
+
+You can register multiple notification handlers, which will be called in the order they were registered.
+
+For more detailed information on notification handling, see Handling Notifications.
+
+## Error Handling
+
+All client methods that communicate with the server can return errors. These errors can be:
+
+    Transport errors: Errors that occur in the transport layer
+    Protocol errors: Errors returned by the server
+    Parsing errors: Errors that occur when parsing responses
+
+It's important to check for errors after each client operation:
+
+result, err := client.SomeOperation(ctx, request)
+if err != nil {
+// Handle error
+return err
+}
+// Process result
+
+-->
+            </article>
+        </div>
+        <footer>
+            AJ MCP SDK, a part of
+            <a href="https://framework.ajaxjs.com" target="_blank">AJ-Framework</a>
+            open source. Mail:frank@ajaxjs.com, visit
+            <a href="https://blog.csdn.net/zhangxin09" target="_blank">my blog(In Chinese)</a>. <br/> <br/> Copyright © 2025 Frank Cheung. All rights reserved.
+        </footer>
+    </body>
+</html>
