@@ -1,0 +1,4 @@
+Sitemap: https://mcp.ajaxjs.com/sitemap.xml
+
+User-agent: *
+Disallow:
