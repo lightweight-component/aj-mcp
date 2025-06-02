@@ -17,7 +17,7 @@ Check out these three projects of MCP SDK components:
 - [AJ MCP Common](/aj-mcp-common), Common library for AJ-MCP, it contains the implementation of the Model Context Protocol and some other common
   classes.
 - [AJ MCP Client](/aj-mcp-client), MCP Client SDK.
-- [AJ MCP Common](/aj-mcp-common), MCP Server SDK.
+- [AJ MCP Server](/aj-mcp-common), MCP Server SDK.
 - [Samples](/samples) for both client and server.
 
 ## Why MCP?
