@@ -16,7 +16,7 @@ AJ-MCP Server is a lightweight MCP server for Java. It provides a simple and pow
 
 ## Links
 
-[Tutorials](https://javadoc.io/doc/com.ajaxjs/aj-mcp) | [Java Documents](https://javadoc.io/doc/com.ajaxjs/aj-mcp-server)
+[Tutorials](https://mcp.ajaxjs.com/) | [Java Documents](https://javadoc.io/doc/com.ajaxjs/aj-mcp-server)
 
 ## Install
 

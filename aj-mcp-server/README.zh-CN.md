@@ -16,7 +16,7 @@ AJ-MCP Server 是一个轻量级的 Java MCP 服务器。它为构建 MCP 服务
 
 ## 链接
 
-[教程](https://javadoc.io/doc/com.ajaxjs/aj-mcp) | [Java 文档](https://javadoc.io/doc/com.ajaxjs/aj-mcp-server)
+[教程](https://mcp.ajaxjs.com/) | [Java 文档](https://javadoc.io/doc/com.ajaxjs/aj-mcp-server)
 
 ## 安装
 

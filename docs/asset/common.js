@@ -1,10 +1,10 @@
 /* 百度统计 */
 var _hmt = _hmt || [];
-(function () {
-    var hm = document.createElement("script");
-    hm.src = "https://hm.baidu.com/hm.js?061f86e97629f2d5b916a718bf2fe516";
-    var s = document.getElementsByTagName("script")[0];
-    s.parentNode.insertBefore(hm, s);
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?15cec415fe8edf62b6d630ea60ca2b07";
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
 })();
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (arr && arr.length > 3) {
         arr.pop();
 
-        const m = arr.pop();
+        let m = arr.pop();
 
         if (m === 'cn')
             m = arr.pop();
