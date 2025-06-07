@@ -7,56 +7,6 @@
         </url>
     
         <url>
-            <loc>/client/setup-client/</loc>
-            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-        </url>
-    
-        <url>
-            <loc>/client/usage-client/</loc>
-            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-        </url>
-    
-        <url>
-            <loc>/cn/</loc>
-            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-        </url>
-    
-        <url>
-            <loc>/</loc>
-            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-        </url>
-    
-        <url>
-            <loc>/misc/contact-cn/</loc>
-            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-        </url>
-    
-        <url>
-            <loc>/misc/contact/</loc>
-            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-        </url>
-    
-        <url>
-            <loc>/misc/versions-cn/</loc>
-            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-        </url>
-    
-        <url>
-            <loc>/misc/versions/</loc>
-            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-        </url>
-    
-        <url>
-            <loc>/server/setup-server/</loc>
-            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-        </url>
-    
-        <url>
-            <loc>/server/usage-server/</loc>
-            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-        </url>
-    
-        <url>
             <loc>/architecture/index-cn/</loc>
             <lastmod>2022-01-05T00:00:00.000Z</lastmod>
         </url>
@@ -97,12 +47,47 @@
         </url>
     
         <url>
+            <loc>/client/setup-client/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
             <loc>/client/tool-cn/</loc>
             <lastmod>2022-01-05T00:00:00.000Z</lastmod>
         </url>
     
         <url>
             <loc>/client/tool/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>/cn/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>/misc/contact-cn/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>/misc/contact/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>/misc/versions-cn/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>/misc/versions/</loc>
             <lastmod>2022-01-05T00:00:00.000Z</lastmod>
         </url>
     
@@ -152,23 +137,28 @@
         </url>
     
         <url>
+            <loc>/server/usage-server/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
             <loc>/asset/style/common.css</loc>
-            <lastmod>2025-05-20T23:55:38.024Z</lastmod>
+            <lastmod>2025-04-25T14:04:42.393Z</lastmod>
         </url>
     
         <url>
             <loc>/asset/style/main.css</loc>
-            <lastmod>2025-05-20T23:55:38.025Z</lastmod>
+            <lastmod>2025-04-25T14:04:42.393Z</lastmod>
         </url>
     
         <url>
             <loc>/client/handling-notifications/</loc>
-            <lastmod>2025-05-31T08:50:46.284Z</lastmod>
+            <lastmod>2025-05-29T09:23:18.329Z</lastmod>
         </url>
     
         <url>
             <loc>/baidu_verify_codeva-05U1Ak03ZG/</loc>
-            <lastmod>2025-05-31T08:53:31.720Z</lastmod>
+            <lastmod>2025-06-02T15:40:33.010Z</lastmod>
         </url>
     
 </urlset>
