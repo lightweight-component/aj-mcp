@@ -33,3 +33,14 @@ The AJ MCP SDK is structured around several core components that work together t
 
 The architecture follows a client-server model with flexible transport options. The client interacts with the server using JSON-RPC over either HTTP (
 with Server-Sent Events) or standard I/O pipes.
+
+
+# Stdio Mode vs SSE Mode Comparison
+
+| Feature            | Stdio Mode                  | SSE Mode                     |
+|--------------------|-----------------------------|------------------------------|
+| **Deployment**     | Local subprocess            | Independent server           |
+| **Use Case**       | Local development           | Distributed environments     |
+| **Configuration**  | Complex                     | Simple                       |
+| **Multi-Client Support** | Not supported             | Supported                    |
+| **Network Requirement**  | None                      | Requires network connection  |
