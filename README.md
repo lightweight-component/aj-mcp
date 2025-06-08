@@ -20,6 +20,8 @@ Check out these three projects of MCP SDK components:
 - [AJ MCP Server](/aj-mcp-common), MCP Server SDK.
 - [Samples](/samples) for both client and server.
 
+For further information, please refer to the [User Manual](https://mcp.ajaxjs.com/) website.
+
 ## Why MCP?
 
 The Model Context Protocol opens up exciting possibilities for building intelligent applications using your application data with your favourite

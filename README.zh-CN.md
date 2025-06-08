@@ -12,6 +12,9 @@ AJ-MCP 是一个轻量级的 Java MCP SDK，为构建 MCP [客户端](/aj-mcp-cl
 - [AJ MCP Client](/aj-mcp-client)：MCP 客户端 SDK。
 - [AJ MCP Server](/aj-mcp-server)：MCP 服务器端 SDK。
 - [Samples](/samples)：客户端与服务器端的示例代码。
+
+更多详细的介绍及文档，请查看[用户手册](https://mcp.ajaxjs.com/)以了解更多。
+
 ## 为什么选择 MCP？
 
 模型上下文协议（Model Context Protocol, MCP）为使用你喜爱的编程语言和框架，基于你的应用数据构建智能应用带来了无限可能。通过 AJ MCP 服务器，你可以轻松搭建自己的 Java 服务器，将 AI 与任意数据源或系统相连接。
@@ -27,4 +30,5 @@ AJ-MCP 是一个轻量级的 Java MCP SDK，为构建 MCP [客户端](/aj-mcp-cl
 [用户手册](https://mcp.ajaxjs.com/) | [Github](https://github.com/lightweight-component/aj-mcp) | [Gitcode](https://gitcode.com/lightweight-component/aj-mcp)
 
 ## MCP 相关资源
+
 [Awesome MCP Servers](https://mcplab.cc/zh) | [TypeScript SDK](https://github.com/modelcontextprotocol/typescript-sdk) | [MCP 官方文档](https://modelcontextprotocol.io)
