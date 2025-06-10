@@ -9,6 +9,7 @@ import com.ajaxjs.mcp.protocol.tools.GetToolListRequest;
 import com.ajaxjs.mcp.protocol.tools.JsonSchema;
 import com.ajaxjs.mcp.protocol.tools.ToolItem;
 import com.ajaxjs.mcp.protocol.utils.CancellationNotification;
+import com.ajaxjs.mcp.protocol.utils.pagination.Cursor;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -37,8 +38,17 @@ import java.util.stream.StreamSupport;
 public class McpClient extends McpClientResource {
     @Override
     public List<ToolItem> listTools() {
+        return listTools(0);
+    }
+
+    @Override
+    public List<ToolItem> listTools(int pageNo) {
         GetToolListRequest request = new GetToolListRequest();
         request.setId(idGenerator.getAndIncrement());
+
+        if (pageNo != 0)
+            request.setParams(new Cursor(pageNo));
+
         JsonNode result;
 
         try {

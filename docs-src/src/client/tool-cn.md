@@ -19,7 +19,12 @@ AJ MCP 的工具系统提供了一种结构化方式，用于定义可被客户�
 List<ToolItem> tools = mcpClient.listTools();
 assertEquals(7, tools.size());
 ```
+此方法将跨多个页面获取所有的工具，并没有分页。如果你需要对分页进行更精细的控制，可以改用重载的`listTools(int pageNo)`方法。
 
+``` java
+List<ToolItem> tools = mcpClient.listTools(1);
+assertEquals(3, tools.size());
+```
 ## 调用工具
 
 调用某个工具：

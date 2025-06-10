@@ -13,15 +13,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class TestInitializeStdio extends TestInitializeBase {
     @BeforeAll
     static void setup() {
-        mcpClient = McpClient.createStdioMcpClient("java", "-jar",
-                "C:\\code\\ajaxjs\\aj-mcp\\samples\\server\\server-stdio\\target\\my-app-jar-with-dependencies.jar");
+        mcpClient = McpClient.createStdioMcpClient("java", "-jar", StidoAppConfig.APP_LOCATION);
     }
 
     @Test
     void testConfig() {
         McpTransport transport = StdioTransport.builder()
-                .command(Arrays.asList("java", "-jar",
-                        "C:\\code\\ajaxjs\\aj-mcp\\samples\\server\\server-stdio\\target\\my-app-jar-with-dependencies.jar"))
+                .command(Arrays.asList("java", "-jar", StidoAppConfig.APP_LOCATION))
                 .logEvents(true)
                 .build();
 

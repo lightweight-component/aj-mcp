@@ -21,7 +21,9 @@ public class Config {
         ServerConfig serverConfig = new ServerConfig();
         serverConfig.setName("MY_MCP_Server");
         serverConfig.setVersion("1.0");
+        serverConfig.setPageSize(8);
         server.setServerConfig(serverConfig);
+
 
         server.start();
 

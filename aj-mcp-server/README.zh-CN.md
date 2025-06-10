@@ -1,5 +1,5 @@
 [![Maven Central](https://img.shields.io/maven-central/v/com.ajaxjs/aj-mcp-server?label=Latest%20Release)](https://central.sonatype.com/artifact/com.ajaxjs/aj-mcp-server)
-[![Javadoc](https://img.shields.io/badge/javadoc-1.1-brightgreen.svg?)](https://javadoc.io/doc/com.ajaxjs/aj-mcp-server)
+[![Javadoc](https://img.shields.io/badge/javadoc-1.2-brightgreen.svg?)](https://javadoc.io/doc/com.ajaxjs/aj-mcp-server)
 ![coverage](https://img.shields.io/badge/coverage-80%25-yellowgreen.svg?maxAge=2592000)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Email](https://img.shields.io/badge/Contact--me-Email-orange.svg)](mailto:frank@ajaxjs.com)
@@ -26,6 +26,6 @@ AJ-MCP Server 是一个轻量级的 Java MCP 服务器。它为构建 MCP 服务
 <dependency>
     <groupId>com.ajaxjs</groupId>
     <artifactId>aj-mcp-server</artifactId>
-    <version>1.1</version>
+    <version>1.2</version>
 </dependency>
 ```

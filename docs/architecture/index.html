@@ -75,8 +75,8 @@
 
                 <h3>Misc</h3>
                 <ul>
+                    <li><a href="/misc/versions">Release History</a></li>
                     <li><a href="/misc/contact">Contact</a></li>
-                    
                 </ul>
             </menu>
             <article>
@@ -98,6 +98,43 @@ functionality.</p>
 <p><img src="/asset/imgs/a-1.jpg" alt=""></p>
 <p>The architecture follows a client-server model with flexible transport options. The client interacts with the server using JSON-RPC over either HTTP (
 with Server-Sent Events) or standard I/O pipes.</p>
+<h1>Stdio Mode vs SSE Mode Comparison</h1>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Stdio Mode</th>
+<th>SSE Mode</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Deployment</strong></td>
+<td>Local subprocess</td>
+<td>Independent server</td>
+</tr>
+<tr>
+<td><strong>Use Case</strong></td>
+<td>Local development</td>
+<td>Distributed environments</td>
+</tr>
+<tr>
+<td><strong>Configuration</strong></td>
+<td>Complex</td>
+<td>Simple</td>
+</tr>
+<tr>
+<td><strong>Multi-Client Support</strong></td>
+<td>Not supported</td>
+<td>Supported</td>
+</tr>
+<tr>
+<td><strong>Network Requirement</strong></td>
+<td>None</td>
+<td>Requires network connection</td>
+</tr>
+</tbody>
+</table>
 
             </article>
         </div>

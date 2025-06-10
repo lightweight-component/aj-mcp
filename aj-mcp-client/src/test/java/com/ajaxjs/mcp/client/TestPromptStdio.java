@@ -12,7 +12,7 @@ class TestPromptStdio extends TestPromptBase {
     @BeforeAll
     static void setup() {
         McpTransport transport = StdioTransport.builder()
-                .command(Arrays.asList("java", "-jar", "C:\\code\\ajaxjs\\aj-mcp\\samples\\server\\server-stdio\\target\\my-app-jar-with-dependencies.jar"))
+                .command(Arrays.asList("java", "-jar", StidoAppConfig.APP_LOCATION))
                 .logEvents(true)
                 .build();
 

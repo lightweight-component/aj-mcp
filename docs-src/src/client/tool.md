@@ -23,6 +23,14 @@ List<ToolItem> tools = mcpClient.listTools();
 assertEquals(7, tools.size());
 ```
 
+This method will fetch all tools across multiple pages without handling pagination.
+If you need more control over pagination, you can use the overloaded `listTools(int pageNo)` method instead.
+
+``` java
+List<ToolItem> tools = mcpClient.listTools(1);
+assertEquals(3, tools.size());
+```
+
 ## Calling Tools
 
 To call a tool:

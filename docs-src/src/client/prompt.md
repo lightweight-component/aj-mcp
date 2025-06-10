@@ -35,9 +35,13 @@ static PromptItem findPromptByName(String name, List<PromptItem> promptRefs) {
 }
 ```
 
-<!-- 
-    Similar to resources, this method automatically handles pagination. You can use ListPromptsByPage for more control over pagination.
--->
+This method will fetch all prompts across multiple pages without handling pagination.
+If you need more control over pagination, you can use the overloaded `listPrompts(int pageNo)` method instead.
+
+``` java
+List<PromptItem> prompts = mcpClient.listPrompts(1);
+assertEquals(3, prompts.size(), "Expected 3 prompts");
+```
 
 # Getting Prompt Details
 

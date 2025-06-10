@@ -17,6 +17,12 @@ public abstract class TestToolBase {
     }
 
     @Test
+    public void resourceListPage() {
+        List<ToolItem> tools = mcpClient.listTools(1);
+        assertEquals(3, tools.size());
+    }
+
+    @Test
     public void executeTool() {
         String toolExecutionResultString = mcpClient.callTool("echoString", "{\"input\": \"hi\"}");
         assertEquals("hi", toolExecutionResultString);

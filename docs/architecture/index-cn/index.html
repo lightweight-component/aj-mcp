@@ -75,8 +75,8 @@
 
                 <h3>其他</h3>
                 <ul>
+                    <li><a href="/misc/versions">版本记录</a></li>
                     <li><a href="/misc/contact-cn">联系方式</a></li>
-                    
                 </ul>
             </menu>
             <article>
@@ -95,6 +95,43 @@
 <p>AJ MCP SDK 的结构围绕几个核心组件构建，这些组件协同工作以实现 MCP 规范：</p>
 <p><img src="/asset/imgs/a-1.jpg" alt="架构图"></p>
 <p>该架构采用客户端-服务器模型，并支持灵活的传输方式。客户端可以通过 HTTP（带 Server-Sent Events）或标准 I/O 管道使用 JSON-RPC 与服务器进行交互。</p>
+<h1>Stdio 模式 vs SSE 模式对比</h1>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>Stdio 模式</th>
+<th>SSE 模式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>部署方式</strong></td>
+<td>本地子进程</td>
+<td>独立服务器</td>
+</tr>
+<tr>
+<td><strong>适用场景</strong></td>
+<td>本地开发</td>
+<td>分布式环境</td>
+</tr>
+<tr>
+<td><strong>配置复杂度</strong></td>
+<td>复杂</td>
+<td>简单</td>
+</tr>
+<tr>
+<td><strong>多客户端支持</strong></td>
+<td>不支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td><strong>网络要求</strong></td>
+<td>无</td>
+<td>需要网络连接</td>
+</tr>
+</tbody>
+</table>
 
             </article>
         </div>

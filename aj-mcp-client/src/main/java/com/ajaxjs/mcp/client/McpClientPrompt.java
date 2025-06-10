@@ -7,6 +7,7 @@ import com.ajaxjs.mcp.protocol.prompt.GetPromptListRequest;
 import com.ajaxjs.mcp.protocol.prompt.GetPromptRequest;
 import com.ajaxjs.mcp.protocol.prompt.GetPromptResult;
 import com.ajaxjs.mcp.protocol.prompt.PromptItem;
+import com.ajaxjs.mcp.protocol.utils.pagination.Cursor;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
@@ -28,10 +29,19 @@ public abstract class McpClientPrompt extends McpClientBase {
     @Override
     public List<PromptItem> listPrompts() {
         if (promptRefs.get() == null)
-            obtainPromptList();
+            obtainPromptList(0);
 
         return promptRefs.get();
     }
+
+    @Override
+    public List<PromptItem> listPrompts(int pageNo) {
+        if (promptRefs.get() == null)
+            obtainPromptList(pageNo);
+
+        return promptRefs.get();
+    }
+
 
     /**
      * Synchronized method to get the prompt list
@@ -39,12 +49,15 @@ public abstract class McpClientPrompt extends McpClientBase {
      * If promptRefs is not empty, it returns directly to avoid redundant fetching.
      * A synchronized mechanism is used to ensure thread-safe access to the prompt list in a multithreading environment.
      */
-    private synchronized void obtainPromptList() {
+    private synchronized void obtainPromptList(int pageNo) {
         if (promptRefs.get() != null)
             return;
 
         GetPromptListRequest request = new GetPromptListRequest();
         request.setId(idGenerator.getAndIncrement());
+
+        if (pageNo != 0)
+            request.setParams(new Cursor(pageNo));
 
         long timeoutMillis = requestTimeout.toMillis() == 0 ? Integer.MAX_VALUE : requestTimeout.toMillis();
 

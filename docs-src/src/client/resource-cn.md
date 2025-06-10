@@ -27,9 +27,13 @@ assertEquals("image/jpg", blob.getMimeType(), "MIME 类型不符（'blob'）");
 assertEquals("A nice pic", blob.getDescription(), "描述不符（'blob'）");
 ```
 
-<!--
-该方法自动处理分页，会抓取所有页的资源。如果需要更细粒度的分页控制，可以使用 `ListResourcesByPage` 方法。
--->
+
+此方法将跨多个页面获取所有的资源，并没有分页。如果你需要对分页进行更精细的控制，可以改用重载的`listResources(int pageNo)`方法。
+
+``` java
+List<ResourceItem> resourceList = mcpClient.listResources(1);
+assertEquals(2, resourceList.size(), "Expected exactly two resources");
+```
 
 ### 读取资源内容
 

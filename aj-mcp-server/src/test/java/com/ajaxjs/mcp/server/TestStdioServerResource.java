@@ -1,12 +1,37 @@
 package com.ajaxjs.mcp.server;
 
+import com.ajaxjs.mcp.common.JsonUtils;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TestStdioServerResource extends TestStdioServerBase {
     @Test
     void testList() {
+        setIn("{\"jsonrpc\": \"2.0\",\"id\":1,\"method\":\"resources/list\"}\n");
+        // Verify the output
+        String expectedOutput = "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"resources\":[{\"uri\":\"file:///text\",\"name\":\"text\",\"mimeType\":\"text/plain\",\"description\":\"A nice piece of text\"},{\"uri\":\"file:///blob\",\"name\":\"blob\",\"mimeType\":\"text/blob\",\"description\":\"A nice blob\"}]}}\r\n";
+        assertEquals(expectedOutput, testOut.toString());
+    }
+
+    @Test
+    void testListPage() {
+        setIn("{\"jsonrpc\": \"2.0\",\"id\":1,\"method\":\"resources/list\",\"params\":{\"cursor\":\"eyJwYWdlIjoxfQ==\"}}\n");
+        // Verify the output
+        String expectedOutput = "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"resources\":[{\"uri\":\"file:///text\",\"name\":\"text\",\"mimeType\":\"text/plain\",\"description\":\"A nice piece of text\"},{\"uri\":\"file:///blob\",\"name\":\"blob\",\"mimeType\":\"image/jpg\",\"description\":\"A nice pic\"}]}}\r\n";
+
+        JsonNode jsonNode = JsonUtils.json2Node(expectedOutput);
+        JsonNode jsonNode1 = jsonNode.get("result").get("resources");
+        List list = JsonUtils.jsonNode2bean(jsonNode1, List.class);
+        assertEquals(2, list.size());
+        assertEquals(expectedOutput, testOut.toString());
+    }
+
+    @Test
+    void testListTemplate() {
         setIn("{\"jsonrpc\": \"2.0\",\"id\":1,\"method\":\"resources/list\"}\n");
         // Verify the output
         String expectedOutput = "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"resources\":[{\"uri\":\"file:///text\",\"name\":\"text\",\"mimeType\":\"text/plain\",\"description\":\"A nice piece of text\"},{\"uri\":\"file:///blob\",\"name\":\"blob\",\"mimeType\":\"text/blob\",\"description\":\"A nice blob\"}]}}\r\n";

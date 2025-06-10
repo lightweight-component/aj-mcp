@@ -32,18 +32,7 @@
         <dependency>
             <groupId>com.ajaxjs</groupId>
             <artifactId>aj-mcp-server</artifactId>
-            <version>1.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>okhttp</artifactId>
-            <version>4.12.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>okhttp-sse</artifactId>
-            <version>4.12.0</version>
+            <version>1.2</version>
         </dependency>
 
         <!-- 编译为 jar 包时依赖的 -->

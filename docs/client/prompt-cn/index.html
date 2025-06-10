@@ -75,8 +75,8 @@
 
                 <h3>其他</h3>
                 <ul>
+                    <li><a href="/misc/versions">版本记录</a></li>
                     <li><a href="/misc/contact-cn">联系方式</a></li>
-                    
                 </ul>
             </menu>
             <article>
@@ -100,9 +100,10 @@ static PromptItem findPromptByName(String name, List&lt;PromptItem&gt; promptRef
     return null;
 }
 </code></pre>
-<!-- 
-    类似资源，listPrompts 方法会自动处理分页。若需更细粒度的分页控制，可用 ListPromptsByPage。
--->
+<p>此方法将跨多个页面获取所有的提示，并没有分页。如果你需要对分页进行更精细的控制，可以改用重载的<code>listPrompts(int pageNo)</code>方法。</p>
+<pre><code class="language-java">List&lt;PromptItem&gt; prompts = mcpClient.listPrompts(1);
+assertEquals(3, prompts.size(), &quot;Expected 3 prompts&quot;);
+</code></pre>
 <h1>获取提示详情</h1>
 <p>获取某个提示的详细信息：</p>
 <pre><code class="language-java">GetPromptResult.PromptResultDetail prompt = mcpClient.getPrompt(&quot;basic&quot;, new HashMap&lt;&gt;());

@@ -9,6 +9,8 @@ import com.ajaxjs.mcp.protocol.resource.GetResourceListRequest;
 import com.ajaxjs.mcp.protocol.tools.*;
 import com.ajaxjs.mcp.protocol.utils.pagination.Cursor;
 import com.ajaxjs.mcp.protocol.utils.ping.PingResponse;
+import com.ajaxjs.mcp.server.common.PaginatedResponse;
+import com.ajaxjs.mcp.server.common.ServerUtils;
 import com.ajaxjs.mcp.server.error.JsonRpcErrorCode;
 import com.ajaxjs.mcp.server.error.JsonRpcErrorException;
 import com.ajaxjs.mcp.server.feature.FeatureMgr;
@@ -91,8 +93,11 @@ public class McpServer extends McpServerPrompt {
         GetResourceListRequest request = new GetResourceListRequest();
         request.setId(requestRaw.getId());
 
-        if (jsonNode.has(PARAMS))
-            request.setParams(JsonUtils.jsonNode2bean(jsonNode.get(PARAMS), Cursor.class));
+        if (jsonNode.has(PARAMS)) {
+            JsonNode jsonNode1 = jsonNode.get(PARAMS);
+            Cursor cursor = JsonUtils.jsonNode2bean(jsonNode1, Cursor.class);
+            request.setParams(cursor);
+        }
 
         // get info from RAM
         if (FeatureMgr.TOOL_STORE.isEmpty())
@@ -107,7 +112,21 @@ public class McpServer extends McpServerPrompt {
 
         GetToolListResult result = new GetToolListResult();
         result.setId(requestRaw.getId());
-        result.setResult(new GetToolListResult.ToolList(tools));
+
+        GetToolListResult.ToolList toolList;
+
+        if (request.getParams() != null && request.getParams().getPageNo() != null) {
+            // do the page
+            PaginatedResponse<ToolItem> page = ServerUtils.paginate(tools, request.getParams(), this);
+            tools = page.getList();
+            toolList = new GetToolListResult.ToolList(tools);
+
+            if (!page.isLastPage())
+                toolList.setNextCursor(page.getNextPageNoAsBse64());
+        } else
+            toolList = new GetToolListResult.ToolList(tools);
+
+        result.setResult(toolList);
 
         return result;
     }

@@ -19,7 +19,7 @@ We’ll need the AJ MCP SDK for making API requests. Install them with:
 <dependency>
     <groupId>com.ajaxjs</groupId>
     <artifactId>aj-mcp-client</artifactId>
-    <version>1.2</version>
+    <version>1.3</version>
 </dependency>
 ```
 

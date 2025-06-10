@@ -75,8 +75,8 @@
 
                 <h3>其他</h3>
                 <ul>
+                    <li><a href="/misc/versions">版本记录</a></li>
                     <li><a href="/misc/contact-cn">联系方式</a></li>
-                    
                 </ul>
             </menu>
             <article>
@@ -94,9 +94,10 @@ assertEquals(&quot;file:///blob&quot;, blob.getUri(), &quot;URI 不符（'blob'�
 assertEquals(&quot;image/jpg&quot;, blob.getMimeType(), &quot;MIME 类型不符（'blob'）&quot;);
 assertEquals(&quot;A nice pic&quot;, blob.getDescription(), &quot;描述不符（'blob'）&quot;);
 </code></pre>
-<!--
-该方法自动处理分页，会抓取所有页的资源。如果需要更细粒度的分页控制，可以使用 `ListResourcesByPage` 方法。
--->
+<p>此方法将跨多个页面获取所有的资源，并没有分页。如果你需要对分页进行更精细的控制，可以改用重载的<code>listResources(int pageNo)</code>方法。</p>
+<pre><code class="language-java">List&lt;ResourceItem&gt; resourceList = mcpClient.listResources(1);
+assertEquals(2, resourceList.size(), &quot;Expected exactly two resources&quot;);
+</code></pre>
 <h3>读取资源内容</h3>
 <p>读取某个资源内容：</p>
 <pre><code class="language-java">GetResourceResult.ResourceResultDetail response = mcpClient.readResource(&quot;file:///text&quot;);

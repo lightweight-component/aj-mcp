@@ -75,8 +75,8 @@
 
                 <h3>其他</h3>
                 <ul>
+                    <li><a href="/misc/versions">版本记录</a></li>
                     <li><a href="/misc/contact-cn">联系方式</a></li>
-                    
                 </ul>
             </menu>
             <article>
@@ -86,6 +86,10 @@
 <p>列出所有可用工具：</p>
 <pre><code class="language-java">List&lt;ToolItem&gt; tools = mcpClient.listTools();
 assertEquals(7, tools.size());
+</code></pre>
+<p>此方法将跨多个页面获取所有的工具，并没有分页。如果你需要对分页进行更精细的控制，可以改用重载的<code>listTools(int pageNo)</code>方法。</p>
+<pre><code class="language-java">List&lt;ToolItem&gt; tools = mcpClient.listTools(1);
+assertEquals(3, tools.size());
 </code></pre>
 <h2>调用工具</h2>
 <p>调用某个工具：</p>

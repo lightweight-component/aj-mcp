@@ -5,6 +5,8 @@ import com.ajaxjs.mcp.protocol.McpRequestRawInfo;
 import com.ajaxjs.mcp.protocol.McpResponse;
 import com.ajaxjs.mcp.protocol.prompt.*;
 import com.ajaxjs.mcp.protocol.utils.pagination.Cursor;
+import com.ajaxjs.mcp.server.common.PaginatedResponse;
+import com.ajaxjs.mcp.server.common.ServerUtils;
 import com.ajaxjs.mcp.server.error.JsonRpcErrorCode;
 import com.ajaxjs.mcp.server.error.JsonRpcErrorException;
 import com.ajaxjs.mcp.server.feature.FeatureMgr;
@@ -46,7 +48,19 @@ public abstract class McpServerPrompt extends McpServerResource {
             prompts.add(promptItem);
         }
 
-        GetPromptListResult.PromptResult resultList = new GetPromptListResult.PromptResult(prompts);
+        GetPromptListResult.PromptResult resultList;
+
+        if (request.getParams() != null && request.getParams().getPageNo() != null) {
+            // do the page
+            PaginatedResponse<PromptItem> page = ServerUtils.paginate(prompts, request.getParams(), this);
+            prompts = page.getList();
+            resultList = new GetPromptListResult.PromptResult(prompts);
+
+            if (!page.isLastPage())
+                resultList.setNextCursor(page.getNextPageNoAsBse64());
+        } else
+            resultList = new GetPromptListResult.PromptResult(prompts);
+
         GetPromptListResult result = new GetPromptListResult(resultList);
         result.setId(requestRaw.getId());
 

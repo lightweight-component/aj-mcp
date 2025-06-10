@@ -21,6 +21,11 @@ public class ServerConfig {
     private String version;
 
     /**
+     * The page size.
+     */
+    private Integer pageSize = 3;
+
+    /**
      * Supported protocol versions.
      */
     private List<String> protocolVersions = Collections.singletonList("2024-11-05");

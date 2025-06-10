@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public abstract class TestPromptBase {
     static IMcpClient mcpClient;
@@ -54,6 +53,12 @@ public abstract class TestPromptBase {
         assertNotNull(embeddedBlob, "Prompt 'embeddedBinaryResource' should not be null");
         assertEquals("Prompt that returns an embedded binary resource", embeddedBlob.getDescription(), "Description mismatch for 'embeddedBinaryResource'");
         assertNull(embeddedBlob.getArguments(), "'embeddedBinaryResource' arguments should be empty");
+    }
+
+    @Test
+    void listPromptsPage() {
+        List<PromptItem> prompts = mcpClient.listPrompts(1);
+        assertEquals(3, prompts.size(), "Expected 3 prompts");
     }
 
     @Test

@@ -3,6 +3,7 @@ package com.ajaxjs.mcp.client;
 import com.ajaxjs.mcp.common.JsonUtils;
 import com.ajaxjs.mcp.common.McpException;
 import com.ajaxjs.mcp.protocol.resource.*;
+import com.ajaxjs.mcp.protocol.utils.pagination.Cursor;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +21,15 @@ public abstract class McpClientResource extends McpClientPrompt {
     @Override
     public List<ResourceItem> listResources() {
         if (resourceRefs.get() == null)
-            obtainResourceList();
+            obtainResourceList(0);
+
+        return resourceRefs.get();
+    }
+
+    @Override
+    public List<ResourceItem> listResources(int pageNo) {
+        if (resourceRefs.get() == null)
+            obtainResourceList(pageNo);
 
         return resourceRefs.get();
     }
@@ -49,7 +58,15 @@ public abstract class McpClientResource extends McpClientPrompt {
     @Override
     public List<ResourceTemplate> listResourceTemplates() {
         if (resourceTemplateRefs.get() == null)
-            obtainResourceTemplateList();
+            obtainResourceTemplateList(0);
+
+        return resourceTemplateRefs.get();
+    }
+
+    @Override
+    public List<ResourceTemplate> listResourceTemplates(int pageNo) {
+        if (resourceTemplateRefs.get() == null)
+            obtainResourceTemplateList(pageNo);
 
         return resourceTemplateRefs.get();
     }
@@ -70,12 +87,15 @@ public abstract class McpClientResource extends McpClientPrompt {
      *
      * @throws RuntimeException if the request execution, interruption, or timeout occurs
      */
-    private synchronized void obtainResourceList() {
+    private synchronized void obtainResourceList(int pageNo) {
         if (resourceRefs.get() != null)
             return;
 
         GetResourceListRequest request = new GetResourceListRequest();
         request.setId(idGenerator.getAndIncrement());
+
+        if (pageNo != 0)
+            request.setParams(new Cursor(pageNo));
 
         long timeoutMillis = requestTimeout.toMillis() == 0 ? Integer.MAX_VALUE : requestTimeout.toMillis();
 
@@ -90,13 +110,16 @@ public abstract class McpClientResource extends McpClientPrompt {
         }
     }
 
-    private synchronized void obtainResourceTemplateList() {
+    private synchronized void obtainResourceTemplateList(int pageNo) {
         if (resourceTemplateRefs.get() != null)
             return;
 
         GetResourceTemplateListRequest request = new GetResourceTemplateListRequest();
         request.setId(idGenerator.getAndIncrement());
         long timeoutMillis = requestTimeout.toMillis() == 0 ? Integer.MAX_VALUE : requestTimeout.toMillis();
+
+        if(pageNo!=0)
+            request.setParams(new Cursor(pageNo));
 
         try {
             CompletableFuture<JsonNode> resultFuture = transport.sendRequestWithResponse(request);

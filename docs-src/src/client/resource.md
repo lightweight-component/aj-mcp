@@ -29,10 +29,14 @@ assertEquals("image/jpg", blob.getMimeType(), "MIME type mismatch for 'blob'");
 assertEquals("A nice pic", blob.getDescription(), "Description mismatch for 'blob'");
 ```
 
-<!--
-This method automatically handles pagination, fetching all resources across multiple pages. 
-If you need more control over pagination, you can use the `ListResourcesByPage` method instead.
--->
+
+This method will fetch all resources across multiple pages without handling pagination. 
+If you need more control over pagination, you can use the overloaded `listResources(int pageNo)` method instead.
+
+``` java
+List<ResourceItem> resourceList = mcpClient.listResources(1);
+assertEquals(2, resourceList.size(), "Expected exactly two resources");
+```
 
 ### Reading Resource Contents
 

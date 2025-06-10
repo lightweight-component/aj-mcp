@@ -32,6 +32,12 @@ public abstract class TestResourceBase {
     }
 
     @Test
+    public void resourceListPage() {
+        List<ResourceItem> resourceList = mcpClient.listResources(1);
+        assertEquals(2, resourceList.size(), "Expected exactly two resources");
+    }
+
+    @Test
     public void readTextResource() {
         GetResourceResult.ResourceResultDetail response = mcpClient.readResource("file:///text");
         assertEquals(1, response.getContents().size(), "Expected exactly one content");

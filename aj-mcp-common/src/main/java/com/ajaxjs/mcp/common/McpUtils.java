@@ -1,5 +1,6 @@
 package com.ajaxjs.mcp.common;
 
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -112,6 +113,15 @@ public class McpUtils {
         map.put(k3, v3);
 
         return map;
+    }
+
+    public static String base64Encode(String str) {
+        return Base64.getEncoder().encodeToString(str.getBytes());
+    }
+
+    public static String base64Decode(String str) {
+        byte[] decodedBytes = Base64.getDecoder().decode(str);
+        return new String(decodedBytes);
     }
 
     /**

@@ -1,10 +1,8 @@
 package com.ajaxjs.mcp.protocol.tools;
 
 import com.ajaxjs.mcp.protocol.McpResponse;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.*;
 
 import java.util.List;
 
@@ -23,8 +21,16 @@ public class GetToolListResult extends McpResponse {
 
     @Data
     @AllArgsConstructor
+    @RequiredArgsConstructor
     @NoArgsConstructor
     public static class ToolList {
-        List<ToolItem> tools;
+        @NonNull
+        private List<ToolItem> tools;
+
+        /**
+         * Pagination for response.
+         */
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        private String nextCursor;
     }
 }

@@ -75,8 +75,8 @@
 
                 <h3>Misc</h3>
                 <ul>
+                    <li><a href="/misc/versions">Release History</a></li>
                     <li><a href="/misc/contact">Contact</a></li>
-                    
                 </ul>
             </menu>
             <article>
@@ -96,10 +96,11 @@ assertEquals(&quot;file:///blob&quot;, blob.getUri(), &quot;URI mismatch for 'bl
 assertEquals(&quot;image/jpg&quot;, blob.getMimeType(), &quot;MIME type mismatch for 'blob'&quot;);
 assertEquals(&quot;A nice pic&quot;, blob.getDescription(), &quot;Description mismatch for 'blob'&quot;);
 </code></pre>
-<!--
-This method automatically handles pagination, fetching all resources across multiple pages. 
-If you need more control over pagination, you can use the `ListResourcesByPage` method instead.
--->
+<p>This method will fetch all resources across multiple pages without handling pagination.
+If you need more control over pagination, you can use the overloaded <code>listResources(int pageNo)</code> method instead.</p>
+<pre><code class="language-java">List&lt;ResourceItem&gt; resourceList = mcpClient.listResources(1);
+assertEquals(2, resourceList.size(), &quot;Expected exactly two resources&quot;);
+</code></pre>
 <h3>Reading Resource Contents</h3>
 <p>To read the contents of a resource:</p>
 <pre><code class="language-java">GetResourceResult.ResourceResultDetail response = mcpClient.readResource(&quot;file:///text&quot;);

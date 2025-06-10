@@ -75,8 +75,8 @@
 
                 <h3>Misc</h3>
                 <ul>
+                    <li><a href="/misc/versions">Release History</a></li>
                     <li><a href="/misc/contact">Contact</a></li>
-                    
                 </ul>
             </menu>
             <article>
@@ -88,6 +88,11 @@ The tool system is designed to make it easy for LLMs to understand what tools ar
 <p>To list available tools:</p>
 <pre><code class="language-java">List&lt;ToolItem&gt; tools = mcpClient.listTools();
 assertEquals(7, tools.size());
+</code></pre>
+<p>This method will fetch all tools across multiple pages without handling pagination.
+If you need more control over pagination, you can use the overloaded <code>listTools(int pageNo)</code> method instead.</p>
+<pre><code class="language-java">List&lt;ToolItem&gt; tools = mcpClient.listTools(1);
+assertEquals(3, tools.size());
 </code></pre>
 <h2>Calling Tools</h2>
 <p>To call a tool:</p>

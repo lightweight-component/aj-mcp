@@ -75,8 +75,8 @@
 
                 <h3>Misc</h3>
                 <ul>
+                    <li><a href="/misc/versions">Release History</a></li>
                     <li><a href="/misc/contact">Contact</a></li>
-                    
                 </ul>
             </menu>
             <article>
@@ -102,9 +102,11 @@ static PromptItem findPromptByName(String name, List&lt;PromptItem&gt; promptRef
     return null;
 }
 </code></pre>
-<!-- 
-    Similar to resources, this method automatically handles pagination. You can use ListPromptsByPage for more control over pagination.
--->
+<p>This method will fetch all prompts across multiple pages without handling pagination.
+If you need more control over pagination, you can use the overloaded <code>listPrompts(int pageNo)</code> method instead.</p>
+<pre><code class="language-java">List&lt;PromptItem&gt; prompts = mcpClient.listPrompts(1);
+assertEquals(3, prompts.size(), &quot;Expected 3 prompts&quot;);
+</code></pre>
 <h1>Getting Prompt Details</h1>
 <p>To get details of a specific prompt:</p>
 <pre><code class="language-java">GetPromptResult.PromptResultDetail prompt = mcpClient.getPrompt(&quot;basic&quot;, new HashMap&lt;&gt;());

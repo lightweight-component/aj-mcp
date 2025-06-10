@@ -19,7 +19,7 @@ Add this dependency to build MCP servers:
 <dependency>
     <groupId>com.ajaxjs</groupId>
     <artifactId>aj-mcp-server</artifactId>
-    <version>1.1</version>
+    <version>1.2</version>
 </dependency>
 ```
 
@@ -106,6 +106,7 @@ After feature manager initialization with package scanning, we can configure the
 - Server instance creation with transport layer setup
 - Server configuration with name and version
 - Connection timeout settings
+- The page size for paginated responses
 
 Server configuration is handled through the ServerConfig class, which contains essential server metadata `McpServerInitialize`. The configuration
 includes server name, version, and supported protocol versions `McpServerInitialize`.
@@ -117,11 +118,12 @@ requested version if supported `McpServerInitialize`.
 FeatureMgr mgr=new FeatureMgr();
         mgr.init("com.foo.myproduct");
 
-        McpServer server=new McpServer();
+        McpServer server = new McpServer();
         server.setTransport(new ServerStdio(server));
 
-        ServerConfig serverConfig=new ServerConfig();
+        ServerConfig serverConfig = new ServerConfig();
         serverConfig.setName("MY_MCP_Server");
         serverConfig.setVersion("1.0");
+        serverConfig.setPageSize(8);
         server.setServerConfig(serverConfig);
 ```

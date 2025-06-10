@@ -1,6 +1,11 @@
 package com.ajaxjs.mcp.server;
 
+import com.ajaxjs.mcp.common.JsonUtils;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -10,6 +15,19 @@ class TestStdioServerTool extends TestStdioServerBase {
         setIn("{\"jsonrpc\": \"2.0\",\"id\":1,\"method\":\"tools/list\"}\n");
         // Verify the output
         String expectedOutput = "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"tools\":[{\"name\":\"longOperation\",\"description\":\"Takes 10 seconds to complete\",\"inputSchema\":null},{\"name\":\"image\",\"description\":\"A nice pic\",\"inputSchema\":null},{\"name\":\"getAll\",\"description\":\"List ALL\",\"inputSchema\":null},{\"name\":\"echoBoolean\",\"description\":\"Echoes a boolean\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"input\":{\"type\":\"Boolean\",\"description\":\"The boolean to be echoed\"}},\"required\":[\"input\"]}},{\"name\":\"echoInteger\",\"description\":\"Echoes an integer\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"input\":{\"type\":\"Number\",\"description\":\"The integer to be echoed\"}},\"required\":[\"input\"]}},{\"name\":\"error\",\"description\":\"Throws a business error\",\"inputSchema\":null},{\"name\":\"echoString\",\"description\":\"Echoes a string\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"input\":{\"type\":\"string\",\"description\":\"The string to be echoed\"}},\"required\":[\"input\"]}}]}}\r\n";
+        assertEquals(expectedOutput, testOut.toString());
+    }
+
+    @Test
+    void testListPage() {
+        setIn("{\"jsonrpc\": \"2.0\",\"id\":1,\"method\":\"tools/list\",\"params\":{\"cursor\":\"eyJwYWdlIjoxfQ==\"}}\n");
+        // Verify the output
+        String expectedOutput = "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"tools\":[{\"name\":\"longOperation\",\"description\":\"Takes 10 seconds to complete\",\"inputSchema\":null},{\"name\":\"image\",\"description\":\"A nice pic\",\"inputSchema\":null},{\"name\":\"getAll\",\"description\":\"List ALL\",\"inputSchema\":null}],\"nextCursor\":\"eyJwYWdlIjoyfQ==\"}}\r\n";
+        JsonNode jsonNode = JsonUtils.json2Node(expectedOutput);
+        JsonNode jsonNode1 = jsonNode.get("result").get("tools");
+        List list = JsonUtils.jsonNode2bean(jsonNode1, List.class);
+        assertEquals(3, list.size());
+
         assertEquals(expectedOutput, testOut.toString());
     }
 

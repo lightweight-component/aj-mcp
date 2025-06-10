@@ -3,8 +3,12 @@ package com.ajaxjs.mcp.server;
 import com.ajaxjs.mcp.common.JsonUtils;
 import com.ajaxjs.mcp.protocol.McpRequestRawInfo;
 import com.ajaxjs.mcp.protocol.McpResponse;
+import com.ajaxjs.mcp.protocol.prompt.GetPromptListResult;
+import com.ajaxjs.mcp.protocol.prompt.PromptItem;
 import com.ajaxjs.mcp.protocol.resource.*;
 import com.ajaxjs.mcp.protocol.utils.pagination.Cursor;
+import com.ajaxjs.mcp.server.common.PaginatedResponse;
+import com.ajaxjs.mcp.server.common.ServerUtils;
 import com.ajaxjs.mcp.server.error.JsonRpcErrorCode;
 import com.ajaxjs.mcp.server.error.JsonRpcErrorException;
 import com.ajaxjs.mcp.server.feature.FeatureMgr;
@@ -48,7 +52,19 @@ public abstract class McpServerResource extends McpServerInitialize {
             resources.add(resourceItem);
         }
 
-        GetResourceListResult.ResourceResult resultList = new GetResourceListResult.ResourceResult(resources);
+        GetResourceListResult.ResourceResult resultList;
+
+        if (request.getParams() != null && request.getParams().getPageNo() != null) {
+            // do the page
+            PaginatedResponse<ResourceItem> page = ServerUtils.paginate(resources, request.getParams(), this);
+            resources = page.getList();
+            resultList = new GetResourceListResult.ResourceResult(resources);
+
+            if (!page.isLastPage())
+                resultList.setNextCursor(page.getNextPageNoAsBse64());
+        } else
+            resultList = new GetResourceListResult.ResourceResult(resources);
+
         GetResourceListResult result = new GetResourceListResult(resultList);
         result.setId(requestRaw.getId());
 

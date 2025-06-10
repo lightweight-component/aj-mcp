@@ -1,10 +1,8 @@
 package com.ajaxjs.mcp.protocol.prompt;
 
 import com.ajaxjs.mcp.protocol.McpResponse;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.*;
 
 import java.util.List;
 
@@ -23,8 +21,16 @@ public class GetPromptListResult extends McpResponse {
 
     @Data
     @AllArgsConstructor
+    @RequiredArgsConstructor
     @NoArgsConstructor
     public static class PromptResult {
-        List<PromptItem> prompts;
+        @NonNull
+        private List<PromptItem> prompts;
+
+        /**
+         * Pagination for response.
+         */
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        private String nextCursor;
     }
 }

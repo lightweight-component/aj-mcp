@@ -75,8 +75,8 @@
 
                 <h3>Misc</h3>
                 <ul>
+                    <li><a href="/misc/versions">Release History</a></li>
                     <li><a href="/misc/contact">Contact</a></li>
-                    
                 </ul>
             </menu>
             <article>
@@ -87,7 +87,7 @@
 &lt;dependency&gt;
     &lt;groupId&gt;com.ajaxjs&lt;/groupId&gt;
     &lt;artifactId&gt;aj-mcp-server&lt;/artifactId&gt;
-    &lt;version&gt;1.1&lt;/version&gt;
+    &lt;version&gt;1.2&lt;/version&gt;
 &lt;/dependency&gt;
 </code></pre>
 <p>We can find the latest version:
@@ -189,6 +189,7 @@ with <code>@McpService</code>.</p>
 <li>Server instance creation with transport layer setup</li>
 <li>Server configuration with name and version</li>
 <li>Connection timeout settings</li>
+<li>The page size for paginated responses</li>
 </ul>
 <p>Server configuration is handled through the ServerConfig class, which contains essential server metadata <code>McpServerInitialize</code>. The configuration
 includes server name, version, and supported protocol versions <code>McpServerInitialize</code>.</p>
@@ -197,12 +198,13 @@ requested version if supported <code>McpServerInitialize</code>.</p>
 <pre><code class="language-java">FeatureMgr mgr=new FeatureMgr();
         mgr.init(&quot;com.foo.myproduct&quot;);
 
-        McpServer server=new McpServer();
+        McpServer server = new McpServer();
         server.setTransport(new ServerStdio(server));
 
-        ServerConfig serverConfig=new ServerConfig();
+        ServerConfig serverConfig = new ServerConfig();
         serverConfig.setName(&quot;MY_MCP_Server&quot;);
         serverConfig.setVersion(&quot;1.0&quot;);
+        serverConfig.setPageSize(8);
         server.setServerConfig(serverConfig);
 </code></pre>
 

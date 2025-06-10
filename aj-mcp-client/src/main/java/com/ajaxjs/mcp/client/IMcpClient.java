@@ -28,6 +28,14 @@ public interface IMcpClient extends AutoCloseable {
     List<ToolItem> listTools();
 
     /**
+     * Obtains a pagination list of tools from the MCP server.
+     *
+     * @param pageNo The page number to retrieve.
+     * @return The list of tools
+     */
+    List<ToolItem> listTools(int pageNo);
+
+    /**
      * Calls a tool on the MCP server and returns the result as a String.
      *
      * @param request The tool request
@@ -45,18 +53,34 @@ public interface IMcpClient extends AutoCloseable {
     String callTool(String name, String arguments);
 
     /**
-     * Obtains the current list of resources available on the MCP server.
+     * Obtains the full list of resources available on the MCP server.
      *
      * @return The list of resources
      */
     List<ResourceItem> listResources();
 
     /**
-     * Obtains the current list of resource templates (dynamic resources) available on the MCP server.
+     * Obtains the pagination list of resources available on the MCP server.
+     *
+     * @param pageNo The page number to retrieve.
+     * @return The list of resources
+     */
+    List<ResourceItem> listResources(int pageNo);
+
+    /**
+     * Obtains the full list of resource templates (dynamic resources) available on the MCP server.
      *
      * @return The list of resource templates
      */
     List<ResourceTemplate> listResourceTemplates();
+
+    /**
+     * Obtains the pagination list of resource templates (dynamic resources) available on the MCP server.
+     *
+     * @param pageNo The page number to retrieve.
+     * @return The list of resource templates
+     */
+    List<ResourceTemplate> listResourceTemplates(int pageNo);
 
     /**
      * Retrieves the contents of the resource with the specified URI.
@@ -73,6 +97,14 @@ public interface IMcpClient extends AutoCloseable {
      * @return The list of prompts
      */
     List<PromptItem> listPrompts();
+
+    /**
+     * Obtain a pagination list of prompts available on the MCP server.
+     *
+     * @param pageNo The page number to retrieve.
+     * @return The list of prompts
+     */
+    List<PromptItem> listPrompts(int pageNo);
 
     /**
      * Render the contents of a prompt.
