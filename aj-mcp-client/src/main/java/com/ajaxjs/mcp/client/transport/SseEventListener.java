@@ -77,7 +77,7 @@ public class SseEventListener extends EventSourceListener {
                 initializationFinished.completeExceptionally(new RuntimeException("The server returned: " + response.message()));
         }
 
-        if (t != null && (t.getMessage() == null || !t.getMessage().contains("Socket closed")))
+        if (t != null && (t.getMessage() == null || !t.getMessage().toLowerCase().contains("Socket closed".toLowerCase())))
             log.warn("SSE channel failure", t);
     }
 
