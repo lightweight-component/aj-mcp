@@ -1,0 +1,15 @@
+@font-face {
+  font-family: 'DaxOT';
+  src: url('DaxWeb.eot');
+  src: url('DaxWeb.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'DaxOT';
+  src: url('DaxWeb-Bold.eot');
+  src: url('DaxWeb-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+}
