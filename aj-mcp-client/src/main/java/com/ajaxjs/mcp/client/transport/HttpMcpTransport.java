@@ -263,7 +263,7 @@ public class HttpMcpTransport extends McpTransport {
         Request request = new Request.Builder().url(sseUrl).build();
         CompletableFuture<String> initializationFinished = new CompletableFuture<>();
         SseEventListener listener = new SseEventListener(this, logResponses, initializationFinished);
-        EventSource eventSource = EventSources.createFactory(client).newEventSource(request, listener);
+        EventSource eventSource = createEventSource(request, listener);
         int timeout = client.callTimeoutMillis() > 0 ? client.callTimeoutMillis() : Integer.MAX_VALUE;
 
         // wait for the SSE channel to be created, receive the POST url from the server, throw an exception if that failed
@@ -272,10 +272,17 @@ public class HttpMcpTransport extends McpTransport {
             postUrl = URI.create(sseUrl).resolve(relativePostUrl).toString();
             log.debug("Received the server's POST URL: {}", postUrl);
         } catch (Exception e) {
+            eventSource.cancel();
+            if (e instanceof InterruptedException)
+                Thread.currentThread().interrupt();
             throw new RuntimeException(e);
         }
 
         return eventSource;
+    }
+
+    EventSource createEventSource(Request request, SseEventListener listener) {
+        return EventSources.createFactory(client).newEventSource(request, listener);
     }
 
     /**
