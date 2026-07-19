@@ -11,8 +11,7 @@ layout: layouts/docs.njk
 
 # MCP Server SDK Integration Samples
 
-The source code repository of this project contains two integration samples: one is a standalone Tomcat server with a simple MCP service,
-and the other is a Spring Boot application with a MCP service.
+The repository contains two integration samples: a standalone Tomcat server and a Spring Boot application, each exposing a simple MCP service.
 
 ## Tomcat Application Integration
 
@@ -38,6 +37,7 @@ public class StandaloneTomcat {
         mgr.init("com.foo.myapp");
 
         McpServer server = new McpServer();
+        server.setFeatureMgr(mgr);
         ServerSse serverSse = new ServerSse(server);
         server.setTransport(serverSse);
 
@@ -70,8 +70,8 @@ public class StandaloneTomcat {
 
         // Configure connectionTimeout and keepAliveTimeout
         Connector connector = tomcat.getConnector();
-        connector.setProperty("connectionTimeout", "60000"); // 20 seconds
-        connector.setProperty("keepAliveTimeout", "60000"); // 30 seconds
+        connector.setProperty("connectionTimeout", "60000"); // 60 seconds
+        connector.setProperty("keepAliveTimeout", "60000"); // 60 seconds
         connector.setProperty("maxKeepAliveRequests", "100"); // Optional: Max requests per connection
 
         tomcat.start();
@@ -82,8 +82,7 @@ public class StandaloneTomcat {
 
 ## Spring Application Integration
 
-The Spring configuration demonstrates dependency injection setup `Config.java:12-29`, where the ServerSse bean is configured with the same pattern but
-managed by Spring's container.
+The Spring configuration uses the same setup pattern, with `ServerSse` managed by the Spring container.
 
 ```java
 package com.foo.myapp;
@@ -103,6 +102,7 @@ public class Config {
         mgr.init("com.foo.myapp");
 
         McpServer server = new McpServer();
+        server.setFeatureMgr(mgr);
         ServerSse serverSse = new ServerSse(server);
         server.setTransport(serverSse);
 
@@ -120,7 +120,9 @@ public class Config {
 
 ## Design Note
 
-For Mcp server over SSE, there are two endpoints that should be known:
+The legacy HTTP/SSE transport uses two endpoints:
 
-    SSE Url, this is the endpoint that the client will first connect to, which is at time of initialization. In this initialization, it'll return a POST Url(The second endpoint) form the server.
-    POST Url, this is the real endpoint for the MCP business, client will send the request to this endpoint and the server will return the response by this endpoint. It's an SSE endpoint.
+- **SSE URL**: the client opens this connection first. The server registers the session with `openSession(clientId, writer, postPath)` and sends an `endpoint` event containing the POST path.
+- **POST URL**: the client sends JSON-RPC requests to this endpoint. The controller calls `serverSse.handle(clientId, json)`, and the response is written back only to the originating SSE session—not to the POST response and not to every connected client.
+
+`ServerSse.start()` starts one shared heartbeat scheduler. Do not create a heartbeat thread per HTTP request. Remove the session when the request ends, and close `ServerSse` when the application shuts down.

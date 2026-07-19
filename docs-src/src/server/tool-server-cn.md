@@ -49,6 +49,8 @@ public class MyTools {
 | boolean, Boolean                  | "boolean"        |
 | 其它类型                          | "Object"         |
 
+> 当前限制：虽然 `required=false` 会体现在生成的 schema 中，但反射调用路径尚不能正确处理被省略的可选参数。在该问题修复前，请显式传递所有带注解的参数。
+
 ## 工具实现示例
 
 ### 基础字符串工具
@@ -63,7 +65,7 @@ public String echoString(@ToolArg(description = "要回显的字符串") String 
 ### 无参数工具
 
 ```java
-@Tool(description = "耗时 10 秒完成")
+@Tool(description = "耗时 5 秒完成")
 public String longOperation() throws Exception {
     TimeUnit.SECONDS.sleep(5);
     return "ok";
@@ -88,9 +90,9 @@ public ContentImage image() {
 ```java
 @Tool(description = "列出全部内容")
 public List<Content> getAll() {
-        List<Content> list = new ArrayList<>();
-        list.add(new ContentImage(/* ... */));
-        list.add(new ContentText("Hello World"));
-        return list;
-        }
+    List<Content> list = new ArrayList<>();
+    list.add(new ContentImage(/* ... */));
+    list.add(new ContentText("Hello World"));
+    return list;
+}
 ```

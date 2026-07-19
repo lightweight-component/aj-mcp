@@ -36,13 +36,13 @@ Text resources return `ResourceContentText` objects containing plain text or str
 
 ```java
 @Resource(uri = "file:///text", description = "A nice piece of text", mimeType = "text/plain")
-public ResourceContentText text(){
-        ResourceContentText content=new ResourceContentText();
-        content.setUri("file:///text");
-        content.setMimeType("text/plain");
-        content.setText("text888");
-        return content;
-        }
+public ResourceContentText text() {
+    ResourceContentText content = new ResourceContentText();
+    content.setUri("file:///text");
+    content.setMimeType("text/plain");
+    content.setText("text888");
+    return content;
+}
 ```
 
 #### Binary Resources
@@ -51,21 +51,21 @@ Binary resources return `ResourceContentBinary` objects containing Base64-encode
 
 ```java
 @Resource(uri = "file:///blob", description = "A nice pic", mimeType = "image/jpg")
-public ResourceContentBinary blob(){
-        String base64EncodedImage=ServerUtils.encodeImageToBase64("bird-eye.jpg");
+public ResourceContentBinary blob() {
+    String base64EncodedImage = ServerUtils.encodeImageToBase64("bird-eye.jpg");
 
-        ResourceContentBinary content=new ResourceContentBinary();
-        content.setUri("file:///blob");
-        content.setMimeType("image/jpg");
-        content.setBlob(base64EncodedImage);
+    ResourceContentBinary content = new ResourceContentBinary();
+    content.setUri("file:///blob");
+    content.setMimeType("image/jpg");
+    content.setBlob(base64EncodedImage);
 
-        return content;
-        }
+    return content;
+}
 ```
 
 ### Resource Templates
 
-The `@ResourceTemplate` annotation supports dynamic resources with parameterized URIs following RFC 6570 URI template syntax.
+The SDK contains `@ResourceTemplate` and the related protocol models, but automatic registration and server dispatch for resource templates are not complete in this version.
 
 | Property    | Required | Description                   |
 |-------------|----------|-------------------------------|
@@ -74,10 +74,4 @@ The `@ResourceTemplate` annotation supports dynamic resources with parameterized
 | description | No       | Template description          |
 | mimeType    | No       | Content MIME type             |
 
-Property Required Description
-uriTemplate Yes RFC 6570 Level 1 URI template
-name No Human-readable name
-description No Template description
-mimeType No Content MIME type
-
-Template methods accept parameters that correspond to template variables in the URI pattern.
+Treat this annotation as preview API until template methods are registered by `FeatureMgr` and `resources/templates/list` is handled by the server.

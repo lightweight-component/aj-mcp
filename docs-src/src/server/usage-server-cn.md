@@ -65,7 +65,7 @@ public class MyServerFeatures {
 
 ## 服务器功能管理
 
-功能管理系统通过集中式的 `FeatureMgr` 类进行，负责包扫描、注解处理与功能存储。系统使用反射机制发现被注解的方法，并将功能元数据存储于并发哈希表中，确保运行时线程安全访问。
+每个服务器使用独立的 `FeatureMgr` 实例负责包扫描、注解处理与功能存储，因此同一 JVM 中的多个服务器不会共享工具、资源或提示。
 
 ### 注解体系
 
@@ -80,7 +80,7 @@ public class MyServerFeatures {
 | @Prompt      | 方法      | 将方法暴露为 MCP 提示         |
 | @PromptArg   | 参数      | 定义提示方法参数              |
 
-服务端配置通过 `FeatureMgr.init()` 注解驱动功能发现，自动扫描并注册含有 `@McpService` 注解且包含 `@Tool`、`@Resource`、`@Prompt` 方法的类。
+调用 `FeatureMgr.init()` 会扫描指定包，并注册 `@McpService` 类中的 `@Tool`、`@Resource` 和 `@Prompt` 方法。单个类无法加载时会记录日志并跳过，不会中断整个扫描过程。
 
 ### 初始化功能管理器
 
@@ -97,7 +97,7 @@ mgr.init("com.foo.myproduct");
 
 - 创建服务器实例并设置传输层
 - 配置服务器名称与版本号
-- 设置连接超时等参数
+- 设置分页大小和协议版本等参数
 
 服务器配置由 `ServerConfig` 类管理，包含服务端元数据。初始化时还会进行协议版本协商，返回所支持的最高版本，或与客户端请求一致的版本。
 
@@ -106,10 +106,13 @@ FeatureMgr mgr = new FeatureMgr();
 mgr.init("com.foo.myproduct");
 
 McpServer server = new McpServer();
+server.setFeatureMgr(mgr);
 server.setTransport(new ServerStdio(server));
 
 ServerConfig serverConfig = new ServerConfig();
 serverConfig.setName("MY_MCP_Server");
 serverConfig.setVersion("1.0");
 server.setServerConfig(serverConfig);
+
+server.start();
 ```

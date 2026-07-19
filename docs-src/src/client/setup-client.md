@@ -10,9 +10,9 @@ layout: layouts/docs.njk
 
 # MCP Client SDK Setup
 
-## Install Dependency
+## Install the Dependency
 
-We’ll need the AJ MCP SDK for making API requests. Install them with:
+Add the AJ MCP client dependency:
 
 ```xml
 
@@ -33,8 +33,7 @@ The client SDK implementation consists of two main components:
 - Transport: Manages the subprocess and handles low-level message exchange.
 - MCP Client: Provides a high-level API for using the transport, implementing the MCP protocol.
 
-To start using the MCP client, you must first these two main components:
-first to create a appropriate transport instance, and then to create a client instance with that transport.
+To use the client, first create an appropriate transport and then build an `McpClient` with that transport.
 The client supports different transport mechanisms, primarily Server-Sent Events (SSE) and standard I/O (stdio).
 
 ## Setup the Transport
@@ -44,35 +43,32 @@ server.
 
 ### Stdio Transport
 
-'Stdio' stands for Standard Input/Output, by using command line to interact between the programme and human in short. But here is between the MCP
-Client
-and the MCP Server. Usually, we use stdio for the local application, such as a `*.exe` programme or a Java Jar programme, and so on.
+Stdio stands for standard input/output. In this transport, the client launches a local MCP server subprocess and exchanges one JSON-RPC message per line through its standard streams.
 
 ``` java
-// The MCP server is a Java programme, runs on stdio.
+// The MCP server is a Java program that communicates over stdio.
 McpTransport transport = StdioTransport.builder()
     .command(Arrays.asList("java", "-jar", "C:\\app\\my-app-jar-with-dependencies.jar"))
     .logEvents(true)
     .build();
 ```
 
-Let's take a look at a `.exe` programme as an example:
+Here is an example using a `.exe` program:
 
 ``` java
-// The MCP server is an executable programme, runs on stdio.
+// The MCP server is a native executable that communicates over stdio.
 McpTransport transport = StdioTransport.builder()
-    .command("C:\\app\\my-app.exe", "-token", "dd4df2sx32ds"))
+    .command(Arrays.asList("C:\\app\\my-app.exe", "-token", "dd4df2sx32ds"))
     .logEvents(true)
     .build();
 ```
 
-If you want to check out the fully logs of the client, you can set `logEvents` to `true`. This approach is beneficial for debugging purposes or for
-gaining a deeper understanding of the MCP protocol's JSON-based messaging format.
+Set `logEvents` to `true` to log outgoing protocol messages while debugging. The transport also consumes stderr so that a child process cannot block on a full error pipe.
 
 ### SSE Transport
 
 The SSE Transport enables bidirectional communication between MCP clients and servers using the HTTP protocol with Server-Sent Events. This transport
-method is particularly useful for web-based applications
+method is particularly useful for web-based applications.
 
 ``` java
 McpTransport transport = HttpMcpTransport.builder()
@@ -96,7 +92,7 @@ McpClient mcpClient = McpClient.builder()
         .build();
 ```
 
-Usually we fill the `clientName` and `clientVersion` properties.
+Usually, you should set the `clientName` and `clientVersion` properties.
 The `clientName` property is used to identify the client to the MCP server, while the  `clientVersion` property is used to indicate the version of the
 client.
 
@@ -107,10 +103,10 @@ All properties are listing below:
 | clientName      | Sets the name that the client will use to identify itself to the MCP server in the initialization message.                                                                        | String        | myapp/foo-app            |
 | clientVersion   | Sets the version string that the client will use to identify itself to the MCP server in the initialization message. The default value is "1.0".                                  | String        | 1.0/2.1.2                |
 | protocolVersion | Sets the protocol version that the client will advertise in the initialization message. The default value right now is "2024-11-05", but will change over time in later versions. | String        | 2024-11-05               |
-| requestTimeout  | Sets the timeout for tool execution. This value applies to each tool execution individually. The default value is 60 seconds. A value of zero means no timeout.                   | Duration      | `Duration.ofSeconds(60)` |
+| requestTimeout  | Timeout applied to every request, including initialization and health checks. The default is 60 seconds; zero means wait indefinitely, and negative values are rejected.             | Duration      | `Duration.ofSeconds(60)` |
 
 Please note that after creating the McpClient, you should call `mcpClient.initialize();` right away.
-We'll talk about the initialization of MCP in next section.
+The next section describes protocol initialization.
 
 ``` java
 McpClient mcpClient = McpClient.builder()
@@ -122,10 +118,11 @@ McpClient mcpClient = McpClient.builder()
 mcpClient.initialize();
 ```
 
-Finally, please remember to close the McpClient resources by calling the `close()` method, or using autocloseable.
+Close the client when it is no longer needed. Closing the transport releases HTTP/SSE requests or the stdio subprocess and completes outstanding requests exceptionally.
 
 ``` java
-try(IMcpClient mcpClient2 = McpClient.builder().transport(transport).build()){
+try (IMcpClient mcpClient2 = McpClient.builder().transport(transport).build()) {
+    mcpClient2.initialize();
     ...
 } catch (Exception e) {
    throw new RuntimeException(e);

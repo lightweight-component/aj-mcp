@@ -1,26 +1,27 @@
 ---
-title: Versions
+title: 版本记录
 subTitle: 2024-12-05 by Frank Cheung
-description: TODO
+description: AJ MCP SDK 版本记录
 date: 2022-01-05
 tags:
-  - last one
+  - 版本
 layout: layouts/docs-cn.njk
 ---
-    <h1>版本发布说明</h1>
-    <h3>v1.1.8 <span class="release-date">2024-01-11</span></h3>
 
-    <ul>
-        <li>拆分了各个模块；修正了若干的 bug</li>
-    </ul>
-    <h3>v1.1.7 <span class="release-date">2023-12-11</span></h3>
+# 版本发布说明
 
-    <ul>
-        <li>大幅度重构后的版本</li>
-        <li>修正大量 bug，引入诸多新功能</li>
-    </ul>
-    <h3>v1.0 <span class="release-date">2019-06-24</span></h3>
+## 尚未发布的维护更新
 
-    <ul>
-        <li>首次版本发布</li>
-    </ul>
+- 修复 HTTP 响应泄漏，以及 SSE、Stdio 故障后的 pending request 清理。
+- 完善客户端 Stdio 和服务端 SSE 的关闭生命周期。
+- 修正 notification 响应行为和请求超时语义。
+- 将 feature store 调整为服务器实例级，并允许包扫描跳过不可加载的可选类。
+- 为 Prompt、Resource 和 ResourceTemplate 列表增加按页缓存。
+
+## aj-mcp-common 1.5 / aj-mcp-client 1.3 / aj-mcp-server 1.2 — 2025-06-10
+
+- 增加[分页支持](https://modelcontextprotocol.io/specification/2024-11-05/server/utilities/pagination)。
+
+## 1.0 — 2025-06-01
+
+- 首次发布。

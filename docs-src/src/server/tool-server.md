@@ -31,7 +31,7 @@ public class MyTools {
 
 ## Parameter Handling and Validation
 
-Tool parameters are annotated with @ToolArg to provide metadata for validation and schema generation. Each parameter can specify a name, description, and whether it's required.
+Tool parameters are annotated with `@ToolArg` to provide metadata for validation and schema generation. Each parameter can specify a name, description, and whether it is required.
 
 ### Parameter Annotation
 
@@ -52,6 +52,8 @@ The framework automatically maps Java types to JSON Schema types:
 | boolean, Boolean                   | "boolean"        |
 | Other types                        | "Object"         |
 
+> Current limitation: although `required=false` is represented in the generated schema, omitted optional arguments are not yet handled correctly by the reflection invocation path. Until that is fixed, pass every annotated argument explicitly.
+
 
 ## Example Tool Implementations
 
@@ -66,7 +68,7 @@ public String echoString(@ToolArg(description = "The string to be echoed") Strin
 ### Parameterless Tool
 
 ```java
-@Tool(description = "Takes 10 seconds to complete")
+@Tool(description = "Takes 5 seconds to complete")
 public String longOperation() throws Exception {
     TimeUnit.SECONDS.sleep(5);
     return "ok";

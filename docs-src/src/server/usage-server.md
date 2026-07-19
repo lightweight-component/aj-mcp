@@ -68,10 +68,9 @@ public class MyServerFeatures {
 }
 ```
 
-## Server  Feature Management
+## Server Feature Management
 
-The Feature Management system operates through a centralized `FeatureMgr` class that coordinates package scanning, annotation processing, and feature
-storage.The system uses reflection to discover annotated methods and stores feature metadata in concurrent hash maps for thread-safe runtime access.
+Each server uses a `FeatureMgr` instance to coordinate package scanning, annotation processing, and feature storage. The stores are instance-scoped, so multiple servers in the same JVM do not share tools, resources, or prompts.
 
 ### Annotation System
 
@@ -86,8 +85,7 @@ The annotation system is built around several key annotations that mark classes 
 | @Prompt     | Method    | Exposes a method as an MCP prompt   |
 | @PromptArg  | Parameter | Defines prompt method parameters    |
 
-Server configuration includes annotation-driven feature discovery through `FeatureMgr.init()` with package scanning `FeatureMgr`. This automatically
-discovers and registers `@McpService` annotated classes containing `@Tool`, `@Resource`, and `@Prompt` methods.
+Calling `FeatureMgr.init()` scans a package and registers methods from classes annotated with `@McpService`. A class that cannot be loaded is logged and skipped without aborting the rest of the scan.
 
 ### Initialize Feature Manager
 
@@ -95,8 +93,8 @@ The `FeatureMgr.init()` method orchestrates the entire annotation discovery proc
 with `@McpService`.
 
 ```java
-FeatureMgr mgr=new FeatureMgr();
-        mgr.init("com.foo.myproduct");.
+FeatureMgr mgr = new FeatureMgr();
+mgr.init("com.foo.myproduct");
 ```
 
 ## Server Configuration
@@ -105,25 +103,25 @@ After feature manager initialization with package scanning, we can configure the
 
 - Server instance creation with transport layer setup
 - Server configuration with name and version
-- Connection timeout settings
 - The page size for paginated responses
 
-Server configuration is handled through the ServerConfig class, which contains essential server metadata `McpServerInitialize`. The configuration
-includes server name, version, and supported protocol versions `McpServerInitialize`.
+`ServerConfig` contains the server name, version, supported protocol versions, and page size.
 
-During initialization, the server processes protocol version negotiation where it responds with the highest supported version or matches the client's
-requested version if supported `McpServerInitialize`.
+During initialization, the server returns the requested protocol version when it is supported; otherwise, it returns its highest supported version.
 
 ```java
-FeatureMgr mgr=new FeatureMgr();
-        mgr.init("com.foo.myproduct");
+FeatureMgr mgr = new FeatureMgr();
+mgr.init("com.foo.myproduct");
 
-        McpServer server = new McpServer();
-        server.setTransport(new ServerStdio(server));
+McpServer server = new McpServer();
+server.setFeatureMgr(mgr);
+server.setTransport(new ServerStdio(server));
 
-        ServerConfig serverConfig = new ServerConfig();
-        serverConfig.setName("MY_MCP_Server");
-        serverConfig.setVersion("1.0");
-        serverConfig.setPageSize(8);
-        server.setServerConfig(serverConfig);
+ServerConfig serverConfig = new ServerConfig();
+serverConfig.setName("MY_MCP_Server");
+serverConfig.setVersion("1.0");
+serverConfig.setPageSize(8);
+server.setServerConfig(serverConfig);
+
+server.start();
 ```

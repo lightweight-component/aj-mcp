@@ -23,7 +23,7 @@ MCP provides several core capabilities:
 - Prompts: Templates for LLM interactions
 - Notifications: Event-based communication between server and client
 
-In short, MCP provides the rich and diverse context for LLM applications to interact with external resources and tools.
+In short, MCP gives LLM applications a standardized way to interact with external resources and tools.
 
 ## Architecture
 
@@ -31,8 +31,7 @@ The AJ MCP SDK is structured around several core components that work together t
 
 ![](/asset/imgs/a-1.jpg)
 
-The architecture follows a client-server model with flexible transport options. The client interacts with the server using JSON-RPC over either HTTP (
-with Server-Sent Events) or standard I/O pipes.
+The architecture follows a client-server model with flexible transport options. The client exchanges JSON-RPC messages over standard I/O pipes or the legacy HTTP/SSE transport implemented by this version.
 
 
 # Stdio Mode vs SSE Mode Comparison
@@ -41,6 +40,6 @@ with Server-Sent Events) or standard I/O pipes.
 |--------------------|-----------------------------|------------------------------|
 | **Deployment**     | Local subprocess            | Independent server           |
 | **Use Case**       | Local development           | Distributed environments     |
-| **Configuration**  | Complex                     | Simple                       |
+| **Configuration**  | Subprocess command required | HTTP endpoints required      |
 | **Multi-Client Support** | Not supported             | Supported                    |
 | **Network Requirement**  | None                      | Requires network connection  |

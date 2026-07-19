@@ -23,8 +23,7 @@ List<ToolItem> tools = mcpClient.listTools();
 assertEquals(7, tools.size());
 ```
 
-This method will fetch all tools across multiple pages without handling pagination.
-If you need more control over pagination, you can use the overloaded `listTools(int pageNo)` method instead.
+`listTools()` requests the first/default page. It does not automatically follow `nextCursor`. Use `listTools(int pageNo)` to request another page.
 
 ``` java
 List<ToolItem> tools = mcpClient.listTools(1);
@@ -40,42 +39,8 @@ String toolExecutionResultString = mcpClient.callTool("echoString", "{\"input\":
 assertEquals("hi", toolExecutionResultString);
 ```
 
-The `callTool()` method returns a CallToolResult containing the tool's response, which may include text, images, or other content types.
-
-<!--
-For tools that send progress notifications, you can provide a ProgressToken in the request metadata. You'll need to register a notification handler to
-receive these updates.
+The current `callTool()` convenience API returns a `String` assembled from text content. It does not expose image content through this method. Tool-level errors are returned as an error message string; transport and timeout failures follow the client exception/timeout behavior.
 
 ## Handling Notifications
 
-The client can receive notifications from the server using the OnNotification method:
-
-client.OnNotification(func(notification mcp.JSONRPCNotification) {
-// Handle notification
-if notification.Method == "notifications/progress" {
-// Handle progress notification
-}
-})
-
-You can register multiple notification handlers, which will be called in the order they were registered.
-
-For more detailed information on notification handling, see Handling Notifications.
-
-## Error Handling
-
-All client methods that communicate with the server can return errors. These errors can be:
-
-    Transport errors: Errors that occur in the transport layer
-    Protocol errors: Errors returned by the server
-    Parsing errors: Errors that occur when parsing responses
-
-It's important to check for errors after each client operation:
-
-result, err := client.SomeOperation(ctx, request)
-if err != nil {
-// Handle error
-return err
-}
-// Process result
-
--->
+The current Java client does not expose a public callback-registration API for progress or list-change notifications. See [Handling Notifications](handling-notifications) for the supported behavior.

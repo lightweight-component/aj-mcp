@@ -28,7 +28,7 @@ assertEquals("A nice pic", blob.getDescription(), "描述不符（'blob'）");
 ```
 
 
-此方法将跨多个页面获取所有的资源，并没有分页。如果你需要对分页进行更精细的控制，可以改用重载的`listResources(int pageNo)`方法。
+`listResources()` 请求并缓存第一页（默认页）。如需获取其他页，请调用 `listResources(int pageNo)`。各页独立缓存，请求第 2 页不会覆盖第 0 页。
 
 ``` java
 List<ResourceItem> resourceList = mcpClient.listResources(1);
@@ -63,8 +63,9 @@ assertEquals("file:///blob", blobContents.getUri(), "URI 应为 'file:///blob'")
 assertEquals("blob", blobContents.getBlob(), "二进制内容应为 'blob'");
 ```
 
-你也可以通过模板资源读取内容，即可传递参数给资源：
+SDK 已包含资源模板的协议模型，但当前版本尚未完整实现基于注解的模板注册和服务端分发。在服务端模板功能补齐前，请勿依赖下面的调用方式。
 
+<!--
 ```java
 GetResourceResult.ResourceResultDetail response = mcpClient.readResource("file:///text-template/hello");
 assertEquals(1, response.getContents().size(), "期望内容数量为 1");
@@ -75,6 +76,7 @@ ResourceContentText textContents = (ResourceContentText) contents;
 assertEquals("file:///text-template/hello", textContents.getUri(), "URI 应为 'file:///text-template/hello'");
 assertEquals("text hello", textContents.getText(), "文本内容应为 'text hello'");
 ```
+-->
 
 <!--
 ### 资源订阅

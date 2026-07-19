@@ -32,7 +32,7 @@ AJ-MCP 注解体系为将 Java 方法声明式地暴露为 MCP（模型上下文
 
 ```java
 @Resource(uri = "file:///text", description = "一段优美的文本", mimeType = "text/plain")
-public ResourceContentText text(){
+public ResourceContentText text() {
     ResourceContentText content = new ResourceContentText();
     content.setUri("file:///text");
     content.setMimeType("text/plain");
@@ -47,7 +47,7 @@ public ResourceContentText text(){
 
 ```java
 @Resource(uri = "file:///blob", description = "一张图片", mimeType = "image/jpg")
-public ResourceContentBinary blob(){
+public ResourceContentBinary blob() {
     String base64EncodedImage = ServerUtils.encodeImageToBase64("bird-eye.jpg");
 
     ResourceContentBinary content = new ResourceContentBinary();
@@ -61,7 +61,7 @@ public ResourceContentBinary blob(){
 
 ### 资源模板
 
-`@ResourceTemplate` 注解支持动态资源，采用符合 RFC 6570 URI 模板语法的参数化 URI。
+SDK 已包含 `@ResourceTemplate` 注解及相关协议模型，但当前版本尚未完整实现资源模板的自动注册和服务端分发。
 
 | 属性         | 是否必需 | 描述                          |
 |--------------|----------|-------------------------------|
@@ -70,5 +70,4 @@ public ResourceContentBinary blob(){
 | description  | 否       | 模板描述                      |
 | mimeType     | 否       | 内容的 MIME 类型              |
 
-模板方法可以接受与 URI 模板变量对应的参数。
-
+在 `FeatureMgr` 能够注册模板方法且服务端实现 `resources/templates/list` 分发之前，请将该注解视为预览 API。

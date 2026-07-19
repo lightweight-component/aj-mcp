@@ -15,7 +15,7 @@ AJ-MCP 通过注解在 `@McpService` 类中定义提示（Prompt）。`@Prompt` 
 
 ```java
 @Prompt(description = "基础简单提示")
-public PromptMessage basic(){
+public PromptMessage basic() {
     PromptMessage message = new PromptMessage();
     message.setRole(Role.USER);
     message.setContent(new ContentText("Hello"));
@@ -30,7 +30,7 @@ public PromptMessage basic(){
 
 ```java
 @Prompt(description = "返回两条消息的提示")
-public List<PromptMessage> multi(){
+public List<PromptMessage> multi() {
     PromptMessage message1 = new PromptMessage();
     message1.setRole(Role.USER);
     message1.setContent(new ContentText("first"));
@@ -49,7 +49,7 @@ public List<PromptMessage> multi(){
 
 ```java
 @Prompt(description = "带参数的提示")
-public PromptMessage parametrized(@PromptArg(description = "姓名") String name){
+public PromptMessage parametrized(@PromptArg(description = "姓名") String name) {
     PromptMessage message = new PromptMessage();
     message.setRole(Role.USER);
     message.setContent(new ContentText("Hello " + name));
@@ -85,4 +85,3 @@ Role 枚举用于定义提示消息中的角色：
 
 - USER —— 用户视角的消息
 - ASSISTANT —— AI 助手视角的消息
-- SYSTEM —— 系统指令或上下文消息

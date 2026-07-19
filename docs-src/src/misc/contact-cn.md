@@ -1,7 +1,7 @@
 ---
 title: Contact Us
 subTitle: 2024-12-05 by Frank Cheung
-description: TODO
+description: 联系 AJ MCP 维护者
 date: 2022-01-05
 tags:
   - last one

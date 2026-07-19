@@ -35,8 +35,7 @@ static PromptItem findPromptByName(String name, List<PromptItem> promptRefs) {
 }
 ```
 
-This method will fetch all prompts across multiple pages without handling pagination.
-If you need more control over pagination, you can use the overloaded `listPrompts(int pageNo)` method instead.
+`listPrompts()` requests and caches the first/default page. Use `listPrompts(int pageNo)` for another page. Each page is cached independently.
 
 ``` java
 List<PromptItem> prompts = mcpClient.listPrompts(1);
@@ -60,6 +59,6 @@ assertEquals("Hello", ((ContentText) message.getContent()).getText(), "Text cont
 The `getPrompt()` method returns a `PromptResultDetail` containing the prompt's description and messages.
 
 Normally, the prompt system receives a prompt name and a map of arguments. The arguments are used to fill in the placeholders in the prompt template.
-It accepts a map of arguments, where the key is the argument name and the value is the argument value. And JSON String also accepts.
+Arguments may be supplied as a map, where each key is an argument name, or as a JSON object string.
 
 If you don't want to use arguments, you can pass an empty map.

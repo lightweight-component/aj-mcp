@@ -41,8 +41,8 @@ layout: layouts/docs-cn.njk
 
 ```java
 // MCP 服务器是一个 Java 程序，使用标准输入输出运行。
-McpTransport transport=StdioTransport.builder()
-        .command(Arrays.asList("java","-jar","C:\\app\\my-app-jar-with-dependencies.jar"))
+McpTransport transport = StdioTransport.builder()
+        .command(Arrays.asList("java", "-jar", "C:\\app\\my-app-jar-with-dependencies.jar"))
         .logEvents(true)
         .build();
 ```
@@ -51,13 +51,13 @@ McpTransport transport=StdioTransport.builder()
 
 ```java
 // MCP 服务器是一个可执行程序，使用标准输入输出运行。
-McpTransport transport=StdioTransport.builder()
-        .command("C:\\app\\my-app.exe","-token","dd4df2sx32ds"))
+McpTransport transport = StdioTransport.builder()
+        .command(Arrays.asList("C:\\app\\my-app.exe", "-token", "dd4df2sx32ds"))
         .logEvents(true)
         .build();
 ```
 
-如果您希望查看客户端的完整日志，可以将 `logEvents` 设置为 `true`。这种方法有助于调试或更深入地理解 MCP 协议的基于 JSON 的消息格式。
+调试时可将 `logEvents` 设置为 `true`，以记录发出的协议消息。传输层也会持续消费子进程的 stderr，避免错误输出管道写满后阻塞子进程。
 
 ### SSE 传输
 
@@ -71,14 +71,14 @@ McpTransport transport=HttpMcpTransport.builder()
         .build();
 ```
 
-`SseUrl` 是必需的，它指定了 MCP 服务器监听传入连接的 SSE 端点 URL。
+`sseUrl` 是必需的，它指定 MCP 服务器的 SSE 端点 URL。
 
 ## MCP 客户端
 
 MCP 客户端充当本地应用程序与远程工具实现之间的桥梁。
 
 ```java
-McpClient mcpClient=McpClient.builder()
+McpClient mcpClient = McpClient.builder()
         .clientName("my-host")
         .clientVersion("1.2")
         .transport(transport)
@@ -97,27 +97,28 @@ McpClient mcpClient=McpClient.builder()
 | clientName      | 设置客户端在初始化消息中向 MCP 服务器标识自己的名称。                           | String   | myapp/foo-app            |
 | clientVersion   | 设置客户端在初始化消息中向 MCP 服务器标识自己的版本字符串。默认值为 "1.0"。             | String   | 1.0/2.1.2                |
 | protocolVersion | 设置客户端在初始化消息中声明的协议版本。当前默认值为 "2024-11-05"，但在后续版本中可能会有所更改。 | String   | 2024-11-05               |
-| requestTimeout  | 设置工具执行的超时时间。此值适用于每个工具执行。默认值为 60 秒，值为 0 表示没有超时。          | Duration | `Duration.ofSeconds(60)` |
+| requestTimeout  | 所有请求（包括初始化和健康检查）的超时时间。默认值为 60 秒；0 表示无限等待，负值不合法。       | Duration | `Duration.ofSeconds(60)` |
 
 请注意，在创建 McpClient 后，应立即调用 `mcpClient.initialize();`。关于初始化工作将在下一小节介绍。
 
 ```java
-McpClient mcpClient=McpClient.builder()
+McpClient mcpClient = McpClient.builder()
         .clientName("my-host")
         .clientVersion("1.2")
         .transport(sseTransport)
         .build();
 
-        mcpClient.initialize();
+mcpClient.initialize();
 ```
 
-最后，请记得在不再需要 MCP 客户端时，通过调用 `close()` 方法或使用自动关闭资源的方式来释放客户端资源。
+不再使用客户端时应调用 `close()`。关闭操作会释放 HTTP/SSE 请求或 Stdio 子进程，并使尚未完成的请求以异常结束。
 
 ```java
-try(IMcpClient mcpClient2=McpClient.builder().transport(transport).build()) {
-     ...
-}catch(Exception e){
-     throw new RuntimeException(e);
+try (IMcpClient mcpClient2 = McpClient.builder().transport(transport).build()) {
+    mcpClient2.initialize();
+    ...
+} catch (Exception e) {
+    throw new RuntimeException(e);
 }
 ```
 

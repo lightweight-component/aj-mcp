@@ -18,13 +18,13 @@ message with role and content.
 
 ```java
 @Prompt(description = "Basic simple prompt")
-public PromptMessage basic(){
-        PromptMessage message=new PromptMessage();
-        message.setRole(Role.USER);
-        message.setContent(new ContentText("Hello"));
+public PromptMessage basic() {
+    PromptMessage message = new PromptMessage();
+    message.setRole(Role.USER);
+    message.setContent(new ContentText("Hello"));
 
-        return message;
-        }
+    return message;
+}
 ```
 
 ## Multi-Message Prompts
@@ -34,17 +34,17 @@ role-based interactions.
 
 ```java
 @Prompt(description = "Prompt that returns two messages")
-public List<PromptMessage> multi(){
-        PromptMessage message1=new PromptMessage();
-        message1.setRole(Role.USER);
-        message1.setContent(new ContentText("first"));
+public List<PromptMessage> multi() {
+    PromptMessage message1 = new PromptMessage();
+    message1.setRole(Role.USER);
+    message1.setContent(new ContentText("first"));
 
-        PromptMessage message2=new PromptMessage();
-        message2.setRole(Role.USER);
-        message2.setContent(new ContentText("second"));
+    PromptMessage message2 = new PromptMessage();
+    message2.setRole(Role.USER);
+    message2.setContent(new ContentText("second"));
 
-        return Arrays.asList(message1,message2);
-        }   
+    return Arrays.asList(message1, message2);
+}
 ```
 
 ## Parameterized Prompts
@@ -54,13 +54,13 @@ retrieving the prompt.
 
 ```java
 @Prompt(description = "Parametrized prompt")
-public PromptMessage parametrized(@PromptArg(description = "The name") String name){
-        PromptMessage message=new PromptMessage();
-        message.setRole(Role.USER);
-        message.setContent(new ContentText("Hello "+name));
+public PromptMessage parametrized(@PromptArg(description = "The name") String name) {
+    PromptMessage message = new PromptMessage();
+    message.setRole(Role.USER);
+    message.setContent(new ContentText("Hello " + name));
 
-        return message;
-        }
+    return message;
+}
 ```
 
 ## Content Types and Rich Media
@@ -91,4 +91,3 @@ The Role enum defines message roles in prompt conversations:
 
 - USER - Messages from the user perspective
 - ASSISTANT - Messages from the AI assistant perspective
-- SYSTEM - System-level instructions or context

@@ -24,10 +24,10 @@ MCP 是一个基于协议的框架，因此应具有更强的通用性，满足�
 
 | 框架名称                | 所需 JDK 版本 |
 |---------------------|-----------|
-| 官方 Java MCP SDK     | jdk17+    |
-| Spring AI MCP       | jdk17+    |
-| Quarkus MCP 服务器     | jdk17+    |
-| langchain4j-mcp 客户端 | jdk11+    |
+| 官方 Java MCP SDK     | JDK 17+   |
+| Spring AI MCP       | JDK 17+   |
+| Quarkus MCP 服务器     | JDK 17+   |
+| langchain4j-mcp 客户端 | JDK 11+   |
 
 考虑到仍有大量服务器运行在 JDK 8 上，使用 Java 8 开发 MCP（或 MCP 服务器）对于确保广泛兼容性和灵活性至关重要——这才是 MCP 真正意义上的自由。
 

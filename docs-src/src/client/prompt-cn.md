@@ -33,11 +33,11 @@ static PromptItem findPromptByName(String name, List<PromptItem> promptRefs) {
 }
 ```
 
-此方法将跨多个页面获取所有的提示，并没有分页。如果你需要对分页进行更精细的控制，可以改用重载的`listPrompts(int pageNo)`方法。
+`listPrompts()` 请求并缓存第一页（默认页）。如需获取其他页，请调用 `listPrompts(int pageNo)`；各页缓存彼此独立。
 
 ``` java
 List<PromptItem> prompts = mcpClient.listPrompts(1);
-assertEquals(3, prompts.size(), "Expected 3 prompts");
+assertEquals(3, prompts.size(), "期望返回 3 个提示");
 ```
 
 # 获取提示详情

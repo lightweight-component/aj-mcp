@@ -36,6 +36,7 @@ public class StandaloneTomcat {
         mgr.init("com.foo.myapp");
 
         McpServer server = new McpServer();
+        server.setFeatureMgr(mgr);
         ServerSse serverSse = new ServerSse(server);
         server.setTransport(serverSse);
 
@@ -68,8 +69,8 @@ public class StandaloneTomcat {
 
         // Configure connectionTimeout and keepAliveTimeout
         Connector connector = tomcat.getConnector();
-        connector.setProperty("connectionTimeout", "60000"); // 20 seconds
-        connector.setProperty("keepAliveTimeout", "60000"); // 30 seconds
+        connector.setProperty("connectionTimeout", "60000"); // 60 秒
+        connector.setProperty("keepAliveTimeout", "60000"); // 60 秒
         connector.setProperty("maxKeepAliveRequests", "100"); // Optional: Max requests per connection
 
         tomcat.start();
@@ -81,7 +82,7 @@ public class StandaloneTomcat {
 
 ## Spring 应用集成
 
-Spring 配置演示了依赖注入的设置方式，见 `Config.java:12-29`，其中 ServerSse Bean 按相同模式配置，但由 Spring 容器管理。
+Spring 配置采用相同的初始化方式，并由 Spring 容器管理 `ServerSse` Bean。
 
 
 ```java
@@ -102,6 +103,7 @@ public class Config {
         mgr.init("com.foo.myapp");
 
         McpServer server = new McpServer();
+        server.setFeatureMgr(mgr);
         ServerSse serverSse = new ServerSse(server);
         server.setTransport(serverSse);
 
@@ -118,7 +120,9 @@ public class Config {
 ```
 ## 设计说明
 
-对于基于 SSE 的 MCP 服务器，有两个端点需要了解：
+旧版 HTTP/SSE 传输包含两个端点：
 
-- **SSE Url**：这是客户端最初连接的端点，在初始化时使用。在此初始化过程中，服务器会返回一个 POST Url（第二个端点）。
-- **POST Url**：这是 MCP 业务的实际端点，客户端将请求发送到该端点，服务器也会通过该端点返回响应。它同样是一个 SSE 端点。
+- **SSE URL**：客户端首先建立该连接。服务端通过 `openSession(clientId, writer, postPath)` 注册会话，并发送包含 POST 路径的 `endpoint` 事件。
+- **POST URL**：客户端把 JSON-RPC 请求发送到该端点。控制器调用 `serverSse.handle(clientId, json)`；响应只写回发起请求的 SSE 会话，不写入 POST 响应，也不会广播给其他客户端。
+
+`ServerSse.start()` 会启动一个共享的心跳调度器，不要为每个 HTTP 请求单独创建心跳线程。请求结束时应移除对应会话，应用关闭时应关闭 `ServerSse`。

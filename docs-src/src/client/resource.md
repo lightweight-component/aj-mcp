@@ -30,8 +30,7 @@ assertEquals("A nice pic", blob.getDescription(), "Description mismatch for 'blo
 ```
 
 
-This method will fetch all resources across multiple pages without handling pagination. 
-If you need more control over pagination, you can use the overloaded `listResources(int pageNo)` method instead.
+`listResources()` requests and caches the first/default page. Use `listResources(int pageNo)` for another page. Each page is cached independently, so requesting page 2 does not overwrite page 0.
 
 ``` java
 List<ResourceItem> resourceList = mcpClient.listResources(1);
@@ -68,8 +67,9 @@ assertEquals("file:///blob", blobContents.getUri(), "URI should be 'file:///blob
 assertEquals("blob", blobContents.getBlob(), "Blob content should be 'blob'");
 ```
 
-You can read the resource with template, that means, you can pass any parameters to the resource.
+Resource-template protocol models exist in the SDK, but annotation-based resource-template registration and server dispatch are not complete in this version. Do not rely on the following pattern until server-side template support is implemented.
 
+<!--
 ``` java
 GetResourceResult.ResourceResultDetail response = mcpClient.readResource("file:///text-template/hello");
 assertEquals(1, response.getContents().size(), "Expected exactly one content");
@@ -80,6 +80,7 @@ ResourceContentText textContents = (ResourceContentText) contents;
 assertEquals("file:///text-template/hello", textContents.getUri(), "URI should be 'file:///text-template/hello'");
 assertEquals("text hello", textContents.getText(), "Text content should be 'text hello'");
 ```
+-->
 
 <!--
 ### Resource Subscriptions

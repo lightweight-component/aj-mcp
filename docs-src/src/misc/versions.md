@@ -1,20 +1,27 @@
 ---
 title: Release History
 subTitle: 2024-12-05 by Frank Cheung
-description: TODO
+description: AJ MCP SDK release history
 date: 2022-01-05
 tags:
-  - last one
+  - releases
 layout: layouts/docs.njk
 ---
-    <h1>Release History</h1>
-    <h3>aj-mcp-common v1.5/aj-mcp-client v1.3 /aj-mcp-server v1.2 <span class="release-date">2025-06-10</span></h3>
 
-    <ul>
-        <li>Added the pagination. [Sepc.](https://modelcontextprotocol.io/specification/2024-11-05/server/utilities/pagination)</li>
-    </ul>
-    <h3>v1.0 <span class="release-date">2025-06-1</span></h3>
+# Release History
 
-    <ul>
-        <li>First Release</li>
-    </ul>
+## Unreleased maintenance changes
+
+- Fixed HTTP response leaks and pending-request cleanup after SSE or stdio failures.
+- Completed stdio and server-side SSE shutdown lifecycles.
+- Corrected notification response behavior and request timeout consistency.
+- Isolated feature stores per server and made package scanning tolerate unloadable optional classes.
+- Added per-page caches for prompt, resource, and resource-template lists.
+
+## aj-mcp-common 1.5 / aj-mcp-client 1.3 / aj-mcp-server 1.2 — 2025-06-10
+
+- Added [pagination support](https://modelcontextprotocol.io/specification/2024-11-05/server/utilities/pagination).
+
+## 1.0 — 2025-06-01
+
+- Initial release.

@@ -19,7 +19,7 @@ AJ MCP 的工具系统提供了一种结构化方式，用于定义可被客户�
 List<ToolItem> tools = mcpClient.listTools();
 assertEquals(7, tools.size());
 ```
-此方法将跨多个页面获取所有的工具，并没有分页。如果你需要对分页进行更精细的控制，可以改用重载的`listTools(int pageNo)`方法。
+`listTools()` 请求第一页（默认页），不会自动跟随 `nextCursor`。如需获取其他页，请调用 `listTools(int pageNo)`。
 
 ``` java
 List<ToolItem> tools = mcpClient.listTools(1);
@@ -34,41 +34,8 @@ String toolExecutionResultString = mcpClient.callTool("echoString", "{\"input\":
 assertEquals("hi", toolExecutionResultString);
 ```
 
-`callTool()` 方法返回一个 CallToolResult，包含工具的响应内容，可能是文本、图片或其他内容类型。
-
-<!--
-对于支持进度通知的工具，可以在请求元数据中提供 ProgressToken，并注册通知处理器来接收进度更新。
+当前 `callTool()` 便捷接口返回由文本内容拼接而成的 `String`，不会通过该方法暴露图片内容。工具业务错误会转换为错误消息字符串；传输错误和超时则遵循客户端的异常与超时处理逻辑。
 
 ## 通知处理
 
-客户端可通过 OnNotification 方法接收来自服务器的通知：
-
-client.OnNotification(func(notification mcp.JSONRPCNotification) {
-    // 处理通知
-    if notification.Method == "notifications/progress" {
-        // 处理进度通知
-    }
-})
-
-你可以注册多个通知处理器，按注册顺序依次调用。
-
-详细通知处理机制请参阅通知处理文档。
-
-## 错误处理
-
-所有与服务器通信的客户端方法均可能返回错误，包括：
-
-- 传输错误：传输层发生的问题
-- 协议错误：服务器返回的错误
-- 解析错误：解析响应时发生的错误
-
-建议在每次客户端操作后检查错误：
-
-result, err := client.SomeOperation(ctx, request)
-if err != nil {
-    // 处理错误
-    return err
-}
-// 处理结果
-
--->
+当前 Java 客户端尚未公开进度通知或列表变更通知的回调注册 API。已支持的行为请参阅[通知处理](handling-notifications-cn)。
