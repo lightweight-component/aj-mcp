@@ -4,11 +4,11 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.io.Writer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -20,17 +20,17 @@ class TestServerSseLifecycle {
         transport.addConnections("client", new PrintWriter(output));
 
         transport.heartbeat();
-        Object executor = transport.getHeartbeatExecutor();
+        assertTrue(transport.isHeartbeatRunning());
         transport.heartbeat();
 
-        assertNotNull(executor);
-        assertEquals(executor, transport.getHeartbeatExecutor());
+        assertTrue(transport.isHeartbeatRunning());
 
         transport.close();
 
         assertTrue(output.closed);
-        assertTrue(transport.getConnections().isEmpty());
-        assertTrue(transport.getClosed().get());
+        assertEquals(0, transport.getSessionCount());
+        assertTrue(transport.isClosed());
+        assertFalse(transport.isHeartbeatRunning());
         assertThrows(IllegalStateException.class,
                 () -> transport.addConnections("late", new PrintWriter(new TrackingWriter(false))));
         transport.close();
@@ -44,8 +44,28 @@ class TestServerSseLifecycle {
 
         transport.broadcast("heartbeat");
 
-        assertFalse(transport.getConnections().containsKey("broken"));
+        assertEquals(0, transport.getSessionCount());
         assertTrue(output.closed);
+    }
+
+    @Test
+    void sessionOpeningAndResponsesAreTargeted() throws Exception {
+        ServerSse transport = new ServerSse(new McpServer());
+        StringWriter firstOutput = new StringWriter();
+        StringWriter secondOutput = new StringWriter();
+
+        transport.openSession("first", new PrintWriter(firstOutput), "message?uuid=first");
+        transport.openSession("second", new PrintWriter(secondOutput), "message?uuid=second");
+        transport.returnMessage("first", "{\"id\":1}");
+
+        assertEquals("event: endpoint\ndata: message?uuid=first\n\n"
+                + "event: message\ndata: {\"id\":1}\n\n", firstOutput.toString());
+        assertEquals("event: endpoint\ndata: message?uuid=second\n\n", secondOutput.toString());
+        assertTrue(transport.isSessionOpen("first"));
+
+        transport.removeConnection("first");
+        assertFalse(transport.isSessionOpen("first"));
+        transport.close();
     }
 
     private static class TrackingWriter extends Writer {

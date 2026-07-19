@@ -15,7 +15,6 @@ public class MessageController {
     @PostMapping("/message")
     public void handleJson(@RequestBody String json, @RequestParam String uuid) {
         System.out.println("Received JSON: " + json);
-        String data = serverSse.handle(json);
-        serverSse.returnMessage(uuid, data);
+        serverSse.handle(uuid, json);
     }
 }

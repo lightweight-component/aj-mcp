@@ -24,8 +24,7 @@ public class MessageServlet extends HttpServlet {
 
         String body = getBody(req);
         System.out.println(body);
-        String data = serverSse.handle(body);
-        serverSse.returnMessage(uuid, data);
+        serverSse.handle(uuid, body);
     }
 
     static String getBody(HttpServletRequest req) throws IOException {

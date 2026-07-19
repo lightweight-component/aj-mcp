@@ -30,18 +30,12 @@ public class SseServlet extends HttpServlet {
 
         try {
             writer = resp.getWriter();
-            writer.write("event: endpoint\n");
             String endpointPath = "message?uuid=" + uuid;
+            serverSse.openSession(uuid, writer, endpointPath);
 
-            serverSse.addConnections(uuid, writer);
-            writer.write("data: " + endpointPath + "\n\n");
-            writer.flush();
-
-            // Periodically send heartbeat messages
-            while (!Thread.interrupted()) {
+            while (serverSse.isSessionOpen(uuid) && !Thread.currentThread().isInterrupted()) {
                 try {
-                    ServerSse.output(writer, "ping"); // Send a heartbeat
-                    Thread.sleep(3000);// Simulate periodic updates (every 15 seconds)
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
@@ -49,11 +43,7 @@ public class SseServlet extends HttpServlet {
         } catch (IOException e) {
             log.warn("Error on SSE handle: {}", e.getMessage());
         } finally {
-            // Remove the connection when done
-//            removeConnection(uuid);
-//
-//            if (writer != null)
-//                writer.close();
+            serverSse.removeConnection(uuid);
         }
 
         // Optionally close the stream, or leave open for continuous events

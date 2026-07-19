@@ -17,6 +17,7 @@ public class StandaloneTomcat {
         mgr.init("com.foo.myapp");
 
         McpServer server = new McpServer();
+        server.setFeatureMgr(mgr);
         ServerSse serverSse = new ServerSse(server);
         server.setTransport(serverSse);
 
