@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Base Class for MCP Client, mainly doing the initialize job.
@@ -58,11 +57,11 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
 
     final AtomicLong idGenerator = new AtomicLong(1);
 
-    final AtomicReference<List<ResourceItem>> resourceRefs = new AtomicReference<>();
+    final Map<Integer, List<ResourceItem>> resourceRefs = new ConcurrentHashMap<>();
 
-    final AtomicReference<List<ResourceTemplate>> resourceTemplateRefs = new AtomicReference<>();
+    final Map<Integer, List<ResourceTemplate>> resourceTemplateRefs = new ConcurrentHashMap<>();
 
-    final AtomicReference<List<PromptItem>> promptRefs = new AtomicReference<>();
+    final Map<Integer, List<PromptItem>> promptRefs = new ConcurrentHashMap<>();
 
     @Override
     public void initialize() {

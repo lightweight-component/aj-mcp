@@ -19,18 +19,12 @@ import java.util.concurrent.TimeoutException;
 public abstract class McpClientResource extends McpClientPrompt {
     @Override
     public List<ResourceItem> listResources() {
-        if (resourceRefs.get() == null)
-            obtainResourceList(0);
-
-        return resourceRefs.get();
+        return obtainResourceList(0);
     }
 
     @Override
     public List<ResourceItem> listResources(int pageNo) {
-        if (resourceRefs.get() == null)
-            obtainResourceList(pageNo);
-
-        return resourceRefs.get();
+        return obtainResourceList(pageNo);
     }
 
     @Override
@@ -57,18 +51,12 @@ public abstract class McpClientResource extends McpClientPrompt {
 
     @Override
     public List<ResourceTemplate> listResourceTemplates() {
-        if (resourceTemplateRefs.get() == null)
-            obtainResourceTemplateList(0);
-
-        return resourceTemplateRefs.get();
+        return obtainResourceTemplateList(0);
     }
 
     @Override
     public List<ResourceTemplate> listResourceTemplates(int pageNo) {
-        if (resourceTemplateRefs.get() == null)
-            obtainResourceTemplateList(pageNo);
-
-        return resourceTemplateRefs.get();
+        return obtainResourceTemplateList(pageNo);
     }
 
     /**
@@ -87,9 +75,10 @@ public abstract class McpClientResource extends McpClientPrompt {
      *
      * @throws RuntimeException if the request execution, interruption, or timeout occurs
      */
-    private synchronized void obtainResourceList(int pageNo) {
-        if (resourceRefs.get() != null)
-            return;
+    private synchronized List<ResourceItem> obtainResourceList(int pageNo) {
+        List<ResourceItem> cached = resourceRefs.get(pageNo);
+        if (cached != null)
+            return cached;
 
         GetResourceListRequest request = new GetResourceListRequest();
         request.setId(idGenerator.getAndIncrement());
@@ -100,7 +89,9 @@ public abstract class McpClientResource extends McpClientPrompt {
         try {
             CompletableFuture<JsonNode> resultFuture = transport.sendRequestWithResponse(request);
             JsonNode result = awaitResponse(resultFuture);
-            resourceRefs.set(parseResourceRefs(result));
+            List<ResourceItem> resources = parseResourceRefs(result);
+            resourceRefs.put(pageNo, resources);
+            return resources;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
@@ -111,9 +102,10 @@ public abstract class McpClientResource extends McpClientPrompt {
         }
     }
 
-    private synchronized void obtainResourceTemplateList(int pageNo) {
-        if (resourceTemplateRefs.get() != null)
-            return;
+    private synchronized List<ResourceTemplate> obtainResourceTemplateList(int pageNo) {
+        List<ResourceTemplate> cached = resourceTemplateRefs.get(pageNo);
+        if (cached != null)
+            return cached;
 
         GetResourceTemplateListRequest request = new GetResourceTemplateListRequest();
         request.setId(idGenerator.getAndIncrement());
@@ -123,7 +115,9 @@ public abstract class McpClientResource extends McpClientPrompt {
         try {
             CompletableFuture<JsonNode> resultFuture = transport.sendRequestWithResponse(request);
             JsonNode result = awaitResponse(resultFuture);
-            resourceTemplateRefs.set(parseResourceTemplateRefs(result));
+            List<ResourceTemplate> templates = parseResourceTemplateRefs(result);
+            resourceTemplateRefs.put(pageNo, templates);
+            return templates;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);

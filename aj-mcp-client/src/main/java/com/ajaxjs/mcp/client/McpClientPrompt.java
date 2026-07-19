@@ -27,18 +27,12 @@ import java.util.concurrent.TimeoutException;
 public abstract class McpClientPrompt extends McpClientBase {
     @Override
     public List<PromptItem> listPrompts() {
-        if (promptRefs.get() == null)
-            obtainPromptList(0);
-
-        return promptRefs.get();
+        return obtainPromptList(0);
     }
 
     @Override
     public List<PromptItem> listPrompts(int pageNo) {
-        if (promptRefs.get() == null)
-            obtainPromptList(pageNo);
-
-        return promptRefs.get();
+        return obtainPromptList(pageNo);
     }
 
 
@@ -48,9 +42,10 @@ public abstract class McpClientPrompt extends McpClientBase {
      * If promptRefs is not empty, it returns directly to avoid redundant fetching.
      * A synchronized mechanism is used to ensure thread-safe access to the prompt list in a multithreading environment.
      */
-    private synchronized void obtainPromptList(int pageNo) {
-        if (promptRefs.get() != null)
-            return;
+    private synchronized List<PromptItem> obtainPromptList(int pageNo) {
+        List<PromptItem> cached = promptRefs.get(pageNo);
+        if (cached != null)
+            return cached;
 
         GetPromptListRequest request = new GetPromptListRequest();
         request.setId(idGenerator.getAndIncrement());
@@ -63,7 +58,8 @@ public abstract class McpClientPrompt extends McpClientBase {
             JsonNode result = awaitResponse(resultFuture);
 
             List<PromptItem> promptItems = parsePromptRefs(result);
-            promptRefs.set(promptItems);
+            promptRefs.put(pageNo, promptItems);
+            return promptItems;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
