@@ -59,6 +59,7 @@ public class StdioTransport extends McpTransport {
 
         Process startedProcess = process;
         stdoutReaderThread = new Thread(() -> {
+            IOException channelFailure = null;
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(startedProcess.getInputStream()))) {
                 String line;
 
@@ -69,8 +70,16 @@ public class StdioTransport extends McpTransport {
                     handle(JsonUtils.json2Node(line));
                 }
             } catch (IOException e) {
-                if (!closed)
+                if (!closed) {
+                    channelFailure = e;
                     log.warn("IOException while reading MCP process output.", e);
+                }
+            } finally {
+                if (!closed) {
+                    if (channelFailure == null)
+                        channelFailure = new IOException("MCP process stdout closed unexpectedly");
+                    failPendingRequests(channelFailure);
+                }
             }
 
             log.debug("MCP process stdout reader has stopped");
@@ -131,7 +140,8 @@ public class StdioTransport extends McpTransport {
         log.info("JSON RPC {}", request);
         CompletableFuture<JsonNode> future = new CompletableFuture<>();
 
-        if (closed || out == null) {
+        Process currentProcess = process;
+        if (closed || out == null || currentProcess == null || !currentProcess.isAlive()) {
             future.completeExceptionally(new IllegalStateException("StdioTransport is not running"));
             return future;
         }
@@ -145,6 +155,13 @@ public class StdioTransport extends McpTransport {
                 log.debug("> {}", request);
 
             out.println(request); // 输入命令
+            if (out.checkError() || !currentProcess.isAlive()) {
+                IOException failure = new IOException("Failed to write request because the MCP process has stopped");
+                failPendingRequests(failure);
+                future.completeExceptionally(failure);
+                return future;
+            }
+
             // 如果没有 id 的消息，那么表示不用等待响应 For messages with null ID, we don't wait for a corresponding response
             if (id == null)
                 future.complete(null);
