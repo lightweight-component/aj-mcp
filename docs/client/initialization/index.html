@@ -54,6 +54,9 @@
                      <li>
                        <a href="/client/tool">Tools Usage</a>
                     </li>
+                    <li>
+                       <a href="/client/handling-notifications">Notifications</a>
+                    </li>
                 </ul>
                 <h3>MCP Server SDK</h3>
                 <ul>
@@ -82,18 +85,15 @@
             </menu>
             <article>
                 <h1>Initializing the Protocol</h1>
-<p>After creating a client, you need to initialize it before using it to communicate with the server,
-that means, before making any requests, you must initialize the protocol by calling the <code>initialize()</code> method.
-The <code>initialize();</code> method initializes the transport and sets up notification handling.</p>
+<p>After creating a client, call <code>initialize()</code> before sending any other protocol request. It starts the transport, negotiates the protocol version and capabilities, and sends the <code>notifications/initialized</code> notification.</p>
 <p>The Initialize method:</p>
 <ol>
 <li>Sends an initialize request to the server</li>
-<li>Stores the server's capabilities</li>
+<li>Logs the server's initialization result</li>
 <li>Sends an &quot;initialized&quot; notification</li>
-<li>Marks the client as initialized</li>
 </ol>
 <p>After successful initialization, the client can make other requests to the server.</p>
-<p>After creating the McpClient, you should call the <code>initialize();</code> right away.</p>
+<p>Call <code>initialize()</code> immediately after building the <code>McpClient</code>. Initialization uses the configured <code>requestTimeout</code>; zero means wait indefinitely.</p>
 <pre><code class="language-java">McpClient mcpClient = McpClient.builder()
         .clientName(&quot;my-host&quot;)
         .clientVersion(&quot;1.2&quot;)

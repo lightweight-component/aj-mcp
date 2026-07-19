@@ -54,6 +54,9 @@
                      <li>
                        <a href="/client/tool">Tools Usage</a>
                     </li>
+                    <li>
+                       <a href="/client/handling-notifications">Notifications</a>
+                    </li>
                 </ul>
                 <h3>MCP Server SDK</h3>
                 <ul>
@@ -87,41 +90,41 @@
 <p>Simple prompts return a single <code>PromptMessage</code> with text content. The <code>@Prompt</code> annotation requires a description and the method returns a configured
 message with role and content.</p>
 <pre><code class="language-java">@Prompt(description = &quot;Basic simple prompt&quot;)
-public PromptMessage basic(){
-        PromptMessage message=new PromptMessage();
-        message.setRole(Role.USER);
-        message.setContent(new ContentText(&quot;Hello&quot;));
+public PromptMessage basic() {
+    PromptMessage message = new PromptMessage();
+    message.setRole(Role.USER);
+    message.setContent(new ContentText(&quot;Hello&quot;));
 
-        return message;
-        }
+    return message;
+}
 </code></pre>
 <h2>Multi-Message Prompts</h2>
 <p>Prompts can return multiple messages by returning a <code>List&lt;PromptMessage&gt;</code>. This enables creating conversation-style prompts with multiple turns or
 role-based interactions.</p>
 <pre><code class="language-java">@Prompt(description = &quot;Prompt that returns two messages&quot;)
-public List&lt;PromptMessage&gt; multi(){
-        PromptMessage message1=new PromptMessage();
-        message1.setRole(Role.USER);
-        message1.setContent(new ContentText(&quot;first&quot;));
+public List&lt;PromptMessage&gt; multi() {
+    PromptMessage message1 = new PromptMessage();
+    message1.setRole(Role.USER);
+    message1.setContent(new ContentText(&quot;first&quot;));
 
-        PromptMessage message2=new PromptMessage();
-        message2.setRole(Role.USER);
-        message2.setContent(new ContentText(&quot;second&quot;));
+    PromptMessage message2 = new PromptMessage();
+    message2.setRole(Role.USER);
+    message2.setContent(new ContentText(&quot;second&quot;));
 
-        return Arrays.asList(message1,message2);
-        }   
+    return Arrays.asList(message1, message2);
+}
 </code></pre>
 <h2>Parameterized Prompts</h2>
 <p>Prompts can accept parameters using the <code>@PromptArg</code> annotation. Parameters become available to clients when listing prompts and are passed when
 retrieving the prompt.</p>
 <pre><code class="language-java">@Prompt(description = &quot;Parametrized prompt&quot;)
-public PromptMessage parametrized(@PromptArg(description = &quot;The name&quot;) String name){
-        PromptMessage message=new PromptMessage();
-        message.setRole(Role.USER);
-        message.setContent(new ContentText(&quot;Hello &quot;+name));
+public PromptMessage parametrized(@PromptArg(description = &quot;The name&quot;) String name) {
+    PromptMessage message = new PromptMessage();
+    message.setRole(Role.USER);
+    message.setContent(new ContentText(&quot;Hello &quot; + name));
 
-        return message;
-        }
+    return message;
+}
 </code></pre>
 <h2>Content Types and Rich Media</h2>
 <p>Prompts support multiple content types beyond text, including images and embedded resources. Each content type has specific properties and encoding
@@ -194,7 +197,6 @@ requirements.</p>
 <ul>
 <li>USER - Messages from the user perspective</li>
 <li>ASSISTANT - Messages from the AI assistant perspective</li>
-<li>SYSTEM - System-level instructions or context</li>
 </ul>
 
             </article>

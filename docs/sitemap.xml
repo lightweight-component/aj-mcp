@@ -12,6 +12,16 @@
         </url>
     
         <url>
+            <loc>https://mcp.ajaxjs.com/client/handling-notifications-cn/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://mcp.ajaxjs.com/client/handling-notifications/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
             <loc>https://mcp.ajaxjs.com/client/initialization-cn/</loc>
             <lastmod>2022-01-05T00:00:00.000Z</lastmod>
         </url>
@@ -143,27 +153,22 @@
     
         <url>
             <loc>https://mcp.ajaxjs.com/asset/style/common.css</loc>
-            <lastmod>2025-06-25T01:24:34.533Z</lastmod>
+            <lastmod>2025-05-20T23:55:38.024Z</lastmod>
         </url>
     
         <url>
             <loc>https://mcp.ajaxjs.com/baidu_verify_codeva-05U1Ak03ZG/</loc>
-            <lastmod>2025-06-25T01:24:34.534Z</lastmod>
-        </url>
-    
-        <url>
-            <loc>https://mcp.ajaxjs.com/client/handling-notifications/</loc>
-            <lastmod>2025-06-25T01:24:34.534Z</lastmod>
+            <lastmod>2025-05-31T08:53:31.720Z</lastmod>
         </url>
     
         <url>
             <loc>https://mcp.ajaxjs.com/google9ecf72d780b8e5c8/</loc>
-            <lastmod>2025-06-25T01:24:34.538Z</lastmod>
+            <lastmod>2025-06-07T07:52:05.149Z</lastmod>
         </url>
     
         <url>
             <loc>https://mcp.ajaxjs.com/asset/style/main.css</loc>
-            <lastmod>2025-07-14T10:00:19.097Z</lastmod>
+            <lastmod>2025-08-05T14:44:10.356Z</lastmod>
         </url>
     
 </urlset>

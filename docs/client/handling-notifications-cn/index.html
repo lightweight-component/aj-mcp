@@ -3,9 +3,9 @@
     <head>
         <meta charset="utf-8"/>
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-        <title>AJ MCP SDK/MCP Server SDK 资源内容</title>
-        <meta name="description" content="轻量级的 Java 8 Model Context Protocol (MCP) SDK. MCP Server SDK 资源内容"/>
-        <meta name="keywords" content="mcp, mcp sdk, java mcp, mcp client, mcp server, java8 mcp, 资源内容"/>
+        <title>AJ MCP SDK/通知处理</title>
+        <meta name="description" content="轻量级的 Java 8 Model Context Protocol (MCP) SDK. AJ MCP 客户端的通知行为"/>
+        <meta name="keywords" content="mcp, mcp sdk, java mcp, mcp client, mcp server, java8 mcp, 通知"/>
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
         <link rel="stylesheet" href="/asset/style/main.css"/>
         <link rel="icon" type="image/png" href="/asset/favicon.ico"/>
@@ -83,102 +83,10 @@
                 </ul>
             </menu>
             <article>
-                <h1>MCP 服务器 SDK 功能管理</h1>
-<p>AJ-MCP 注解体系为将 Java 方法声明式地暴露为 MCP（模型上下文协议，Model Context Protocol）工具、资源和提示提供了便捷方式。该体系通过 Java 注解自动发现和注册功能，无需手动配置或注册代码。</p>
-<h2>资源开发</h2>
-<p>资源通过在 <code>@McpService</code> 类中的方法上添加 <code>@Resource</code> 注解进行暴露。注解体系会在服务器初始化时自动发现和注册这些资源。</p>
-<p><code>@Resource</code> 注解将方法暴露为 MCP 资源，具有以下属性：</p>
-<table>
-<thead>
-<tr>
-<th>属性</th>
-<th>是否必需</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>uri</td>
-<td>是</td>
-<td>资源的唯一标识符</td>
-</tr>
-<tr>
-<td>description</td>
-<td>否</td>
-<td>人类可读的描述</td>
-</tr>
-<tr>
-<td>mimeType</td>
-<td>否</td>
-<td>资源内容的 MIME 类型</td>
-</tr>
-<tr>
-<td>value</td>
-<td>否</td>
-<td>人类可读的名称（默认为空）</td>
-</tr>
-</tbody>
-</table>
-<h3>资源内容类型</h3>
-<h4>文本资源</h4>
-<p>文本资源返回包含纯文本或结构化文本数据的 <code>ResourceContentText</code> 对象。</p>
-<pre><code class="language-java">@Resource(uri = &quot;file:///text&quot;, description = &quot;一段优美的文本&quot;, mimeType = &quot;text/plain&quot;)
-public ResourceContentText text() {
-    ResourceContentText content = new ResourceContentText();
-    content.setUri(&quot;file:///text&quot;);
-    content.setMimeType(&quot;text/plain&quot;);
-    content.setText(&quot;text888&quot;);
-    return content;
-}
-</code></pre>
-<h4>二进制资源</h4>
-<p>二进制资源返回包含 Base64 编码二进制数据的 <code>ResourceContentBinary</code> 对象。</p>
-<pre><code class="language-java">@Resource(uri = &quot;file:///blob&quot;, description = &quot;一张图片&quot;, mimeType = &quot;image/jpg&quot;)
-public ResourceContentBinary blob() {
-    String base64EncodedImage = ServerUtils.encodeImageToBase64(&quot;bird-eye.jpg&quot;);
-
-    ResourceContentBinary content = new ResourceContentBinary();
-    content.setUri(&quot;file:///blob&quot;);
-    content.setMimeType(&quot;image/jpg&quot;);
-    content.setBlob(base64EncodedImage);
-
-    return content;
-}
-</code></pre>
-<h3>资源模板</h3>
-<p>SDK 已包含 <code>@ResourceTemplate</code> 注解及相关协议模型，但当前版本尚未完整实现资源模板的自动注册和服务端分发。</p>
-<table>
-<thead>
-<tr>
-<th>属性</th>
-<th>是否必需</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>uriTemplate</td>
-<td>是</td>
-<td>RFC 6570 Level 1 URI 模板</td>
-</tr>
-<tr>
-<td>name</td>
-<td>否</td>
-<td>人类可读的名称</td>
-</tr>
-<tr>
-<td>description</td>
-<td>否</td>
-<td>模板描述</td>
-</tr>
-<tr>
-<td>mimeType</td>
-<td>否</td>
-<td>内容的 MIME 类型</td>
-</tr>
-</tbody>
-</table>
-<p>在 <code>FeatureMgr</code> 能够注册模板方法且服务端实现 <code>resources/templates/list</code> 分发之前，请将该注解视为预览 API。</p>
+                <h1>通知处理</h1>
+<p>JSON-RPC notification 不包含 <code>id</code>，服务端不得返回响应。初始化期间客户端会发送 <code>notifications/initialized</code>；Stdio 和 SSE 服务端传输都不会为该通知输出响应。</p>
+<p>当前客户端能够识别 <code>notifications/message</code>，并把参数写入应用日志。进度、资源变更、工具列表变更和提示列表变更等通知尚无公开的回调注册 API，因此不能依赖通知自动使列表缓存失效。</p>
+<p>SSE 通道关闭或失败、transport 被关闭时，所有 pending request future 都会以异常完成。Stdio 子进程意外退出时也会立即使 pending request 失败，即使 <code>requestTimeout</code> 设置为 0 也不会永久等待。</p>
 
                 <div id="comment-holder">
                 </div>

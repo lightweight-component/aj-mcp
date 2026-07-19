@@ -54,6 +54,9 @@
                      <li>
                        <a href="/client/tool">Tools Usage</a>
                     </li>
+                    <li>
+                       <a href="/client/handling-notifications">Notifications</a>
+                    </li>
                 </ul>
                 <h3>MCP Server SDK</h3>
                 <ul>
@@ -124,30 +127,30 @@ registers resources during server initialization.</p>
 <h4>Text Resources</h4>
 <p>Text resources return <code>ResourceContentText</code> objects containing plain text or structured text data.</p>
 <pre><code class="language-java">@Resource(uri = &quot;file:///text&quot;, description = &quot;A nice piece of text&quot;, mimeType = &quot;text/plain&quot;)
-public ResourceContentText text(){
-        ResourceContentText content=new ResourceContentText();
-        content.setUri(&quot;file:///text&quot;);
-        content.setMimeType(&quot;text/plain&quot;);
-        content.setText(&quot;text888&quot;);
-        return content;
-        }
+public ResourceContentText text() {
+    ResourceContentText content = new ResourceContentText();
+    content.setUri(&quot;file:///text&quot;);
+    content.setMimeType(&quot;text/plain&quot;);
+    content.setText(&quot;text888&quot;);
+    return content;
+}
 </code></pre>
 <h4>Binary Resources</h4>
 <p>Binary resources return <code>ResourceContentBinary</code> objects containing Base64-encoded binary data.</p>
 <pre><code class="language-java">@Resource(uri = &quot;file:///blob&quot;, description = &quot;A nice pic&quot;, mimeType = &quot;image/jpg&quot;)
-public ResourceContentBinary blob(){
-        String base64EncodedImage=ServerUtils.encodeImageToBase64(&quot;bird-eye.jpg&quot;);
+public ResourceContentBinary blob() {
+    String base64EncodedImage = ServerUtils.encodeImageToBase64(&quot;bird-eye.jpg&quot;);
 
-        ResourceContentBinary content=new ResourceContentBinary();
-        content.setUri(&quot;file:///blob&quot;);
-        content.setMimeType(&quot;image/jpg&quot;);
-        content.setBlob(base64EncodedImage);
+    ResourceContentBinary content = new ResourceContentBinary();
+    content.setUri(&quot;file:///blob&quot;);
+    content.setMimeType(&quot;image/jpg&quot;);
+    content.setBlob(base64EncodedImage);
 
-        return content;
-        }
+    return content;
+}
 </code></pre>
 <h3>Resource Templates</h3>
-<p>The <code>@ResourceTemplate</code> annotation supports dynamic resources with parameterized URIs following RFC 6570 URI template syntax.</p>
+<p>The SDK contains <code>@ResourceTemplate</code> and the related protocol models, but automatic registration and server dispatch for resource templates are not complete in this version.</p>
 <table>
 <thead>
 <tr>
@@ -179,12 +182,7 @@ public ResourceContentBinary blob(){
 </tr>
 </tbody>
 </table>
-<p>Property Required Description
-uriTemplate Yes RFC 6570 Level 1 URI template
-name No Human-readable name
-description No Template description
-mimeType No Content MIME type</p>
-<p>Template methods accept parameters that correspond to template variables in the URI pattern.</p>
+<p>Treat this annotation as preview API until template methods are registered by <code>FeatureMgr</code> and <code>resources/templates/list</code> is handled by the server.</p>
 
             </article>
 

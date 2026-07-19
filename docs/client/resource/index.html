@@ -54,6 +54,9 @@
                      <li>
                        <a href="/client/tool">Tools Usage</a>
                     </li>
+                    <li>
+                       <a href="/client/handling-notifications">Notifications</a>
+                    </li>
                 </ul>
                 <h3>MCP Server SDK</h3>
                 <ul>
@@ -97,8 +100,7 @@ assertEquals(&quot;file:///blob&quot;, blob.getUri(), &quot;URI mismatch for 'bl
 assertEquals(&quot;image/jpg&quot;, blob.getMimeType(), &quot;MIME type mismatch for 'blob'&quot;);
 assertEquals(&quot;A nice pic&quot;, blob.getDescription(), &quot;Description mismatch for 'blob'&quot;);
 </code></pre>
-<p>This method will fetch all resources across multiple pages without handling pagination.
-If you need more control over pagination, you can use the overloaded <code>listResources(int pageNo)</code> method instead.</p>
+<p><code>listResources()</code> requests and caches the first/default page. Use <code>listResources(int pageNo)</code> for another page. Each page is cached independently, so requesting page 2 does not overwrite page 0.</p>
 <pre><code class="language-java">List&lt;ResourceItem&gt; resourceList = mcpClient.listResources(1);
 assertEquals(2, resourceList.size(), &quot;Expected exactly two resources&quot;);
 </code></pre>
@@ -125,16 +127,19 @@ ResourceContentBinary blobContents = (ResourceContentBinary) contents;
 assertEquals(&quot;file:///blob&quot;, blobContents.getUri(), &quot;URI should be 'file:///blob'&quot;);
 assertEquals(&quot;blob&quot;, blobContents.getBlob(), &quot;Blob content should be 'blob'&quot;);
 </code></pre>
-<p>You can read the resource with template, that means, you can pass any parameters to the resource.</p>
-<pre><code class="language-java">GetResourceResult.ResourceResultDetail response = mcpClient.readResource(&quot;file:///text-template/hello&quot;);
-assertEquals(1, response.getContents().size(), &quot;Expected exactly one content&quot;);
+<p>Resource-template protocol models exist in the SDK, but annotation-based resource-template registration and server dispatch are not complete in this version. Do not rely on the following pattern until server-side template support is implemented.</p>
+<!--
+``` java
+GetResourceResult.ResourceResultDetail response = mcpClient.readResource("file:///text-template/hello");
+assertEquals(1, response.getContents().size(), "Expected exactly one content");
 
 ResourceContent contents = response.getContents().get(0);
 
 ResourceContentText textContents = (ResourceContentText) contents;
-assertEquals(&quot;file:///text-template/hello&quot;, textContents.getUri(), &quot;URI should be 'file:///text-template/hello'&quot;);
-assertEquals(&quot;text hello&quot;, textContents.getText(), &quot;Text content should be 'text hello'&quot;);
-</code></pre>
+assertEquals("file:///text-template/hello", textContents.getUri(), "URI should be 'file:///text-template/hello'");
+assertEquals("text hello", textContents.getText(), "Text content should be 'text hello'");
+```
+-->
 <!--
 ### Resource Subscriptions
 

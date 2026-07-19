@@ -45,13 +45,16 @@
                        <a href="/client/initialization-cn">初始化</a>
                     </li>
                     <li>
-                       <a href="/client/resource-cn">Resources 用法</a>
+                       <a href="/client/resource-cn">资源用法</a>
                     </li>
                      <li>
-                       <a href="/client/prompt-cn">Prompts 用法</a>
+                       <a href="/client/prompt-cn">提示用法</a>
                     </li>
                      <li>
-                       <a href="/client/tool-cn">Tools 用法</a>
+                       <a href="/client/tool-cn">工具用法</a>
+                    </li>
+                    <li>
+                       <a href="/client/handling-notifications-cn">通知处理</a>
                     </li>
                 </ul>
                 <h3>MCP 服务端 SDK</h3>
@@ -75,7 +78,7 @@
 
                 <h3>其他</h3>
                 <ul>
-                    <li><a href="/misc/versions">版本记录</a></li>
+                    <li><a href="/misc/versions-cn">版本记录</a></li>
                     <li><a href="/misc/contact-cn">联系方式</a></li>
                 </ul>
             </menu>
@@ -84,7 +87,7 @@
 <p>AJ-MCP 通过注解在 <code>@McpService</code> 类中定义提示（Prompt）。<code>@Prompt</code> 注解用于标记作为提示处理器的方法，<code>@PromptArg</code> 用于定义交互式提示的参数。</p>
 <p>简单提示返回单条 <code>PromptMessage</code>，内容为文本。<code>@Prompt</code> 注解要求提供描述，方法返回配置好的消息（含角色和内容）。</p>
 <pre><code class="language-java">@Prompt(description = &quot;基础简单提示&quot;)
-public PromptMessage basic(){
+public PromptMessage basic() {
     PromptMessage message = new PromptMessage();
     message.setRole(Role.USER);
     message.setContent(new ContentText(&quot;Hello&quot;));
@@ -95,7 +98,7 @@ public PromptMessage basic(){
 <h2>多消息提示</h2>
 <p>提示可以返回多条消息（<code>List&lt;PromptMessage&gt;</code>），支持多轮对话或多角色交互场景。</p>
 <pre><code class="language-java">@Prompt(description = &quot;返回两条消息的提示&quot;)
-public List&lt;PromptMessage&gt; multi(){
+public List&lt;PromptMessage&gt; multi() {
     PromptMessage message1 = new PromptMessage();
     message1.setRole(Role.USER);
     message1.setContent(new ContentText(&quot;first&quot;));
@@ -110,7 +113,7 @@ public List&lt;PromptMessage&gt; multi(){
 <h2>带参数提示</h2>
 <p>提示可通过 <code>@PromptArg</code> 注解接收参数。参数会在列出提示时对客户端可见，并在获取提示时传递。</p>
 <pre><code class="language-java">@Prompt(description = &quot;带参数的提示&quot;)
-public PromptMessage parametrized(@PromptArg(description = &quot;姓名&quot;) String name){
+public PromptMessage parametrized(@PromptArg(description = &quot;姓名&quot;) String name) {
     PromptMessage message = new PromptMessage();
     message.setRole(Role.USER);
     message.setContent(new ContentText(&quot;Hello &quot; + name));
@@ -188,7 +191,6 @@ public PromptMessage parametrized(@PromptArg(description = &quot;姓名&quot;) S
 <ul>
 <li>USER —— 用户视角的消息</li>
 <li>ASSISTANT —— AI 助手视角的消息</li>
-<li>SYSTEM —— 系统指令或上下文消息</li>
 </ul>
 
                 <div id="comment-holder">

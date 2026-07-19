@@ -45,13 +45,16 @@
                        <a href="/client/initialization-cn">初始化</a>
                     </li>
                     <li>
-                       <a href="/client/resource-cn">Resources 用法</a>
+                       <a href="/client/resource-cn">资源用法</a>
                     </li>
                      <li>
-                       <a href="/client/prompt-cn">Prompts 用法</a>
+                       <a href="/client/prompt-cn">提示用法</a>
                     </li>
                      <li>
-                       <a href="/client/tool-cn">Tools 用法</a>
+                       <a href="/client/tool-cn">工具用法</a>
+                    </li>
+                    <li>
+                       <a href="/client/handling-notifications-cn">通知处理</a>
                     </li>
                 </ul>
                 <h3>MCP 服务端 SDK</h3>
@@ -75,7 +78,7 @@
 
                 <h3>其他</h3>
                 <ul>
-                    <li><a href="/misc/versions">版本记录</a></li>
+                    <li><a href="/misc/versions-cn">版本记录</a></li>
                     <li><a href="/misc/contact-cn">联系方式</a></li>
                 </ul>
             </menu>
@@ -94,7 +97,7 @@
 <h2>架构说明</h2>
 <p>AJ MCP SDK 的结构围绕几个核心组件构建，这些组件协同工作以实现 MCP 规范：</p>
 <p><img src="/asset/imgs/a-1.jpg" alt="架构图"></p>
-<p>该架构采用客户端-服务器模型，并支持灵活的传输方式。客户端可以通过 HTTP（带 Server-Sent Events）或标准 I/O 管道使用 JSON-RPC 与服务器进行交互。</p>
+<p>该架构采用客户端-服务器模型，并支持灵活的传输方式。客户端可以通过标准 I/O 管道，或当前版本实现的旧版 HTTP/SSE 传输交换 JSON-RPC 消息。</p>
 <h1>Stdio 模式 vs SSE 模式对比</h1>
 <table>
 <thead>
@@ -116,9 +119,9 @@
 <td>分布式环境</td>
 </tr>
 <tr>
-<td><strong>配置复杂度</strong></td>
-<td>复杂</td>
-<td>简单</td>
+<td><strong>配置方式</strong></td>
+<td>需要子进程命令</td>
+<td>需要 HTTP 端点</td>
 </tr>
 <tr>
 <td><strong>多客户端支持</strong></td>

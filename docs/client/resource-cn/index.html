@@ -45,13 +45,16 @@
                        <a href="/client/initialization-cn">初始化</a>
                     </li>
                     <li>
-                       <a href="/client/resource-cn">Resources 用法</a>
+                       <a href="/client/resource-cn">资源用法</a>
                     </li>
                      <li>
-                       <a href="/client/prompt-cn">Prompts 用法</a>
+                       <a href="/client/prompt-cn">提示用法</a>
                     </li>
                      <li>
-                       <a href="/client/tool-cn">Tools 用法</a>
+                       <a href="/client/tool-cn">工具用法</a>
+                    </li>
+                    <li>
+                       <a href="/client/handling-notifications-cn">通知处理</a>
                     </li>
                 </ul>
                 <h3>MCP 服务端 SDK</h3>
@@ -75,7 +78,7 @@
 
                 <h3>其他</h3>
                 <ul>
-                    <li><a href="/misc/versions">版本记录</a></li>
+                    <li><a href="/misc/versions-cn">版本记录</a></li>
                     <li><a href="/misc/contact-cn">联系方式</a></li>
                 </ul>
             </menu>
@@ -94,7 +97,7 @@ assertEquals(&quot;file:///blob&quot;, blob.getUri(), &quot;URI 不符（'blob'�
 assertEquals(&quot;image/jpg&quot;, blob.getMimeType(), &quot;MIME 类型不符（'blob'）&quot;);
 assertEquals(&quot;A nice pic&quot;, blob.getDescription(), &quot;描述不符（'blob'）&quot;);
 </code></pre>
-<p>此方法将跨多个页面获取所有的资源，并没有分页。如果你需要对分页进行更精细的控制，可以改用重载的<code>listResources(int pageNo)</code>方法。</p>
+<p><code>listResources()</code> 请求并缓存第一页（默认页）。如需获取其他页，请调用 <code>listResources(int pageNo)</code>。各页独立缓存，请求第 2 页不会覆盖第 0 页。</p>
 <pre><code class="language-java">List&lt;ResourceItem&gt; resourceList = mcpClient.listResources(1);
 assertEquals(2, resourceList.size(), &quot;Expected exactly two resources&quot;);
 </code></pre>
@@ -119,16 +122,19 @@ ResourceContentBinary blobContents = (ResourceContentBinary) contents;
 assertEquals(&quot;file:///blob&quot;, blobContents.getUri(), &quot;URI 应为 'file:///blob'&quot;);
 assertEquals(&quot;blob&quot;, blobContents.getBlob(), &quot;二进制内容应为 'blob'&quot;);
 </code></pre>
-<p>你也可以通过模板资源读取内容，即可传递参数给资源：</p>
-<pre><code class="language-java">GetResourceResult.ResourceResultDetail response = mcpClient.readResource(&quot;file:///text-template/hello&quot;);
-assertEquals(1, response.getContents().size(), &quot;期望内容数量为 1&quot;);
+<p>SDK 已包含资源模板的协议模型，但当前版本尚未完整实现基于注解的模板注册和服务端分发。在服务端模板功能补齐前，请勿依赖下面的调用方式。</p>
+<!--
+```java
+GetResourceResult.ResourceResultDetail response = mcpClient.readResource("file:///text-template/hello");
+assertEquals(1, response.getContents().size(), "期望内容数量为 1");
 
 ResourceContent contents = response.getContents().get(0);
 
 ResourceContentText textContents = (ResourceContentText) contents;
-assertEquals(&quot;file:///text-template/hello&quot;, textContents.getUri(), &quot;URI 应为 'file:///text-template/hello'&quot;);
-assertEquals(&quot;text hello&quot;, textContents.getText(), &quot;文本内容应为 'text hello'&quot;);
-</code></pre>
+assertEquals("file:///text-template/hello", textContents.getUri(), "URI 应为 'file:///text-template/hello'");
+assertEquals("text hello", textContents.getText(), "文本内容应为 'text hello'");
+```
+-->
 <!--
 ### 资源订阅
 
@@ -149,6 +155,7 @@ err := client.Unsubscribe(ctx, mcp.UnsubscribeRequest{
 })
 
 -->
+
                 <div id="comment-holder">
                 </div>
             </article>

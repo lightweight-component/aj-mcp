@@ -45,13 +45,16 @@
                        <a href="/client/initialization-cn">初始化</a>
                     </li>
                     <li>
-                       <a href="/client/resource-cn">Resources 用法</a>
+                       <a href="/client/resource-cn">资源用法</a>
                     </li>
                      <li>
-                       <a href="/client/prompt-cn">Prompts 用法</a>
+                       <a href="/client/prompt-cn">提示用法</a>
                     </li>
                      <li>
-                       <a href="/client/tool-cn">Tools 用法</a>
+                       <a href="/client/tool-cn">工具用法</a>
+                    </li>
+                    <li>
+                       <a href="/client/handling-notifications-cn">通知处理</a>
                     </li>
                 </ul>
                 <h3>MCP 服务端 SDK</h3>
@@ -75,7 +78,7 @@
 
                 <h3>其他</h3>
                 <ul>
-                    <li><a href="/misc/versions">版本记录</a></li>
+                    <li><a href="/misc/versions-cn">版本记录</a></li>
                     <li><a href="/misc/contact-cn">联系方式</a></li>
                 </ul>
             </menu>
@@ -126,7 +129,7 @@ public class MyServerFeatures {
 }
 </code></pre>
 <h2>服务器功能管理</h2>
-<p>功能管理系统通过集中式的 <code>FeatureMgr</code> 类进行，负责包扫描、注解处理与功能存储。系统使用反射机制发现被注解的方法，并将功能元数据存储于并发哈希表中，确保运行时线程安全访问。</p>
+<p>每个服务器使用独立的 <code>FeatureMgr</code> 实例负责包扫描、注解处理与功能存储，因此同一 JVM 中的多个服务器不会共享工具、资源或提示。</p>
 <h3>注解体系</h3>
 <p>注解体系围绕几个核心注解展开，用于标记类和方法以供 MCP 识别和暴露：</p>
 <table>
@@ -170,7 +173,7 @@ public class MyServerFeatures {
 </tr>
 </tbody>
 </table>
-<p>服务端配置通过 <code>FeatureMgr.init()</code> 注解驱动功能发现，自动扫描并注册含有 <code>@McpService</code> 注解且包含 <code>@Tool</code>、<code>@Resource</code>、<code>@Prompt</code> 方法的类。</p>
+<p>调用 <code>FeatureMgr.init()</code> 会扫描指定包，并注册 <code>@McpService</code> 类中的 <code>@Tool</code>、<code>@Resource</code> 和 <code>@Prompt</code> 方法。单个类无法加载时会记录日志并跳过，不会中断整个扫描过程。</p>
 <h3>初始化功能管理器</h3>
 <p><code>FeatureMgr.init()</code> 方法负责整个注解发现流程。它首先扫描指定包下带有 <code>@McpService</code> 注解的类。</p>
 <pre><code class="language-java">FeatureMgr mgr = new FeatureMgr();
@@ -181,19 +184,22 @@ mgr.init(&quot;com.foo.myproduct&quot;);
 <ul>
 <li>创建服务器实例并设置传输层</li>
 <li>配置服务器名称与版本号</li>
-<li>设置连接超时等参数</li>
+<li>设置分页大小和协议版本等参数</li>
 </ul>
 <p>服务器配置由 <code>ServerConfig</code> 类管理，包含服务端元数据。初始化时还会进行协议版本协商，返回所支持的最高版本，或与客户端请求一致的版本。</p>
 <pre><code class="language-java">FeatureMgr mgr = new FeatureMgr();
 mgr.init(&quot;com.foo.myproduct&quot;);
 
 McpServer server = new McpServer();
+server.setFeatureMgr(mgr);
 server.setTransport(new ServerStdio(server));
 
 ServerConfig serverConfig = new ServerConfig();
 serverConfig.setName(&quot;MY_MCP_Server&quot;);
 serverConfig.setVersion(&quot;1.0&quot;);
 server.setServerConfig(serverConfig);
+
+server.start();
 </code></pre>
 
                 <div id="comment-holder">

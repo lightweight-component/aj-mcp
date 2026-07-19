@@ -54,6 +54,9 @@
                      <li>
                        <a href="/client/tool">Tools Usage</a>
                     </li>
+                    <li>
+                       <a href="/client/handling-notifications">Notifications</a>
+                    </li>
                 </ul>
                 <h3>MCP Server SDK</h3>
                 <ul>
@@ -99,7 +102,7 @@ public class MyTools {
 }
 </code></pre>
 <h2>Parameter Handling and Validation</h2>
-<p>Tool parameters are annotated with @ToolArg to provide metadata for validation and schema generation. Each parameter can specify a name, description, and whether it's required.</p>
+<p>Tool parameters are annotated with <code>@ToolArg</code> to provide metadata for validation and schema generation. Each parameter can specify a name, description, and whether it is required.</p>
 <h3>Parameter Annotation</h3>
 <table>
 <thead>
@@ -155,6 +158,9 @@ public class MyTools {
 </tr>
 </tbody>
 </table>
+<blockquote>
+<p>Current limitation: although <code>required=false</code> is represented in the generated schema, omitted optional arguments are not yet handled correctly by the reflection invocation path. Until that is fixed, pass every annotated argument explicitly.</p>
+</blockquote>
 <h2>Example Tool Implementations</h2>
 <h3>Basic String Tool</h3>
 <pre><code class="language-java">@Tool(description = &quot;Echoes a string&quot;)
@@ -163,7 +169,7 @@ public String echoString(@ToolArg(description = &quot;The string to be echoed&qu
 }
 </code></pre>
 <h3>Parameterless Tool</h3>
-<pre><code class="language-java">@Tool(description = &quot;Takes 10 seconds to complete&quot;)
+<pre><code class="language-java">@Tool(description = &quot;Takes 5 seconds to complete&quot;)
 public String longOperation() throws Exception {
     TimeUnit.SECONDS.sleep(5);
     return &quot;ok&quot;;

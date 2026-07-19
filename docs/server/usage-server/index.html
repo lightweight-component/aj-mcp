@@ -54,6 +54,9 @@
                      <li>
                        <a href="/client/tool">Tools Usage</a>
                     </li>
+                    <li>
+                       <a href="/client/handling-notifications">Notifications</a>
+                    </li>
                 </ul>
                 <h3>MCP Server SDK</h3>
                 <ul>
@@ -130,9 +133,8 @@ public class MyServerFeatures {
     }
 }
 </code></pre>
-<h2>Server  Feature Management</h2>
-<p>The Feature Management system operates through a centralized <code>FeatureMgr</code> class that coordinates package scanning, annotation processing, and feature
-storage.The system uses reflection to discover annotated methods and stores feature metadata in concurrent hash maps for thread-safe runtime access.</p>
+<h2>Server Feature Management</h2>
+<p>Each server uses a <code>FeatureMgr</code> instance to coordinate package scanning, annotation processing, and feature storage. The stores are instance-scoped, so multiple servers in the same JVM do not share tools, resources, or prompts.</p>
 <h3>Annotation System</h3>
 <p>The annotation system is built around several key annotations that mark classes and methods for MCP exposure:</p>
 <table>
@@ -176,37 +178,36 @@ storage.The system uses reflection to discover annotated methods and stores feat
 </tr>
 </tbody>
 </table>
-<p>Server configuration includes annotation-driven feature discovery through <code>FeatureMgr.init()</code> with package scanning <code>FeatureMgr</code>. This automatically
-discovers and registers <code>@McpService</code> annotated classes containing <code>@Tool</code>, <code>@Resource</code>, and <code>@Prompt</code> methods.</p>
+<p>Calling <code>FeatureMgr.init()</code> scans a package and registers methods from classes annotated with <code>@McpService</code>. A class that cannot be loaded is logged and skipped without aborting the rest of the scan.</p>
 <h3>Initialize Feature Manager</h3>
 <p>The <code>FeatureMgr.init()</code> method orchestrates the entire annotation discovery process. It begins by scanning specified packages for classes annotated
 with <code>@McpService</code>.</p>
-<pre><code class="language-java">FeatureMgr mgr=new FeatureMgr();
-        mgr.init(&quot;com.foo.myproduct&quot;);.
+<pre><code class="language-java">FeatureMgr mgr = new FeatureMgr();
+mgr.init(&quot;com.foo.myproduct&quot;);
 </code></pre>
 <h2>Server Configuration</h2>
 <p>After feature manager initialization with package scanning, we can configure the server with:</p>
 <ul>
 <li>Server instance creation with transport layer setup</li>
 <li>Server configuration with name and version</li>
-<li>Connection timeout settings</li>
 <li>The page size for paginated responses</li>
 </ul>
-<p>Server configuration is handled through the ServerConfig class, which contains essential server metadata <code>McpServerInitialize</code>. The configuration
-includes server name, version, and supported protocol versions <code>McpServerInitialize</code>.</p>
-<p>During initialization, the server processes protocol version negotiation where it responds with the highest supported version or matches the client's
-requested version if supported <code>McpServerInitialize</code>.</p>
-<pre><code class="language-java">FeatureMgr mgr=new FeatureMgr();
-        mgr.init(&quot;com.foo.myproduct&quot;);
+<p><code>ServerConfig</code> contains the server name, version, supported protocol versions, and page size.</p>
+<p>During initialization, the server returns the requested protocol version when it is supported; otherwise, it returns its highest supported version.</p>
+<pre><code class="language-java">FeatureMgr mgr = new FeatureMgr();
+mgr.init(&quot;com.foo.myproduct&quot;);
 
-        McpServer server = new McpServer();
-        server.setTransport(new ServerStdio(server));
+McpServer server = new McpServer();
+server.setFeatureMgr(mgr);
+server.setTransport(new ServerStdio(server));
 
-        ServerConfig serverConfig = new ServerConfig();
-        serverConfig.setName(&quot;MY_MCP_Server&quot;);
-        serverConfig.setVersion(&quot;1.0&quot;);
-        serverConfig.setPageSize(8);
-        server.setServerConfig(serverConfig);
+ServerConfig serverConfig = new ServerConfig();
+serverConfig.setName(&quot;MY_MCP_Server&quot;);
+serverConfig.setVersion(&quot;1.0&quot;);
+serverConfig.setPageSize(8);
+server.setServerConfig(serverConfig);
+
+server.start();
 </code></pre>
 
             </article>

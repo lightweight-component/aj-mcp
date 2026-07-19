@@ -54,6 +54,9 @@
                      <li>
                        <a href="/client/tool">Tools Usage</a>
                     </li>
+                    <li>
+                       <a href="/client/handling-notifications">Notifications</a>
+                    </li>
                 </ul>
                 <h3>MCP Server SDK</h3>
                 <ul>
@@ -82,8 +85,8 @@
             </menu>
             <article>
                 <h1>MCP Client SDK Setup</h1>
-<h2>Install Dependency</h2>
-<p>We’ll need the AJ MCP SDK for making API requests. Install them with:</p>
+<h2>Install the Dependency</h2>
+<p>Add the AJ MCP client dependency:</p>
 <pre><code class="language-xml">
 &lt;dependency&gt;
     &lt;groupId&gt;com.ajaxjs&lt;/groupId&gt;
@@ -99,34 +102,30 @@
 <li>Transport: Manages the subprocess and handles low-level message exchange.</li>
 <li>MCP Client: Provides a high-level API for using the transport, implementing the MCP protocol.</li>
 </ul>
-<p>To start using the MCP client, you must first these two main components:
-first to create a appropriate transport instance, and then to create a client instance with that transport.
+<p>To use the client, first create an appropriate transport and then build an <code>McpClient</code> with that transport.
 The client supports different transport mechanisms, primarily Server-Sent Events (SSE) and standard I/O (stdio).</p>
 <h2>Setup the Transport</h2>
 <p>First, we need to create the transport. There are two types of transport you can choose from for your application, depending on the type of your MCP
 server.</p>
 <h3>Stdio Transport</h3>
-<p>'Stdio' stands for Standard Input/Output, by using command line to interact between the programme and human in short. But here is between the MCP
-Client
-and the MCP Server. Usually, we use stdio for the local application, such as a <code>*.exe</code> programme or a Java Jar programme, and so on.</p>
-<pre><code class="language-java">// The MCP server is a Java programme, runs on stdio.
+<p>Stdio stands for standard input/output. In this transport, the client launches a local MCP server subprocess and exchanges one JSON-RPC message per line through its standard streams.</p>
+<pre><code class="language-java">// The MCP server is a Java program that communicates over stdio.
 McpTransport transport = StdioTransport.builder()
     .command(Arrays.asList(&quot;java&quot;, &quot;-jar&quot;, &quot;C:\\app\\my-app-jar-with-dependencies.jar&quot;))
     .logEvents(true)
     .build();
 </code></pre>
-<p>Let's take a look at a <code>.exe</code> programme as an example:</p>
-<pre><code class="language-java">// The MCP server is an executable programme, runs on stdio.
+<p>Here is an example using a <code>.exe</code> program:</p>
+<pre><code class="language-java">// The MCP server is a native executable that communicates over stdio.
 McpTransport transport = StdioTransport.builder()
-    .command(&quot;C:\\app\\my-app.exe&quot;, &quot;-token&quot;, &quot;dd4df2sx32ds&quot;))
+    .command(Arrays.asList(&quot;C:\\app\\my-app.exe&quot;, &quot;-token&quot;, &quot;dd4df2sx32ds&quot;))
     .logEvents(true)
     .build();
 </code></pre>
-<p>If you want to check out the fully logs of the client, you can set <code>logEvents</code> to <code>true</code>. This approach is beneficial for debugging purposes or for
-gaining a deeper understanding of the MCP protocol's JSON-based messaging format.</p>
+<p>Set <code>logEvents</code> to <code>true</code> to log outgoing protocol messages while debugging. The transport also consumes stderr so that a child process cannot block on a full error pipe.</p>
 <h3>SSE Transport</h3>
 <p>The SSE Transport enables bidirectional communication between MCP clients and servers using the HTTP protocol with Server-Sent Events. This transport
-method is particularly useful for web-based applications</p>
+method is particularly useful for web-based applications.</p>
 <pre><code class="language-java">McpTransport transport = HttpMcpTransport.builder()
     .sseUrl(&quot;http://localhost:8080/sse&quot;)
     .logRequests(true)
@@ -142,7 +141,7 @@ method is particularly useful for web-based applications</p>
         .transport(transport)
         .build();
 </code></pre>
-<p>Usually we fill the <code>clientName</code> and <code>clientVersion</code> properties.
+<p>Usually, you should set the <code>clientName</code> and <code>clientVersion</code> properties.
 The <code>clientName</code> property is used to identify the client to the MCP server, while the  <code>clientVersion</code> property is used to indicate the version of the
 client.</p>
 <p>All properties are listing below:</p>
@@ -176,14 +175,14 @@ client.</p>
 </tr>
 <tr>
 <td>requestTimeout</td>
-<td>Sets the timeout for tool execution. This value applies to each tool execution individually. The default value is 60 seconds. A value of zero means no timeout.</td>
+<td>Timeout applied to every request, including initialization and health checks. The default is 60 seconds; zero means wait indefinitely, and negative values are rejected.</td>
 <td>Duration</td>
 <td><code>Duration.ofSeconds(60)</code></td>
 </tr>
 </tbody>
 </table>
 <p>Please note that after creating the McpClient, you should call <code>mcpClient.initialize();</code> right away.
-We'll talk about the initialization of MCP in next section.</p>
+The next section describes protocol initialization.</p>
 <pre><code class="language-java">McpClient mcpClient = McpClient.builder()
         .clientName(&quot;my-host&quot;)
         .clientVersion(&quot;1.2&quot;)
@@ -192,8 +191,9 @@ We'll talk about the initialization of MCP in next section.</p>
         
 mcpClient.initialize();
 </code></pre>
-<p>Finally, please remember to close the McpClient resources by calling the <code>close()</code> method, or using autocloseable.</p>
-<pre><code class="language-java">try(IMcpClient mcpClient2 = McpClient.builder().transport(transport).build()){
+<p>Close the client when it is no longer needed. Closing the transport releases HTTP/SSE requests or the stdio subprocess and completes outstanding requests exceptionally.</p>
+<pre><code class="language-java">try (IMcpClient mcpClient2 = McpClient.builder().transport(transport).build()) {
+    mcpClient2.initialize();
     ...
 } catch (Exception e) {
    throw new RuntimeException(e);

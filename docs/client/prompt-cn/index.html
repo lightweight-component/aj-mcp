@@ -45,13 +45,16 @@
                        <a href="/client/initialization-cn">初始化</a>
                     </li>
                     <li>
-                       <a href="/client/resource-cn">Resources 用法</a>
+                       <a href="/client/resource-cn">资源用法</a>
                     </li>
                      <li>
-                       <a href="/client/prompt-cn">Prompts 用法</a>
+                       <a href="/client/prompt-cn">提示用法</a>
                     </li>
                      <li>
-                       <a href="/client/tool-cn">Tools 用法</a>
+                       <a href="/client/tool-cn">工具用法</a>
+                    </li>
+                    <li>
+                       <a href="/client/handling-notifications-cn">通知处理</a>
                     </li>
                 </ul>
                 <h3>MCP 服务端 SDK</h3>
@@ -75,7 +78,7 @@
 
                 <h3>其他</h3>
                 <ul>
-                    <li><a href="/misc/versions">版本记录</a></li>
+                    <li><a href="/misc/versions-cn">版本记录</a></li>
                     <li><a href="/misc/contact-cn">联系方式</a></li>
                 </ul>
             </menu>
@@ -100,9 +103,9 @@ static PromptItem findPromptByName(String name, List&lt;PromptItem&gt; promptRef
     return null;
 }
 </code></pre>
-<p>此方法将跨多个页面获取所有的提示，并没有分页。如果你需要对分页进行更精细的控制，可以改用重载的<code>listPrompts(int pageNo)</code>方法。</p>
+<p><code>listPrompts()</code> 请求并缓存第一页（默认页）。如需获取其他页，请调用 <code>listPrompts(int pageNo)</code>；各页缓存彼此独立。</p>
 <pre><code class="language-java">List&lt;PromptItem&gt; prompts = mcpClient.listPrompts(1);
-assertEquals(3, prompts.size(), &quot;Expected 3 prompts&quot;);
+assertEquals(3, prompts.size(), &quot;期望返回 3 个提示&quot;);
 </code></pre>
 <h1>获取提示详情</h1>
 <p>获取某个提示的详细信息：</p>
