@@ -69,11 +69,8 @@ public class McpServer extends McpServerPrompt {
                 return toolList(requestRaw);
             case Methods.TOOLS_CALL:
                 return toolCall(requestRaw);
-            case Methods.NOTIFICATION_INITIALIZED: // TODO: it seems should not return anything
-                PingResponse respEmpty = new PingResponse();
-                respEmpty.setId(0L);
-
-                return respEmpty;
+            case Methods.NOTIFICATION_INITIALIZED:
+                return null;
             default:
                 throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.METHOD_NOT_FOUND, "Method " + requestRaw.getMethod() + " not found.");
         }
@@ -155,7 +152,7 @@ public class McpServer extends McpServerPrompt {
         CallToolRequest.Params params = JsonUtils.jsonNode2bean(paramsNode, CallToolRequest.Params.class);
         Map<String, Object> arguments = params.getArguments();
 
-        ServerStoreTool store = getStore(FeatureMgr.TOOL_STORE, params.getName());
+        ServerStoreTool store = getStore(FeatureMgr.TOOL_STORE, params.getName(), requestRaw.getId(), "tool");
         ToolItem tool = store.getTool();
         JsonSchema inputSchema = tool.getInputSchema();
 
@@ -176,7 +173,6 @@ public class McpServer extends McpServerPrompt {
             if (argumentsDefined != null && !argumentsDefined.isEmpty()) {
                 for (int i = 0; i < paramsOrder.size(); i++) {
                     String name = paramsOrder.get(i);
-
                     Object arg = arguments.get(name);
 
                     if (arg == null && required.contains(name))
@@ -200,10 +196,13 @@ public class McpServer extends McpServerPrompt {
             else
                 returnedValue = method.invoke(store.getInstance(), argValues);
         } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
+            throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INTERNAL_ERROR,
+                    "Tool method is not accessible: " + params.getName(), e);
         } catch (InvocationTargetException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
+            Throwable cause = e.getCause() == null ? e : e.getCause();
+            log.warn("Tool '{}' execution failed", params.getName(), cause);
+
+            return toolErrorResult(requestRaw.getId(), cause);
         }
 
         List<Content> content;
@@ -222,6 +221,22 @@ public class McpServer extends McpServerPrompt {
 
         CallToolResult result = new CallToolResult();
         result.setId(requestRaw.getId());
+        result.setResult(detail);
+
+        return result;
+    }
+
+    private static McpResponse toolErrorResult(Long requestId, Throwable cause) {
+        String message = cause.getMessage();
+        if (message == null || message.trim().isEmpty())
+            message = cause.getClass().getSimpleName();
+
+        CallToolResult.CallToolResultDetail detail = new CallToolResult.CallToolResultDetail();
+        detail.setIsError(true);
+        detail.setContent(Collections.singletonList(new ContentText(message)));
+
+        CallToolResult result = new CallToolResult();
+        result.setId(requestId);
         result.setResult(detail);
 
         return result;

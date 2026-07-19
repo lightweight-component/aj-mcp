@@ -48,7 +48,10 @@ public abstract class McpClientResource extends McpClientPrompt {
             JsonNode result = resultFuture.get(timeoutMillis, TimeUnit.MILLISECONDS);
 
             return parseResourceContents(result);
-        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+        } catch (ExecutionException | TimeoutException e) {
             throw new RuntimeException(e);
         } finally {
             pendingRequests.remove(operationId);
@@ -103,7 +106,10 @@ public abstract class McpClientResource extends McpClientPrompt {
             CompletableFuture<JsonNode> resultFuture = transport.sendRequestWithResponse(request);
             JsonNode result = resultFuture.get(timeoutMillis, TimeUnit.MILLISECONDS);
             resourceRefs.set(parseResourceRefs(result));
-        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+        } catch (ExecutionException | TimeoutException e) {
             throw new RuntimeException(e);
         } finally {
             pendingRequests.remove(request.getId());
@@ -125,7 +131,10 @@ public abstract class McpClientResource extends McpClientPrompt {
             CompletableFuture<JsonNode> resultFuture = transport.sendRequestWithResponse(request);
             JsonNode result = resultFuture.get(timeoutMillis, TimeUnit.MILLISECONDS);
             resourceTemplateRefs.set(parseResourceTemplateRefs(result));
-        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+        } catch (ExecutionException | TimeoutException e) {
             throw new RuntimeException(e);
         } finally {
             pendingRequests.remove(request.getId());

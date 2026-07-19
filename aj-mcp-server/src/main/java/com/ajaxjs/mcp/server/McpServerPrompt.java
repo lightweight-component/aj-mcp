@@ -12,6 +12,7 @@ import com.ajaxjs.mcp.server.error.JsonRpcErrorException;
 import com.ajaxjs.mcp.server.feature.FeatureMgr;
 import com.ajaxjs.mcp.server.feature.model.ServerStorePrompt;
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -20,6 +21,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 public abstract class McpServerPrompt extends McpServerResource {
     /**
      * Processes the prompt list request.
@@ -89,7 +91,7 @@ public abstract class McpServerPrompt extends McpServerResource {
         request.setId(requestRaw.getId());
         request.setParams(params);
 
-        ServerStorePrompt store = getStore(FeatureMgr.PROMPT_STORE, params.getName());
+        ServerStorePrompt store = getStore(FeatureMgr.PROMPT_STORE, params.getName(), requestRaw.getId(), "prompt");
         PromptItem prompt = store.getPrompt();
 
         Object[] argValues = null;
@@ -129,9 +131,13 @@ public abstract class McpServerPrompt extends McpServerResource {
             else
                 returnedValue = method.invoke(store.getInstance(), argValues);
         } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
+            throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INTERNAL_ERROR,
+                    "Prompt method is not accessible: " + params.getName(), e);
         } catch (InvocationTargetException e) {
-            throw new RuntimeException(e);
+            Throwable cause = e.getCause() == null ? e : e.getCause();
+            log.warn("Prompt '{}' execution failed", params.getName(), cause);
+            throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INTERNAL_ERROR,
+                    "Prompt execution failed: " + errorMessage(cause), cause);
         }
 
         List<PromptMessage> promptMessages = null;
@@ -150,6 +156,11 @@ public abstract class McpServerPrompt extends McpServerResource {
         result.setResult(promptResultDetail);
 
         return result;
+    }
+
+    private static String errorMessage(Throwable cause) {
+        String message = cause.getMessage();
+        return message == null || message.trim().isEmpty() ? cause.getClass().getSimpleName() : message;
     }
 
     static Object[] extractValues(Map<String, Object> map, String[] paramOrder) {

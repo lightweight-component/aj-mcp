@@ -9,10 +9,17 @@ public class JsonRpcErrorException extends RuntimeException {
     private final JsonRpcError jsonRpcError;
 
     public JsonRpcErrorException(Long id, JsonRpcErrorCode code, String message) {
+        super(message);
+        this.jsonRpcError = new JsonRpcError(id, code, message);
+    }
+
+    public JsonRpcErrorException(Long id, JsonRpcErrorCode code, String message, Throwable cause) {
+        super(message, cause);
         this.jsonRpcError = new JsonRpcError(id, code, message);
     }
 
     public JsonRpcErrorException(JsonRpcErrorCode code, String message) {
+        super(message);
         this.jsonRpcError = new JsonRpcError(null, code, message);
     }
 

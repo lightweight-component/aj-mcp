@@ -83,6 +83,9 @@ public class ServerSse implements McpTransportSync {
     }
 
     public void returnMessage(String uuid, String data) {
+        if (data == null)
+            return;
+
         PrintWriter writer = connections.get(uuid);
 
         if (writer == null)
@@ -102,7 +105,7 @@ public class ServerSse implements McpTransportSync {
         McpRequestRawInfo request = McpServerInitialize.jsonRpcValidate(rawJson); // 解析输入消息
         McpResponse mcpResponse = server.processMessage(request);
 
-        return JsonUtils.toJson(mcpResponse);  // 处理消息并生成响应
+        return mcpResponse == null ? null : JsonUtils.toJson(mcpResponse);  // 处理消息并生成响应
     }
 
     @Override

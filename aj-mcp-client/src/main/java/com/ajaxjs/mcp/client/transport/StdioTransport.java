@@ -12,6 +12,7 @@ import java.io.*;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 @Builder
 @Slf4j
@@ -26,8 +27,20 @@ public class StdioTransport extends McpTransport {
 
     private PrintStream out;
 
+    private Thread stdoutReaderThread;
+
+    private Thread stderrReaderThread;
+
+    private volatile boolean closed;
+
     @Override
-    public void start(Map<Long, CompletableFuture<JsonNode>> pendingRequest) {
+    public synchronized void start(Map<Long, CompletableFuture<JsonNode>> pendingRequest) {
+        if (closed)
+            throw new IllegalStateException("StdioTransport is closed");
+
+        if (process != null)
+            throw new IllegalStateException("StdioTransport is already started");
+
         setPendingRequests(pendingRequest);
 
         log.info("Starting process: {}", command);
@@ -38,16 +51,15 @@ public class StdioTransport extends McpTransport {
 
         try {
             process = processBuilder.start();
+            out = new PrintStream(process.getOutputStream(), true);
         } catch (IOException e) {
             log.warn("IOException when creating Process.", e);
             throw new UncheckedIOException(e);
         }
 
-        // FIXME: where should we obtain the thread?
-        new Thread(() -> {
-            out = new PrintStream(process.getOutputStream(), true);
-
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+        Process startedProcess = process;
+        stdoutReaderThread = new Thread(() -> {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(startedProcess.getInputStream()))) {
                 String line;
 
                 while ((line = reader.readLine()) != null) {
@@ -57,24 +69,30 @@ public class StdioTransport extends McpTransport {
                     handle(JsonUtils.json2Node(line));
                 }
             } catch (IOException e) {
-                log.warn("IOException when creating Stdio.", e);
-                throw new RuntimeException(e);
+                if (!closed)
+                    log.warn("IOException while reading MCP process output.", e);
             }
 
-            log.info("ProcessIOHandler has finished reading output from process"); // Why can't reach this line code
-        }).start();
+            log.debug("MCP process stdout reader has stopped");
+        }, "aj-mcp-stdio-stdout");
+        stdoutReaderThread.setDaemon(true);
+        stdoutReaderThread.start();
 
-        new Thread(() -> { // Process for the Error output
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
+        stderrReaderThread = new Thread(() -> {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(startedProcess.getErrorStream()))) {
                 String line;
 
                 while ((line = reader.readLine()) != null)
                     log.warn("[ERROR] {}", line);
             } catch (IOException e) {
-                log.warn("IOException when creating Error Stdio.", e);
-                throw new UncheckedIOException(e);
+                if (!closed)
+                    log.warn("IOException while reading MCP process error output.", e);
             }
-        }).start();
+
+            log.debug("MCP process stderr reader has stopped");
+        }, "aj-mcp-stdio-stderr");
+        stderrReaderThread.setDaemon(true);
+        stderrReaderThread.start();
     }
 
     @Override
@@ -113,6 +131,11 @@ public class StdioTransport extends McpTransport {
         log.info("JSON RPC {}", request);
         CompletableFuture<JsonNode> future = new CompletableFuture<>();
 
+        if (closed || out == null) {
+            future.completeExceptionally(new IllegalStateException("StdioTransport is not running"));
+            return future;
+        }
+
         if (id != null)
 //            messageHandler.startOperation(id, future);
             saveRequest(id, future);
@@ -135,13 +158,69 @@ public class StdioTransport extends McpTransport {
 
     @Override
     public void checkHealth() {
-        if (!process.isAlive())
+        if (closed || process == null || !process.isAlive())
             throw new IllegalStateException("Process is not alive");
     }
 
     @Override
-    public void close() {
-        out.close();
-        process.destroy();
+    public synchronized void close() {
+        if (closed)
+            return;
+
+        closed = true;
+        boolean interrupted = false;
+
+        if (out != null)
+            out.close();
+
+        if (process != null) {
+            process.destroy();
+
+            try {
+                if (!process.waitFor(2, TimeUnit.SECONDS)) {
+                    process.destroyForcibly();
+                    if (!process.waitFor(2, TimeUnit.SECONDS))
+                        log.warn("MCP process did not terminate after being forcibly destroyed");
+                }
+            } catch (InterruptedException e) {
+                interrupted = true;
+                process.destroyForcibly();
+            }
+
+            closeQuietly(process.getInputStream());
+            closeQuietly(process.getErrorStream());
+            closeQuietly(process.getOutputStream());
+        }
+
+        if (stdoutReaderThread != null)
+            stdoutReaderThread.interrupt();
+        if (stderrReaderThread != null)
+            stderrReaderThread.interrupt();
+
+        interrupted |= joinQuietly(stdoutReaderThread);
+        interrupted |= joinQuietly(stderrReaderThread);
+
+        if (interrupted)
+            Thread.currentThread().interrupt();
+    }
+
+    private static void closeQuietly(Closeable closeable) {
+        try {
+            closeable.close();
+        } catch (IOException ignored) {
+            // Best-effort cleanup during shutdown.
+        }
+    }
+
+    private static boolean joinQuietly(Thread thread) {
+        if (thread == null || thread == Thread.currentThread())
+            return false;
+
+        try {
+            thread.join(1_000);
+            return false;
+        } catch (InterruptedException e) {
+            return true;
+        }
     }
 }

@@ -39,6 +39,7 @@ public class ServerStdio implements McpTransportSync {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 break;
             }
         }
@@ -52,8 +53,10 @@ public class ServerStdio implements McpTransportSync {
 //                    McpRequestRawInfo request = McpServerInitialize.jsonRpcValidate(line); // 解析输入消息
 //                    String response = JsonUtils.toJson(server.processMessage(request));  // 处理消息并生成响应
                     String response = handle(line);
-                    writer.println(response);    // 发送响应
-                    writer.flush();
+                    if (response != null) {
+                        writer.println(response);    // 发送响应
+                        writer.flush();
+                    }
                 } catch (JsonRpcErrorException e) {
                     writer.println(e.toJson());
                     writer.flush();
@@ -76,7 +79,7 @@ public class ServerStdio implements McpTransportSync {
         McpRequestRawInfo request = McpServerInitialize.jsonRpcValidate(rawJson); // 解析输入消息
         McpResponse mcpResponse = server.processMessage(request);
 
-        return JsonUtils.toJson(mcpResponse);  // 处理消息并生成响应
+        return mcpResponse == null ? null : JsonUtils.toJson(mcpResponse);  // 处理消息并生成响应
     }
 
     @Override

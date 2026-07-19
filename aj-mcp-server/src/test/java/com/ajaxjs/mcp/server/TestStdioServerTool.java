@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TestStdioServerTool extends TestStdioServerBase {
     @Test
@@ -69,6 +70,17 @@ class TestStdioServerTool extends TestStdioServerBase {
 
         String expectedOutput = "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"isError\":false,\"content\":[{\"type\":\"text\",\"text\":\"ok\"}]}}\r\n";
         assertEquals(expectedOutput, testOut.toString());
+    }
+
+    @Test
+    void testBusinessErrorIsReturnedAsToolError() {
+        setIn("{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/call\",\"params\":{\"name\":\"error\"}}\n");
+
+        JsonNode response = JsonUtils.json2Node(testOut.toString());
+        JsonNode result = response.get("result");
+        assertTrue(result.get("isError").asBoolean());
+        assertEquals("text", result.get("content").get(0).get("type").asText());
+        assertEquals("business error", result.get("content").get(0).get("text").asText());
     }
 
     @Test

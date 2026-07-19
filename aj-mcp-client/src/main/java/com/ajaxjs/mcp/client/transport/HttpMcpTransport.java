@@ -212,14 +212,16 @@ public class HttpMcpTransport extends McpTransport {
 
             @Override
             public void onResponse(Call call, Response response) {
-                int statusCode = response.code();
+                try (Response ignored = response) {
+                    int statusCode = response.code();
 
-                if (!isExpectedStatusCode(statusCode))
-                    future.completeExceptionally(new RuntimeException("HTTP return ERROR! Unexpected status code: " + statusCode));
+                    if (!isExpectedStatusCode(statusCode))
+                        future.completeExceptionally(new RuntimeException("HTTP return ERROR! Unexpected status code: " + statusCode));
 
-                // For messages with null ID, we don't wait for a response in the SSE channel
-                if (id == null)
-                    future.complete(null);
+                    // For messages with null ID, we don't wait for a response in the SSE channel
+                    if (id == null)
+                        future.complete(null);
+                }
             }
         });
 

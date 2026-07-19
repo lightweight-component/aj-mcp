@@ -53,7 +53,10 @@ public class McpClient extends McpClientResource {
 
         try {
             result = transport.sendRequestWithResponse(request).get();
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+        } catch (ExecutionException e) {
             throw new RuntimeException(e);
         } finally {
             pendingRequests.remove(request.getId());
@@ -107,7 +110,10 @@ public class McpClient extends McpClientResource {
                     .put(ContentType.TEXT, "There was a timeout executing the tool");
 
             return extractResult(resultTimeout);
-        } catch (ExecutionException | InterruptedException e) {
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+        } catch (ExecutionException e) {
             throw new RuntimeException(e);
         } finally {
             pendingRequests.remove(operationId);

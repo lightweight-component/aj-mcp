@@ -54,6 +54,19 @@ public abstract class McpServerInitialize implements McpConstant {
         return store;
     }
 
+    static <T> T getStore(Map<String, T> map, String name, Long requestId, String featureType) {
+        if (McpUtils.isEmptyText(name))
+            throw new JsonRpcErrorException(requestId, JsonRpcErrorCode.INVALID_PARAMS,
+                    featureType + " name is required");
+
+        T store = map.get(name);
+        if (store == null)
+            throw new JsonRpcErrorException(requestId, JsonRpcErrorCode.INVALID_PARAMS,
+                    "Unknown " + featureType + ": " + name);
+
+        return store;
+    }
+
     /**
      * Initializes the connection with the client and returns the server configuration information.
      * <p>

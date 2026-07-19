@@ -80,6 +80,7 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
             log.warn("ExecutionException when initializing MCP", e);
             throw new RuntimeException(e);
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             log.warn("InterruptedException when initializing MCP", e);
             throw new RuntimeException(e);
         } finally {
@@ -120,7 +121,10 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
         try {
             CompletableFuture<JsonNode> resultFuture = transport.sendRequestWithResponse(ping);
             resultFuture.get(requestTimeout.toMillis(), TimeUnit.MILLISECONDS);
-        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+        } catch (ExecutionException | TimeoutException e) {
             throw new RuntimeException(e);
         } finally {
             pendingRequests.remove(operationId);

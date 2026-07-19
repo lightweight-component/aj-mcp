@@ -89,7 +89,7 @@ public abstract class McpServerResource extends McpServerInitialize {
             throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_PARAMS, "params is required");
 
         GetResourceRequest.Params params = JsonUtils.jsonNode2bean(paramsNode, GetResourceRequest.Params.class);
-        ServerStoreResource store = getStore(FeatureMgr.RESOURCE_STORE, params.getUri());
+        ServerStoreResource store = getStore(FeatureMgr.RESOURCE_STORE, params.getUri(), requestRaw.getId(), "resource");
 
         // execute prompt method
         Method method = store.getMethod();
@@ -98,10 +98,12 @@ public abstract class McpServerResource extends McpServerInitialize {
         try {
             returnedValue = method.invoke(store.getInstance());
         } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
+            throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INTERNAL_ERROR,
+                    "Resource method is not accessible: " + params.getUri(), e);
         } catch (InvocationTargetException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
+            Throwable cause = e.getCause() == null ? e : e.getCause();
+            throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INTERNAL_ERROR,
+                    "Resource execution failed: " + errorMessage(cause), cause);
         }
 
         List<ResourceContent> contents = Collections.singletonList((ResourceContent) returnedValue);
@@ -111,5 +113,10 @@ public abstract class McpServerResource extends McpServerInitialize {
         result.setResult(new GetResourceResult.ResourceResultDetail(contents));
 
         return result;
+    }
+
+    private static String errorMessage(Throwable cause) {
+        String message = cause.getMessage();
+        return message == null || message.trim().isEmpty() ? cause.getClass().getSimpleName() : message;
     }
 }

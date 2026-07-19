@@ -67,7 +67,10 @@ public abstract class McpClientPrompt extends McpClientBase {
 
             List<PromptItem> promptItems = parsePromptRefs(result);
             promptRefs.set(promptItems);
-        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+        } catch (ExecutionException | TimeoutException e) {
             throw new RuntimeException(e);
         } finally {
             pendingRequests.remove(request.getId());
@@ -134,7 +137,10 @@ public abstract class McpClientPrompt extends McpClientBase {
             McpException.checkForErrors(result);
 
             return JsonUtils.jsonNode2bean(result.get(McpConstant.RESPONSE_RESULT), GetPromptResult.PromptResultDetail.class);
-        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+        } catch (ExecutionException | TimeoutException e) {
             throw new RuntimeException(e);
         } finally {
             pendingRequests.remove(operationId);

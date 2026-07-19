@@ -38,13 +38,13 @@ public class PackageAnnotationScanner {
                 // 处理本地文件系统中的 .class 文件
                 File directory = new File(resource.getFile());
                 if (directory.exists()) {
-                    findClassesInDirectory(directory, packageName, annotation, classes);
+                    findClassesInDirectory(directory, packageName, annotation, classLoader, classes);
                 }
             } else if ("jar".equals(resource.getProtocol())) {
                 // 处理 JAR 文件
                 JarURLConnection jarConnection = (JarURLConnection) resource.openConnection();
                 try (JarFile jarFile = jarConnection.getJarFile()) {
-                    findClassesInJar(jarFile, packagePath, annotation, classes);
+                    findClassesInJar(jarFile, packagePath, annotation, classLoader, classes);
                 }
             }
         }
@@ -58,18 +58,20 @@ public class PackageAnnotationScanner {
      * @param directory   目录文件对象，代表要扫描的目录
      * @param packageName 扫描的包名，用于构建类的全限定名
      * @param annotation  要查找的注解类，仅添加带有此注解的类
+     * @param classLoader 用于加载类的类加载器
      * @param classes     用于存储找到的类的集合
      * @throws ClassNotFoundException 当类加载失败时抛出
      */
-    private static void findClassesInDirectory(File directory, String packageName, Class<? extends Annotation> annotation, Set<Class<?>> classes) throws ClassNotFoundException {
+    private static void findClassesInDirectory(File directory, String packageName, Class<? extends Annotation> annotation,
+                                               ClassLoader classLoader, Set<Class<?>> classes) throws ClassNotFoundException {
         for (File file : Objects.requireNonNull(directory.listFiles())) {
             if (file.isDirectory()) {
                 // 递归子目录
-                findClassesInDirectory(file, packageName + "." + file.getName(), annotation, classes);
+                findClassesInDirectory(file, packageName + "." + file.getName(), annotation, classLoader, classes);
             } else if (file.getName().endsWith(CLASS_FILE_EXTENSION)) {
                 // 加载类并检查是否带有目标注解
                 String className = packageName + "." + file.getName().replace(CLASS_FILE_EXTENSION, McpConstant.EMPTY_STR);
-                Class<?> clazz = Class.forName(className);
+                Class<?> clazz = Class.forName(className, false, classLoader);
                 if (clazz.isAnnotationPresent(annotation))
                     classes.add(clazz);
             }
@@ -78,7 +80,8 @@ public class PackageAnnotationScanner {
 
     private static final String CLASS_FILE_EXTENSION = ".class";
 
-    private static void findClassesInJar(JarFile jarFile, String packagePath, Class<? extends Annotation> annotation, Set<Class<?>> classes) throws ClassNotFoundException {
+    private static void findClassesInJar(JarFile jarFile, String packagePath, Class<? extends Annotation> annotation,
+                                         ClassLoader classLoader, Set<Class<?>> classes) throws ClassNotFoundException {
         Enumeration<JarEntry> entries = jarFile.entries();
         while (entries.hasMoreElements()) {
             JarEntry entry = entries.nextElement();
@@ -87,7 +90,7 @@ public class PackageAnnotationScanner {
             if (entryName.startsWith(packagePath) && entryName.endsWith(CLASS_FILE_EXTENSION)) {
                 // 加载类并检查是否带有目标注解
                 String className = entryName.replace('/', '.').replace(CLASS_FILE_EXTENSION, McpConstant.EMPTY_STR);
-                Class<?> clazz = Class.forName(className);
+                Class<?> clazz = Class.forName(className, false, classLoader);
                 if (clazz.isAnnotationPresent(annotation))
                     classes.add(clazz);
 
