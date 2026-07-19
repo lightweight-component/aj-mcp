@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -59,11 +58,9 @@ public abstract class McpClientPrompt extends McpClientBase {
         if (pageNo != 0)
             request.setParams(new Cursor(pageNo));
 
-        long timeoutMillis = requestTimeout.toMillis() == 0 ? Integer.MAX_VALUE : requestTimeout.toMillis();
-
         try {
             CompletableFuture<JsonNode> resultFuture = transport.sendRequestWithResponse(request);
-            JsonNode result = resultFuture.get(timeoutMillis, TimeUnit.MILLISECONDS);
+            JsonNode result = awaitResponse(resultFuture);
 
             List<PromptItem> promptItems = parsePromptRefs(result);
             promptRefs.set(promptItems);
@@ -129,11 +126,9 @@ public abstract class McpClientPrompt extends McpClientBase {
         request.setId(operationId);
         request.setParams(params);
 
-        long timeoutMillis = requestTimeout.toMillis() == 0 ? Integer.MAX_VALUE : requestTimeout.toMillis();
-
         try {
             CompletableFuture<JsonNode> resultFuture = transport.sendRequestWithResponse(request);
-            JsonNode result = resultFuture.get(timeoutMillis, TimeUnit.MILLISECONDS);
+            JsonNode result = awaitResponse(resultFuture);
             McpException.checkForErrors(result);
 
             return JsonUtils.jsonNode2bean(result.get(McpConstant.RESPONSE_RESULT), GetPromptResult.PromptResultDetail.class);

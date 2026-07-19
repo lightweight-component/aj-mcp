@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 @Slf4j
@@ -41,11 +40,9 @@ public abstract class McpClientResource extends McpClientPrompt {
         request.setId(operationId);
         request.setParams(new GetResourceRequest.Params(uri));
 
-        long timeoutMillis = requestTimeout.toMillis() == 0 ? Integer.MAX_VALUE : requestTimeout.toMillis();
-
         try {
             CompletableFuture<JsonNode> resultFuture = transport.sendRequestWithResponse(request);
-            JsonNode result = resultFuture.get(timeoutMillis, TimeUnit.MILLISECONDS);
+            JsonNode result = awaitResponse(resultFuture);
 
             return parseResourceContents(result);
         } catch (InterruptedException e) {
@@ -100,11 +97,9 @@ public abstract class McpClientResource extends McpClientPrompt {
         if (pageNo != 0)
             request.setParams(new Cursor(pageNo));
 
-        long timeoutMillis = requestTimeout.toMillis() == 0 ? Integer.MAX_VALUE : requestTimeout.toMillis();
-
         try {
             CompletableFuture<JsonNode> resultFuture = transport.sendRequestWithResponse(request);
-            JsonNode result = resultFuture.get(timeoutMillis, TimeUnit.MILLISECONDS);
+            JsonNode result = awaitResponse(resultFuture);
             resourceRefs.set(parseResourceRefs(result));
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -122,14 +117,12 @@ public abstract class McpClientResource extends McpClientPrompt {
 
         GetResourceTemplateListRequest request = new GetResourceTemplateListRequest();
         request.setId(idGenerator.getAndIncrement());
-        long timeoutMillis = requestTimeout.toMillis() == 0 ? Integer.MAX_VALUE : requestTimeout.toMillis();
-
         if(pageNo!=0)
             request.setParams(new Cursor(pageNo));
 
         try {
             CompletableFuture<JsonNode> resultFuture = transport.sendRequestWithResponse(request);
-            JsonNode result = resultFuture.get(timeoutMillis, TimeUnit.MILLISECONDS);
+            JsonNode result = awaitResponse(resultFuture);
             resourceTemplateRefs.set(parseResourceTemplateRefs(result));
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();

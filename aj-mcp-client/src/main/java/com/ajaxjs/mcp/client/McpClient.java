@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -53,10 +52,7 @@ public class McpClient extends McpClientResource {
 
         try {
             CompletableFuture<JsonNode> resultFuture = transport.sendRequestWithResponse(request);
-            if (requestTimeout.isZero())
-                result = resultFuture.get();
-            else
-                result = resultFuture.get(requestTimeout.toMillis(), TimeUnit.MILLISECONDS);
+            result = awaitResponse(resultFuture);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
@@ -98,14 +94,12 @@ public class McpClient extends McpClientResource {
     @Override
     public String callTool(CallToolRequest request) {
         long operationId = idGenerator.getAndIncrement();
-        long timeoutMillis = requestTimeout.toMillis() == 0 ? Integer.MAX_VALUE : requestTimeout.toMillis();
-
         request.setId(operationId);
         JsonNode result;
 
         try {
             CompletableFuture<JsonNode> resultFuture = transport.sendRequestWithResponse(request);
-            result = resultFuture.get(timeoutMillis, TimeUnit.MILLISECONDS);
+            result = awaitResponse(resultFuture);
         } catch (TimeoutException timeout) {
             transport.sendRequestWithoutResponse(new CancellationNotification(String.valueOf(operationId), "Timeout"));
             ObjectNode resultTimeout = JsonNodeFactory.instance.objectNode();

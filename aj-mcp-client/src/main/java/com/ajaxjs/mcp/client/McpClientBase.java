@@ -48,7 +48,7 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
     String protocolVersion = "2024-11-05";
 
     /**
-     * Sets the timeout for tool execution. This value applies to each tool execution individually.
+     * Sets the timeout for every request, including initialization and health checks.
      * The default value is 60 seconds. A value of zero means no timeout.
      */
     @Builder.Default
@@ -74,8 +74,10 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
 
         try {
             CompletableFuture<JsonNode> future = transport.initialize(request); // here is almost a synchronous call
-            JsonNode capabilities = future.get();
+            JsonNode capabilities = awaitResponse(future);
             log.info("MCP server capabilities: {}", capabilities.get("result"));
+        } catch (TimeoutException e) {
+            throw new RuntimeException("Timed out initializing MCP client after " + requestTimeout, e);
         } catch (ExecutionException e) {
             log.warn("ExecutionException when initializing MCP", e);
             throw new RuntimeException(e);
@@ -86,6 +88,24 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
         } finally {
             pendingRequests.remove(operationId);
         }
+    }
+
+    /**
+     * Waits for an MCP response using the timeout policy shared by every client operation.
+     * A zero duration means an unlimited wait.
+     */
+    protected JsonNode awaitResponse(CompletableFuture<JsonNode> future)
+            throws InterruptedException, ExecutionException, TimeoutException {
+        if (requestTimeout.isNegative())
+            throw new IllegalArgumentException("requestTimeout must not be negative");
+
+        if (requestTimeout.isZero())
+            return future.get();
+
+        // CompletableFuture only accepts a numeric timeout. Preserve positive
+        // sub-millisecond durations instead of accidentally turning them into zero.
+        long timeoutMillis = Math.max(1L, requestTimeout.toMillis());
+        return future.get(timeoutMillis, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -120,7 +140,7 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
 
         try {
             CompletableFuture<JsonNode> resultFuture = transport.sendRequestWithResponse(ping);
-            resultFuture.get(requestTimeout.toMillis(), TimeUnit.MILLISECONDS);
+            awaitResponse(resultFuture);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
