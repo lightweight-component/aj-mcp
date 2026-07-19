@@ -41,13 +41,8 @@ public abstract class McpServerResource extends McpServerInitialize {
         if (jsonNode.has(PARAMS))
             request.setParams(JsonUtils.jsonNode2bean(jsonNode.get(PARAMS), Cursor.class));
 
-        // get info from RAM
-        if (FeatureMgr.RESOURCE_STORE.isEmpty())
-            throw new NullPointerException("Store is NOT initialized");
-
         List<ResourceItem> resources = new ArrayList<>();
-        for (String name : FeatureMgr.RESOURCE_STORE.keySet()) {
-            ServerStoreResource store = getStore(FeatureMgr.RESOURCE_STORE, name);
+        for (ServerStoreResource store : featureMgr.getResourceStore().values()) {
             ResourceItem resourceItem = store.getResource();
             resources.add(resourceItem);
         }
@@ -89,7 +84,7 @@ public abstract class McpServerResource extends McpServerInitialize {
             throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_PARAMS, "params is required");
 
         GetResourceRequest.Params params = JsonUtils.jsonNode2bean(paramsNode, GetResourceRequest.Params.class);
-        ServerStoreResource store = getStore(FeatureMgr.RESOURCE_STORE, params.getUri(), requestRaw.getId(), "resource");
+        ServerStoreResource store = getStore(featureMgr.getResourceStore(), params.getUri(), requestRaw.getId(), "resource");
 
         // execute prompt method
         Method method = store.getMethod();

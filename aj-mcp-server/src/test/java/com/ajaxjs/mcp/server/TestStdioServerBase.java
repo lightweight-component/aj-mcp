@@ -32,6 +32,7 @@ class TestStdioServerBase {
         mgr.init("com.ajaxjs.mcp.server.testcase");
 
         McpServer server = new McpServer();
+        server.setFeatureMgr(mgr);
         server.setTransport(new ServerStdio(server));
         ServerConfig serverConfig = new ServerConfig();
         serverConfig.setName("AJ_MCP_Server");

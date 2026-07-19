@@ -96,14 +96,9 @@ public class McpServer extends McpServerPrompt {
             request.setParams(cursor);
         }
 
-        // get info from RAM
-        if (FeatureMgr.TOOL_STORE.isEmpty())
-            throw new NullPointerException("Store is NOT initialized.");
-
         List<ToolItem> tools = new ArrayList<>();
 
-        for (String name : FeatureMgr.TOOL_STORE.keySet()) {
-            ServerStoreTool store = getStore(FeatureMgr.TOOL_STORE, name);
+        for (ServerStoreTool store : featureMgr.getToolStore().values()) {
             tools.add(store.getTool());
         }
 
@@ -152,7 +147,7 @@ public class McpServer extends McpServerPrompt {
         CallToolRequest.Params params = JsonUtils.jsonNode2bean(paramsNode, CallToolRequest.Params.class);
         Map<String, Object> arguments = params.getArguments();
 
-        ServerStoreTool store = getStore(FeatureMgr.TOOL_STORE, params.getName(), requestRaw.getId(), "tool");
+        ServerStoreTool store = getStore(featureMgr.getToolStore(), params.getName(), requestRaw.getId(), "tool");
         ToolItem tool = store.getTool();
         JsonSchema inputSchema = tool.getInputSchema();
 

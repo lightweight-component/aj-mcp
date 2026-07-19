@@ -39,13 +39,8 @@ public abstract class McpServerPrompt extends McpServerResource {
         if (jsonNode.has(PARAMS))
             request.setParams(JsonUtils.jsonNode2bean(jsonNode.get(PARAMS), Cursor.class));
 
-        // get info from RAM
-        if (FeatureMgr.PROMPT_STORE.isEmpty())
-            throw new NullPointerException("Store is NOT initialized");
-
         List<PromptItem> prompts = new ArrayList<>();
-        for (String name : FeatureMgr.PROMPT_STORE.keySet()) {
-            ServerStorePrompt store = getStore(FeatureMgr.PROMPT_STORE, name);
+        for (ServerStorePrompt store : featureMgr.getPromptStore().values()) {
             PromptItem promptItem = store.getPrompt();
             prompts.add(promptItem);
         }
@@ -91,7 +86,7 @@ public abstract class McpServerPrompt extends McpServerResource {
         request.setId(requestRaw.getId());
         request.setParams(params);
 
-        ServerStorePrompt store = getStore(FeatureMgr.PROMPT_STORE, params.getName(), requestRaw.getId(), "prompt");
+        ServerStorePrompt store = getStore(featureMgr.getPromptStore(), params.getName(), requestRaw.getId(), "prompt");
         PromptItem prompt = store.getPrompt();
 
         Object[] argValues = null;

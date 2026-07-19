@@ -1,10 +1,12 @@
 package com.ajaxjs.mcp.server.feature;
 
 import com.ajaxjs.mcp.protocol.McpConstant;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.lang.annotation.AnnotationFormatError;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.util.Enumeration;
@@ -14,6 +16,7 @@ import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+@Slf4j
 public class PackageAnnotationScanner {
     /**
      * 在指定的包中查找带有特定注解的类
@@ -71,9 +74,7 @@ public class PackageAnnotationScanner {
             } else if (file.getName().endsWith(CLASS_FILE_EXTENSION)) {
                 // 加载类并检查是否带有目标注解
                 String className = packageName + "." + file.getName().replace(CLASS_FILE_EXTENSION, McpConstant.EMPTY_STR);
-                Class<?> clazz = Class.forName(className, false, classLoader);
-                if (clazz.isAnnotationPresent(annotation))
-                    classes.add(clazz);
+                addIfAnnotated(className, annotation, classLoader, classes);
             }
         }
     }
@@ -90,11 +91,21 @@ public class PackageAnnotationScanner {
             if (entryName.startsWith(packagePath) && entryName.endsWith(CLASS_FILE_EXTENSION)) {
                 // 加载类并检查是否带有目标注解
                 String className = entryName.replace('/', '.').replace(CLASS_FILE_EXTENSION, McpConstant.EMPTY_STR);
-                Class<?> clazz = Class.forName(className, false, classLoader);
-                if (clazz.isAnnotationPresent(annotation))
-                    classes.add(clazz);
+                addIfAnnotated(className, annotation, classLoader, classes);
 
             }
+        }
+    }
+
+    private static void addIfAnnotated(String className, Class<? extends Annotation> annotation,
+                                       ClassLoader classLoader, Set<Class<?>> classes) {
+        try {
+            Class<?> clazz = Class.forName(className, false, classLoader);
+            if (clazz.isAnnotationPresent(annotation))
+                classes.add(clazz);
+        } catch (ClassNotFoundException | LinkageError | TypeNotPresentException | AnnotationFormatError e) {
+            log.warn("Skipping class '{}' while scanning annotations because it cannot be loaded: {}",
+                    className, e.toString());
         }
     }
 }
