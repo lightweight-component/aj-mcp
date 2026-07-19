@@ -11,18 +11,30 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Data
 @Slf4j
 public class ServerStdio implements McpTransportSync {
-    private final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+    private final InputStream input = System.in;
+
+    private final BufferedReader reader = new BufferedReader(new InputStreamReader(input));
 
     private final PrintWriter writer = new PrintWriter(System.out, true);
 
-    private final AtomicBoolean running = new AtomicBoolean(true);
+    private final AtomicBoolean running = new AtomicBoolean(false);
+
+    private final AtomicBoolean started = new AtomicBoolean(false);
+
+    private final AtomicBoolean closed = new AtomicBoolean(false);
+
+    private final Object lifecycleLock = new Object();
+
+    private volatile Thread inputThread;
 
     private McpServer server;
 
@@ -32,16 +44,29 @@ public class ServerStdio implements McpTransportSync {
 
     @Override
     public void start() {
-        // 启动输入处理线程
-        new Thread(this::processInput).start();
+        synchronized (lifecycleLock) {
+            if (closed.get())
+                throw new IllegalStateException("STDIO server transport is closed");
 
-        while (running.get()) { // 主线程处理其他任务
+            if (!started.compareAndSet(false, true))
+                throw new IllegalStateException("STDIO server transport is already started");
+
+            running.set(true);
+            inputThread = new Thread(this::processInput, "aj-mcp-server-stdio-input");
+            inputThread.setDaemon(true);
+            inputThread.start();
+        }
+
+        try {
+            while (running.get() && inputThread.isAlive())
+                inputThread.join(250);
+        } catch (InterruptedException e) {
             try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                break;
+                close();
+            } catch (IOException closeError) {
+                log.warn("Failed to close STDIO server transport after interruption", closeError);
             }
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -68,7 +93,8 @@ public class ServerStdio implements McpTransportSync {
                 }
             }
         } catch (IOException e) {
-            log.warn("输入处理错误: {}", e.getMessage());
+            if (!closed.get())
+                log.warn("输入处理错误: {}", e.getMessage());
         } finally {
             running.set(false);
         }
@@ -89,6 +115,54 @@ public class ServerStdio implements McpTransportSync {
 
     @Override
     public void close() throws IOException {
+        if (!closed.compareAndSet(false, true))
+            return;
 
+        running.set(false);
+        IOException closeFailure = null;
+
+        try {
+            // BufferedReader.readLine() holds the reader lock while blocking. Closing the
+            // underlying stream directly is therefore required to unblock the input thread.
+            input.close();
+        } catch (IOException e) {
+            closeFailure = e;
+        }
+
+        writer.flush();
+
+        Thread thread;
+        synchronized (lifecycleLock) {
+            thread = inputThread;
+        }
+
+        if (thread != null && thread != Thread.currentThread()) {
+            thread.interrupt();
+            boolean interrupted = false;
+
+            try {
+                thread.join(TimeUnit.SECONDS.toMillis(2));
+            } catch (InterruptedException e) {
+                interrupted = true;
+            }
+
+            if (thread.isAlive())
+                log.warn("STDIO server input thread did not stop within 2 seconds");
+
+            if (interrupted)
+                Thread.currentThread().interrupt();
+        }
+
+        try {
+            reader.close();
+        } catch (IOException e) {
+            if (closeFailure == null)
+                closeFailure = e;
+            else
+                closeFailure.addSuppressed(e);
+        }
+
+        if (closeFailure != null)
+            throw closeFailure;
     }
 }
