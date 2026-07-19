@@ -8,6 +8,7 @@ import okhttp3.Response;
 import okhttp3.sse.EventSource;
 import okhttp3.sse.EventSourceListener;
 
+import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -70,12 +71,17 @@ public class SseEventListener extends EventSourceListener {
      */
     @Override
     public void onFailure(EventSource eventSource, Throwable t, Response response) {
+        Throwable cause = t;
+        if (cause == null && response != null)
+            cause = new IOException("SSE server returned HTTP " + response.code() + ": " + response.message());
+        if (cause == null)
+            cause = new IOException("SSE channel failed");
+
         if (!initializationFinished.isDone()) {
-            if (t != null)
-                initializationFinished.completeExceptionally(t);
-            else if (response != null)
-                initializationFinished.completeExceptionally(new RuntimeException("The server returned: " + response.message()));
+            initializationFinished.completeExceptionally(cause);
         }
+
+        transport.failPendingRequests(cause);
 
         if (t != null && (t.getMessage() == null || !t.getMessage().toLowerCase().contains("Socket closed".toLowerCase())))
             log.warn("SSE channel failure", t);
@@ -88,6 +94,10 @@ public class SseEventListener extends EventSourceListener {
 
     @Override
     public void onClosed(EventSource eventSource) {
+        IOException cause = new IOException("SSE channel closed");
+        if (!initializationFinished.isDone())
+            initializationFinished.completeExceptionally(cause);
+        transport.failPendingRequests(cause);
         log.debug("SSE channel closed");
     }
 }

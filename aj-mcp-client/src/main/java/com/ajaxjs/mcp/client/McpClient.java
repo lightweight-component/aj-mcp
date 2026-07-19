@@ -52,11 +52,15 @@ public class McpClient extends McpClientResource {
         JsonNode result;
 
         try {
-            result = transport.sendRequestWithResponse(request).get();
+            CompletableFuture<JsonNode> resultFuture = transport.sendRequestWithResponse(request);
+            if (requestTimeout.isZero())
+                result = resultFuture.get();
+            else
+                result = resultFuture.get(requestTimeout.toMillis(), TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
-        } catch (ExecutionException e) {
+        } catch (ExecutionException | TimeoutException e) {
             throw new RuntimeException(e);
         } finally {
             pendingRequests.remove(request.getId());

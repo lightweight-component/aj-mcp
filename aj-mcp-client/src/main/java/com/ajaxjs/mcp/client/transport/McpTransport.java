@@ -94,6 +94,22 @@ public abstract class McpTransport implements McpConstant, Closeable {
     }
 
     /**
+     * Completes and removes every outstanding request when the transport can no longer
+     * deliver responses, for example after a connection failure or shutdown.
+     *
+     * @param cause the transport failure reported to request callers
+     */
+    public void failPendingRequests(Throwable cause) {
+        if (pendingRequests == null)
+            return;
+
+        pendingRequests.forEach((id, future) -> {
+            if (pendingRequests.remove(id, future))
+                future.completeExceptionally(cause);
+        });
+    }
+
+    /**
      * 解析来自 MCP 服务器的 JSON 报文。
      * 首先获取 id 字段，用于确定响应消息所对应的请求。另外还针对 ping 以及 notifications/message 方法的响应进行处理。
      * <p>

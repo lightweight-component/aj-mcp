@@ -168,6 +168,7 @@ public class StdioTransport extends McpTransport {
             return;
 
         closed = true;
+        failPendingRequests(new IOException("STDIO MCP transport is closed"));
         boolean interrupted = false;
 
         if (out != null)

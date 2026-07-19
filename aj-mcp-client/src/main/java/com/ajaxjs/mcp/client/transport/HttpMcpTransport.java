@@ -63,6 +63,8 @@ public class HttpMcpTransport extends McpTransport {
      */
     private volatile String postUrl;
 
+    private volatile boolean closed;
+
     /**
      * Constructor for creating an instance with only the SSE URL.
      *
@@ -133,6 +135,9 @@ public class HttpMcpTransport extends McpTransport {
      */
     @Override
     public void start(Map<Long, CompletableFuture<JsonNode>> pendingRequest) {
+        if (closed)
+            throw new IllegalStateException("HTTP MCP transport is closed");
+
         setPendingRequests(pendingRequest);
         mcpSseEventListener = startSseChannel(logResponses);
     }
@@ -199,8 +204,18 @@ public class HttpMcpTransport extends McpTransport {
      */
     private CompletableFuture<JsonNode> execute(Request request, Long id) {
         CompletableFuture<JsonNode> future = new CompletableFuture<>();
+        if (closed) {
+            future.completeExceptionally(new IOException("HTTP MCP transport is closed"));
+            return future;
+        }
+
         if (id != null)
             saveRequest(id, future);
+
+        if (closed) {
+            future.completeExceptionally(new IOException("HTTP MCP transport is closed"));
+            return future;
+        }
 
         log.info("pending request to {}", request.url());
 
@@ -288,6 +303,12 @@ public class HttpMcpTransport extends McpTransport {
      */
     @Override
     public void close() {
+        if (closed)
+            return;
+
+        closed = true;
+        failPendingRequests(new IOException("HTTP MCP transport is closed"));
+
         if (mcpSseEventListener != null)
             mcpSseEventListener.cancel();
 
