@@ -18,6 +18,13 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -107,7 +114,6 @@ public class FeatureMgr {
 
         Map<String, JsonSchemaProperty> properties = new HashMap<>();
         List<String> required = new ArrayList<>();
-        boolean hasArgs = false;
         Parameter[] parameters = method.getParameters();
         List<String> paramsOrder = null;
 
@@ -115,7 +121,6 @@ public class FeatureMgr {
             paramsOrder = new ArrayList<>();
             for (Parameter parameter : parameters) {
                 if (parameter.isAnnotationPresent(ToolArg.class)) {
-                    hasArgs = true;
                     ToolArg arg = parameter.getAnnotation(ToolArg.class);
                     String name = arg.value().isEmpty() ? parameter.getName() : arg.value();
                     JsonSchemaProperty property = new JsonSchemaProperty();
@@ -130,18 +135,17 @@ public class FeatureMgr {
                 }
             }
         }
+        // 无论是否有参数，都生成合法的 JSON Schema（无参工具为空的 {"type":"object","properties":{}}），
+        // 否则 MCP 规范要求 inputSchema 必须是对象，严格客户端会校验失败
         JsonSchema inputSchema = new JsonSchema();
-
-        if (hasArgs) {
-            inputSchema.setType("object");
-            inputSchema.setProperties(properties);
-            inputSchema.setRequired(required);
-        }
+        inputSchema.setType("object");
+        inputSchema.setProperties(properties);
+        inputSchema.setRequired(required);
 
         ToolItem toolItem = new ToolItem();
         toolItem.setName(toolName);
         toolItem.setDescription(description);
-        toolItem.setInputSchema(hasArgs ? inputSchema : null);
+        toolItem.setInputSchema(inputSchema);
 
         ServerStoreTool store = new ServerStoreTool();
         store.setMethod(method);
@@ -164,26 +168,31 @@ public class FeatureMgr {
         // 获取参数的类型
         Class<?> type = parameter.getType();
 
-        // 基础类型和包装类型的映射
+        // 基础类型和包装类型的映射（JSON Schema 的 type 必须是小写）
         if (type.isPrimitive()) {
-            if (type == byte.class || type == short.class || type == int.class ||
-                    type == long.class || type == float.class || type == double.class)
+            if (type == byte.class || type == short.class || type == int.class || type == long.class)
+                return "integer";
+            else if (type == float.class || type == double.class)
                 return "number";
             else if (type == boolean.class)
                 return "boolean";
             else if (type == char.class)
                 return "string";
         } else {
-            if (Number.class.isAssignableFrom(type))
-                return "Number";
-            else if (type == Boolean.class)
-                return "Boolean";
+            if (type == Boolean.class)
+                return "boolean";
             else if (type == Character.class || type == String.class)
                 return "string";
+            else if (Number.class.isAssignableFrom(type)) {
+                // 浮点类型映射为 number，其余数字类型映射为 integer
+                if (type == Float.class || type == Double.class || type == BigDecimal.class)
+                    return "number";
+                return "integer";
+            }
         }
 
-        // 其他类型默认返回 Object
-        return "Object";
+        // 其他类型默认返回 object
+        return "object";
     }
 
     /**

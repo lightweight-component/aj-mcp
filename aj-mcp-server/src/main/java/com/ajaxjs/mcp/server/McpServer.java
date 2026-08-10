@@ -154,18 +154,21 @@ public class McpServer extends McpServerPrompt {
         Object[] argValues = null;
 
         if (inputSchema != null) {
-            if (arguments == null || arguments.isEmpty())
-                throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_PARAMS, "arguments is required!");
-
             List<String> required = inputSchema.getRequired();
-            if (arguments.size() < required.size())
-                throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_PARAMS, "arguments size is not match!");
-
             Map<String, JsonSchemaProperty> argumentsDefined = inputSchema.getProperties();
             List<String> paramsOrder = store.getParamsOrder();
-            argValues = new Object[paramsOrder.size()];
 
+            // 无参工具（未定义任何参数）允许省略 arguments，直接以无参方式调用；
+            // 只有定义过参数的工具才要求客户端提供 arguments
             if (argumentsDefined != null && !argumentsDefined.isEmpty()) {
+                if (arguments == null || arguments.isEmpty())
+                    throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_PARAMS, "arguments is required!");
+
+                if (arguments.size() < required.size())
+                    throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_PARAMS, "arguments size is not match!");
+
+                argValues = new Object[paramsOrder.size()];
+
                 for (int i = 0; i < paramsOrder.size(); i++) {
                     String name = paramsOrder.get(i);
                     Object arg = arguments.get(name);
@@ -253,6 +256,7 @@ public class McpServer extends McpServerPrompt {
             case "string":
                 return value.toString();
             case "number":
+            case "integer":
                 // 首先检查是否是数字类型
                 if (value instanceof Number) {
                     Number numberValue = (Number) value;
@@ -296,6 +300,10 @@ public class McpServer extends McpServerPrompt {
                     return Boolean.parseBoolean(strValue);
 
                 throw new IllegalArgumentException("Value cannot be converted to Boolean: " + value);
+
+            case "object":
+                // JSON 对象类型参数直接原样返回
+                return value;
 
             default:
                 throw new IllegalArgumentException("Unsupported targetType: " + targetType);
