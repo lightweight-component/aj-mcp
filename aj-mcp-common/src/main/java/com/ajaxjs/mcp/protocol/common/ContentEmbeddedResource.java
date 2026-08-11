@@ -1,6 +1,7 @@
 package com.ajaxjs.mcp.protocol.common;
 
 import com.ajaxjs.mcp.protocol.McpConstant;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -33,10 +34,13 @@ public class ContentEmbeddedResource extends Content {
          * Either text content or base64-encoded blob data
          */
         String text;
+
+        /** Base64-encoded binary data. Exactly one of text and blob should be set. */
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        String blob;
     }
 
     public ContentEmbeddedResource() {
         this.type = McpConstant.ContentType.RESOURCE;
     }
 }
-

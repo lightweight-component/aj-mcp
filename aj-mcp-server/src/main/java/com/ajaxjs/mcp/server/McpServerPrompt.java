@@ -147,12 +147,19 @@ public abstract class McpServerPrompt extends McpServerResource {
             throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INTERNAL_ERROR, "Prompt execution failed: " + errorMessage(cause), cause);
         }
 
-        List<PromptMessage> promptMessages = null;
+        List<PromptMessage> promptMessages;
 
         if (returnedValue instanceof PromptMessage)
             promptMessages = Collections.singletonList((PromptMessage) returnedValue);
-        else if (returnedValue instanceof List)
-            promptMessages = (List<PromptMessage>) returnedValue;
+        else if (returnedValue instanceof List) {
+            promptMessages = new ArrayList<>();
+            for (Object value : (List<?>) returnedValue) {
+                if (!(value instanceof PromptMessage))
+                    throw invalidPromptReturn(requestRaw.getId(), value);
+                promptMessages.add((PromptMessage) value);
+            }
+        } else
+            throw invalidPromptReturn(requestRaw.getId(), returnedValue);
 
         GetPromptResult.PromptResultDetail promptResultDetail = new GetPromptResult.PromptResultDetail();
         promptResultDetail.setDescription(prompt.getDescription());
@@ -163,6 +170,12 @@ public abstract class McpServerPrompt extends McpServerResource {
         result.setResult(promptResultDetail);
 
         return result;
+    }
+
+    private static JsonRpcErrorException invalidPromptReturn(Object requestId, Object value) {
+        return new JsonRpcErrorException(requestId, JsonRpcErrorCode.INTERNAL_ERROR,
+                "Prompt returned an unsupported value: "
+                        + (value == null ? "null" : value.getClass().getName()));
     }
 
     private static String errorMessage(Throwable cause) {

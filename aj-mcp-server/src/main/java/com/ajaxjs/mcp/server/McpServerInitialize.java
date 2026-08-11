@@ -58,13 +58,36 @@ public abstract class McpServerInitialize implements McpConstant {
      * @return Returns the initialization response object containing the server configuration information
      */
     McpResponse initialize(Object id, JsonNode jsonNode) {
+        JsonNode paramsNode = jsonNode == null ? null : jsonNode.get(PARAMS);
+        if (paramsNode == null || !paramsNode.isObject())
+            throw new JsonRpcErrorException(id, JsonRpcErrorCode.INVALID_PARAMS,
+                    "initialize params must be an object");
+
+        JsonNode protocolVersionNode = paramsNode.get("protocolVersion");
+        if (protocolVersionNode == null || !protocolVersionNode.isTextual()
+                || McpUtils.isEmptyText(protocolVersionNode.textValue()))
+            throw new JsonRpcErrorException(id, JsonRpcErrorCode.INVALID_PARAMS,
+                    "protocolVersion must be a non-empty string");
+
+        JsonNode capabilitiesNode = paramsNode.get("capabilities");
+        if (capabilitiesNode == null || !capabilitiesNode.isObject())
+            throw new JsonRpcErrorException(id, JsonRpcErrorCode.INVALID_PARAMS,
+                    "capabilities must be an object");
+
+        JsonNode clientInfoNode = paramsNode.get("clientInfo");
+        if (clientInfoNode == null || !clientInfoNode.isObject()
+                || !nonEmptyText(clientInfoNode.get("name")) || !nonEmptyText(clientInfoNode.get("version")))
+            throw new JsonRpcErrorException(id, JsonRpcErrorCode.INVALID_PARAMS,
+                    "clientInfo.name and clientInfo.version must be non-empty strings");
+
         InitializeRequest initializeRequest;
 
         try {
             initializeRequest = JsonUtils.OBJECT_MAPPER.treeToValue(jsonNode, InitializeRequest.class);
         } catch (JsonProcessingException e) {
             log.warn("JsonNode converts to bean.", e);
-            throw new RuntimeException(e);
+            throw new JsonRpcErrorException(id, JsonRpcErrorCode.INVALID_PARAMS,
+                    "Invalid initialize parameters", e);
         }
 
         InitializeRequestParams requestParams = initializeRequest.getParams();
@@ -133,6 +156,10 @@ public abstract class McpServerInitialize implements McpConstant {
         return resp;
     }
 
+    private static boolean nonEmptyText(JsonNode node) {
+        return node != null && node.isTextual() && McpUtils.hasText(node.textValue());
+    }
+
     /** Hook used by the concrete server to bind negotiated state to its transport session. */
     protected void onProtocolNegotiated(String version, InitializeRequestParams requestParams) {
     }
@@ -164,6 +191,9 @@ public abstract class McpServerInitialize implements McpConstant {
         if (jsonrpcNode == null)
             throw new JsonRpcErrorException(JsonRpcErrorCode.INVALID_REQUEST, "Empty jsonrpc version.");
 
+        if (!jsonrpcNode.isTextual())
+            throw new JsonRpcErrorException(JsonRpcErrorCode.INVALID_REQUEST, "jsonrpc version must be a string.");
+
         String jsonrpc = jsonrpcNode.asText();
 
         if (McpUtils.isEmptyText(jsonrpc) || !BaseJsonRpcMessage.VERSION.equals(jsonrpc))
@@ -192,13 +222,13 @@ public abstract class McpServerInitialize implements McpConstant {
 
         JsonNode methodNode = jsonNode.get(METHOD);
 
-        if (methodNode == null)
-            throw new JsonRpcErrorException(JsonRpcErrorCode.METHOD_NOT_FOUND, "Method not found.");
+        if (methodNode == null || !methodNode.isTextual())
+            throw new JsonRpcErrorException(JsonRpcErrorCode.INVALID_REQUEST, "Method must be a string.");
 
         String method = methodNode.asText();
 
         if (McpUtils.isEmptyText(method))
-            throw new JsonRpcErrorException(JsonRpcErrorCode.METHOD_NOT_FOUND, "Method not found.");
+            throw new JsonRpcErrorException(JsonRpcErrorCode.INVALID_REQUEST, "Method must not be empty.");
 
         return new McpRequestRawInfo(id, method, jsonNode);
     }

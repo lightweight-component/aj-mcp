@@ -71,7 +71,7 @@ public class HttpMcpTransport extends McpTransport {
      * @param sseUrl The SSE URL.
      */
     public HttpMcpTransport(String sseUrl) {
-        this.sseUrl = sseUrl;
+        this(sseUrl, false, false);
     }
 
     @Builder

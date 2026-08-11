@@ -31,6 +31,7 @@ import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -45,8 +46,11 @@ public class McpServer extends McpServerPrompt {
     private final Map<String, InitializeRequestParams.Capabilities> clientCapabilities = new ConcurrentHashMap<>();
     private final Map<String, Set<String>> resourceSubscriptions = new ConcurrentHashMap<>();
     private volatile String loggingLevel = "info";
-    private final Map<String, Thread> runningRequests = new ConcurrentHashMap<>();
-    private final Set<String> cancelledRequests = ConcurrentHashMap.newKeySet();
+    /**
+     * JSON-RPC request IDs are scoped to a connection. Keep the session in the
+     * key so two clients using the same ID cannot cancel each other's tools.
+     */
+    private final Map<RequestKey, RunningRequest> runningRequests = new ConcurrentHashMap<>();
     private final Map<String, SessionState> sessionStates = new ConcurrentHashMap<>();
     private final AtomicLong serverRequestIds = new AtomicLong(1);
     private final Map<String, CompletableFuture<JsonNode>> pendingClientResponses = new ConcurrentHashMap<>();
@@ -62,12 +66,19 @@ public class McpServer extends McpServerPrompt {
     }
 
     void removeSession(String sessionId) {
-        for (Set<String> sessions : resourceSubscriptions.values())
-            sessions.remove(sessionId);
+        resourceSubscriptions.forEach((uri, ignored) ->
+                resourceSubscriptions.computeIfPresent(uri, (key, sessions) -> {
+                    sessions.remove(sessionId);
+                    return sessions.isEmpty() ? null : sessions;
+                }));
 
         sessionStates.remove(sessionId);
         sessionProtocolVersions.remove(sessionId);
         clientCapabilities.remove(sessionId);
+        runningRequests.forEach((key, request) -> {
+            if (key.belongsTo(sessionId) && runningRequests.remove(key, request))
+                request.cancel();
+        });
         String prefix = sessionId + ":";
         pendingClientResponses.forEach((key, future) -> {
             if (key.startsWith(prefix) && pendingClientResponses.remove(key, future))
@@ -102,6 +113,9 @@ public class McpServer extends McpServerPrompt {
     }
 
     public List<Root> listRoots(String sessionId, Duration timeout) {
+        InitializeRequestParams.Capabilities capabilities = clientCapabilities.get(sessionId);
+        if (capabilities == null || capabilities.getRoots() == null)
+            throw new IllegalStateException("Client did not advertise roots capability");
         JsonNode result = requestClient(sessionId, Methods.ROOTS_LIST, null, timeout);
         List<Root> roots = new ArrayList<>();
         for (JsonNode root : result.path("roots"))
@@ -111,6 +125,9 @@ public class McpServer extends McpServerPrompt {
 
     public SamplingCreateMessageResult createMessage(String sessionId, SamplingCreateMessageParams params,
                                                      Duration timeout) {
+        InitializeRequestParams.Capabilities capabilities = clientCapabilities.get(sessionId);
+        if (capabilities == null || capabilities.getSampling() == null)
+            throw new IllegalStateException("Client did not advertise sampling capability");
         JsonNode result = requestClient(sessionId, Methods.SAMPLING_CREATE_MESSAGE,
                 JsonUtils.OBJECT_MAPPER.valueToTree(params), timeout);
         return JsonUtils.OBJECT_MAPPER.convertValue(result, SamplingCreateMessageResult.class);
@@ -252,14 +269,28 @@ public class McpServer extends McpServerPrompt {
             return;
 
         try {
-            Thread task = runningRequests.get(requestId.asText());
-            cancelledRequests.add(requestId.asText());
+            RunningRequest request = runningRequests.get(requestKey(requestIdValue(requestId)));
 
-            if (task != null)
-                task.interrupt();
+            // Do not retain unknown cancellation IDs. JSON-RPC IDs may be reused,
+            // so retaining one could cancel an unrelated future request.
+            if (request != null)
+                request.cancel();
         } catch (RuntimeException ignored) {
             log.debug("Ignoring malformed cancellation request id {}", requestId);
         }
+    }
+
+    private static Object requestIdValue(JsonNode requestId) {
+        if (requestId.isIntegralNumber())
+            return requestId.longValue();
+        if (requestId.isTextual())
+            return requestId.textValue();
+        throw new IllegalArgumentException("Cancellation requestId must be a string or integer");
+    }
+
+    private RequestKey requestKey(Object requestId) {
+        String sessionId = currentSession.get();
+        return new RequestKey(sessionId == null ? "direct" : sessionId, requestId);
     }
 
     private McpResponse setLoggingLevel(McpRequestRawInfo requestRaw) {
@@ -353,10 +384,10 @@ public class McpServer extends McpServerPrompt {
         if (subscribe)
             resourceSubscriptions.computeIfAbsent(uri, ignored -> ConcurrentHashMap.newKeySet()).add(sessionId);
         else {
-            Set<String> sessions = resourceSubscriptions.get(uri);
-
-            if (sessions != null)
+            resourceSubscriptions.computeIfPresent(uri, (ignored, sessions) -> {
                 sessions.remove(sessionId);
+                return sessions.isEmpty() ? null : sessions;
+            });
         }
 
         McpResponse response = new McpResponse();
@@ -579,10 +610,15 @@ public class McpServer extends McpServerPrompt {
         Method method = store.getMethod();
         Object returnedValue;
 
-        runningRequests.put(String.valueOf(requestRaw.getId()), Thread.currentThread());
+        RequestKey requestKey = requestKey(requestRaw.getId());
+        RunningRequest runningRequest = new RunningRequest(Thread.currentThread());
+        RunningRequest previous = runningRequests.putIfAbsent(requestKey, runningRequest);
+
+        if (previous != null)
+            throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_REQUEST,
+                    "A request with the same id is already running in this session");
+
         try {
-            if (cancelledRequests.remove(String.valueOf(requestRaw.getId())))
-                Thread.currentThread().interrupt();
             if (argValues == null)
                 returnedValue = method.invoke(store.getInstance());
             else
@@ -596,8 +632,7 @@ public class McpServer extends McpServerPrompt {
 
             return toolErrorResult(requestRaw.getId(), cause);
         } finally {
-            runningRequests.remove(String.valueOf(requestRaw.getId()), Thread.currentThread());
-            cancelledRequests.remove(String.valueOf(requestRaw.getId()));
+            runningRequests.remove(requestKey, runningRequest);
             // Executor workers are reused; do not leak a cancellation interrupt into
             // an unrelated request accepted by the same worker later.
             Thread.interrupted();
@@ -614,15 +649,25 @@ public class McpServer extends McpServerPrompt {
                 throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_REQUEST,
                         "Structured tool output requires MCP 2025-06-18");
             StructuredToolResult structured = (StructuredToolResult) returnedValue;
-            content = structured.getContent();
+            try {
+                content = toolContentList(requestRaw.getId(), structured.getContent());
+            } catch (JsonRpcErrorException e) {
+                return toolErrorResult(requestRaw.getId(), e);
+            }
             structuredContent = structured.getStructuredContent();
             structuredError = structured.isError();
         } else if (returnedValue instanceof Content)
             content = Collections.singletonList((Content) returnedValue);
         else if (returnedValue instanceof String)
             content = Collections.singletonList(new ContentText((String) returnedValue));
-        else if (returnedValue instanceof List)
-            content = (List<Content>) returnedValue;
+        else if (returnedValue instanceof List) {
+            try {
+                content = toolContentList(requestRaw.getId(), (List<?>) returnedValue);
+            } catch (JsonRpcErrorException e) {
+                return toolErrorResult(requestRaw.getId(), e);
+            }
+        } else if (returnedValue == null)
+            return toolErrorResult(requestRaw.getId(), new IllegalStateException("Tool returned null"));
         else
             content = Collections.singletonList(new ContentText(returnedValue.toString()));
 
@@ -636,6 +681,22 @@ public class McpServer extends McpServerPrompt {
         result.setResult(detail);
 
         return result;
+    }
+
+    private static List<Content> toolContentList(Object requestId, List<?> values) {
+        if (values == null)
+            throw new JsonRpcErrorException(requestId, JsonRpcErrorCode.INTERNAL_ERROR,
+                    "Tool returned a null content list");
+
+        List<Content> content = new ArrayList<>(values.size());
+        for (Object value : values) {
+            if (!(value instanceof Content))
+                throw new JsonRpcErrorException(requestId, JsonRpcErrorCode.INTERNAL_ERROR,
+                        "Tool content list contains an unsupported value: "
+                                + (value == null ? "null" : value.getClass().getName()));
+            content.add((Content) value);
+        }
+        return content;
     }
 
     private static Class<?> methodParameterType(ServerStoreTool store, int index) {
@@ -686,6 +747,49 @@ public class McpServer extends McpServerPrompt {
             return text.indexOf('.') >= 0 ? Double.valueOf(text) : Long.valueOf(text);
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Value cannot be converted to Number: " + value, e);
+        }
+    }
+
+    private static final class RequestKey {
+        private final String sessionId;
+        private final Object requestId;
+
+        private RequestKey(String sessionId, Object requestId) {
+            this.sessionId = Objects.requireNonNull(sessionId, "sessionId");
+            this.requestId = Objects.requireNonNull(requestId, "requestId");
+        }
+
+        private boolean belongsTo(String sessionId) {
+            return this.sessionId.equals(sessionId);
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            if (this == other)
+                return true;
+            if (!(other instanceof RequestKey))
+                return false;
+            RequestKey that = (RequestKey) other;
+            return sessionId.equals(that.sessionId) && requestId.equals(that.requestId);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(sessionId, requestId);
+        }
+    }
+
+    private static final class RunningRequest {
+        private final Thread thread;
+        private final AtomicBoolean cancelled = new AtomicBoolean();
+
+        private RunningRequest(Thread thread) {
+            this.thread = thread;
+        }
+
+        private void cancel() {
+            if (cancelled.compareAndSet(false, true))
+                thread.interrupt();
         }
     }
 

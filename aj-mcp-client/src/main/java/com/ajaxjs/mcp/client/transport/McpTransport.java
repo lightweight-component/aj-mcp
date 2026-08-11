@@ -167,16 +167,27 @@ public abstract class McpTransport implements McpConstant, Closeable {
         // A message containing both method and id is a server-initiated request,
         // not a response to one of the client's pending operations.
         if (message.has(METHOD) && message.has(ID)) {
-            JsonNode result = serverRequestHandler == null ? null : serverRequestHandler.apply(message);
             ObjectNode response = JsonUtils.OBJECT_MAPPER.createObjectNode();
             response.put("jsonrpc", BaseJsonRpcMessage.VERSION);
             response.set(ID, message.get(ID));
 
-            if (result != null)
-                response.set(RESPONSE_RESULT, result);
-            else
+            if (serverRequestHandler == null)
                 response.putObject("error").put("code", -32601).put("message",
                         "No client handler for method " + message.get(METHOD).asText());
+            else {
+                try {
+                    JsonNode result = serverRequestHandler.apply(message);
+                    if (result != null)
+                        response.set(RESPONSE_RESULT, result);
+                    else
+                        response.putObject("error").put("code", -32601).put("message",
+                                "No client handler for method " + message.get(METHOD).asText());
+                } catch (RuntimeException e) {
+                    log.warn("Client request handler failed for {}", message.get(METHOD).asText(), e);
+                    response.putObject("error").put("code", -32603)
+                            .put("message", "Client request handler failed");
+                }
+            }
             sendJson(response);
         } else if (message.has(ID)) {
             long messageId = message.get(ID).asLong();

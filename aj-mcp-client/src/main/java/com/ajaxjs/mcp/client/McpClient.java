@@ -84,6 +84,7 @@ public class McpClient extends McpClientResource {
         try {
             CompletableFuture<JsonNode> resultFuture = transport.sendRequestWithResponse(request);
             result = awaitResponse(resultFuture);
+            com.ajaxjs.mcp.common.McpException.checkForErrors(result);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);

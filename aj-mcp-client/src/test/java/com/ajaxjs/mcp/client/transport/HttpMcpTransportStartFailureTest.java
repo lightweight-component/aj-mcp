@@ -21,11 +21,36 @@ class HttpMcpTransportStartFailureTest {
         assertTrue(transport.eventSource.cancelled);
     }
 
+    @Test
+    void convenienceConstructorInitializesHttpClient() {
+        OneArgFailingTransport transport = new OneArgFailingTransport();
+
+        assertThrows(RuntimeException.class,
+                () -> transport.start(new ConcurrentHashMap<>()));
+
+        assertTrue(transport.eventSource.cancelled);
+    }
+
     private static class FailingTransport extends HttpMcpTransport {
         private TestEventSource eventSource;
 
         private FailingTransport() {
             super("http://localhost/sse", false, false);
+        }
+
+        @Override
+        EventSource createEventSource(Request request, SseEventListener listener) {
+            eventSource = new TestEventSource(request);
+            listener.onFailure(eventSource, new IOException("connection failed"), null);
+            return eventSource;
+        }
+    }
+
+    private static class OneArgFailingTransport extends HttpMcpTransport {
+        private TestEventSource eventSource;
+
+        private OneArgFailingTransport() {
+            super("http://localhost/sse");
         }
 
         @Override

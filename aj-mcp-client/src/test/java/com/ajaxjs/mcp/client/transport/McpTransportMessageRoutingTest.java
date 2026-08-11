@@ -36,6 +36,22 @@ class McpTransportMessageRoutingTest {
         assertEquals(0, transport.sent.get().get("result").get("roots").size());
     }
 
+    @Test
+    void convertsServerRequestHandlerFailureToJsonRpcError() {
+        CapturingTransport transport = new CapturingTransport();
+        transport.setMessageHandlers(ignored -> { }, message -> {
+            throw new IllegalStateException("handler bug");
+        });
+
+        transport.handle(JsonUtils.json2Node(
+                "{\"jsonrpc\":\"2.0\",\"id\":7,\"method\":\"sampling/createMessage\"}"));
+
+        assertEquals(7, transport.sent.get().get("id").asInt());
+        assertEquals(-32603, transport.sent.get().get("error").get("code").asInt());
+        assertEquals("Client request handler failed",
+                transport.sent.get().get("error").get("message").asText());
+    }
+
     private static final class CapturingTransport extends McpTransport {
         final AtomicReference<JsonNode> sent = new AtomicReference<>();
 

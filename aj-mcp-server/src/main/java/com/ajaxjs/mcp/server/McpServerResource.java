@@ -128,7 +128,7 @@ public abstract class McpServerResource extends McpServerInitialize {
                     "Resource execution failed: " + errorMessage(cause), cause);
         }
 
-        List<ResourceContent> contents = Collections.singletonList((ResourceContent) returnedValue);
+        List<ResourceContent> contents = resourceContents(requestRaw.getId(), returnedValue, "Resource");
 
         GetResourceResult result = new GetResourceResult();
         result.setId(requestRaw.getId());
@@ -164,19 +164,7 @@ public abstract class McpServerResource extends McpServerInitialize {
                         "Resource template execution failed: " + errorMessage(cause), cause);
             }
 
-            List<ResourceContent> contents;
-
-            if (returned instanceof List)
-                contents = (List<ResourceContent>) returned;
-            else if (returned instanceof ResourceContent)
-                contents = Collections.singletonList((ResourceContent) returned);
-            else {
-                ResourceContentText text = new ResourceContentText();
-                text.setUri(uri);
-                text.setMimeType(store.getResourceTemplate().getMimeType());
-                text.setText(String.valueOf(returned));
-                contents = Collections.singletonList(text);
-            }
+            List<ResourceContent> contents = resourceContents(requestId, returned, "Resource template");
 
             GetResourceResult response = new GetResourceResult();
             response.setId(requestId);
@@ -185,6 +173,29 @@ public abstract class McpServerResource extends McpServerInitialize {
             return response;
         }
         throw new JsonRpcErrorException(requestId, JsonRpcErrorCode.INVALID_PARAMS, "Unknown resource: " + uri);
+    }
+
+    private static List<ResourceContent> resourceContents(Object requestId, Object returned, String feature) {
+        if (returned instanceof ResourceContent)
+            return Collections.singletonList((ResourceContent) returned);
+
+        if (returned instanceof List) {
+            List<ResourceContent> contents = new ArrayList<>();
+            for (Object value : (List<?>) returned) {
+                if (!(value instanceof ResourceContent))
+                    throw invalidResourceReturn(requestId, feature, value);
+                contents.add((ResourceContent) value);
+            }
+            return contents;
+        }
+
+        throw invalidResourceReturn(requestId, feature, returned);
+    }
+
+    private static JsonRpcErrorException invalidResourceReturn(Object requestId, String feature, Object value) {
+        return new JsonRpcErrorException(requestId, JsonRpcErrorCode.INTERNAL_ERROR,
+                feature + " returned an unsupported value: "
+                        + (value == null ? "null" : value.getClass().getName()));
     }
 
     private static String decodeUriPart(String value) {

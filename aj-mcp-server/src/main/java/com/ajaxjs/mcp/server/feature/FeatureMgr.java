@@ -190,20 +190,24 @@ public class FeatureMgr {
 
         if (parameters != null) {
             paramsOrder = new ArrayList<>();
-            for (Parameter parameter : parameters) {
-                if (parameter.isAnnotationPresent(ToolArg.class)) {
-                    ToolArg arg = parameter.getAnnotation(ToolArg.class);
-                    String name = arg.value().isEmpty() ? parameter.getName() : arg.value();
-                    JsonSchemaProperty property = new JsonSchemaProperty();
-                    property.setType(mapJavaTypeToJsType(parameter));
-                    property.setDescription(arg.description().isEmpty() ? null : arg.description());
+            for (int index = 0; index < parameters.length; index++) {
+                Parameter parameter = parameters[index];
+                if (!parameter.isAnnotationPresent(ToolArg.class))
+                    throw new IllegalArgumentException("Every tool parameter must be annotated with @ToolArg: "
+                            + method.getDeclaringClass().getName() + "#" + method.getName()
+                            + " parameter " + index);
 
-                    properties.put(name, property);
-                    paramsOrder.add(name);
+                ToolArg arg = parameter.getAnnotation(ToolArg.class);
+                String name = arg.value().isEmpty() ? parameter.getName() : arg.value();
+                JsonSchemaProperty property = new JsonSchemaProperty();
+                property.setType(mapJavaTypeToJsType(parameter));
+                property.setDescription(arg.description().isEmpty() ? null : arg.description());
 
-                    if (arg.required())
-                        required.add(name);
-                }
+                properties.put(name, property);
+                paramsOrder.add(name);
+
+                if (arg.required())
+                    required.add(name);
             }
         }
         // inputSchema is required by every MCP protocol revision. A tool with
