@@ -185,7 +185,6 @@ public class FeatureMgr {
 
         Map<String, JsonSchemaProperty> properties = new HashMap<>();
         List<String> required = new ArrayList<>();
-        boolean hasArgs = false;
         Parameter[] parameters = method.getParameters();
         List<String> paramsOrder = null;
 
@@ -193,7 +192,6 @@ public class FeatureMgr {
             paramsOrder = new ArrayList<>();
             for (Parameter parameter : parameters) {
                 if (parameter.isAnnotationPresent(ToolArg.class)) {
-                    hasArgs = true;
                     ToolArg arg = parameter.getAnnotation(ToolArg.class);
                     String name = arg.value().isEmpty() ? parameter.getName() : arg.value();
                     JsonSchemaProperty property = new JsonSchemaProperty();
@@ -208,19 +206,19 @@ public class FeatureMgr {
                 }
             }
         }
+        // inputSchema is required by every MCP protocol revision. A tool with
+        // no arguments still accepts an empty JSON object and must therefore be
+        // described by an object schema instead of JSON null.
         JsonSchema inputSchema = new JsonSchema();
-
-        if (hasArgs) {
-            inputSchema.setType("object");
-            inputSchema.setProperties(properties);
-            inputSchema.setRequired(required);
-        }
+        inputSchema.setType("object");
+        inputSchema.setProperties(properties);
+        inputSchema.setRequired(required);
 
         ToolItem toolItem = new ToolItem();
         toolItem.setName(toolName);
         toolItem.setDescription(description);
         toolItem.setTitle(McpUtils.isEmptyText(tool.title()) ? null : tool.title());
-        toolItem.setInputSchema(hasArgs ? inputSchema : null);
+        toolItem.setInputSchema(inputSchema);
         if (!McpUtils.isEmptyText(tool.outputSchema())) {
             try {
                 toolItem.setOutputSchema(com.ajaxjs.mcp.common.JsonUtils.fromJson(tool.outputSchema(), JsonSchema.class));

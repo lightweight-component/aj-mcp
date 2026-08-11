@@ -9,6 +9,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class TestStdioServerTool extends TestStdioServerBase {
     @Test
@@ -21,19 +22,31 @@ class TestStdioServerTool extends TestStdioServerBase {
         tools.forEach(tool -> byName.put(tool.get("name").asText(), tool));
         assertEquals("number", byName.get("echoInteger").get("inputSchema").get("properties").get("input").get("type").asText());
         assertEquals("boolean", byName.get("echoBoolean").get("inputSchema").get("properties").get("input").get("type").asText());
+
+        // Parameterless tools still require a valid JSON object input schema.
+        JsonNode schema = byName.get("longOperation").get("inputSchema");
+        assertNotNull(schema);
+        assertTrue(schema.isObject());
+        assertEquals("object", schema.get("type").asText());
+        assertTrue(schema.get("properties").isObject());
+        assertEquals(0, schema.get("properties").size());
     }
 
     @Test
     void testListPage() {
         setIn("{\"jsonrpc\": \"2.0\",\"id\":1,\"method\":\"tools/list\",\"params\":{\"cursor\":\"eyJwYWdlIjoxfQ==\"}}\n");
         // Verify the output
-        String expectedOutput = "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"tools\":[{\"name\":\"longOperation\",\"description\":\"Takes 10 seconds to complete\",\"inputSchema\":null},{\"name\":\"image\",\"description\":\"A nice pic\",\"inputSchema\":null},{\"name\":\"getAll\",\"description\":\"List ALL\",\"inputSchema\":null}],\"nextCursor\":\"eyJwYWdlIjoyfQ==\"}}\r\n";
-        JsonNode jsonNode = JsonUtils.json2Node(expectedOutput);
+        JsonNode jsonNode = JsonUtils.json2Node(testOut.toString());
         JsonNode jsonNode1 = jsonNode.get("result").get("tools");
         List list = JsonUtils.jsonNode2bean(jsonNode1, List.class);
         assertEquals(3, list.size());
-
-        assertEquals(expectedOutput, testOut.toString());
+        assertEquals("eyJwYWdlIjoyfQ==", jsonNode.get("result").get("nextCursor").asText());
+        jsonNode1.forEach(tool -> {
+            JsonNode inputSchema = tool.get("inputSchema");
+            assertNotNull(inputSchema);
+            assertEquals("object", inputSchema.get("type").asText());
+            assertTrue(inputSchema.get("properties").isObject());
+        });
     }
 
     @Test
