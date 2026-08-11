@@ -151,13 +151,11 @@ public class MyTools {
 </tr>
 <tr>
 <td>其它类型</td>
-<td>&quot;Object&quot;</td>
+<td>&quot;object&quot;</td>
 </tr>
 </tbody>
 </table>
-<blockquote>
-<p>当前限制：虽然 <code>required=false</code> 会体现在生成的 schema 中，但反射调用路径尚不能正确处理被省略的可选参数。在该问题修复前，请显式传递所有带注解的参数。</p>
-</blockquote>
+<p><code>required=false</code> 参数可以省略。缺少的引用类型参数会以 <code>null</code> 传入；Java 基本类型无法表达缺省，因此基本类型参数仍须提供。</p>
 <h2>工具实现示例</h2>
 <h3>基础字符串工具</h3>
 <pre><code class="language-java">@Tool(description = &quot;回显字符串&quot;)

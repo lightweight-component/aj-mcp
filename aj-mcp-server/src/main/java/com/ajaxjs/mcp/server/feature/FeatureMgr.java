@@ -98,21 +98,25 @@ public class FeatureMgr {
         String template = annotation.uriTemplate();
         int cursor = 0;
         java.util.regex.Matcher variables = java.util.regex.Pattern.compile("\\{([A-Za-z0-9_]+)}").matcher(template);
+
         while (variables.find()) {
             expression.append(java.util.regex.Pattern.quote(template.substring(cursor, variables.start())));
             expression.append("([^/?#]+)");
             names.add(variables.group(1));
             cursor = variables.end();
         }
+
         expression.append(java.util.regex.Pattern.quote(template.substring(cursor))).append('$');
 
         List<String> methodParameterNames = new ArrayList<>();
+
         for (Parameter parameter : method.getParameters()) {
             ResourceTemplateArg argument = parameter.getAnnotation(ResourceTemplateArg.class);
             String name = argument == null || ResourceTemplateArg.ELEMENT_NAME.equals(argument.name())
                     ? parameter.getName() : argument.name();
             methodParameterNames.add(name);
         }
+
         if (!new HashSet<>(names).equals(new HashSet<>(methodParameterNames)))
             throw new IllegalArgumentException("Resource template variables must match method parameters: " + templateName);
 
@@ -299,7 +303,7 @@ public class FeatureMgr {
         store.setResource(resourceItem);
 
         resourceStore.put(resource.uri(), store);
-        log.info("Added resource: " + resource.uri());
+        log.info("Added resource: {}", resource.uri());
     }
 
     /**
@@ -315,7 +319,6 @@ public class FeatureMgr {
     private void addPrompt(Prompt prompt, Method method, Object instance) {
         String promptName = prompt.value().isEmpty() ? method.getName() : prompt.value();
         String description = prompt.description();
-
         List<PromptArgument> arguments = null;
         Parameter[] parameters = method.getParameters();
 

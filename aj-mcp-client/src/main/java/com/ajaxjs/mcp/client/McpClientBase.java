@@ -79,9 +79,13 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
     final Map<Integer, List<ResourceTemplate>> resourceTemplateRefs = new ConcurrentHashMap<>();
 
     final Map<Integer, List<PromptItem>> promptRefs = new ConcurrentHashMap<>();
+
     final Map<String, Consumer<JsonNode>> notificationHandlers = new ConcurrentHashMap<>();
+
     final Map<String, Function<JsonNode, JsonNode>> serverRequestHandlers = new ConcurrentHashMap<>();
+
     volatile List<Root> roots = java.util.Collections.emptyList();
+
     volatile boolean rootsListChanged;
 
     @Override
@@ -97,8 +101,10 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
             CompletableFuture<JsonNode> future = transport.initialize(request); // here is almost a synchronous call
             JsonNode capabilities = awaitResponse(future);
             JsonNode negotiatedVersion = capabilities.path(RESPONSE_RESULT).path("protocolVersion");
+
             if (!supportedProtocolVersions.contains(negotiatedVersion.asText()))
                 throw new IllegalStateException("Server selected unsupported protocol version: " + negotiatedVersion.asText());
+
             negotiatedProtocolVersion = negotiatedVersion.asText();
             transport.setNegotiatedProtocolVersion(negotiatedProtocolVersion);
             transport.markInitialized();
@@ -131,6 +137,7 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
     public void setRoots(List<Root> roots, boolean notifyChanges) {
         this.roots = java.util.Collections.unmodifiableList(new ArrayList<>(roots));
         this.rootsListChanged = notifyChanges;
+
         onServerRequest(Methods.ROOTS_LIST, ignored -> {
             com.fasterxml.jackson.databind.node.ObjectNode result = JsonUtils.OBJECT_MAPPER.createObjectNode();
             result.set("roots", JsonUtils.OBJECT_MAPPER.valueToTree(this.roots));
@@ -142,6 +149,7 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
     public void notifyRootsChanged() {
         if (!rootsListChanged)
             throw new IllegalStateException("roots listChanged capability was not enabled");
+
         McpRequest notification = new McpRequest();
         notification.setMethod(Methods.ROOTS_LIST_CHANGED_NOTIFICATION);
         transport.sendRequestWithoutResponse(notification);
@@ -168,6 +176,7 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
         String method = message.get(METHOD).asText();
         // List-change notifications invalidate all pages because an insertion can
         // shift every cursor/page boundary, not only the first cached page.
+
         if (Methods.TOOLS_LIST_CHANGED_NOTIFICATION.equals(method)) {
             // Tool lists are currently uncached.
         } else if (Methods.RESOURCE_LIST_CHANGED_NOTIFICATION.equals(method)) {
@@ -177,6 +186,7 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
             promptRefs.clear();
 
         Consumer<JsonNode> handler = notificationHandlers.get(method);
+
         if (handler != null) {
             try {
                 handler.accept(message.get(PARAMS));
@@ -189,6 +199,7 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
 
     private JsonNode handleServerRequest(JsonNode message) {
         Function<JsonNode, JsonNode> handler = serverRequestHandlers.get(message.get(METHOD).asText());
+
         return handler == null ? null : handler.apply(message.get(PARAMS));
     }
 
@@ -225,18 +236,22 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
         params.setClientInfo(clientInfo);
 
         InitializeRequestParams.Capabilities capabilities = new InitializeRequestParams.Capabilities();
+
         if (serverRequestHandlers.containsKey(Methods.ROOTS_LIST)) {
             InitializeRequestParams.Capabilities.Roots roots = new InitializeRequestParams.Capabilities.Roots();
             roots.setListChanged(rootsListChanged);
             capabilities.setRoots(roots);
         }
+
         if (serverRequestHandlers.containsKey(Methods.SAMPLING_CREATE_MESSAGE))
             capabilities.setSampling(new InitializeRequestParams.Capabilities.Sampling());
+
         if (serverRequestHandlers.containsKey(Methods.ELICITATION_CREATE)) {
             if (!ProtocolVersion.from(protocolVersion).supportsElicitation())
                 throw new IllegalStateException("Elicitation requires MCP 2025-06-18 or newer");
             capabilities.setElicitation(new InitializeRequestParams.Capabilities.Elicitation());
         }
+
         params.setCapabilities(capabilities);
 
         return params;

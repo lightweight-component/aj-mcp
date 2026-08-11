@@ -119,6 +119,7 @@ public abstract class McpServerPrompt extends McpServerResource {
 
             argValues = new Object[paramOrder.length];
             Class<?>[] parameterTypes = store.getMethod().getParameterTypes();
+
             for (int i = 0; i < argumentsDefined.size(); i++) {
                 PromptArgument definition = argumentsDefined.get(i);
                 Object value = arguments.get(paramOrder[i]);
@@ -139,13 +140,11 @@ public abstract class McpServerPrompt extends McpServerResource {
             else
                 returnedValue = method.invoke(store.getInstance(), argValues);
         } catch (IllegalAccessException e) {
-            throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INTERNAL_ERROR,
-                    "Prompt method is not accessible: " + params.getName(), e);
+            throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INTERNAL_ERROR, "Prompt method is not accessible: " + params.getName(), e);
         } catch (InvocationTargetException e) {
             Throwable cause = e.getCause() == null ? e : e.getCause();
             log.warn("Prompt '{}' execution failed", params.getName(), cause);
-            throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INTERNAL_ERROR,
-                    "Prompt execution failed: " + errorMessage(cause), cause);
+            throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INTERNAL_ERROR, "Prompt execution failed: " + errorMessage(cause), cause);
         }
 
         List<PromptMessage> promptMessages = null;

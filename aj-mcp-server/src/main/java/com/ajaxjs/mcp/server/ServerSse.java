@@ -50,6 +50,7 @@ public class ServerSse implements McpTransportSync {
             throw new IllegalArgumentException("endpointPath is required");
 
         SseSession session = registerSession(clientId, writer);
+
         try {
             session.sendFrame("event: endpoint\ndata: " + endpointPath + "\n\n");
         } catch (RuntimeException e) {
@@ -61,13 +62,16 @@ public class ServerSse implements McpTransportSync {
     private synchronized SseSession registerSession(String clientId, PrintWriter writer) {
         if (closed.get())
             throw new IllegalStateException("SSE server transport is closed");
+
         if (clientId == null || clientId.trim().isEmpty())
             throw new IllegalArgumentException("clientId is required");
+
         if (writer == null)
             throw new IllegalArgumentException("writer is required");
 
         SseSession session = new SseSession(writer);
         SseSession previous = connections.put(clientId, session);
+
         if (previous != null)
             previous.close();
 
@@ -81,8 +85,10 @@ public class ServerSse implements McpTransportSync {
      */
     public void removeConnection(String clientId) {
         SseSession session = connections.remove(clientId);
+
         if (session != null)
             session.close();
+
         server.removeSession(clientId);
     }
 
@@ -176,6 +182,7 @@ public class ServerSse implements McpTransportSync {
         synchronized (writer) {
             writer.write(frame);
             writer.flush();
+
             if (writer.checkError())
                 throw new IllegalStateException("SSE connection write failed");
         }
@@ -223,8 +230,10 @@ public class ServerSse implements McpTransportSync {
     public String handle(String rawJson) {
         if (server.acceptClientResponse("default", rawJson))
             return null;
+
         McpRequestRawInfo request = McpServerInitialize.jsonRpcValidate(rawJson); // 解析输入消息
         McpResponse mcpResponse;
+
         try {
             mcpResponse = server.processMessage(request);
         } catch (JsonRpcErrorException e) {

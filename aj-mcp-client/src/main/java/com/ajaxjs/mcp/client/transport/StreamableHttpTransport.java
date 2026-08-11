@@ -49,13 +49,13 @@ public class StreamableHttpTransport extends McpTransport {
                                    Map<String, String> requestHeaders) {
         this.endpointUrl = Objects.requireNonNull(endpointUrl, "Missing MCP endpoint URL");
         this.openEventStream = openEventStream;
-        this.requestHeaders = requestHeaders == null ? Collections.<String, String>emptyMap()
+        this.requestHeaders = requestHeaders == null ? Collections.emptyMap()
                 : Collections.unmodifiableMap(new LinkedHashMap<>(requestHeaders));
         Duration effectiveTimeout = timeout == null ? Duration.ofSeconds(60) : timeout;
         this.client = new OkHttpClient.Builder()
                 .callTimeout(effectiveTimeout)
                 .connectTimeout(effectiveTimeout)
-                // SSE GET streams are intentionally long lived.
+                // SSE GET streams are intentionally long-lived.
                 .readTimeout(Duration.ZERO)
                 .writeTimeout(effectiveTimeout)
                 .build();
@@ -73,6 +73,7 @@ public class StreamableHttpTransport extends McpTransport {
         initializationVersion = request.getParams().getProtocolVersion();
         return post(request, numericId(request.getId()), false).thenCompose(response -> {
             InitializationNotification initialized = new InitializationNotification();
+
             return post(initialized, null, true).thenApply(ignored -> {
                 if (openEventStream)
                     openGetStream();
@@ -84,6 +85,7 @@ public class StreamableHttpTransport extends McpTransport {
     @Override
     public CompletableFuture<JsonNode> sendRequestWithResponse(McpRequest request) {
         requireInitialized();
+
         return post(request, numericId(request.getId()), true);
     }
 
@@ -115,10 +117,12 @@ public class StreamableHttpTransport extends McpTransport {
 
     private CompletableFuture<JsonNode> postBytes(byte[] json, Long id, boolean versionHeader) {
         CompletableFuture<JsonNode> future = new CompletableFuture<>();
+
         if (closed) {
             future.completeExceptionally(new IOException("Streamable HTTP transport is closed"));
             return future;
         }
+
         if (id != null)
             saveRequest(id, future);
 
@@ -126,6 +130,7 @@ public class StreamableHttpTransport extends McpTransport {
                 .header("Content-Type", "application/json")
                 .header("Accept", "application/json, text/event-stream")
                 .post(RequestBody.create(json));
+
         client.newCall(builder.build()).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -139,21 +144,28 @@ public class StreamableHttpTransport extends McpTransport {
             public void onResponse(Call call, Response response) {
                 try (Response ignored = response) {
                     captureSession(response);
+
                     if (!response.isSuccessful()) {
                         String body = response.body() == null ? "" : response.body().string();
                         failOne(id, future, new IOException("MCP HTTP " + response.code() + ": " + body));
                         return;
                     }
+
                     if (response.code() == 202 || response.code() == 204 || response.body() == null) {
                         future.complete(null);
                         return;
                     }
+
                     String body = response.body().string();
                     String contentType = response.header("Content-Type", "");
+
+                    assert contentType != null;
                     if (contentType.startsWith("text/event-stream"))
                         handleSsePayload(body);
+
                     else if (!body.trim().isEmpty())
                         handle(JsonUtils.json2Node(body));
+
                     if (id == null && !future.isDone())
                         future.complete(null);
                 } catch (Exception e) {
@@ -170,18 +182,24 @@ public class StreamableHttpTransport extends McpTransport {
         // The transport only carries explicitly configured headers.
         for (Map.Entry<String, String> header : requestHeaders.entrySet())
             builder.header(header.getKey(), header.getValue());
+
         if (sessionId != null)
             builder.header(SESSION_ID_HEADER, sessionId);
+
         String version = getNegotiatedProtocolVersion();
+
         if (version == null)
             version = initializationVersion;
+
         if (includeVersion && version != null)
             builder.header(PROTOCOL_VERSION_HEADER, version);
+
         return builder;
     }
 
     private void captureSession(Response response) {
         String received = response.header(SESSION_ID_HEADER);
+
         if (received != null && !received.trim().isEmpty())
             sessionId = received;
     }
@@ -196,6 +214,7 @@ public class StreamableHttpTransport extends McpTransport {
     /** Parses all data records in an SSE response while preserving record boundaries. */
     private void handleSsePayload(String payload) {
         StringBuilder data = new StringBuilder();
+
         for (String line : payload.split("\\r?\\n", -1)) {
             if (line.isEmpty()) {
                 dispatchSseData(data);
@@ -203,9 +222,11 @@ public class StreamableHttpTransport extends McpTransport {
             } else if (line.startsWith("data:")) {
                 if (data.length() > 0)
                     data.append('\n');
+
                 data.append(line.substring(5).trim());
             }
         }
+
         dispatchSseData(data);
     }
 
@@ -241,10 +262,13 @@ public class StreamableHttpTransport extends McpTransport {
     public void close() {
         if (closed)
             return;
+
         closed = true;
         failPendingRequests(new IOException("Streamable HTTP transport is closed"));
+
         if (eventSource != null)
             eventSource.cancel();
+
         client.dispatcher().cancelAll();
         client.dispatcher().executorService().shutdown();
         client.connectionPool().evictAll();

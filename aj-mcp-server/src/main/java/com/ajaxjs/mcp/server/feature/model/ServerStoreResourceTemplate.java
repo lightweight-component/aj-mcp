@@ -7,7 +7,9 @@ import lombok.EqualsAndHashCode;
 import java.util.List;
 import java.util.regex.Pattern;
 
-/** Runtime binding between an RFC 6570 level-1 template and its Java method. */
+/**
+ * Runtime binding between an RFC 6570 level-1 template and its Java method.
+ */
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class ServerStoreResourceTemplate extends ServerStoreBase {

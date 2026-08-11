@@ -165,6 +165,7 @@ public abstract class McpServerResource extends McpServerInitialize {
             }
 
             List<ResourceContent> contents;
+
             if (returned instanceof List)
                 contents = (List<ResourceContent>) returned;
             else if (returned instanceof ResourceContent)
@@ -176,9 +177,11 @@ public abstract class McpServerResource extends McpServerInitialize {
                 text.setText(String.valueOf(returned));
                 contents = Collections.singletonList(text);
             }
+
             GetResourceResult response = new GetResourceResult();
             response.setId(requestId);
             response.setResult(new GetResourceResult.ResourceResultDetail(contents));
+
             return response;
         }
         throw new JsonRpcErrorException(requestId, JsonRpcErrorCode.INVALID_PARAMS, "Unknown resource: " + uri);

@@ -10,5 +10,6 @@ import java.util.List;
 @AllArgsConstructor
 public class McpPage<T> {
     private List<T> items;
+
     private String nextCursor;
 }

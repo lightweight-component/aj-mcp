@@ -127,39 +127,21 @@ ResourceContentBinary blobContents = (ResourceContentBinary) contents;
 assertEquals(&quot;file:///blob&quot;, blobContents.getUri(), &quot;URI should be 'file:///blob'&quot;);
 assertEquals(&quot;blob&quot;, blobContents.getBlob(), &quot;Blob content should be 'blob'&quot;);
 </code></pre>
-<p>Resource-template protocol models exist in the SDK, but annotation-based resource-template registration and server dispatch are not complete in this version. Do not rely on the following pattern until server-side template support is implemented.</p>
-<!--
-``` java
-GetResourceResult.ResourceResultDetail response = mcpClient.readResource("file:///text-template/hello");
-assertEquals(1, response.getContents().size(), "Expected exactly one content");
+<p>Resource templates registered by the server can be listed and read through their expanded URI. For interoperable pagination, prefer <code>listResourceTemplatePage(cursor)</code> and pass the returned opaque <code>nextCursor</code> unchanged.</p>
+<pre><code class="language-java">GetResourceResult.ResourceResultDetail response = mcpClient.readResource(&quot;file:///text-template/hello&quot;);
+assertEquals(1, response.getContents().size(), &quot;Expected exactly one content&quot;);
 
 ResourceContent contents = response.getContents().get(0);
 
 ResourceContentText textContents = (ResourceContentText) contents;
-assertEquals("file:///text-template/hello", textContents.getUri(), "URI should be 'file:///text-template/hello'");
-assertEquals("text hello", textContents.getText(), "Text content should be 'text hello'");
-```
--->
-<!--
-### Resource Subscriptions
-
-The client can subscribe to resource changes to receive notifications when resources are updated:
-
-err := client.Subscribe(ctx, mcp.SubscribeRequest{
-Params: mcp.SubscribeParams{
-URI: "test://resource/path",
-},
-})
-
-To stop receiving notifications for a resource:
-
-err := client.Unsubscribe(ctx, mcp.UnsubscribeRequest{
-Params: mcp.UnsubscribeParams{
-URI: "test://resource/path",
-},
-})
-
--->
+assertEquals(&quot;file:///text-template/hello&quot;, textContents.getUri(), &quot;URI should be 'file:///text-template/hello'&quot;);
+assertEquals(&quot;text hello&quot;, textContents.getText(), &quot;Text content should be 'text hello'&quot;);
+</code></pre>
+<h3>Resource Subscriptions</h3>
+<p>The client can subscribe to resource changes to receive notifications when resources are updated:</p>
+<p>mcpClient.subscribeResource(&quot;test://resource/path&quot;);</p>
+<p>To stop receiving notifications for a resource:</p>
+<p>mcpClient.unsubscribeResource(&quot;test://resource/path&quot;);</p>
 
             </article>
 

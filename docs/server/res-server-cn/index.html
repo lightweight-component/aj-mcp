@@ -146,7 +146,7 @@ public ResourceContentBinary blob() {
 }
 </code></pre>
 <h3>资源模板</h3>
-<p>SDK 已包含 <code>@ResourceTemplate</code> 注解及相关协议模型，但当前版本尚未完整实现资源模板的自动注册和服务端分发。</p>
+<p><code>FeatureMgr</code> 会注册 <code>@ResourceTemplate</code> 方法，通过 <code>resources/templates/list</code> 暴露模板，并在 <code>resources/read</code> 收到动态 URI 时执行匹配。</p>
 <table>
 <thead>
 <tr>
@@ -178,7 +178,7 @@ public ResourceContentBinary blob() {
 </tr>
 </tbody>
 </table>
-<p>在 <code>FeatureMgr</code> 能够注册模板方法且服务端实现 <code>resources/templates/list</code> 分发之前，请将该注解视为预览 API。</p>
+<p>模板变量必须与 <code>@ResourceTemplateArg</code> 参数对应。当前匹配器支持 RFC 6570 Level 1 简单变量，例如 <code>users://{id}</code>。</p>
 
                 <div id="comment-holder">
                 </div>

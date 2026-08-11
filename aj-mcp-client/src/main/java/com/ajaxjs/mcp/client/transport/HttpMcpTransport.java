@@ -35,7 +35,7 @@ public class HttpMcpTransport extends McpTransport {
     /**
      * The URL for the SSE (Server-Sent Events) connection.
      */
-    private String sseUrl;
+    private final String sseUrl;
 
     /**
      * The HTTP client used for making requests.
@@ -173,6 +173,7 @@ public class HttpMcpTransport extends McpTransport {
     @Override
     public CompletableFuture<JsonNode> sendRequestWithResponse(McpRequest request) {
         requireInitialized();
+
         try {
             Request req = createRequest(request);
             return execute(req, numericId(request.getId()));
@@ -216,6 +217,7 @@ public class HttpMcpTransport extends McpTransport {
      */
     private CompletableFuture<JsonNode> execute(Request request, Long id) {
         CompletableFuture<JsonNode> future = new CompletableFuture<>();
+
         if (closed) {
             future.completeExceptionally(new IOException("HTTP MCP transport is closed"));
             return future;

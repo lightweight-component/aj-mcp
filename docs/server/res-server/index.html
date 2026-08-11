@@ -150,7 +150,7 @@ public ResourceContentBinary blob() {
 }
 </code></pre>
 <h3>Resource Templates</h3>
-<p>The SDK contains <code>@ResourceTemplate</code> and the related protocol models, but automatic registration and server dispatch for resource templates are not complete in this version.</p>
+<p><code>@ResourceTemplate</code> methods are registered by <code>FeatureMgr</code>, exposed through <code>resources/templates/list</code>, and matched when <code>resources/read</code> receives a dynamic URI.</p>
 <table>
 <thead>
 <tr>
@@ -182,7 +182,7 @@ public ResourceContentBinary blob() {
 </tr>
 </tbody>
 </table>
-<p>Treat this annotation as preview API until template methods are registered by <code>FeatureMgr</code> and <code>resources/templates/list</code> is handled by the server.</p>
+<p>Template variables must match parameters annotated with <code>@ResourceTemplateArg</code>. The current matcher supports RFC 6570 Level 1 simple variables such as <code>users://{id}</code>.</p>
 
             </article>
 

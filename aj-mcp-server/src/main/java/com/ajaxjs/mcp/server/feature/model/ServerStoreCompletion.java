@@ -3,7 +3,9 @@ package com.ajaxjs.mcp.server.feature.model;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-/** Runtime binding for a prompt or resource-template completion provider. */
+/**
+ * Runtime binding for a prompt or resource-template completion provider.
+ */
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class ServerStoreCompletion extends ServerStoreBase {

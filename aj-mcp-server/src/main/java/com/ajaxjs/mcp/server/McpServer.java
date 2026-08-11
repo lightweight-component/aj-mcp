@@ -3,21 +3,23 @@ package com.ajaxjs.mcp.server;
 import com.ajaxjs.mcp.common.JsonUtils;
 import com.ajaxjs.mcp.protocol.McpRequestRawInfo;
 import com.ajaxjs.mcp.protocol.McpResponse;
+import com.ajaxjs.mcp.protocol.ProtocolVersion;
+import com.ajaxjs.mcp.protocol.client.*;
 import com.ajaxjs.mcp.protocol.common.Content;
 import com.ajaxjs.mcp.protocol.common.ContentText;
+import com.ajaxjs.mcp.protocol.initialize.InitializeRequestParams;
 import com.ajaxjs.mcp.protocol.resource.GetResourceListRequest;
 import com.ajaxjs.mcp.protocol.tools.*;
-import com.ajaxjs.mcp.protocol.utils.pagination.Cursor;
-import com.ajaxjs.mcp.protocol.utils.ping.PingResponse;
 import com.ajaxjs.mcp.protocol.utils.completion.CompleteRequest;
 import com.ajaxjs.mcp.protocol.utils.completion.CompleteResult;
+import com.ajaxjs.mcp.protocol.utils.pagination.Cursor;
+import com.ajaxjs.mcp.protocol.utils.ping.PingResponse;
 import com.ajaxjs.mcp.server.common.PaginatedResponse;
 import com.ajaxjs.mcp.server.common.ServerUtils;
 import com.ajaxjs.mcp.server.error.JsonRpcErrorCode;
 import com.ajaxjs.mcp.server.error.JsonRpcErrorException;
-import com.ajaxjs.mcp.server.feature.FeatureMgr;
-import com.ajaxjs.mcp.server.feature.model.ServerStoreTool;
 import com.ajaxjs.mcp.server.feature.model.ServerStoreCompletion;
+import com.ajaxjs.mcp.server.feature.model.ServerStoreTool;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Data;
@@ -26,25 +28,10 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicLong;
 import java.time.Duration;
-import com.ajaxjs.mcp.protocol.client.Root;
-import com.ajaxjs.mcp.protocol.client.SamplingCreateMessageParams;
-import com.ajaxjs.mcp.protocol.client.SamplingCreateMessageResult;
-import com.ajaxjs.mcp.protocol.client.ElicitRequestParams;
-import com.ajaxjs.mcp.protocol.client.ElicitResult;
-import com.ajaxjs.mcp.protocol.ProtocolVersion;
-import com.ajaxjs.mcp.protocol.initialize.InitializeRequestParams;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * MCP Server Tools
@@ -64,7 +51,7 @@ public class McpServer extends McpServerPrompt {
     private final AtomicLong serverRequestIds = new AtomicLong(1);
     private final Map<String, CompletableFuture<JsonNode>> pendingClientResponses = new ConcurrentHashMap<>();
 
-    private enum SessionState { NEW, INITIALIZING, READY }
+    private enum SessionState {NEW, INITIALIZING, READY}
 
     void bindSession(String sessionId) {
         currentSession.set(sessionId);
@@ -77,6 +64,7 @@ public class McpServer extends McpServerPrompt {
     void removeSession(String sessionId) {
         for (Set<String> sessions : resourceSubscriptions.values())
             sessions.remove(sessionId);
+
         sessionStates.remove(sessionId);
         sessionProtocolVersions.remove(sessionId);
         clientCapabilities.remove(sessionId);
@@ -98,7 +86,9 @@ public class McpServer extends McpServerPrompt {
         return sessionProtocolVersions.get(sessionId);
     }
 
-    /** Completes a pending server-to-client request response, if the JSON is a response envelope. */
+    /**
+     * Completes a pending server-to-client request response, if the JSON is a response envelope.
+     */
     boolean acceptClientResponse(String sessionId, String rawJson) {
         JsonNode message = JsonUtils.json2Node(rawJson);
         if (message.has(METHOD) || !message.has(ID))
@@ -120,13 +110,15 @@ public class McpServer extends McpServerPrompt {
     }
 
     public SamplingCreateMessageResult createMessage(String sessionId, SamplingCreateMessageParams params,
-                                                      Duration timeout) {
+                                                     Duration timeout) {
         JsonNode result = requestClient(sessionId, Methods.SAMPLING_CREATE_MESSAGE,
                 JsonUtils.OBJECT_MAPPER.valueToTree(params), timeout);
         return JsonUtils.OBJECT_MAPPER.convertValue(result, SamplingCreateMessageResult.class);
     }
 
-    /** Requests structured user input from a 2025-06-18 capable client. */
+    /**
+     * Requests structured user input from a 2025-06-18 capable client.
+     */
     public ElicitResult elicit(String sessionId, ElicitRequestParams params, Duration timeout) {
         String version = sessionProtocolVersions.get(sessionId);
         if (version == null || !ProtocolVersion.from(version).supportsElicitation())
@@ -148,14 +140,17 @@ public class McpServer extends McpServerPrompt {
         request.put("jsonrpc", "2.0");
         request.put(ID, id);
         request.put(METHOD, method);
+
         if (params != null)
             request.set(PARAMS, params);
+
         try {
             transport.send(sessionId, request.toString());
             JsonNode response = timeout == null || timeout.isZero()
                     ? future.get() : future.get(Math.max(1L, timeout.toMillis()), TimeUnit.MILLISECONDS);
             if (response.has("error"))
                 throw new IllegalStateException("Client rejected " + method + ": " + response.get("error"));
+
             return response.path(RESPONSE_RESULT);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -166,6 +161,7 @@ public class McpServer extends McpServerPrompt {
             pendingClientResponses.remove(key, future);
         }
     }
+
     public void start() {
         log.info("MCP Server started, waiting for input...");
         transport.start();
@@ -184,9 +180,11 @@ public class McpServer extends McpServerPrompt {
             log.warn("Ignoring MCP request method sent as a notification: {}", requestRaw.getMethod());
             return null;
         }
+
         String sessionId = currentSession.get() == null ? "direct" : currentSession.get();
         SessionState state = sessionStates.getOrDefault(sessionId, SessionState.NEW);
         boolean strict = serverConfig != null && serverConfig.isStrictLifecycle();
+
         if (strict && !Methods.INITIALIZE.equals(requestRaw.getMethod()) && !Methods.PING.equals(requestRaw.getMethod())
                 && !Methods.NOTIFICATION_INITIALIZED.equals(requestRaw.getMethod()) && state != SessionState.READY)
             throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_REQUEST,
@@ -197,9 +195,11 @@ public class McpServer extends McpServerPrompt {
                 if (strict && state != SessionState.NEW)
                     throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_REQUEST,
                             "MCP session is already initialized");
+
                 JsonNode jsonNode = requestRaw.getJsonNode();
                 McpResponse initialized = initialize(requestRaw.getId(), jsonNode);
                 sessionStates.put(sessionId, SessionState.INITIALIZING);
+
                 return initialized;
             case Methods.PING:
                 PingResponse resp = new PingResponse();
@@ -247,11 +247,14 @@ public class McpServer extends McpServerPrompt {
     private void cancelRequest(McpRequestRawInfo requestRaw) {
         JsonNode params = requestRaw.getJsonNode().get(PARAMS);
         JsonNode requestId = params == null ? null : params.get("requestId");
+
         if (requestId == null)
             return;
+
         try {
             Thread task = runningRequests.get(requestId.asText());
             cancelledRequests.add(requestId.asText());
+
             if (task != null)
                 task.interrupt();
         } catch (RuntimeException ignored) {
@@ -262,12 +265,15 @@ public class McpServer extends McpServerPrompt {
     private McpResponse setLoggingLevel(McpRequestRawInfo requestRaw) {
         JsonNode params = requestRaw.getJsonNode().get(PARAMS);
         String level = params == null || params.get("level") == null ? null : params.get("level").asText();
+
         if (level == null || !java.util.Arrays.asList("debug", "info", "notice", "warning", "error", "critical", "alert", "emergency").contains(level))
             throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_PARAMS, "invalid logging level");
+
         loggingLevel = level;
         McpResponse response = new McpResponse();
         response.setId(requestRaw.getId());
         response.setResult(Collections.emptyMap());
+
         return response;
     }
 
@@ -287,25 +293,33 @@ public class McpServer extends McpServerPrompt {
         ObjectNode params = JsonUtils.OBJECT_MAPPER.createObjectNode();
         params.set("progressToken", JsonUtils.OBJECT_MAPPER.valueToTree(progressToken));
         params.put("progress", progress);
+
         if (total != null)
             params.put("total", total);
+
         transport.send(sessionId, notificationJson(Methods.PROGRESS_NOTIFICATION, params));
     }
 
-    /** Sends progress to the session currently executing a request. */
+    /**
+     * Sends progress to the session currently executing a request.
+     */
     public void sendProgress(Object progressToken, double progress, Double total) {
         String sessionId = currentSession.get();
+
         if (sessionId == null)
             throw new IllegalStateException("No MCP request session is bound to this thread");
+
         sendProgress(sessionId, progressToken, progress, total);
     }
 
     public void publishLog(String level, String loggerName, Object data) {
         ObjectNode params = JsonUtils.OBJECT_MAPPER.createObjectNode();
         params.put("level", level == null ? loggingLevel : level);
+
         if (loggerName != null)
             params.put("logger", loggerName);
         params.set("data", JsonUtils.OBJECT_MAPPER.valueToTree(data));
+
         transport.broadcast(notificationJson(Methods.LOGGING_MESSAGE_NOTIFICATION, params));
     }
 
@@ -317,42 +331,56 @@ public class McpServer extends McpServerPrompt {
         ObjectNode notification = JsonUtils.OBJECT_MAPPER.createObjectNode();
         notification.put("jsonrpc", "2.0");
         notification.put("method", method);
+
         if (params != null)
             notification.set(PARAMS, params);
+
         return notification.toString();
     }
 
     private McpResponse changeSubscription(McpRequestRawInfo requestRaw, boolean subscribe) {
         String sessionId = currentSession.get();
+
         if (sessionId == null)
-            throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INTERNAL_ERROR,
-                    "Transport session is unavailable");
+            throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INTERNAL_ERROR, "Transport session is unavailable");
+
         JsonNode params = requestRaw.getJsonNode().get(PARAMS);
         String uri = params == null || params.get("uri") == null ? null : params.get("uri").asText();
+
         if (uri == null || uri.trim().isEmpty())
             throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_PARAMS, "resource uri is required");
+
         if (subscribe)
             resourceSubscriptions.computeIfAbsent(uri, ignored -> ConcurrentHashMap.newKeySet()).add(sessionId);
         else {
             Set<String> sessions = resourceSubscriptions.get(uri);
+
             if (sessions != null)
                 sessions.remove(sessionId);
         }
+
         McpResponse response = new McpResponse();
         response.setId(requestRaw.getId());
         response.setResult(Collections.emptyMap());
+
         return response;
     }
 
-    /** Publishes a resource update only to sessions subscribed to the exact URI. */
+    /**
+     * Publishes a resource update only to sessions subscribed to the exact URI.
+     */
     public void publishResourceUpdated(String uri) {
         Set<String> sessions = resourceSubscriptions.get(uri);
+
         if (sessions == null || sessions.isEmpty())
             return;
+
         com.ajaxjs.mcp.protocol.resource.SubscriptionUpdateNotification notification =
                 new com.ajaxjs.mcp.protocol.resource.SubscriptionUpdateNotification();
+
         notification.setParams(new com.ajaxjs.mcp.protocol.resource.GetResourceRequest.Params(uri));
         String json = JsonUtils.toJson(notification);
+
         for (String sessionId : new ArrayList<>(sessions)) {
             try {
                 transport.send(sessionId, json);
@@ -367,7 +395,9 @@ public class McpServer extends McpServerPrompt {
         JsonNode paramsNode = requestRaw.getJsonNode().get(PARAMS);
         if (paramsNode == null)
             throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_PARAMS, "params is required");
+
         CompleteRequest.Params params = JsonUtils.jsonNode2bean(paramsNode, CompleteRequest.Params.class);
+
         if (params == null || params.getRef() == null || params.getArgument() == null)
             throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_PARAMS,
                     "ref and argument are required");
@@ -377,6 +407,7 @@ public class McpServer extends McpServerPrompt {
         String key = ref.getType() + ":" + reference + ":" + params.getArgument().getName();
         ServerStoreCompletion store = getStore(featureMgr.getCompletionStore(), key, requestRaw.getId(), "completion provider");
         Object returned;
+
         try {
             returned = store.getMethod().invoke(store.getInstance(), params.getArgument().getValue());
         } catch (IllegalAccessException e) {
@@ -389,13 +420,16 @@ public class McpServer extends McpServerPrompt {
         }
 
         List<String> values = new ArrayList<>();
+
         if (returned instanceof List)
             for (Object value : (List<?>) returned)
                 values.add(String.valueOf(value));
         else if (returned != null)
             values.add(String.valueOf(returned));
+
         int total = values.size();
         boolean hasMore = total > 100;
+
         if (hasMore)
             values = new ArrayList<>(values.subList(0, 100));
 
@@ -403,6 +437,7 @@ public class McpServer extends McpServerPrompt {
         response.setId(requestRaw.getId());
         CompleteResult.CompletionResult completion = new CompleteResult.CompletionResult(values, total, hasMore);
         response.setResult(new CompleteResult.CompleteResultDetail(completion));
+
         return response;
     }
 
@@ -411,6 +446,7 @@ public class McpServer extends McpServerPrompt {
                 : featureMgr.getResourceTemplateStore().values())
             if (java.util.Objects.equals(uriTemplate, store.getResourceTemplate().getUriTemplate()))
                 return store.getResourceTemplate().getName();
+
         return uriTemplate;
     }
 

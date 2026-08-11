@@ -39,6 +39,7 @@ public abstract class McpClientPrompt extends McpClientBase {
     public McpPage<PromptItem> listPromptPage(String cursor) {
         GetPromptListRequest request = new GetPromptListRequest();
         request.setId(idGenerator.getAndIncrement());
+
         if (cursor != null)
             request.setParams(new Cursor(cursor));
         try {
@@ -66,6 +67,7 @@ public abstract class McpClientPrompt extends McpClientBase {
      */
     private synchronized List<PromptItem> obtainPromptList(int pageNo) {
         List<PromptItem> cached = promptRefs.get(pageNo);
+
         if (cached != null)
             return cached;
 
@@ -81,6 +83,7 @@ public abstract class McpClientPrompt extends McpClientBase {
 
             List<PromptItem> promptItems = parsePromptRefs(result);
             promptRefs.put(pageNo, promptItems);
+
             return promptItems;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -108,6 +111,7 @@ public abstract class McpClientPrompt extends McpClientBase {
 
             if (resultNode.has("prompts")) {
                 List<PromptItem> promptRefs = new ArrayList<>();
+
                 for (JsonNode promptNode : resultNode.get("prompts"))
                     promptRefs.add(JsonUtils.jsonNode2bean(promptNode, PromptItem.class));
 
@@ -159,7 +163,6 @@ public abstract class McpClientPrompt extends McpClientBase {
             pendingRequests.remove(operationId);
         }
     }
-
 
     /**
      * Retrieves prompt details by name and arguments.

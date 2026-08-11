@@ -133,6 +133,20 @@ method is particularly useful for web-based applications.</p>
     .build();
 </code></pre>
 <p>The <code>sseUrl</code> is required. It specifies the URL of the SSE endpoint where the MCP server is listening for incoming connections.</p>
+<h3>Streamable HTTP (2025-03-26 / 2025-06-18)</h3>
+<p>Newer revisions use one HTTP endpoint:</p>
+<pre><code class="language-java">McpTransport transport = StreamableHttpTransport.builder()
+        .endpointUrl(&quot;http://localhost:8080/mcp&quot;)
+        .openEventStream(true)
+        .build();
+
+McpClient client = McpClient.builder()
+        .transport(transport)
+        .protocolVersion(&quot;2025-06-18&quot;)
+        .build();
+client.initialize();
+</code></pre>
+<p>For OAuth, pass an <code>Authorization</code> Bearer token through <code>requestHeaders</code>. The SDK retains the returned session ID and automatically sends the negotiated <code>MCP-Protocol-Version</code> on subsequent requests.</p>
 <h2>McpClient</h2>
 <p>The MCP Client serves as a bridge between local applications and remote tool implementations.</p>
 <pre><code class="language-java">McpClient mcpClient = McpClient.builder()

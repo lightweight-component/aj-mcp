@@ -4,6 +4,7 @@ import lombok.Data;
 
 import java.util.Collections;
 import java.util.List;
+
 import com.ajaxjs.mcp.protocol.ProtocolVersion;
 
 /**
@@ -31,9 +32,13 @@ public class ServerConfig {
      */
     private List<String> protocolVersions = ProtocolVersion.supportedVersions();
 
-    /** Enforces the MCP initialize/initialized lifecycle for every transport session. */
+    /**
+     * Enforces the MCP initialize/initialized lifecycle for every transport session.
+     */
     private boolean strictLifecycle = true;
 
-    /** Allowed browser Origin values for Streamable HTTP. Empty rejects every supplied Origin. */
+    /**
+     * Allowed browser Origin values for Streamable HTTP. Empty rejects every supplied Origin.
+     */
     private List<String> allowedOrigins = Collections.emptyList();
 }

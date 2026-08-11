@@ -34,6 +34,7 @@ public abstract class McpClientResource extends McpClientPrompt {
     private void executeSubscriptionRequest(com.ajaxjs.mcp.protocol.McpRequest request) {
         long operationId = idGenerator.getAndIncrement();
         request.setId(operationId);
+
         try {
             JsonNode response = awaitResponse(transport.sendRequestWithResponse(request));
             McpException.checkForErrors(response);
@@ -46,6 +47,7 @@ public abstract class McpClientResource extends McpClientPrompt {
             pendingRequests.remove(operationId);
         }
     }
+
     @Override
     public List<ResourceItem> listResources() {
         return obtainResourceList(0);
@@ -60,12 +62,15 @@ public abstract class McpClientResource extends McpClientPrompt {
     public McpPage<ResourceItem> listResourcePage(String cursor) {
         GetResourceListRequest request = new GetResourceListRequest();
         request.setId(idGenerator.getAndIncrement());
+
         if (cursor != null)
             request.setParams(new Cursor(cursor));
+
         try {
             JsonNode response = awaitResponse(transport.sendRequestWithResponse(request));
             McpException.checkForErrors(response);
             JsonNode result = response.get(RESPONSE_RESULT);
+
             return new McpPage<>(parseResourceRefs(response), nextCursor(result));
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -113,8 +118,10 @@ public abstract class McpClientResource extends McpClientPrompt {
     public McpPage<ResourceTemplate> listResourceTemplatePage(String cursor) {
         GetResourceTemplateListRequest request = new GetResourceTemplateListRequest();
         request.setId(idGenerator.getAndIncrement());
+
         if (cursor != null)
             request.setParams(new Cursor(cursor));
+
         try {
             JsonNode response = awaitResponse(transport.sendRequestWithResponse(request));
             McpException.checkForErrors(response);
@@ -152,6 +159,7 @@ public abstract class McpClientResource extends McpClientPrompt {
      */
     private synchronized List<ResourceItem> obtainResourceList(int pageNo) {
         List<ResourceItem> cached = resourceRefs.get(pageNo);
+
         if (cached != null)
             return cached;
 
@@ -166,6 +174,7 @@ public abstract class McpClientResource extends McpClientPrompt {
             JsonNode result = awaitResponse(resultFuture);
             List<ResourceItem> resources = parseResourceRefs(result);
             resourceRefs.put(pageNo, resources);
+
             return resources;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -179,11 +188,13 @@ public abstract class McpClientResource extends McpClientPrompt {
 
     private synchronized List<ResourceTemplate> obtainResourceTemplateList(int pageNo) {
         List<ResourceTemplate> cached = resourceTemplateRefs.get(pageNo);
+
         if (cached != null)
             return cached;
 
         GetResourceTemplateListRequest request = new GetResourceTemplateListRequest();
         request.setId(idGenerator.getAndIncrement());
+
         if(pageNo!=0)
             request.setParams(new Cursor(pageNo));
 
@@ -192,6 +203,7 @@ public abstract class McpClientResource extends McpClientPrompt {
             JsonNode result = awaitResponse(resultFuture);
             List<ResourceTemplate> templates = parseResourceTemplateRefs(result);
             resourceTemplateRefs.put(pageNo, templates);
+
             return templates;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -240,6 +252,7 @@ public abstract class McpClientResource extends McpClientPrompt {
 
         if (mcpMessage.has(RESPONSE_RESULT)) {
             JsonNode resultNode = mcpMessage.get(RESPONSE_RESULT);
+
             if (resultNode.has("contents")) {
                 List<ResourceContent> resourceContentsList = new ArrayList<>();
 

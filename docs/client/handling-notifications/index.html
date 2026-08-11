@@ -86,7 +86,8 @@
             <article>
                 <h1>Handling Notifications</h1>
 <p>JSON-RPC notifications do not contain an <code>id</code> and must not receive a response. During initialization, the client sends <code>notifications/initialized</code>; both the stdio and SSE server transports suppress output for that notification.</p>
-<p>The current client recognizes <code>notifications/message</code> and writes its parameters to the application log. A public callback-registration API for progress, resource-change, tool-list-change, and prompt-list-change notifications is not implemented yet. Do not assume that notification-driven cache invalidation is available.</p>
+<p>Use <code>onNotification(method, handler)</code> to register callbacks for progress, resource-update, logging, and list-change notifications. Resource, resource-template, and prompt caches are invalidated automatically when the corresponding list-change notification arrives.</p>
+<p>The client can also answer server-initiated requests with <code>onServerRequest(...)</code>. The convenience methods <code>setRoots(...)</code> and <code>setSamplingHandler(...)</code> configure the standard <code>roots/list</code> and <code>sampling/createMessage</code> handlers before <code>initialize()</code> advertises those capabilities.</p>
 <p>When an SSE channel closes or fails, or when a transport is closed, all pending request futures are completed exceptionally. Likewise, an unexpected stdio subprocess exit fails pending requests immediately, including when <code>requestTimeout</code> is zero.</p>
 
             </article>

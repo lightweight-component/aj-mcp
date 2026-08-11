@@ -171,6 +171,7 @@ public abstract class McpTransport implements McpConstant, Closeable {
             ObjectNode response = JsonUtils.OBJECT_MAPPER.createObjectNode();
             response.put("jsonrpc", BaseJsonRpcMessage.VERSION);
             response.set(ID, message.get(ID));
+
             if (result != null)
                 response.set(RESPONSE_RESULT, result);
             else

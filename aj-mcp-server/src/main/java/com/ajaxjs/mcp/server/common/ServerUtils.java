@@ -45,7 +45,6 @@ public class ServerUtils {
         }
     }
 
-
     public static <T> PaginatedResponse<T> paginate(List<T> list, Cursor params, McpServerInitialize instance) {
         Integer pageNo = params.getPageNo();
         Integer pageSize = instance.getServerConfig().getPageSize();
@@ -62,16 +61,14 @@ public class ServerUtils {
      * @return A PaginatedResponse containing the paginated list, a boolean for the last page, and the next page number.
      */
     public static <T> PaginatedResponse<T> paginate(List<T> list, int pageNo, int pageSize) {
-        if (pageNo < 1 || pageSize < 1) {
+        if (pageNo < 1 || pageSize < 1)
             throw new IllegalArgumentException("Page number and page size must be greater than 0.");
-        }
 
         int fromIndex = (pageNo - 1) * pageSize;
         int toIndex = Math.min(fromIndex + pageSize, list.size());
 
-        if (fromIndex >= list.size()) {
+        if (fromIndex >= list.size())
             return new PaginatedResponse<>(new ArrayList<>(), true, null); // Return empty list if the page is out of range
-        }
 
         List<T> paginatedList = list.subList(fromIndex, toIndex);
         boolean isLastPage = toIndex >= list.size();

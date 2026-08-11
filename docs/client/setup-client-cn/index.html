@@ -90,7 +90,7 @@
 &lt;dependency&gt;
     &lt;groupId&gt;com.ajaxjs&lt;/groupId&gt;
     &lt;artifactId&gt;aj-mcp-client&lt;/artifactId&gt;
-    &lt;version&gt;1.3&lt;/version&gt;
+    &lt;version&gt;1.4&lt;/version&gt;
 &lt;/dependency&gt;
 </code></pre>
 <p>您可以通过以下链接找到最新版本：
@@ -127,6 +127,20 @@ McpTransport transport = StdioTransport.builder()
         .build();
 </code></pre>
 <p><code>sseUrl</code> 是必需的，它指定 MCP 服务器的 SSE 端点 URL。</p>
+<h3>Streamable HTTP（2025-03-26 / 2025-06-18）</h3>
+<p>较新的协议版本使用单一 HTTP 端点：</p>
+<pre><code class="language-java">McpTransport transport = StreamableHttpTransport.builder()
+        .endpointUrl(&quot;http://localhost:8080/mcp&quot;)
+        .openEventStream(true)
+        .build();
+
+McpClient client = McpClient.builder()
+        .transport(transport)
+        .protocolVersion(&quot;2025-06-18&quot;)
+        .build();
+client.initialize();
+</code></pre>
+<p>如需 OAuth Bearer token，可通过 <code>requestHeaders</code> 传入 <code>Authorization</code>。SDK 会保存服务端返回的 session ID，并在后续请求中自动加入协商后的 <code>MCP-Protocol-Version</code>。</p>
 <h2>MCP 客户端</h2>
 <p>MCP 客户端充当本地应用程序与远程工具实现之间的桥梁。</p>
 <pre><code class="language-java">McpClient mcpClient = McpClient.builder()
