@@ -3,6 +3,7 @@ package com.ajaxjs.mcp.server;
 import com.ajaxjs.mcp.common.JsonUtils;
 import com.ajaxjs.mcp.protocol.McpRequestRawInfo;
 import com.ajaxjs.mcp.protocol.McpResponse;
+import com.ajaxjs.mcp.server.error.JsonRpcErrorException;
 import com.ajaxjs.mcp.transport.McpTransportSync;
 import lombok.extern.slf4j.Slf4j;
 
@@ -82,11 +83,14 @@ public class ServerSse implements McpTransportSync {
         SseSession session = connections.remove(clientId);
         if (session != null)
             session.close();
+        server.removeSession(clientId);
     }
 
     private void removeConnection(String clientId, SseSession session) {
-        if (connections.remove(clientId, session))
+        if (connections.remove(clientId, session)) {
             session.close();
+            server.removeSession(clientId);
+        }
     }
 
     public boolean isSessionOpen(String clientId) {
@@ -120,6 +124,7 @@ public class ServerSse implements McpTransportSync {
      * administrative broadcasts.
      */
     @Deprecated
+    @Override
     public void broadcast(String data) {
         for (Map.Entry<String, SseSession> entry : connections.entrySet()) {
             try {
@@ -195,7 +200,14 @@ public class ServerSse implements McpTransportSync {
 
     /** Processes a request and sends its response only to the originating session. */
     public void handle(String clientId, String rawJson) {
-        returnMessage(clientId, handle(rawJson));
+        if (server.acceptClientResponse(clientId, rawJson))
+            return;
+        server.bindSession(clientId);
+        try {
+            returnMessage(clientId, handle(rawJson));
+        } finally {
+            server.clearSession();
+        }
     }
 
     @Override
@@ -209,8 +221,17 @@ public class ServerSse implements McpTransportSync {
 
     @Override
     public String handle(String rawJson) {
+        if (server.acceptClientResponse("default", rawJson))
+            return null;
         McpRequestRawInfo request = McpServerInitialize.jsonRpcValidate(rawJson); // 解析输入消息
-        McpResponse mcpResponse = server.processMessage(request);
+        McpResponse mcpResponse;
+        try {
+            mcpResponse = server.processMessage(request);
+        } catch (JsonRpcErrorException e) {
+            if (request.getId() == null)
+                return null;
+            throw e;
+        }
 
         return mcpResponse == null ? null : JsonUtils.toJson(mcpResponse);  // 处理消息并生成响应
     }
@@ -218,6 +239,11 @@ public class ServerSse implements McpTransportSync {
     @Override
     public void initialize() {
         start();
+    }
+
+    @Override
+    public void send(String sessionId, String json) {
+        returnMessage(sessionId, json);
     }
 
     @Override

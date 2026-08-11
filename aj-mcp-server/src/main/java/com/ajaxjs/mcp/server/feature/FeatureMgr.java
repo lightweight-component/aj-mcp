@@ -4,6 +4,7 @@ import com.ajaxjs.mcp.common.McpUtils;
 import com.ajaxjs.mcp.protocol.prompt.PromptArgument;
 import com.ajaxjs.mcp.protocol.prompt.PromptItem;
 import com.ajaxjs.mcp.protocol.resource.ResourceItem;
+import com.ajaxjs.mcp.protocol.resource.ResourceTemplate;
 import com.ajaxjs.mcp.protocol.tools.JsonSchema;
 import com.ajaxjs.mcp.protocol.tools.JsonSchemaProperty;
 import com.ajaxjs.mcp.protocol.tools.ToolItem;
@@ -11,6 +12,8 @@ import com.ajaxjs.mcp.server.feature.annotation.*;
 import com.ajaxjs.mcp.server.feature.model.ServerStorePrompt;
 import com.ajaxjs.mcp.server.feature.model.ServerStoreResource;
 import com.ajaxjs.mcp.server.feature.model.ServerStoreTool;
+import com.ajaxjs.mcp.server.feature.model.ServerStoreCompletion;
+import com.ajaxjs.mcp.server.feature.model.ServerStoreResourceTemplate;
 import lombok.extern.slf4j.Slf4j;
 import lombok.Getter;
 
@@ -31,6 +34,12 @@ public class FeatureMgr {
 
     @Getter
     private final Map<String, ServerStoreTool> toolStore = new ConcurrentHashMap<>();
+
+    @Getter
+    private final Map<String, ServerStoreResourceTemplate> resourceTemplateStore = new ConcurrentHashMap<>();
+
+    @Getter
+    private final Map<String, ServerStoreCompletion> completionStore = new ConcurrentHashMap<>();
 
     /**
      * Initializes all classes with a specific annotation within the given package name.
@@ -59,6 +68,12 @@ public class FeatureMgr {
             for (Method method : publicMethods) {
                 if (method.isAnnotationPresent(Prompt.class)) {
                     addPrompt(method.getAnnotation(Prompt.class), method, instance);
+                } else if (method.isAnnotationPresent(com.ajaxjs.mcp.server.feature.annotation.ResourceTemplate.class)) {
+                    addResourceTemplate(method.getAnnotation(com.ajaxjs.mcp.server.feature.annotation.ResourceTemplate.class), method, instance);
+                } else if (method.isAnnotationPresent(CompletePrompt.class)) {
+                    addCompletion("ref/prompt", method.getAnnotation(CompletePrompt.class).value(), method, instance);
+                } else if (method.isAnnotationPresent(CompleteResourceTemplate.class)) {
+                    addCompletion("ref/resource", method.getAnnotation(CompleteResourceTemplate.class).value(), method, instance);
                 } else {
                     Resource resource = method.getAnnotation(Resource.class);
 
@@ -73,6 +88,65 @@ public class FeatureMgr {
                 }
             }
         }
+    }
+
+    private void addResourceTemplate(com.ajaxjs.mcp.server.feature.annotation.ResourceTemplate annotation,
+                                     Method method, Object instance) {
+        String templateName = McpUtils.isEmptyText(annotation.name()) ? method.getName() : annotation.name();
+        List<String> names = new ArrayList<>();
+        StringBuilder expression = new StringBuilder("^");
+        String template = annotation.uriTemplate();
+        int cursor = 0;
+        java.util.regex.Matcher variables = java.util.regex.Pattern.compile("\\{([A-Za-z0-9_]+)}").matcher(template);
+        while (variables.find()) {
+            expression.append(java.util.regex.Pattern.quote(template.substring(cursor, variables.start())));
+            expression.append("([^/?#]+)");
+            names.add(variables.group(1));
+            cursor = variables.end();
+        }
+        expression.append(java.util.regex.Pattern.quote(template.substring(cursor))).append('$');
+
+        List<String> methodParameterNames = new ArrayList<>();
+        for (Parameter parameter : method.getParameters()) {
+            ResourceTemplateArg argument = parameter.getAnnotation(ResourceTemplateArg.class);
+            String name = argument == null || ResourceTemplateArg.ELEMENT_NAME.equals(argument.name())
+                    ? parameter.getName() : argument.name();
+            methodParameterNames.add(name);
+        }
+        if (!new HashSet<>(names).equals(new HashSet<>(methodParameterNames)))
+            throw new IllegalArgumentException("Resource template variables must match method parameters: " + templateName);
+
+        ResourceTemplate model = new ResourceTemplate();
+        model.setName(templateName);
+        model.setTitle(McpUtils.isEmptyText(annotation.title()) ? null : annotation.title());
+        model.setUriTemplate(template);
+        model.setDescription(McpUtils.isEmptyText(annotation.description()) ? null : annotation.description());
+        model.setMimeType(McpUtils.isEmptyText(annotation.mimeType()) ? null : annotation.mimeType());
+
+        ServerStoreResourceTemplate store = new ServerStoreResourceTemplate();
+        store.setInstance(instance);
+        store.setMethod(method);
+        store.setResourceTemplate(model);
+        store.setParameterNames(methodParameterNames);
+        store.setTemplateVariableNames(names);
+        store.setUriPattern(java.util.regex.Pattern.compile(expression.toString()));
+        resourceTemplateStore.put(templateName, store);
+    }
+
+    private void addCompletion(String referenceType, String referenceName, Method method, Object instance) {
+        if (method.getParameterTypes().length != 1 || method.getParameterTypes()[0] != String.class)
+            throw new IllegalArgumentException("Completion method must accept exactly one String parameter: " + method);
+        CompleteArg argument = method.getParameters()[0].getAnnotation(CompleteArg.class);
+        String argumentName = argument == null || McpUtils.isEmptyText(argument.name())
+                ? method.getParameters()[0].getName() : argument.name();
+
+        ServerStoreCompletion store = new ServerStoreCompletion();
+        store.setInstance(instance);
+        store.setMethod(method);
+        store.setReferenceType(referenceType);
+        store.setReferenceName(referenceName);
+        store.setArgumentName(argumentName);
+        completionStore.put(referenceType + ":" + referenceName + ":" + argumentName, store);
     }
 
     static Object newInstance(Class<?> clazz) {
@@ -141,7 +215,21 @@ public class FeatureMgr {
         ToolItem toolItem = new ToolItem();
         toolItem.setName(toolName);
         toolItem.setDescription(description);
+        toolItem.setTitle(McpUtils.isEmptyText(tool.title()) ? null : tool.title());
         toolItem.setInputSchema(hasArgs ? inputSchema : null);
+        if (!McpUtils.isEmptyText(tool.outputSchema())) {
+            try {
+                toolItem.setOutputSchema(com.ajaxjs.mcp.common.JsonUtils.fromJson(tool.outputSchema(), JsonSchema.class));
+            } catch (RuntimeException e) {
+                throw new IllegalArgumentException("Invalid outputSchema for tool " + toolName, e);
+            }
+        }
+        Map<String, Object> annotations = new LinkedHashMap<>();
+        annotations.put("readOnlyHint", tool.readOnlyHint());
+        annotations.put("destructiveHint", tool.destructiveHint());
+        annotations.put("idempotentHint", tool.idempotentHint());
+        annotations.put("openWorldHint", tool.openWorldHint());
+        toolItem.setAnnotations(annotations);
 
         ServerStoreTool store = new ServerStoreTool();
         store.setMethod(method);
@@ -175,15 +263,15 @@ public class FeatureMgr {
                 return "string";
         } else {
             if (Number.class.isAssignableFrom(type))
-                return "Number";
+                return "number";
             else if (type == Boolean.class)
-                return "Boolean";
+                return "boolean";
             else if (type == Character.class || type == String.class)
                 return "string";
         }
 
         // 其他类型默认返回 Object
-        return "Object";
+        return "object";
     }
 
     /**
@@ -201,6 +289,7 @@ public class FeatureMgr {
         ResourceItem resourceItem = new ResourceItem();
         resourceItem.setUri(resource.uri());
         resourceItem.setName(resource.value().isEmpty() ? method.getName() : resource.value());
+        resourceItem.setTitle(McpUtils.isEmptyText(resource.title()) ? null : resource.title());
         resourceItem.setDescription(resource.description());
         resourceItem.setMimeType(resource.mimeType());
 
@@ -252,6 +341,7 @@ public class FeatureMgr {
 
         PromptItem promptItem = new PromptItem();
         promptItem.setName(promptName);
+        promptItem.setTitle(McpUtils.isEmptyText(prompt.title()) ? null : prompt.title());
         promptItem.setDescription(description);
         promptItem.setArguments(arguments);
 

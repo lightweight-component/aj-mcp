@@ -23,6 +23,8 @@ public interface McpConstant {
 
         public static final String RESOURCES_SUBSCRIBE_REQUEST = "resources/subscribe";
 
+        public static final String RESOURCES_UNSUBSCRIBE_REQUEST = "resources/unsubscribe";
+
         public static final String RESOURCE_UPDATE_NOTIFICATION = "notifications/resources/updated";
 
         public static final String PROMPTS_LIST = "prompts/list";
@@ -38,6 +40,20 @@ public interface McpConstant {
         public static final String TOOLS_LIST_CHANGED_NOTIFICATION = "notifications/tools/list_changed";
 
         public static final String COMPLETION_COMPLETE = "completion/complete";
+
+        public static final String LOGGING_SET_LEVEL = "logging/setLevel";
+
+        public static final String LOGGING_MESSAGE_NOTIFICATION = "notifications/message";
+
+        public static final String PROGRESS_NOTIFICATION = "notifications/progress";
+
+        public static final String ROOTS_LIST = "roots/list";
+
+        public static final String ROOTS_LIST_CHANGED_NOTIFICATION = "notifications/roots/list_changed";
+
+        public static final String SAMPLING_CREATE_MESSAGE = "sampling/createMessage";
+
+        public static final String ELICITATION_CREATE = "elicitation/create";
     }
 
     interface ContentType {
@@ -48,6 +64,8 @@ public interface McpConstant {
         String AUDIO = "audio";
 
         String RESOURCE = "resource";
+
+        String RESOURCE_LINK = "resource_link";
     }
 
     String RESPONSE_RESULT = "result";

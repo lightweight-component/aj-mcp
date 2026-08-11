@@ -17,4 +17,13 @@ public interface McpTransportSync extends Closeable {
     String handle(String rawJson);
 
     void initialize();
+
+    /** Sends a server-originated message to one logical transport session. */
+    default void send(String sessionId, String json) {
+        throw new UnsupportedOperationException("Server-originated messages are not supported by this transport");
+    }
+
+    default void broadcast(String json) {
+        throw new UnsupportedOperationException("Broadcast is not supported by this transport");
+    }
 }

@@ -37,6 +37,8 @@ class TestStdioServerBase {
         ServerConfig serverConfig = new ServerConfig();
         serverConfig.setName("AJ_MCP_Server");
         serverConfig.setVersion("1.0");
+        // Legacy unit tests exercise individual methods without a handshake.
+        serverConfig.setStrictLifecycle(false);
         server.setServerConfig(serverConfig);
 
         server.start();

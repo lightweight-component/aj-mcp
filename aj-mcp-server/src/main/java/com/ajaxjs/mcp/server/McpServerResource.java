@@ -13,6 +13,7 @@ import com.ajaxjs.mcp.server.error.JsonRpcErrorCode;
 import com.ajaxjs.mcp.server.error.JsonRpcErrorException;
 import com.ajaxjs.mcp.server.feature.FeatureMgr;
 import com.ajaxjs.mcp.server.feature.model.ServerStoreResource;
+import com.ajaxjs.mcp.server.feature.model.ServerStoreResourceTemplate;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.lang.reflect.InvocationTargetException;
@@ -20,6 +21,9 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.net.URLDecoder;
 
 public abstract class McpServerResource extends McpServerInitialize {
     /**
@@ -66,6 +70,27 @@ public abstract class McpServerResource extends McpServerInitialize {
         return result;
     }
 
+    McpResponse resourceTemplateList(McpRequestRawInfo requestRaw) {
+        Cursor cursor = requestRaw.getJsonNode().has(PARAMS)
+                ? JsonUtils.jsonNode2bean(requestRaw.getJsonNode().get(PARAMS), Cursor.class) : null;
+        List<com.ajaxjs.mcp.protocol.resource.ResourceTemplate> templates = new ArrayList<>();
+        for (ServerStoreResourceTemplate store : featureMgr.getResourceTemplateStore().values())
+            templates.add(store.getResourceTemplate());
+
+        ResourceTemplateResult.ResourceTemplatesResult detail = new ResourceTemplateResult.ResourceTemplatesResult();
+        if (cursor != null && cursor.getPageNo() != null) {
+            PaginatedResponse<com.ajaxjs.mcp.protocol.resource.ResourceTemplate> page = ServerUtils.paginate(templates, cursor, this);
+            detail.setResourceTemplates(page.getList());
+            if (!page.isLastPage())
+                detail.setNextCursor(page.getNextPageNoAsBse64());
+        } else
+            detail.setResourceTemplates(templates);
+
+        ResourceTemplateResult response = new ResourceTemplateResult(detail);
+        response.setId(requestRaw.getId());
+        return response;
+    }
+
     /**
      * Reads resource information based on the request.
      * This method interprets the request parameters, retrieves the corresponding resource from the server store,
@@ -84,7 +109,9 @@ public abstract class McpServerResource extends McpServerInitialize {
             throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_PARAMS, "params is required");
 
         GetResourceRequest.Params params = JsonUtils.jsonNode2bean(paramsNode, GetResourceRequest.Params.class);
-        ServerStoreResource store = getStore(featureMgr.getResourceStore(), params.getUri(), requestRaw.getId(), "resource");
+        ServerStoreResource store = featureMgr.getResourceStore().get(params.getUri());
+        if (store == null)
+            return readTemplateResource(requestRaw.getId(), params.getUri());
 
         // execute prompt method
         Method method = store.getMethod();
@@ -108,6 +135,62 @@ public abstract class McpServerResource extends McpServerInitialize {
         result.setResult(new GetResourceResult.ResourceResultDetail(contents));
 
         return result;
+    }
+
+    private McpResponse readTemplateResource(Object requestId, String uri) {
+        for (ServerStoreResourceTemplate store : featureMgr.getResourceTemplateStore().values()) {
+            java.util.regex.Matcher matcher = store.getUriPattern().matcher(uri);
+            if (!matcher.matches())
+                continue;
+
+            Map<String, String> captured = new LinkedHashMap<>();
+            for (int i = 0; i < store.getTemplateVariableNames().size(); i++)
+                captured.put(store.getTemplateVariableNames().get(i), decodeUriPart(matcher.group(i + 1)));
+
+            Object[] values = new Object[store.getParameterNames().size()];
+            Class<?>[] types = store.getMethod().getParameterTypes();
+            for (int i = 0; i < values.length; i++)
+                values[i] = McpServer.convertToType(captured.get(store.getParameterNames().get(i)), types[i]);
+
+            Object returned;
+            try {
+                returned = store.getMethod().invoke(store.getInstance(), values);
+            } catch (IllegalAccessException e) {
+                throw new JsonRpcErrorException(requestId, JsonRpcErrorCode.INTERNAL_ERROR,
+                        "Resource template method is not accessible", e);
+            } catch (InvocationTargetException e) {
+                Throwable cause = e.getCause() == null ? e : e.getCause();
+                throw new JsonRpcErrorException(requestId, JsonRpcErrorCode.INTERNAL_ERROR,
+                        "Resource template execution failed: " + errorMessage(cause), cause);
+            }
+
+            List<ResourceContent> contents;
+            if (returned instanceof List)
+                contents = (List<ResourceContent>) returned;
+            else if (returned instanceof ResourceContent)
+                contents = Collections.singletonList((ResourceContent) returned);
+            else {
+                ResourceContentText text = new ResourceContentText();
+                text.setUri(uri);
+                text.setMimeType(store.getResourceTemplate().getMimeType());
+                text.setText(String.valueOf(returned));
+                contents = Collections.singletonList(text);
+            }
+            GetResourceResult response = new GetResourceResult();
+            response.setId(requestId);
+            response.setResult(new GetResourceResult.ResourceResultDetail(contents));
+            return response;
+        }
+        throw new JsonRpcErrorException(requestId, JsonRpcErrorCode.INVALID_PARAMS, "Unknown resource: " + uri);
+    }
+
+    private static String decodeUriPart(String value) {
+        try {
+            // URLDecoder treats '+' as a space; preserve it because URI paths do not.
+            return URLDecoder.decode(value.replace("+", "%2B"), "UTF-8");
+        } catch (java.io.UnsupportedEncodingException impossible) {
+            throw new IllegalStateException(impossible);
+        }
     }
 
     private static String errorMessage(Throwable cause) {

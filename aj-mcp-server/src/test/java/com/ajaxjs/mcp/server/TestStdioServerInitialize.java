@@ -41,7 +41,7 @@ class TestStdioServerInitialize extends TestStdioServerBase {
         setIn("{\"jsonrpc\":\"2.0\",\"id\":2,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2024-11-05\",\"capabilities\":{\"roots\":{\"listChanged\":false}},\"clientInfo\":{\"name\":\"aj-mcp-client\",\"version\":\"1.0\"}}}\n");
 
         // Verify the output
-        String expectedOutput = "{\"jsonrpc\":\"2.0\",\"id\":2,\"result\":{\"protocolVersion\":\"2024-11-05\",\"capabilities\":{\"tools\":{\"listChanged\":true},\"logging\":{}},\"serverInfo\":{\"name\":\"AJ_MCP_Server\",\"version\":\"1.0\"}}}\r\n";
+        String expectedOutput = "{\"jsonrpc\":\"2.0\",\"id\":2,\"result\":{\"protocolVersion\":\"2024-11-05\",\"capabilities\":{\"prompts\":{\"listChanged\":true},\"resources\":{\"listChanged\":true,\"subscribe\":true},\"tools\":{\"listChanged\":true},\"logging\":{}},\"serverInfo\":{\"name\":\"AJ_MCP_Server\",\"version\":\"1.0\"}}}\r\n";
         assertEquals(expectedOutput, testOut.toString());
     }
 

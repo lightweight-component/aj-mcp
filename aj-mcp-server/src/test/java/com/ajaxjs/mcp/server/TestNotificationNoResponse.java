@@ -23,7 +23,9 @@ class TestNotificationNoResponse extends TestStdioServerBase {
     @Test
     void sseDoesNotSerializeOrWriteResponseForNotification() {
         McpServer server = new McpServer();
-        server.setServerConfig(new ServerConfig());
+        ServerConfig config = new ServerConfig();
+        config.setStrictLifecycle(false);
+        server.setServerConfig(config);
         ServerSse transport = new ServerSse(server);
         StringWriter output = new StringWriter();
         transport.addConnections("client", new PrintWriter(output));

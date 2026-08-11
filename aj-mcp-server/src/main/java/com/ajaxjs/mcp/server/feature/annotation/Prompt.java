@@ -22,4 +22,6 @@ public @interface Prompt {
      * @return description
      */
     String description() default McpConstant.EMPTY_STR;
+
+    String title() default McpConstant.EMPTY_STR;
 }

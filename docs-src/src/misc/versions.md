@@ -17,6 +17,12 @@ layout: layouts/docs.njk
 - Corrected notification response behavior and request timeout consistency.
 - Isolated feature stores per server and made package scanning tolerate unloadable optional classes.
 - Added per-page caches for prompt, resource, and resource-template lists.
+- Added string JSON-RPC IDs, strict initialization lifecycle checks, and truthful dynamic capabilities.
+- Completed resource templates, completion, resource subscriptions, cancellation, logging, progress, Roots, Sampling, and generic notification callbacks.
+- Added opaque-cursor page APIs while retaining the page-number APIs for compatibility.
+- Added negotiation for MCP `2024-11-05`, `2025-03-26`, and `2025-06-18` in one SDK; server version lists are preference ordered.
+- Added client and server Streamable HTTP adapters. JSON-RPC batching, removed again in `2025-06-18`, is intentionally unsupported.
+- Added tool annotations, progress messages, completion context, resource links, structured tool output, and elicitation.
 
 ## aj-mcp-common 1.5 / aj-mcp-client 1.3 / aj-mcp-server 1.2 — 2025-06-10
 

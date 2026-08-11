@@ -29,7 +29,7 @@
         <dependency>
             <groupId>com.ajaxjs</groupId>
             <artifactId>aj-mcp-common</artifactId>
-            <version>1.5</version>
+            <version>1.6</version>
         </dependency>
 
         <dependency>
@@ -51,4 +51,27 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+            </testResource>
+            <testResource>
+                <directory>src/test/java</directory>
+                <includes>
+                    <include>**/*.jpg</include>
+                </includes>
+            </testResource>
+        </testResources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <skipTests>false</skipTests>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

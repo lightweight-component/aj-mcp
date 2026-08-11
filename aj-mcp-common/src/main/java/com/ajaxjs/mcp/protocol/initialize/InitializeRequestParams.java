@@ -18,11 +18,16 @@ public class InitializeRequestParams {
 
     @Data
     public static class Capabilities {
+        @JsonInclude(JsonInclude.Include.NON_NULL)
         private Roots roots;
 
         @JsonInclude(JsonInclude.Include.NON_NULL)
         private Sampling sampling;
 
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        private Elicitation elicitation;
+
+        @JsonInclude(JsonInclude.Include.NON_NULL)
         private Experimental experimental;
 
         @Data
@@ -31,6 +36,10 @@ public class InitializeRequestParams {
         }
 
         public static class Sampling {
+        }
+
+        /** Client can answer server-initiated elicitation/create requests. */
+        public static class Elicitation {
         }
 
         /**

@@ -16,5 +16,5 @@ public class BaseJsonRpcMessage {
      * id，可以为 null
      */
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    protected Long id;
+    protected Object id;
 }

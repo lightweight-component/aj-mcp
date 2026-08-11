@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class McpRequestRawInfo {
-    private Long id;
+    private Object id;
 
     private String method;
 

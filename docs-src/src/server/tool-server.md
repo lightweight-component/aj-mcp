@@ -50,9 +50,9 @@ The framework automatically maps Java types to JSON Schema types:
 | String, Character                  | "string"         |
 | int, long, float, double, Number   | "number"         |
 | boolean, Boolean                   | "boolean"        |
-| Other types                        | "Object"         |
+| Other types                        | "object"         |
 
-> Current limitation: although `required=false` is represented in the generated schema, omitted optional arguments are not yet handled correctly by the reflection invocation path. Until that is fixed, pass every annotated argument explicitly.
+Parameters declared with `required=false` may be omitted. Missing reference-type parameters are passed as `null`; primitive parameters must still be supplied because Java primitives cannot represent absence.
 
 
 ## Example Tool Implementations

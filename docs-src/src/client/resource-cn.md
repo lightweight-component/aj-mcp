@@ -63,9 +63,8 @@ assertEquals("file:///blob", blobContents.getUri(), "URI 应为 'file:///blob'")
 assertEquals("blob", blobContents.getBlob(), "二进制内容应为 'blob'");
 ```
 
-SDK 已包含资源模板的协议模型，但当前版本尚未完整实现基于注解的模板注册和服务端分发。在服务端模板功能补齐前，请勿依赖下面的调用方式。
+客户端可以列出服务端注册的资源模板，并通过展开后的 URI 读取资源。跨实现分页时建议使用 `listResourceTemplatePage(cursor)`，并原样传回服务端返回的 opaque `nextCursor`。
 
-<!--
 ```java
 GetResourceResult.ResourceResultDetail response = mcpClient.readResource("file:///text-template/hello");
 assertEquals(1, response.getContents().size(), "期望内容数量为 1");
@@ -76,25 +75,13 @@ ResourceContentText textContents = (ResourceContentText) contents;
 assertEquals("file:///text-template/hello", textContents.getUri(), "URI 应为 'file:///text-template/hello'");
 assertEquals("text hello", textContents.getText(), "文本内容应为 'text hello'");
 ```
--->
 
-<!--
 ### 资源订阅
 
 客户端可订阅资源变更通知，以便在资源更新时及时获知：
 
-err := client.Subscribe(ctx, mcp.SubscribeRequest{
-    Params: mcp.SubscribeParams{
-        URI: "test://resource/path",
-    },
-})
+mcpClient.subscribeResource("test://resource/path");
 
 如需取消资源通知：
 
-err := client.Unsubscribe(ctx, mcp.UnsubscribeRequest{
-    Params: mcp.UnsubscribeParams{
-        URI: "test://resource/path",
-    },
-})
-
--->
+mcpClient.unsubscribeResource("test://resource/path");

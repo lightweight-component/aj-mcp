@@ -18,6 +18,35 @@ import java.util.concurrent.TimeoutException;
 @SuperBuilder
 public abstract class McpClientResource extends McpClientPrompt {
     @Override
+    public void subscribeResource(String uri) {
+        SubscribeRequest request = new SubscribeRequest();
+        request.setParams(new GetResourceRequest.Params(uri));
+        executeSubscriptionRequest(request);
+    }
+
+    @Override
+    public void unsubscribeResource(String uri) {
+        UnsubscribeRequest request = new UnsubscribeRequest();
+        request.setParams(new GetResourceRequest.Params(uri));
+        executeSubscriptionRequest(request);
+    }
+
+    private void executeSubscriptionRequest(com.ajaxjs.mcp.protocol.McpRequest request) {
+        long operationId = idGenerator.getAndIncrement();
+        request.setId(operationId);
+        try {
+            JsonNode response = awaitResponse(transport.sendRequestWithResponse(request));
+            McpException.checkForErrors(response);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+        } catch (ExecutionException | TimeoutException e) {
+            throw new RuntimeException(e);
+        } finally {
+            pendingRequests.remove(operationId);
+        }
+    }
+    @Override
     public List<ResourceItem> listResources() {
         return obtainResourceList(0);
     }
@@ -25,6 +54,27 @@ public abstract class McpClientResource extends McpClientPrompt {
     @Override
     public List<ResourceItem> listResources(int pageNo) {
         return obtainResourceList(pageNo);
+    }
+
+    @Override
+    public McpPage<ResourceItem> listResourcePage(String cursor) {
+        GetResourceListRequest request = new GetResourceListRequest();
+        request.setId(idGenerator.getAndIncrement());
+        if (cursor != null)
+            request.setParams(new Cursor(cursor));
+        try {
+            JsonNode response = awaitResponse(transport.sendRequestWithResponse(request));
+            McpException.checkForErrors(response);
+            JsonNode result = response.get(RESPONSE_RESULT);
+            return new McpPage<>(parseResourceRefs(response), nextCursor(result));
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+        } catch (ExecutionException | TimeoutException e) {
+            throw new RuntimeException(e);
+        } finally {
+            pendingRequests.remove(request.getId());
+        }
     }
 
     @Override
@@ -57,6 +107,31 @@ public abstract class McpClientResource extends McpClientPrompt {
     @Override
     public List<ResourceTemplate> listResourceTemplates(int pageNo) {
         return obtainResourceTemplateList(pageNo);
+    }
+
+    @Override
+    public McpPage<ResourceTemplate> listResourceTemplatePage(String cursor) {
+        GetResourceTemplateListRequest request = new GetResourceTemplateListRequest();
+        request.setId(idGenerator.getAndIncrement());
+        if (cursor != null)
+            request.setParams(new Cursor(cursor));
+        try {
+            JsonNode response = awaitResponse(transport.sendRequestWithResponse(request));
+            McpException.checkForErrors(response);
+            JsonNode result = response.get(RESPONSE_RESULT);
+            return new McpPage<>(parseResourceTemplateRefs(response), nextCursor(result));
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+        } catch (ExecutionException | TimeoutException e) {
+            throw new RuntimeException(e);
+        } finally {
+            pendingRequests.remove(request.getId());
+        }
+    }
+
+    private static String nextCursor(JsonNode result) {
+        return result.has("nextCursor") ? result.get("nextCursor").asText() : null;
     }
 
     /**

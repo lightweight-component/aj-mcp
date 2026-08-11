@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.util.Map;
+import com.ajaxjs.mcp.protocol.utils.RequestMeta;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import static com.ajaxjs.mcp.protocol.McpConstant.Methods.TOOLS_CALL;
 
@@ -44,5 +46,8 @@ public class CallToolRequest extends McpRequest {
         private String name;
 
         private Map<String, Object> arguments;
+
+        @JsonProperty("_meta")
+        private RequestMeta meta;
     }
 }

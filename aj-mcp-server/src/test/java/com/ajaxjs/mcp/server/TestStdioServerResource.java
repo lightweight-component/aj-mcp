@@ -13,7 +13,7 @@ class TestStdioServerResource extends TestStdioServerBase {
     void testList() {
         setIn("{\"jsonrpc\": \"2.0\",\"id\":1,\"method\":\"resources/list\"}\n");
         // Verify the output
-        String expectedOutput = "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"resources\":[{\"uri\":\"file:///text\",\"name\":\"text\",\"mimeType\":\"text/plain\",\"description\":\"A nice piece of text\"},{\"uri\":\"file:///blob\",\"name\":\"blob\",\"mimeType\":\"text/blob\",\"description\":\"A nice blob\"}]}}\r\n";
+        String expectedOutput = "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"resources\":[{\"uri\":\"file:///text\",\"name\":\"text\",\"mimeType\":\"text/plain\",\"description\":\"A nice piece of text\"},{\"uri\":\"file:///blob\",\"name\":\"blob\",\"mimeType\":\"image/jpg\",\"description\":\"A nice pic\"}]}}\r\n";
         assertEquals(expectedOutput, testOut.toString());
     }
 
@@ -34,7 +34,7 @@ class TestStdioServerResource extends TestStdioServerBase {
     void testListTemplate() {
         setIn("{\"jsonrpc\": \"2.0\",\"id\":1,\"method\":\"resources/list\"}\n");
         // Verify the output
-        String expectedOutput = "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"resources\":[{\"uri\":\"file:///text\",\"name\":\"text\",\"mimeType\":\"text/plain\",\"description\":\"A nice piece of text\"},{\"uri\":\"file:///blob\",\"name\":\"blob\",\"mimeType\":\"text/blob\",\"description\":\"A nice blob\"}]}}\r\n";
+        String expectedOutput = "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"resources\":[{\"uri\":\"file:///text\",\"name\":\"text\",\"mimeType\":\"text/plain\",\"description\":\"A nice piece of text\"},{\"uri\":\"file:///blob\",\"name\":\"blob\",\"mimeType\":\"image/jpg\",\"description\":\"A nice pic\"}]}}\r\n";
         assertEquals(expectedOutput, testOut.toString());
     }
 

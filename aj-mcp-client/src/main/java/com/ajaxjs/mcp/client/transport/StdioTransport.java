@@ -109,19 +109,25 @@ public class StdioTransport extends McpTransport {
         String requestString = JsonUtils.toJson(request);
         String initializationNotification = JsonUtils.toJson(new InitializationNotification());
 
-        return execute(requestString, request.getId())
+        return execute(requestString, numericId(request.getId()))
                 .thenCompose(originalResponse -> execute(initializationNotification, null)
                         .thenCompose(nullNode -> CompletableFuture.completedFuture(originalResponse)));
     }
 
     @Override
     public CompletableFuture<JsonNode> sendRequestWithResponse(McpRequest request) {
-        return execute(JsonUtils.toJson(request), request.getId());
+        requireInitialized();
+        return execute(JsonUtils.toJson(request), numericId(request.getId()));
     }
 
     @Override
     public void sendRequestWithoutResponse(McpRequest request) {
         execute(JsonUtils.toJson(request), null);
+    }
+
+    @Override
+    protected void sendJson(JsonNode message) {
+        execute(JsonUtils.toJson(message), null);
     }
 
     /**

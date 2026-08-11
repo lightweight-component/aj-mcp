@@ -85,13 +85,13 @@ class McpClientTimeoutTest {
 
         @Override
         public CompletableFuture<JsonNode> initialize(InitializeRequest request) {
-            saveRequest(request.getId(), response);
+            saveRequest(numericId(request.getId()), response);
             return response;
         }
 
         @Override
         public CompletableFuture<JsonNode> sendRequestWithResponse(McpRequest request) {
-            saveRequest(request.getId(), response);
+            saveRequest(numericId(request.getId()), response);
             return response;
         }
 

@@ -17,6 +17,12 @@ layout: layouts/docs-cn.njk
 - 修正 notification 响应行为和请求超时语义。
 - 将 feature store 调整为服务器实例级，并允许包扫描跳过不可加载的可选类。
 - 为 Prompt、Resource 和 ResourceTemplate 列表增加按页缓存。
+- 支持字符串 JSON-RPC ID、严格初始化生命周期及按实际功能生成 capability。
+- 补齐资源模板、Completion、资源订阅、取消、日志、进度、Roots、Sampling 和通用通知回调。
+- 新增 opaque cursor 分页 API，同时保留页码 API 以兼容旧代码。
+- 同一 SDK 支持 `2024-11-05`、`2025-03-26` 和 `2025-06-18` 协议协商；服务端配置列表按优先级排列。
+- 新增 Streamable HTTP 客户端与服务端适配器；不实现已在 `2025-06-18` 删除的 JSON-RPC batch。
+- 支持 Tool annotations、Progress message、Completion context、Resource Link、结构化 Tool 输出以及 Elicitation。
 
 ## aj-mcp-common 1.5 / aj-mcp-client 1.3 / aj-mcp-server 1.2 — 2025-06-10
 

@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import static com.ajaxjs.mcp.protocol.McpConstant.Methods.COMPLETION_COMPLETE;
+import java.util.Map;
 
 /**
  * https://modelcontextprotocol.io/specification/2024-11-05/server/utilities/completion
@@ -25,6 +26,15 @@ public class CompleteRequest extends McpRequest {
     public static class Params {
         Ref ref;
         Argument argument;
+
+        /** Previously resolved variables, introduced in MCP 2025-06-18. */
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        Map<String, String> context;
+
+        public Params(Ref ref, Argument argument) {
+            this.ref = ref;
+            this.argument = argument;
+        }
     }
 
     /**

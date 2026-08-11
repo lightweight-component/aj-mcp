@@ -22,18 +22,18 @@ public class CancellationNotification extends McpRequest {
 
     @Data
     public static class Params {
-        private String requestId;
+        private Object requestId;
 
         @JsonInclude(JsonInclude.Include.NON_NULL)
         private String reason;
     }
 
-    public CancellationNotification(String requestId) {
+    public CancellationNotification(Object requestId) {
         this.params = new Params();
         this.params.setRequestId(requestId);
     }
 
-    public CancellationNotification(String requestId, String message) {
+    public CancellationNotification(Object requestId, String message) {
         this(requestId);
         this.params.setReason(message);
     }

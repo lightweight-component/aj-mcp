@@ -28,6 +28,7 @@ class StdioTransportUnexpectedExitTest {
 
         try {
             transport.start(pending);
+            transport.markInitialized();
             PingRequest request = new PingRequest();
             request.setId(1L);
             CompletableFuture<JsonNode> response = transport.sendRequestWithResponse(request);

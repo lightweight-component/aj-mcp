@@ -35,6 +35,28 @@ public abstract class McpClientPrompt extends McpClientBase {
         return obtainPromptList(pageNo);
     }
 
+    @Override
+    public McpPage<PromptItem> listPromptPage(String cursor) {
+        GetPromptListRequest request = new GetPromptListRequest();
+        request.setId(idGenerator.getAndIncrement());
+        if (cursor != null)
+            request.setParams(new Cursor(cursor));
+        try {
+            JsonNode response = awaitResponse(transport.sendRequestWithResponse(request));
+            McpException.checkForErrors(response);
+            JsonNode result = response.get(RESPONSE_RESULT);
+            return new McpPage<>(parsePromptRefs(response),
+                    result.has("nextCursor") ? result.get("nextCursor").asText() : null);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+        } catch (ExecutionException | TimeoutException e) {
+            throw new RuntimeException(e);
+        } finally {
+            pendingRequests.remove(request.getId());
+        }
+    }
+
 
     /**
      * Synchronized method to get the prompt list

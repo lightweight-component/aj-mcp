@@ -160,7 +160,7 @@ public class HttpMcpTransport extends McpTransport {
             return McpUtils.failedFuture(e);
         }
 
-        return execute(httpRequest, request.getId()).thenCompose(originalResponse -> execute(initializationNotification, null)
+        return execute(httpRequest, numericId(request.getId())).thenCompose(originalResponse -> execute(initializationNotification, null)
                 .thenCompose(nullNode -> CompletableFuture.completedFuture(originalResponse)));
     }
 
@@ -172,9 +172,10 @@ public class HttpMcpTransport extends McpTransport {
      */
     @Override
     public CompletableFuture<JsonNode> sendRequestWithResponse(McpRequest request) {
+        requireInitialized();
         try {
             Request req = createRequest(request);
-            return execute(req, request.getId());
+            return execute(req, numericId(request.getId()));
         } catch (JsonProcessingException e) {
             return McpUtils.failedFuture(e);
         }
@@ -190,6 +191,17 @@ public class HttpMcpTransport extends McpTransport {
         try {
             Request httpRequest = createRequest(request);
             execute(httpRequest, null);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    protected void sendJson(JsonNode message) {
+        try {
+            Request request = new Request.Builder().url(postUrl).header("Content-Type", "application/json")
+                    .post(RequestBody.create(JsonUtils.OBJECT_MAPPER.writeValueAsBytes(message))).build();
+            execute(request, null);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

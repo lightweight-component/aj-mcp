@@ -7,9 +7,20 @@ import com.ajaxjs.mcp.protocol.resource.ResourceItem;
 import com.ajaxjs.mcp.protocol.resource.ResourceTemplate;
 import com.ajaxjs.mcp.protocol.tools.CallToolRequest;
 import com.ajaxjs.mcp.protocol.tools.ToolItem;
+import com.ajaxjs.mcp.protocol.tools.CallToolResult;
 
 import java.util.List;
 import java.util.Map;
+import com.ajaxjs.mcp.protocol.utils.completion.CompleteRequest;
+import com.ajaxjs.mcp.protocol.utils.completion.CompleteResult;
+import com.fasterxml.jackson.databind.JsonNode;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import com.ajaxjs.mcp.protocol.client.Root;
+import com.ajaxjs.mcp.protocol.client.SamplingCreateMessageParams;
+import com.ajaxjs.mcp.protocol.client.SamplingCreateMessageResult;
+import com.ajaxjs.mcp.protocol.client.ElicitRequestParams;
+import com.ajaxjs.mcp.protocol.client.ElicitResult;
 
 /**
  * Represents a client that can communicate with an MCP server over a given transport protocol, retrieve and execute tools using the server.
@@ -35,6 +46,8 @@ public interface IMcpClient extends AutoCloseable {
      */
     List<ToolItem> listTools(int pageNo);
 
+    McpPage<ToolItem> listToolPage(String cursor);
+
     /**
      * Calls a tool on the MCP server and returns the result as a String.
      *
@@ -42,6 +55,9 @@ public interface IMcpClient extends AutoCloseable {
      * @return The tool result
      */
     String callTool(CallToolRequest request);
+
+    /** Returns the complete result, including 2025-06-18 structured content. */
+    CallToolResult.CallToolResultDetail callToolResult(CallToolRequest request);
 
     /***
      * Calls a tool on the MCP server and returns the result as a String.
@@ -67,6 +83,8 @@ public interface IMcpClient extends AutoCloseable {
      */
     List<ResourceItem> listResources(int pageNo);
 
+    McpPage<ResourceItem> listResourcePage(String cursor);
+
     /**
      * Obtains the full list of resource templates (dynamic resources) available on the MCP server.
      *
@@ -82,6 +100,8 @@ public interface IMcpClient extends AutoCloseable {
      */
     List<ResourceTemplate> listResourceTemplates(int pageNo);
 
+    McpPage<ResourceTemplate> listResourceTemplatePage(String cursor);
+
     /**
      * Retrieves the contents of the resource with the specified URI.
      * This also works for dynamic resources (templates).
@@ -90,6 +110,10 @@ public interface IMcpClient extends AutoCloseable {
      * @return Resource contents.
      */
     GetResourceResult.ResourceResultDetail readResource(String uri);
+
+    void subscribeResource(String uri);
+
+    void unsubscribeResource(String uri);
 
     /**
      * Obtain a list of prompts available on the MCP server.
@@ -105,6 +129,8 @@ public interface IMcpClient extends AutoCloseable {
      * @return The list of prompts
      */
     List<PromptItem> listPrompts(int pageNo);
+
+    McpPage<PromptItem> listPromptPage(String cursor);
 
     /**
      * Render the contents of a prompt.
@@ -130,4 +156,29 @@ public interface IMcpClient extends AutoCloseable {
      * the health of this MCP client is considered degraded.
      */
     void checkHealth();
+
+    /** Requests argument completion for a prompt or resource template. */
+    CompleteResult.CompletionResult complete(CompleteRequest.Ref ref, CompleteRequest.Argument argument);
+
+    /** 2025-06-18 completion request with previously resolved arguments. */
+    CompleteResult.CompletionResult complete(CompleteRequest.Ref ref, CompleteRequest.Argument argument,
+                                               Map<String, String> context);
+
+    /** Registers an observer for a JSON-RPC notification method. */
+    void onNotification(String method, Consumer<JsonNode> handler);
+
+    /** Registers a handler for a server-initiated JSON-RPC request such as roots/list or sampling/createMessage. */
+    void onServerRequest(String method, Function<JsonNode, JsonNode> handler);
+
+    void setRoots(List<Root> roots, boolean notifyChanges);
+
+    void notifyRootsChanged();
+
+    void setSamplingHandler(Function<SamplingCreateMessageParams, SamplingCreateMessageResult> handler);
+
+    /** Registers the user-interaction handler advertised by MCP 2025-06-18 clients. */
+    void setElicitationHandler(Function<ElicitRequestParams, ElicitResult> handler);
+
+    /** Returns the protocol revision selected during initialization. */
+    String getNegotiatedProtocolVersion();
 }

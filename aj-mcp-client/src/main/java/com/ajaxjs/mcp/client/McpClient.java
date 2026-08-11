@@ -5,10 +5,13 @@ import com.ajaxjs.mcp.client.transport.StdioTransport;
 import com.ajaxjs.mcp.common.JsonUtils;
 import com.ajaxjs.mcp.protocol.McpConstant;
 import com.ajaxjs.mcp.protocol.tools.CallToolRequest;
+import com.ajaxjs.mcp.protocol.tools.CallToolResult;
 import com.ajaxjs.mcp.protocol.tools.GetToolListRequest;
 import com.ajaxjs.mcp.protocol.tools.JsonSchema;
 import com.ajaxjs.mcp.protocol.tools.ToolItem;
 import com.ajaxjs.mcp.protocol.utils.CancellationNotification;
+import com.ajaxjs.mcp.protocol.utils.completion.CompleteRequest;
+import com.ajaxjs.mcp.protocol.utils.completion.CompleteResult;
 import com.ajaxjs.mcp.protocol.utils.pagination.Cursor;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -35,6 +38,34 @@ import java.util.stream.StreamSupport;
 @Slf4j
 @SuperBuilder
 public class McpClient extends McpClientResource {
+    @Override
+    public CompleteResult.CompletionResult complete(CompleteRequest.Ref ref, CompleteRequest.Argument argument) {
+        return complete(ref, argument, null);
+    }
+
+    @Override
+    public CompleteResult.CompletionResult complete(CompleteRequest.Ref ref, CompleteRequest.Argument argument,
+                                                     java.util.Map<String, String> context) {
+        long operationId = idGenerator.getAndIncrement();
+        CompleteRequest request = new CompleteRequest();
+        request.setId(operationId);
+        CompleteRequest.Params params = new CompleteRequest.Params(ref, argument);
+        params.setContext(context);
+        request.setParams(params);
+        try {
+            JsonNode response = awaitResponse(transport.sendRequestWithResponse(request));
+            com.ajaxjs.mcp.common.McpException.checkForErrors(response);
+            return JsonUtils.jsonNode2bean(response.get(RESPONSE_RESULT).get("completion"),
+                    CompleteResult.CompletionResult.class);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+        } catch (ExecutionException | TimeoutException e) {
+            throw new RuntimeException(e);
+        } finally {
+            pendingRequests.remove(operationId);
+        }
+    }
     @Override
     public List<ToolItem> listTools() {
         return listTools(0);
@@ -65,6 +96,28 @@ public class McpClient extends McpClientResource {
         return toolListFromMcpResponse((ArrayNode) result.get(RESPONSE_RESULT).get("tools"));
     }
 
+    @Override
+    public McpPage<ToolItem> listToolPage(String cursor) {
+        GetToolListRequest request = new GetToolListRequest();
+        request.setId(idGenerator.getAndIncrement());
+        if (cursor != null)
+            request.setParams(new Cursor(cursor));
+        try {
+            JsonNode response = awaitResponse(transport.sendRequestWithResponse(request));
+            com.ajaxjs.mcp.common.McpException.checkForErrors(response);
+            JsonNode result = response.get(RESPONSE_RESULT);
+            List<ToolItem> items = toolListFromMcpResponse((ArrayNode) result.get("tools"));
+            return new McpPage<>(items, result.has("nextCursor") ? result.get("nextCursor").asText() : null);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+        } catch (ExecutionException | TimeoutException e) {
+            throw new RuntimeException(e);
+        } finally {
+            pendingRequests.remove(request.getId());
+        }
+    }
+
     /**
      * Converts the 'tools' element from a ListToolsResult MCP message to a list of ToolSpecification objects.
      *
@@ -80,10 +133,17 @@ public class McpClient extends McpClientResource {
 
             if (tool.has("description"))
                 toolSpecification.setDescription(tool.get("description").asText());
+            if (tool.has("title"))
+                toolSpecification.setTitle(tool.get("title").asText());
+            if (tool.has("annotations"))
+                toolSpecification.setAnnotations(JsonUtils.OBJECT_MAPPER.convertValue(tool.get("annotations"), java.util.Map.class));
 
             JsonNode jsonNode = tool.get("inputSchema");
             JsonSchema jsonSchema = JsonUtils.jsonNode2bean(jsonNode, JsonSchema.class);
             toolSpecification.setInputSchema(jsonSchema);
+
+            if (tool.has("outputSchema"))
+                toolSpecification.setOutputSchema(JsonUtils.jsonNode2bean(tool.get("outputSchema"), JsonSchema.class));
 
             result.add(toolSpecification);
         }
@@ -101,7 +161,7 @@ public class McpClient extends McpClientResource {
             CompletableFuture<JsonNode> resultFuture = transport.sendRequestWithResponse(request);
             result = awaitResponse(resultFuture);
         } catch (TimeoutException timeout) {
-            transport.sendRequestWithoutResponse(new CancellationNotification(String.valueOf(operationId), "Timeout"));
+            transport.sendRequestWithoutResponse(new CancellationNotification(operationId, "Timeout"));
             ObjectNode resultTimeout = JsonNodeFactory.instance.objectNode();
             resultTimeout.putObject(RESPONSE_RESULT)
                     .putArray("content").addObject().put("type", ContentType.TEXT)
@@ -118,6 +178,25 @@ public class McpClient extends McpClientResource {
         }
 
         return extractResult(result);
+    }
+
+    @Override
+    public CallToolResult.CallToolResultDetail callToolResult(CallToolRequest request) {
+        long operationId = idGenerator.getAndIncrement();
+        request.setId(operationId);
+        try {
+            JsonNode response = awaitResponse(transport.sendRequestWithResponse(request));
+            com.ajaxjs.mcp.common.McpException.checkForErrors(response);
+            return JsonUtils.OBJECT_MAPPER.convertValue(response.get(RESPONSE_RESULT),
+                    CallToolResult.CallToolResultDetail.class);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+        } catch (ExecutionException | TimeoutException e) {
+            throw new RuntimeException(e);
+        } finally {
+            pendingRequests.remove(operationId);
+        }
     }
 
     @Override

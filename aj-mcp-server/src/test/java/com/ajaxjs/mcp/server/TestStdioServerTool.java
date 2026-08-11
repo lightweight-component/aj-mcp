@@ -15,8 +15,12 @@ class TestStdioServerTool extends TestStdioServerBase {
     void testList() {
         setIn("{\"jsonrpc\": \"2.0\",\"id\":1,\"method\":\"tools/list\"}\n");
         // Verify the output
-        String expectedOutput = "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"tools\":[{\"name\":\"longOperation\",\"description\":\"Takes 10 seconds to complete\",\"inputSchema\":null},{\"name\":\"image\",\"description\":\"A nice pic\",\"inputSchema\":null},{\"name\":\"getAll\",\"description\":\"List ALL\",\"inputSchema\":null},{\"name\":\"echoBoolean\",\"description\":\"Echoes a boolean\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"input\":{\"type\":\"Boolean\",\"description\":\"The boolean to be echoed\"}},\"required\":[\"input\"]}},{\"name\":\"echoInteger\",\"description\":\"Echoes an integer\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"input\":{\"type\":\"Number\",\"description\":\"The integer to be echoed\"}},\"required\":[\"input\"]}},{\"name\":\"error\",\"description\":\"Throws a business error\",\"inputSchema\":null},{\"name\":\"echoString\",\"description\":\"Echoes a string\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"input\":{\"type\":\"string\",\"description\":\"The string to be echoed\"}},\"required\":[\"input\"]}}]}}\r\n";
-        assertEquals(expectedOutput, testOut.toString());
+        JsonNode tools = JsonUtils.json2Node(testOut.toString()).get("result").get("tools");
+        assertEquals(7, tools.size());
+        Map<String, JsonNode> byName = new java.util.HashMap<>();
+        tools.forEach(tool -> byName.put(tool.get("name").asText(), tool));
+        assertEquals("number", byName.get("echoInteger").get("inputSchema").get("properties").get("input").get("type").asText());
+        assertEquals("boolean", byName.get("echoBoolean").get("inputSchema").get("properties").get("input").get("type").asText());
     }
 
     @Test

@@ -40,4 +40,16 @@ public @interface Tool {
      */
     String description() default McpConstant.EMPTY_STR;
 
+    /** Optional human-facing display name (2025-06-18). */
+    String title() default McpConstant.EMPTY_STR;
+
+    /** Optional JSON Schema object encoded as JSON (2025-06-18). */
+    String outputSchema() default McpConstant.EMPTY_STR;
+
+    /** Behavioral hints introduced in 2025-03-26. They are advisory, not security controls. */
+    boolean readOnlyHint() default false;
+    boolean destructiveHint() default true;
+    boolean idempotentHint() default false;
+    boolean openWorldHint() default true;
+
 }

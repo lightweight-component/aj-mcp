@@ -80,6 +80,25 @@ McpTransport transport = HttpMcpTransport.builder()
 
 The `sseUrl` is required. It specifies the URL of the SSE endpoint where the MCP server is listening for incoming connections.
 
+### Streamable HTTP (2025-03-26 / 2025-06-18)
+
+Newer revisions use one HTTP endpoint:
+
+```java
+McpTransport transport = StreamableHttpTransport.builder()
+        .endpointUrl("http://localhost:8080/mcp")
+        .openEventStream(true)
+        .build();
+
+McpClient client = McpClient.builder()
+        .transport(transport)
+        .protocolVersion("2025-06-18")
+        .build();
+client.initialize();
+```
+
+For OAuth, pass an `Authorization` Bearer token through `requestHeaders`. The SDK retains the returned session ID and automatically sends the negotiated `MCP-Protocol-Version` on subsequent requests.
+
 ## McpClient
 
 The MCP Client serves as a bridge between local applications and remote tool implementations.

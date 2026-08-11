@@ -22,6 +22,10 @@ public class ToolItem {
      */
     String name;
 
+    /** Optional human-friendly display name introduced in MCP 2025-06-18. */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    String title;
+
     /**
      * Human-readable description of functionality. This can be used by clients to improve the LLM's understanding of available tools.
      */
@@ -33,6 +37,10 @@ public class ToolItem {
      * This allows clients to validate tool arguments before sending them to the server.
      */
     JsonSchema inputSchema;
+
+    /** Optional output schema introduced in MCP 2025-06-18. */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    JsonSchema outputSchema;
 
     /**
      * Optional properties describing tool behavior

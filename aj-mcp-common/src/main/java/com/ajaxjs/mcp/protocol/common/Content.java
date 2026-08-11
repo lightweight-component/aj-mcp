@@ -16,7 +16,8 @@ import lombok.Data;
         @JsonSubTypes.Type(value = ContentText.class, name = McpConstant.ContentType.TEXT),
         @JsonSubTypes.Type(value = ContentImage.class, name = McpConstant.ContentType.IMAGE),
         @JsonSubTypes.Type(value = ContentAudio.class, name = McpConstant.ContentType.AUDIO),
-        @JsonSubTypes.Type(value = ContentEmbeddedResource.class, name = McpConstant.ContentType.RESOURCE)
+        @JsonSubTypes.Type(value = ContentEmbeddedResource.class, name = McpConstant.ContentType.RESOURCE),
+        @JsonSubTypes.Type(value = ContentResourceLink.class, name = McpConstant.ContentType.RESOURCE_LINK)
 })
 public abstract class Content {
     @JsonIgnore

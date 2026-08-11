@@ -47,9 +47,9 @@ public class MyTools {
 | String, Character                 | "string"         |
 | int, long, float, double, Number  | "number"         |
 | boolean, Boolean                  | "boolean"        |
-| 其它类型                          | "Object"         |
+| 其它类型                          | "object"         |
 
-> 当前限制：虽然 `required=false` 会体现在生成的 schema 中，但反射调用路径尚不能正确处理被省略的可选参数。在该问题修复前，请显式传递所有带注解的参数。
+`required=false` 参数可以省略。缺少的引用类型参数会以 `null` 传入；Java 基本类型无法表达缺省，因此基本类型参数仍须提供。
 
 ## 工具实现示例
 

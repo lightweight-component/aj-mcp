@@ -50,7 +50,7 @@ public class McpServerTools {
 
     @Tool(description = "A nice pic")
     public ContentImage image() {
-        String base64EncodedImage = ServerUtils.encodeImageToBase64("bird-eye.jpg");
+        String base64EncodedImage = ServerUtils.encodeImageToBase64("com/ajaxjs/mcp/server/testcase/bird-eye.jpg");
 
         ContentImage content = new ContentImage();
         content.setMimeType("image/jpg");
@@ -61,7 +61,7 @@ public class McpServerTools {
 
     @Tool(description = "List ALL")
     public List<Content> getAll() {
-        String base64EncodedImage = ServerUtils.encodeImageToBase64("bird-eye.jpg");
+        String base64EncodedImage = ServerUtils.encodeImageToBase64("com/ajaxjs/mcp/server/testcase/bird-eye.jpg");
 
         ContentImage imgContent = new ContentImage();
         imgContent.setMimeType("image/jpg");

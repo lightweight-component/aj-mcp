@@ -1,6 +1,7 @@
 package com.ajaxjs.mcp.client.transport;
 
 import com.ajaxjs.mcp.protocol.McpConstant;
+import com.ajaxjs.mcp.protocol.BaseJsonRpcMessage;
 import com.ajaxjs.mcp.protocol.McpRequest;
 import com.ajaxjs.mcp.protocol.initialize.InitializeRequest;
 import com.ajaxjs.mcp.protocol.utils.ping.PingRequest;
@@ -10,6 +11,10 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.Closeable;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ajaxjs.mcp.common.JsonUtils;
 
 /**
  * MCP 客户端传输接口
@@ -59,6 +64,11 @@ public abstract class McpTransport implements McpConstant, Closeable {
      */
     public abstract void sendRequestWithoutResponse(McpRequest request);
 
+    /** Sends a JSON-RPC response generated for a server-initiated request. */
+    protected void sendJson(JsonNode message) {
+        throw new UnsupportedOperationException("This transport cannot answer server-initiated requests");
+    }
+
     /**
      * PING 检查
      * <p>
@@ -72,6 +82,39 @@ public abstract class McpTransport implements McpConstant, Closeable {
     public abstract void checkHealth();
 
     private Map<Long, CompletableFuture<JsonNode>> pendingRequests;
+    private Consumer<JsonNode> notificationHandler;
+    private Function<JsonNode, JsonNode> serverRequestHandler;
+    private volatile boolean initialized;
+    private volatile String negotiatedProtocolVersion;
+
+    public void setMessageHandlers(Consumer<JsonNode> notificationHandler,
+                                   Function<JsonNode, JsonNode> serverRequestHandler) {
+        this.notificationHandler = notificationHandler;
+        this.serverRequestHandler = serverRequestHandler;
+    }
+
+    public void markInitialized() {
+        initialized = true;
+    }
+
+    public void setNegotiatedProtocolVersion(String negotiatedProtocolVersion) {
+        this.negotiatedProtocolVersion = negotiatedProtocolVersion;
+    }
+
+    public String getNegotiatedProtocolVersion() {
+        return negotiatedProtocolVersion;
+    }
+
+    protected void requireInitialized() {
+        if (!initialized)
+            throw new IllegalStateException("MCP client is not initialized");
+    }
+
+    protected static Long numericId(Object id) {
+        if (!(id instanceof Number))
+            throw new IllegalArgumentException("Client-generated request id must be numeric: " + id);
+        return ((Number) id).longValue();
+    }
 
     /**
      * 如果一个请求需要响应，那么在发送请求之前，必须调用此方法，将请求的 id 保存起来，以便可以对应到响应。
@@ -121,7 +164,20 @@ public abstract class McpTransport implements McpConstant, Closeable {
      * @param message 要解析的 JSON 报文，是为 Jackson 的 JsonNode 对象。The JSON message to be handled, represented as a JsonNode object.
      */
     public void handle(JsonNode message) {
-        if (message.has(ID)) {
+        // A message containing both method and id is a server-initiated request,
+        // not a response to one of the client's pending operations.
+        if (message.has(METHOD) && message.has(ID)) {
+            JsonNode result = serverRequestHandler == null ? null : serverRequestHandler.apply(message);
+            ObjectNode response = JsonUtils.OBJECT_MAPPER.createObjectNode();
+            response.put("jsonrpc", BaseJsonRpcMessage.VERSION);
+            response.set(ID, message.get(ID));
+            if (result != null)
+                response.set(RESPONSE_RESULT, result);
+            else
+                response.putObject("error").put("code", -32601).put("message",
+                        "No client handler for method " + message.get(METHOD).asText());
+            sendJson(response);
+        } else if (message.has(ID)) {
             long messageId = message.get(ID).asLong();
             CompletableFuture<JsonNode> op = pendingRequests.remove(messageId);
 
@@ -141,11 +197,13 @@ public abstract class McpTransport implements McpConstant, Closeable {
 
                 log.warn("Received response for unknown message id: {}", messageId);
             }
-        } else if (message.has(METHOD) && message.get(METHOD).asText().equals("notifications/message")) {
-            if (message.has(PARAMS))  // this is a log message
-                log.info(message.get(PARAMS).asText());
+        } else if (message.has(METHOD)) {
+            if (notificationHandler != null)
+                notificationHandler.accept(message);
+            else if (message.get(METHOD).asText().equals("notifications/message"))
+                log.info("{}", message.get(PARAMS));
             else
-                log.warn("Received log message without params: {}", message);
+                log.warn("Received notification without a handler: {}", message.get(METHOD).asText());
         } else
             log.warn("Received unknown message: {}", message);
     }

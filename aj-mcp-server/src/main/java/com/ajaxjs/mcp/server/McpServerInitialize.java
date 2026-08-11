@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import com.ajaxjs.mcp.protocol.ProtocolVersion;
 
 @Slf4j
 @Data
@@ -33,7 +34,7 @@ public abstract class McpServerInitialize implements McpConstant {
 
     McpTransportSync transport;
 
-    static <T> T getStore(Map<String, T> map, String name, Long requestId, String featureType) {
+    static <T> T getStore(Map<String, T> map, String name, Object requestId, String featureType) {
         if (McpUtils.isEmptyText(name))
             throw new JsonRpcErrorException(requestId, JsonRpcErrorCode.INVALID_PARAMS,
                     featureType + " name is required");
@@ -56,7 +57,7 @@ public abstract class McpServerInitialize implements McpConstant {
      * @param jsonNode Client request parameters in JsonNode format
      * @return Returns the initialization response object containing the server configuration information
      */
-    McpResponse initialize(Long id, JsonNode jsonNode) {
+    McpResponse initialize(Object id, JsonNode jsonNode) {
         InitializeRequest initializeRequest;
 
         try {
@@ -72,7 +73,15 @@ public abstract class McpServerInitialize implements McpConstant {
             The server MUST respond with the highest protocol version it supports
             if it does not support the requested (e.g. Client) version.
          */
-        String serverProtocolVersion = protocolVersions.get(protocolVersions.size() - 1);
+        if (protocolVersions == null || protocolVersions.isEmpty())
+            throw new IllegalStateException("At least one MCP protocol version must be configured");
+        for (String configuredVersion : protocolVersions) {
+            if (!ProtocolVersion.isSupported(configuredVersion))
+                throw new IllegalStateException("SDK does not implement configured protocol version: " + configuredVersion);
+        }
+
+        // Configuration is preference ordered; the first entry is the fallback.
+        String serverProtocolVersion = protocolVersions.get(0);
 
         /*
             If the server supports the requested protocol version, it MUST respond with the same version.
@@ -87,22 +96,45 @@ public abstract class McpServerInitialize implements McpConstant {
         serverInfo.setVersion(serverConfig.getVersion());
         serverInfo.setName(serverConfig.getName());
 
-        InitializeResponseResult.Capabilities.Tools tools = new InitializeResponseResult.Capabilities.Tools();
-        tools.setListChanged(true);
-
         InitializeResponseResult.Capabilities capabilities = new InitializeResponseResult.Capabilities();
-        capabilities.setTools(tools);
+        // Capabilities are promises. Only advertise methods that this server can
+        // actually route; listChanged remains false until mutation APIs emit it.
+        if (!featureMgr.getToolStore().isEmpty()) {
+            InitializeResponseResult.Capabilities.Tools tools = new InitializeResponseResult.Capabilities.Tools();
+            tools.setListChanged(true);
+            capabilities.setTools(tools);
+        }
+        if (!featureMgr.getPromptStore().isEmpty()) {
+            InitializeResponseResult.Capabilities.Prompts prompts = new InitializeResponseResult.Capabilities.Prompts();
+            prompts.setListChanged(true);
+            capabilities.setPrompts(prompts);
+        }
+        if (!featureMgr.getResourceStore().isEmpty() || !featureMgr.getResourceTemplateStore().isEmpty()) {
+            InitializeResponseResult.Capabilities.Resources resources = new InitializeResponseResult.Capabilities.Resources();
+            resources.setListChanged(true);
+            resources.setSubscribe(true);
+            capabilities.setResources(resources);
+        }
+        capabilities.setLogging(new InitializeResponseResult.Capabilities.Logging());
+        if (!featureMgr.getCompletionStore().isEmpty())
+            capabilities.setCompletions(new InitializeResponseResult.Capabilities.Completions());
 
         InitializeResponseResult result = new InitializeResponseResult();
         result.setProtocolVersion(serverProtocolVersion);
         result.setServerInfo(serverInfo);
         result.setCapabilities(capabilities);
 
+        onProtocolNegotiated(serverProtocolVersion, requestParams);
+
         InitializeResponse resp = new InitializeResponse();
         resp.setId(id);
         resp.setResult(result);
 
         return resp;
+    }
+
+    /** Hook used by the concrete server to bind negotiated state to its transport session. */
+    protected void onProtocolNegotiated(String version, InitializeRequestParams requestParams) {
     }
 
     /**
@@ -124,7 +156,7 @@ public abstract class McpServerInitialize implements McpConstant {
         try {
             jsonNode = JsonUtils.OBJECT_MAPPER.readTree(inputJson);
         } catch (IOException e) {
-            throw new JsonRpcErrorException(JsonRpcErrorCode.INVALID_REQUEST, "Unable to parse the JSON message");
+            throw new JsonRpcErrorException(JsonRpcErrorCode.PARSE_ERROR, "Unable to parse the JSON message");
         }
 
         JsonNode jsonrpcNode = jsonNode.get("jsonrpc");
@@ -139,7 +171,7 @@ public abstract class McpServerInitialize implements McpConstant {
 
         // id 必填
         JsonNode idNode = jsonNode.get(ID);
-        Long id = null;
+        Object id = null;
 
 //        if (idNode == null)
 //            throw new JsonRpcErrorException(JsonRpcErrorCode.INVALID_REQUEST, "Empty id.");
@@ -148,8 +180,15 @@ public abstract class McpServerInitialize implements McpConstant {
 //        if (id == 0L)
 //            id = null;
 
-        if (idNode != null)
-            id = idNode.asLong();
+        if (idNode != null) {
+            if (idNode.isIntegralNumber())
+                id = idNode.longValue();
+            else if (idNode.isTextual())
+                id = idNode.textValue();
+            else
+                throw new JsonRpcErrorException(JsonRpcErrorCode.INVALID_REQUEST,
+                        "JSON-RPC id must be a string or integer");
+        }
 
         JsonNode methodNode = jsonNode.get(METHOD);
 

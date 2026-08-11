@@ -45,4 +45,6 @@ public @interface ResourceTemplate {
      * @return The MIME type of this resource template.
      */
     String mimeType() default McpConstant.EMPTY_STR;
+
+    String title() default McpConstant.EMPTY_STR;
 }

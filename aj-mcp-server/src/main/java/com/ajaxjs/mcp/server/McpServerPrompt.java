@@ -95,11 +95,15 @@ public abstract class McpServerPrompt extends McpServerResource {
         if (argumentsDefined != null && !argumentsDefined.isEmpty()) {
             Map<String, Object> arguments = params.getArguments();
 
-            if (arguments == null || arguments.isEmpty())
+            boolean hasRequired = false;
+            for (PromptArgument definition : argumentsDefined)
+                hasRequired |= definition.isRequired();
+
+            if ((arguments == null || arguments.isEmpty()) && hasRequired)
                 throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_PARAMS, "arguments is required!");
 
-            if (argumentsDefined.size() != arguments.size())
-                throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_PARAMS, "arguments size is not match!");
+            if (arguments == null)
+                arguments = Collections.emptyMap();
 
             /*
             * Java Map 结构如 JSON 所示 {
@@ -113,7 +117,16 @@ public abstract class McpServerPrompt extends McpServerResource {
             for (int i = 0; i < argumentsDefined.size(); i++)
                 paramOrder[i] = argumentsDefined.get(i).getName();
 
-            argValues = extractValues(arguments, paramOrder);
+            argValues = new Object[paramOrder.length];
+            Class<?>[] parameterTypes = store.getMethod().getParameterTypes();
+            for (int i = 0; i < argumentsDefined.size(); i++) {
+                PromptArgument definition = argumentsDefined.get(i);
+                Object value = arguments.get(paramOrder[i]);
+                if (value == null && (definition.isRequired() || parameterTypes[i].isPrimitive()))
+                    throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_PARAMS,
+                            "argument " + paramOrder[i] + " is required");
+                argValues[i] = McpServer.convertToType(value, parameterTypes[i]);
+            }
         }
 
         // execute prompt method

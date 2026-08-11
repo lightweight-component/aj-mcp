@@ -10,7 +10,7 @@ import com.ajaxjs.mcp.server.feature.annotation.Resource;
 public class McpServerResources {
     @Resource(uri = "file:///blob", description = "A nice pic", mimeType = "image/jpg")
     public ResourceContentBinary blob() {
-        String base64EncodedImage = ServerUtils.encodeImageToBase64("bird-eye.jpg");
+        String base64EncodedImage = ServerUtils.encodeImageToBase64("com/ajaxjs/mcp/server/testcase/bird-eye.jpg");
 
         ResourceContentBinary content = new ResourceContentBinary();
         content.setUri("file:///blob");

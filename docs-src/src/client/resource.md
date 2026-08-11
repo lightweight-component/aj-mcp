@@ -67,9 +67,8 @@ assertEquals("file:///blob", blobContents.getUri(), "URI should be 'file:///blob
 assertEquals("blob", blobContents.getBlob(), "Blob content should be 'blob'");
 ```
 
-Resource-template protocol models exist in the SDK, but annotation-based resource-template registration and server dispatch are not complete in this version. Do not rely on the following pattern until server-side template support is implemented.
+Resource templates registered by the server can be listed and read through their expanded URI. For interoperable pagination, prefer `listResourceTemplatePage(cursor)` and pass the returned opaque `nextCursor` unchanged.
 
-<!--
 ``` java
 GetResourceResult.ResourceResultDetail response = mcpClient.readResource("file:///text-template/hello");
 assertEquals(1, response.getContents().size(), "Expected exactly one content");
@@ -80,25 +79,13 @@ ResourceContentText textContents = (ResourceContentText) contents;
 assertEquals("file:///text-template/hello", textContents.getUri(), "URI should be 'file:///text-template/hello'");
 assertEquals("text hello", textContents.getText(), "Text content should be 'text hello'");
 ```
--->
 
-<!--
 ### Resource Subscriptions
 
 The client can subscribe to resource changes to receive notifications when resources are updated:
 
-err := client.Subscribe(ctx, mcp.SubscribeRequest{
-Params: mcp.SubscribeParams{
-URI: "test://resource/path",
-},
-})
+mcpClient.subscribeResource("test://resource/path");
 
 To stop receiving notifications for a resource:
 
-err := client.Unsubscribe(ctx, mcp.UnsubscribeRequest{
-Params: mcp.UnsubscribeParams{
-URI: "test://resource/path",
-},
-})
-
--->
+mcpClient.unsubscribeResource("test://resource/path");

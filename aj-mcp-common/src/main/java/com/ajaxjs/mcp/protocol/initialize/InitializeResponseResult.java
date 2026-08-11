@@ -24,9 +24,14 @@ public class InitializeResponseResult {
         @JsonInclude(JsonInclude.Include.NON_NULL)
         private Resources resources;
 
+        @JsonInclude(JsonInclude.Include.NON_NULL)
         private Tools tools;
 
-        private Logging logging = new Logging();
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        private Logging logging;
+
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        private Completions completions;
 
         @JsonInclude(JsonInclude.Include.NON_NULL)
         private Experimental experimental;
@@ -67,6 +72,10 @@ public class InitializeResponseResult {
          * Emits structured log messages
          */
         public static class Logging {
+        }
+
+        /** Server supports completion/complete. */
+        public static class Completions {
         }
 
         /**

@@ -51,4 +51,6 @@ public @interface Resource {
      */
     String mimeType() default McpConstant.EMPTY_STR;
 
+    String title() default McpConstant.EMPTY_STR;
+
 }

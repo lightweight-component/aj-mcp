@@ -73,6 +73,25 @@ McpTransport transport=HttpMcpTransport.builder()
 
 `sseUrl` 是必需的，它指定 MCP 服务器的 SSE 端点 URL。
 
+### Streamable HTTP（2025-03-26 / 2025-06-18）
+
+较新的协议版本使用单一 HTTP 端点：
+
+```java
+McpTransport transport = StreamableHttpTransport.builder()
+        .endpointUrl("http://localhost:8080/mcp")
+        .openEventStream(true)
+        .build();
+
+McpClient client = McpClient.builder()
+        .transport(transport)
+        .protocolVersion("2025-06-18")
+        .build();
+client.initialize();
+```
+
+如需 OAuth Bearer token，可通过 `requestHeaders` 传入 `Authorization`。SDK 会保存服务端返回的 session ID，并在后续请求中自动加入协商后的 `MCP-Protocol-Version`。
+
 ## MCP 客户端
 
 MCP 客户端充当本地应用程序与远程工具实现之间的桥梁。

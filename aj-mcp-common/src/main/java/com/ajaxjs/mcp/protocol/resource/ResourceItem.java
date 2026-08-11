@@ -18,6 +18,9 @@ public class ResourceItem {
      */
     String name;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    String title;
+
     /**
      * Optional MIME type
      */

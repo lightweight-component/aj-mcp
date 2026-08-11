@@ -7,11 +7,11 @@ import lombok.Data;
 public class JsonRpcError {
     private String jsonrpc = BaseJsonRpcMessage.VERSION;
 
-    private Long id;
+    private Object id;
 
     private JsonRpcErrorDetail error;
 
-    public JsonRpcError(Long id, JsonRpcErrorCode code, String message) {
+    public JsonRpcError(Object id, JsonRpcErrorCode code, String message) {
         this.id = id;
         this.error = new JsonRpcErrorDetail(code, message);
     }

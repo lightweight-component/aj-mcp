@@ -61,7 +61,7 @@ public ResourceContentBinary blob() {
 
 ### 资源模板
 
-SDK 已包含 `@ResourceTemplate` 注解及相关协议模型，但当前版本尚未完整实现资源模板的自动注册和服务端分发。
+`FeatureMgr` 会注册 `@ResourceTemplate` 方法，通过 `resources/templates/list` 暴露模板，并在 `resources/read` 收到动态 URI 时执行匹配。
 
 | 属性         | 是否必需 | 描述                          |
 |--------------|----------|-------------------------------|
@@ -70,4 +70,4 @@ SDK 已包含 `@ResourceTemplate` 注解及相关协议模型，但当前版本�
 | description  | 否       | 模板描述                      |
 | mimeType     | 否       | 内容的 MIME 类型              |
 
-在 `FeatureMgr` 能够注册模板方法且服务端实现 `resources/templates/list` 分发之前，请将该注解视为预览 API。
+模板变量必须与 `@ResourceTemplateArg` 参数对应。当前匹配器支持 RFC 6570 Level 1 简单变量，例如 `users://{id}`。
