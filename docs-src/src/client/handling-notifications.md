@@ -16,4 +16,8 @@ Use `onNotification(method, handler)` to register callbacks for progress, resour
 
 The client can also answer server-initiated requests with `onServerRequest(...)`. The convenience methods `setRoots(...)` and `setSamplingHandler(...)` configure the standard `roots/list` and `sampling/createMessage` handlers before `initialize()` advertises those capabilities.
 
+If a server-request handler throws a runtime exception, the client catches it at the common transport boundary and sends JSON-RPC `INTERNAL_ERROR` (`-32603`) with the original request ID. The exception is logged but does not terminate the stdio or SSE receive loop. Returning `null` means that no handler result is available and produces `METHOD_NOT_FOUND`.
+
 When an SSE channel closes or fails, or when a transport is closed, all pending request futures are completed exceptionally. Likewise, an unexpected stdio subprocess exit fails pending requests immediately, including when `requestTimeout` is zero.
+
+Cancellation is scoped by both session and JSON-RPC request ID on the server. Two clients may safely use the same request ID; cancelling one session does not interrupt the other. Closing a session interrupts only that session's running tools.

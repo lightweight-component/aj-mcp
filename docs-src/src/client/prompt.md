@@ -62,3 +62,17 @@ Normally, the prompt system receives a prompt name and a map of arguments. The a
 Arguments may be supplied as a map, where each key is an argument name, or as a JSON object string.
 
 If you don't want to use arguments, you can pass an empty map.
+
+## Embedded Binary Resources
+
+`ContentEmbeddedResource.Resource` supports either textual content through `text` or base64-encoded binary content through `blob`. Set the URI and MIME type as well, and set only one of `text` and `blob`.
+
+```java
+ContentEmbeddedResource.Resource resource = new ContentEmbeddedResource.Resource();
+resource.setUri("file:///image.png");
+resource.setMimeType("image/png");
+resource.setBlob(base64Image);
+
+ContentEmbeddedResource content = new ContentEmbeddedResource();
+content.setResource(resource);
+```

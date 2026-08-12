@@ -16,4 +16,8 @@ JSON-RPC notification 不包含 `id`，服务端不得返回响应。初始化�
 
 客户端还可通过 `onServerRequest(...)` 响应服务端发起的请求。便捷方法 `setRoots(...)` 和 `setSamplingHandler(...)` 应在 `initialize()` 前调用，用于配置标准的 `roots/list` 和 `sampling/createMessage` 处理器并声明相应能力。
 
+如果 server-request handler 抛出运行时异常，客户端会在公共 transport 边界捕获异常，并使用原始请求 ID 返回 JSON-RPC `INTERNAL_ERROR`（`-32603`）。异常会被记录，但不会终止 Stdio 或 SSE 接收循环。handler 返回 `null` 表示没有可用结果，此时返回 `METHOD_NOT_FOUND`。
+
 SSE 通道关闭或失败、transport 被关闭时，所有 pending request future 都会以异常完成。Stdio 子进程意外退出时也会立即使 pending request 失败，即使 `requestTimeout` 设置为 0 也不会永久等待。
+
+服务端的取消状态同时以 session 和 JSON-RPC request ID 隔离。两个客户端可以安全地使用相同 request ID；取消其中一个 session 的请求不会中断另一个 session。关闭 session 时也只会中断该 session 正在运行的工具。

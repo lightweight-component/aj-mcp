@@ -92,6 +92,10 @@ client.initialize();
 
 如需 OAuth Bearer token，可通过 `requestHeaders` 传入 `Authorization`。SDK 会保存服务端返回的 session ID，并在后续请求中自动加入协商后的 `MCP-Protocol-Version`。
 
+如果客户端声明了 Roots、Sampling 或 Elicitation handler，请设置 `openEventStream(true)`；服务端主动请求通过可选的 GET event stream 到达客户端。
+
+> 当前限制：SDK 尚未端到端实现 POST `text/event-stream` 响应上的请求级流式传输。普通 JSON POST 响应可以正常使用，服务端主动消息通过 GET event stream 发送。在该限制解除前，请勿依赖通过 POST 响应增量发送的 progress 或服务端请求。
+
 ## MCP 客户端
 
 MCP 客户端充当本地应用程序与远程工具实现之间的桥梁。

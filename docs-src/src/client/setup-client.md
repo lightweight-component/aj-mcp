@@ -19,7 +19,7 @@ Add the AJ MCP client dependency:
 <dependency>
     <groupId>com.ajaxjs</groupId>
     <artifactId>aj-mcp-client</artifactId>
-    <version>1.3</version>
+    <version>1.4</version>
 </dependency>
 ```
 
@@ -98,6 +98,10 @@ client.initialize();
 ```
 
 For OAuth, pass an `Authorization` Bearer token through `requestHeaders`. The SDK retains the returned session ID and automatically sends the negotiated `MCP-Protocol-Version` on subsequent requests.
+
+Set `openEventStream(true)` when the client advertises Roots, Sampling, or Elicitation handlers. Those server-initiated requests are received through the optional GET event stream.
+
+> Current limitation: request-scoped streaming over a POST `text/event-stream` response is not yet implemented end to end. Ordinary JSON POST responses work, and server-originated messages use the GET event stream. Do not rely on incremental progress or server requests delivered through the POST response until this limitation is removed.
 
 ## McpClient
 

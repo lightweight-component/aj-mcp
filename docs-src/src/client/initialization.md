@@ -20,6 +20,10 @@ The Initialize method:
 
 After successful initialization, the client can make other requests to the server.
 
+The server validates the initialize payload before negotiation. `params` and `capabilities` must be JSON objects; `protocolVersion`, `clientInfo.name`, and `clientInfo.version` must be non-empty strings. Invalid client input is reported as JSON-RPC `INVALID_PARAMS` instead of an internal error.
+
+Register client capabilities before calling `initialize()`. For example, call `setRoots(...)`, `setSamplingHandler(...)`, or `setElicitationHandler(...)` first; only registered handlers are advertised. A server-side call to Roots or Sampling is rejected locally when the target session did not advertise that capability.
+
 Call `initialize()` immediately after building the `McpClient`. Initialization uses the configured `requestTimeout`; zero means wait indefinitely.
 
 ``` java

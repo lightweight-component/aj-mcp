@@ -59,3 +59,17 @@ assertEquals("Hello", ((ContentText) message.getContent()).getText(), "文本内
 通常，提示系统接收一个提示名称和参数映射。参数用于填充提示模板中的占位符。参数为 Map 类型，key 是参数名，value 是参数值；也可以传递 JSON 字符串。
 
 如无需参数，则传递空 Map 即可。
+
+## 嵌入式二进制资源
+
+`ContentEmbeddedResource.Resource` 可以通过 `text` 表示文本内容，也可以通过 `blob` 表示 Base64 编码的二进制内容。还应设置 URI 和 MIME type，并且 `text` 与 `blob` 只设置其中一个。
+
+```java
+ContentEmbeddedResource.Resource resource = new ContentEmbeddedResource.Resource();
+resource.setUri("file:///image.png");
+resource.setMimeType("image/png");
+resource.setBlob(base64Image);
+
+ContentEmbeddedResource content = new ContentEmbeddedResource();
+content.setResource(resource);
+```
