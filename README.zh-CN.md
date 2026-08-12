@@ -1,10 +1,22 @@
+<h1 align="center">AJ-MCP</h1>
+<h3 align="center">轻量级 Java MCP SDK</h3>
+
+<div align="center" style="text-align: center;">
+
+[![Maven Central](https://img.shields.io/maven-central/v/com.ajaxjs/aj-mcp?label=Latest%20Release)](https://central.sonatype.com/artifact/com.ajaxjs/aj-mcp)
 ![Java Version](https://img.shields.io/badge/Java-8-blue)
+[![Javadoc](https://img.shields.io/badge/javadoc-1.2-brightgreen.svg?)](https://javadoc.io/doc/com.ajaxjs/aj-mcp )
+![coverage](https://img.shields.io/badge/coverage-80%25-yellowgreen.svg?maxAge=2592000)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Email](https://img.shields.io/badge/Contact--me-Email-orange.svg)](mailto:frank@ajaxjs.com)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/lightweight-component/aj-mcp)
+![GitHub repo size](https://img.shields.io/github/repo-size/lightweight-component/aj-mcp)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/lightweight-component/aj-mcp)
+[![Email](https://img.shields.io/badge/Contact--me-Email-orange.svg)](mailto:frank@ajaxjs.com)
 [![QQ群](https://framework.ajaxjs.com/static/qq.svg)](https://shang.qq.com/wpa/qunwpa?idkey=3877893a4ed3a5f0be01e809e7ac120e346102bd550deb6692239bb42de38e22)
 
-# 轻量级 Java MCP SDK：AJ-MCP
+</div>
+
+<hr />
 
 AJ-MCP 是一个轻量级的 Java MCP SDK，为构建 MCP [客户端](/aj-mcp-client)和[服务器](/aj-mcp-server)提供了简单而强大的方式。支持 Java 8 及以上版本。
 
