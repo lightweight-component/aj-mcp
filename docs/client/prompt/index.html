@@ -124,6 +124,16 @@ assertEquals(&quot;Hello&quot;, ((ContentText) message.getContent()).getText(), 
 <p>Normally, the prompt system receives a prompt name and a map of arguments. The arguments are used to fill in the placeholders in the prompt template.
 Arguments may be supplied as a map, where each key is an argument name, or as a JSON object string.</p>
 <p>If you don't want to use arguments, you can pass an empty map.</p>
+<h2>Embedded Binary Resources</h2>
+<p><code>ContentEmbeddedResource.Resource</code> supports either textual content through <code>text</code> or base64-encoded binary content through <code>blob</code>. Set the URI and MIME type as well, and set only one of <code>text</code> and <code>blob</code>.</p>
+<pre><code class="language-java">ContentEmbeddedResource.Resource resource = new ContentEmbeddedResource.Resource();
+resource.setUri(&quot;file:///image.png&quot;);
+resource.setMimeType(&quot;image/png&quot;);
+resource.setBlob(base64Image);
+
+ContentEmbeddedResource content = new ContentEmbeddedResource();
+content.setResource(resource);
+</code></pre>
 
             </article>
 

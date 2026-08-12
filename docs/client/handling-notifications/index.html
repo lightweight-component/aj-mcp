@@ -88,7 +88,9 @@
 <p>JSON-RPC notifications do not contain an <code>id</code> and must not receive a response. During initialization, the client sends <code>notifications/initialized</code>; both the stdio and SSE server transports suppress output for that notification.</p>
 <p>Use <code>onNotification(method, handler)</code> to register callbacks for progress, resource-update, logging, and list-change notifications. Resource, resource-template, and prompt caches are invalidated automatically when the corresponding list-change notification arrives.</p>
 <p>The client can also answer server-initiated requests with <code>onServerRequest(...)</code>. The convenience methods <code>setRoots(...)</code> and <code>setSamplingHandler(...)</code> configure the standard <code>roots/list</code> and <code>sampling/createMessage</code> handlers before <code>initialize()</code> advertises those capabilities.</p>
+<p>If a server-request handler throws a runtime exception, the client catches it at the common transport boundary and sends JSON-RPC <code>INTERNAL_ERROR</code> (<code>-32603</code>) with the original request ID. The exception is logged but does not terminate the stdio or SSE receive loop. Returning <code>null</code> means that no handler result is available and produces <code>METHOD_NOT_FOUND</code>.</p>
 <p>When an SSE channel closes or fails, or when a transport is closed, all pending request futures are completed exceptionally. Likewise, an unexpected stdio subprocess exit fails pending requests immediately, including when <code>requestTimeout</code> is zero.</p>
+<p>Cancellation is scoped by both session and JSON-RPC request ID on the server. Two clients may safely use the same request ID; cancelling one session does not interrupt the other. Closing a session interrupts only that session's running tools.</p>
 
             </article>
 

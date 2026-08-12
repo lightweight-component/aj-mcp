@@ -93,6 +93,8 @@
 <li>Sends an &quot;initialized&quot; notification</li>
 </ol>
 <p>After successful initialization, the client can make other requests to the server.</p>
+<p>The server validates the initialize payload before negotiation. <code>params</code> and <code>capabilities</code> must be JSON objects; <code>protocolVersion</code>, <code>clientInfo.name</code>, and <code>clientInfo.version</code> must be non-empty strings. Invalid client input is reported as JSON-RPC <code>INVALID_PARAMS</code> instead of an internal error.</p>
+<p>Register client capabilities before calling <code>initialize()</code>. For example, call <code>setRoots(...)</code>, <code>setSamplingHandler(...)</code>, or <code>setElicitationHandler(...)</code> first; only registered handlers are advertised. A server-side call to Roots or Sampling is rejected locally when the target session did not advertise that capability.</p>
 <p>Call <code>initialize()</code> immediately after building the <code>McpClient</code>. Initialization uses the configured <code>requestTimeout</code>; zero means wait indefinitely.</p>
 <pre><code class="language-java">McpClient mcpClient = McpClient.builder()
         .clientName(&quot;my-host&quot;)

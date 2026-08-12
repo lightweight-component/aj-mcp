@@ -97,8 +97,14 @@
 <li>Added opaque-cursor page APIs while retaining the page-number APIs for compatibility.</li>
 <li>Added negotiation for MCP <code>2024-11-05</code>, <code>2025-03-26</code>, and <code>2025-06-18</code> in one SDK; server version lists are preference ordered.</li>
 <li>Added client and server Streamable HTTP adapters. JSON-RPC batching, removed again in <code>2025-06-18</code>, is intentionally unsupported.</li>
-<li>Added tool annotations, progress messages, completion context, resource links, structured tool output, and elicitation.</li>
+<li>Added tool annotations, progress messages, completion-context request models, resource links, structured tool output, and elicitation. Passing completion context into server provider methods remains planned work.</li>
+<li>Ensured parameterless tools always expose a non-null object <code>inputSchema</code> and made every tool parameter require <code>@ToolArg</code> during scanning.</li>
+<li>Scoped tool cancellation by session and request ID; session shutdown now interrupts only its own running tools.</li>
+<li>Added strict initialize field validation and capability checks before server-initiated Roots or Sampling requests.</li>
+<li>Added embedded-resource <code>blob</code> representation and validated Tool, Prompt, and Resource return collections before serialization.</li>
+<li>Converted client-side server-request handler failures into JSON-RPC <code>INTERNAL_ERROR</code> without terminating receive loops.</li>
 </ul>
+<p>Streamable HTTP currently supports ordinary JSON POST responses and the optional GET event stream. Request-scoped POST SSE streaming, reconnect/resumption, and full idle-session expiry remain planned work.</p>
 <h2>aj-mcp-common 1.5 / aj-mcp-client 1.3 / aj-mcp-server 1.2 — 2025-06-10</h2>
 <ul>
 <li>Added <a href="https://modelcontextprotocol.io/specification/2024-11-05/server/utilities/pagination">pagination support</a>.</li>

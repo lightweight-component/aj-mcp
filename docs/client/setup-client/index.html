@@ -91,7 +91,7 @@
 &lt;dependency&gt;
     &lt;groupId&gt;com.ajaxjs&lt;/groupId&gt;
     &lt;artifactId&gt;aj-mcp-client&lt;/artifactId&gt;
-    &lt;version&gt;1.3&lt;/version&gt;
+    &lt;version&gt;1.4&lt;/version&gt;
 &lt;/dependency&gt;
 </code></pre>
 <p>We can find the latest version:
@@ -147,6 +147,10 @@ McpClient client = McpClient.builder()
 client.initialize();
 </code></pre>
 <p>For OAuth, pass an <code>Authorization</code> Bearer token through <code>requestHeaders</code>. The SDK retains the returned session ID and automatically sends the negotiated <code>MCP-Protocol-Version</code> on subsequent requests.</p>
+<p>Set <code>openEventStream(true)</code> when the client advertises Roots, Sampling, or Elicitation handlers. Those server-initiated requests are received through the optional GET event stream.</p>
+<blockquote>
+<p>Current limitation: request-scoped streaming over a POST <code>text/event-stream</code> response is not yet implemented end to end. Ordinary JSON POST responses work, and server-originated messages use the GET event stream. Do not rely on incremental progress or server requests delivered through the POST response until this limitation is removed.</p>
+</blockquote>
 <h2>McpClient</h2>
 <p>The MCP Client serves as a bridge between local applications and remote tool implementations.</p>
 <pre><code class="language-java">McpClient mcpClient = McpClient.builder()

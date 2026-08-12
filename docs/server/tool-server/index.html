@@ -103,6 +103,7 @@ public class MyTools {
 </code></pre>
 <h2>Parameter Handling and Validation</h2>
 <p>Tool parameters are annotated with <code>@ToolArg</code> to provide metadata for validation and schema generation. Each parameter can specify a name, description, and whether it is required.</p>
+<p>Every Java parameter of a <code>@Tool</code> method must have <code>@ToolArg</code>. Package scanning fails fast when an annotation is missing and reports the class, method, and parameter index. Parameterless tools are valid; their <code>inputSchema</code> is always an object schema with empty <code>properties</code>, never JSON <code>null</code>.</p>
 <h3>Parameter Annotation</h3>
 <table>
 <thead>
@@ -192,6 +193,9 @@ public List&lt;Content&gt; getAll() {
     return list;
 }
 </code></pre>
+<h2>Return-value Contract</h2>
+<p>A tool may return a <code>String</code>, one <code>Content</code>, <code>List&lt;Content&gt;</code>, or <code>StructuredToolResult</code> for MCP 2025-06-18. Every list element is validated before serialization. A <code>null</code> return, null content list, or list containing another type becomes a tool result with <code>isError=true</code> instead of causing a <code>NullPointerException</code> or emitting invalid protocol JSON.</p>
+<p>Prompt methods must return <code>PromptMessage</code> or <code>List&lt;PromptMessage&gt;</code>. Resource methods must return <code>ResourceContent</code> or <code>List&lt;ResourceContent&gt;</code>. Invalid or null Prompt/Resource results are reported as JSON-RPC <code>INTERNAL_ERROR</code>.</p>
 
             </article>
 

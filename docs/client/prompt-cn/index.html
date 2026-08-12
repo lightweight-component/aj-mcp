@@ -120,6 +120,16 @@ assertEquals(&quot;Hello&quot;, ((ContentText) message.getContent()).getText(), 
 <p><code>getPrompt()</code> 方法返回 <code>PromptResultDetail</code>，包含提示的描述和消息内容。</p>
 <p>通常，提示系统接收一个提示名称和参数映射。参数用于填充提示模板中的占位符。参数为 Map 类型，key 是参数名，value 是参数值；也可以传递 JSON 字符串。</p>
 <p>如无需参数，则传递空 Map 即可。</p>
+<h2>嵌入式二进制资源</h2>
+<p><code>ContentEmbeddedResource.Resource</code> 可以通过 <code>text</code> 表示文本内容，也可以通过 <code>blob</code> 表示 Base64 编码的二进制内容。还应设置 URI 和 MIME type，并且 <code>text</code> 与 <code>blob</code> 只设置其中一个。</p>
+<pre><code class="language-java">ContentEmbeddedResource.Resource resource = new ContentEmbeddedResource.Resource();
+resource.setUri(&quot;file:///image.png&quot;);
+resource.setMimeType(&quot;image/png&quot;);
+resource.setBlob(base64Image);
+
+ContentEmbeddedResource content = new ContentEmbeddedResource();
+content.setResource(resource);
+</code></pre>
 
                 <div id="comment-holder">
                 </div>

@@ -92,6 +92,8 @@
 <li>发送 “initialized” 通知</li>
 </ol>
 <p>初始化成功后，客户端才能向服务器发起其他请求。</p>
+<p>服务端会在协议协商前校验 initialize 报文：<code>params</code> 和 <code>capabilities</code> 必须是 JSON object；<code>protocolVersion</code>、<code>clientInfo.name</code> 与 <code>clientInfo.version</code> 必须是非空字符串。客户端输入不合法时返回 JSON-RPC <code>INVALID_PARAMS</code>，而不是 internal error。</p>
+<p>客户端能力必须在调用 <code>initialize()</code> 前注册。例如，应先调用 <code>setRoots(...)</code>、<code>setSamplingHandler(...)</code> 或 <code>setElicitationHandler(...)</code>；只有已注册 handler 的能力才会被声明。服务端对未声明 Roots 或 Sampling 能力的 session 发起相应请求时，会在本地直接拒绝。</p>
 <p>因此，构建 <code>McpClient</code> 后应立即调用 <code>initialize()</code>。初始化遵循 <code>requestTimeout</code> 配置；设置为 0 时表示无限等待。</p>
 <pre><code class="language-java">McpClient mcpClient = McpClient.builder()
         .clientName(&quot;my-host&quot;)
