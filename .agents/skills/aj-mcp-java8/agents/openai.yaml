@@ -1,0 +1,4 @@
+interface:
+  display_name: "AJ-MCP Java 8"
+  short_description: "Develop and maintain the AJ-MCP Java 8 SDK"
+  default_prompt: "Use $aj-mcp-java8 to implement and verify a change in the AJ-MCP Java 8 SDK."
