@@ -9,13 +9,9 @@ import com.ajaxjs.mcp.protocol.tools.JsonSchema;
 import com.ajaxjs.mcp.protocol.tools.JsonSchemaProperty;
 import com.ajaxjs.mcp.protocol.tools.ToolItem;
 import com.ajaxjs.mcp.server.feature.annotation.*;
-import com.ajaxjs.mcp.server.feature.model.ServerStorePrompt;
-import com.ajaxjs.mcp.server.feature.model.ServerStoreResource;
-import com.ajaxjs.mcp.server.feature.model.ServerStoreTool;
-import com.ajaxjs.mcp.server.feature.model.ServerStoreCompletion;
-import com.ajaxjs.mcp.server.feature.model.ServerStoreResourceTemplate;
-import lombok.extern.slf4j.Slf4j;
+import com.ajaxjs.mcp.server.feature.model.*;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;

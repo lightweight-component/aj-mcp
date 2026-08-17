@@ -3,27 +3,20 @@ package com.ajaxjs.mcp.server;
 import com.ajaxjs.mcp.common.JsonUtils;
 import com.ajaxjs.mcp.protocol.McpRequestRawInfo;
 import com.ajaxjs.mcp.protocol.McpResponse;
-import com.ajaxjs.mcp.protocol.prompt.GetPromptListResult;
-import com.ajaxjs.mcp.protocol.prompt.PromptItem;
 import com.ajaxjs.mcp.protocol.resource.*;
 import com.ajaxjs.mcp.protocol.utils.pagination.Cursor;
 import com.ajaxjs.mcp.server.common.PaginatedResponse;
 import com.ajaxjs.mcp.server.common.ServerUtils;
 import com.ajaxjs.mcp.server.error.JsonRpcErrorCode;
 import com.ajaxjs.mcp.server.error.JsonRpcErrorException;
-import com.ajaxjs.mcp.server.feature.FeatureMgr;
 import com.ajaxjs.mcp.server.feature.model.ServerStoreResource;
 import com.ajaxjs.mcp.server.feature.model.ServerStoreResourceTemplate;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.net.URLDecoder;
+import java.util.*;
 
 public abstract class McpServerResource extends McpServerInitialize {
     /**

@@ -1,13 +1,13 @@
 package com.ajaxjs.mcp.server.advanced;
 
+import com.ajaxjs.mcp.protocol.common.ContentText;
 import com.ajaxjs.mcp.protocol.prompt.PromptMessage;
 import com.ajaxjs.mcp.protocol.resource.ResourceContentText;
+import com.ajaxjs.mcp.protocol.tools.StructuredToolResult;
 import com.ajaxjs.mcp.server.feature.annotation.*;
 
 import java.util.Arrays;
 import java.util.Collections;
-import com.ajaxjs.mcp.protocol.common.ContentText;
-import com.ajaxjs.mcp.protocol.tools.StructuredToolResult;
 
 @McpService
 public class AdvancedFeatures {

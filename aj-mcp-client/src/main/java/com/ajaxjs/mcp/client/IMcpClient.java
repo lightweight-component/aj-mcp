@@ -1,26 +1,22 @@
 package com.ajaxjs.mcp.client;
 
+import com.ajaxjs.mcp.protocol.client.*;
 import com.ajaxjs.mcp.protocol.prompt.GetPromptResult;
 import com.ajaxjs.mcp.protocol.prompt.PromptItem;
 import com.ajaxjs.mcp.protocol.resource.GetResourceResult;
 import com.ajaxjs.mcp.protocol.resource.ResourceItem;
 import com.ajaxjs.mcp.protocol.resource.ResourceTemplate;
 import com.ajaxjs.mcp.protocol.tools.CallToolRequest;
-import com.ajaxjs.mcp.protocol.tools.ToolItem;
 import com.ajaxjs.mcp.protocol.tools.CallToolResult;
-
-import java.util.List;
-import java.util.Map;
+import com.ajaxjs.mcp.protocol.tools.ToolItem;
 import com.ajaxjs.mcp.protocol.utils.completion.CompleteRequest;
 import com.ajaxjs.mcp.protocol.utils.completion.CompleteResult;
 import com.fasterxml.jackson.databind.JsonNode;
+
+import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import com.ajaxjs.mcp.protocol.client.Root;
-import com.ajaxjs.mcp.protocol.client.SamplingCreateMessageParams;
-import com.ajaxjs.mcp.protocol.client.SamplingCreateMessageResult;
-import com.ajaxjs.mcp.protocol.client.ElicitRequestParams;
-import com.ajaxjs.mcp.protocol.client.ElicitResult;
 
 /**
  * Represents a client that can communicate with an MCP server over a given transport protocol, retrieve and execute tools using the server.
@@ -56,7 +52,9 @@ public interface IMcpClient extends AutoCloseable {
      */
     String callTool(CallToolRequest request);
 
-    /** Returns the complete result, including 2025-06-18 structured content. */
+    /**
+     * Returns the complete result, including 2025-06-18 structured content.
+     */
     CallToolResult.CallToolResultDetail callToolResult(CallToolRequest request);
 
     /***
@@ -157,17 +155,25 @@ public interface IMcpClient extends AutoCloseable {
      */
     void checkHealth();
 
-    /** Requests argument completion for a prompt or resource template. */
+    /**
+     * Requests argument completion for a prompt or resource template.
+     */
     CompleteResult.CompletionResult complete(CompleteRequest.Ref ref, CompleteRequest.Argument argument);
 
-    /** 2025-06-18 completion request with previously resolved arguments. */
+    /**
+     * 2025-06-18 completion request with previously resolved arguments.
+     */
     CompleteResult.CompletionResult complete(CompleteRequest.Ref ref, CompleteRequest.Argument argument,
-                                               Map<String, String> context);
+                                             Map<String, String> context);
 
-    /** Registers an observer for a JSON-RPC notification method. */
+    /**
+     * Registers an observer for a JSON-RPC notification method.
+     */
     void onNotification(String method, Consumer<JsonNode> handler);
 
-    /** Registers a handler for a server-initiated JSON-RPC request such as roots/list or sampling/createMessage. */
+    /**
+     * Registers a handler for a server-initiated JSON-RPC request such as roots/list or sampling/createMessage.
+     */
     void onServerRequest(String method, Function<JsonNode, JsonNode> handler);
 
     void setRoots(List<Root> roots, boolean notifyChanges);
@@ -176,9 +182,13 @@ public interface IMcpClient extends AutoCloseable {
 
     void setSamplingHandler(Function<SamplingCreateMessageParams, SamplingCreateMessageResult> handler);
 
-    /** Registers the user-interaction handler advertised by MCP 2025-06-18 clients. */
+    /**
+     * Registers the user-interaction handler advertised by MCP 2025-06-18 clients.
+     */
     void setElicitationHandler(Function<ElicitRequestParams, ElicitResult> handler);
 
-    /** Returns the protocol revision selected during initialization. */
+    /**
+     * Returns the protocol revision selected during initialization.
+     */
     String getNegotiatedProtocolVersion();
 }

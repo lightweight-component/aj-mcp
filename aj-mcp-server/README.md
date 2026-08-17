@@ -8,7 +8,8 @@
 
 # Lightweight Java MCP Server
 
-AJ-MCP Server is a lightweight MCP server for Java. It provides a simple and powerful way to build MCP servers. It supports Java8 and above.
+AJ-MCP Server is a lightweight MCP server for Java. It provides a simple and powerful way to build MCP servers. It
+supports Java8 and above.
 
 ## Source code
 

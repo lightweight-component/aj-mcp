@@ -38,7 +38,9 @@ public class InitializeRequestParams {
         public static class Sampling {
         }
 
-        /** Client can answer server-initiated elicitation/create requests. */
+        /**
+         * Client can answer server-initiated elicitation/create requests.
+         */
         public static class Elicitation {
         }
 

@@ -28,7 +28,8 @@ class McpTransportMessageRoutingTest {
     @Test
     void answersServerRequestAndPreservesStringId() {
         CapturingTransport transport = new CapturingTransport();
-        transport.setMessageHandlers(ignored -> { }, message -> JsonUtils.json2Node("{\"roots\":[]}"));
+        transport.setMessageHandlers(ignored -> {
+        }, message -> JsonUtils.json2Node("{\"roots\":[]}"));
 
         transport.handle(JsonUtils.json2Node("{\"jsonrpc\":\"2.0\",\"id\":\"server-1\",\"method\":\"roots/list\"}"));
 
@@ -39,7 +40,8 @@ class McpTransportMessageRoutingTest {
     @Test
     void convertsServerRequestHandlerFailureToJsonRpcError() {
         CapturingTransport transport = new CapturingTransport();
-        transport.setMessageHandlers(ignored -> { }, message -> {
+        transport.setMessageHandlers(ignored -> {
+        }, message -> {
             throw new IllegalStateException("handler bug");
         });
 
@@ -55,12 +57,36 @@ class McpTransportMessageRoutingTest {
     private static final class CapturingTransport extends McpTransport {
         final AtomicReference<JsonNode> sent = new AtomicReference<>();
 
-        @Override public void start(Map<Long, CompletableFuture<JsonNode>> pendingRequest) { setPendingRequests(pendingRequest); }
-        @Override public CompletableFuture<JsonNode> initialize(InitializeRequest request) { return new CompletableFuture<>(); }
-        @Override public CompletableFuture<JsonNode> sendRequestWithResponse(McpRequest request) { return new CompletableFuture<>(); }
-        @Override public void sendRequestWithoutResponse(McpRequest request) { }
-        @Override protected void sendJson(JsonNode message) { sent.set(message); }
-        @Override public void checkHealth() { }
-        @Override public void close() { }
+        @Override
+        public void start(Map<Long, CompletableFuture<JsonNode>> pendingRequest) {
+            setPendingRequests(pendingRequest);
+        }
+
+        @Override
+        public CompletableFuture<JsonNode> initialize(InitializeRequest request) {
+            return new CompletableFuture<>();
+        }
+
+        @Override
+        public CompletableFuture<JsonNode> sendRequestWithResponse(McpRequest request) {
+            return new CompletableFuture<>();
+        }
+
+        @Override
+        public void sendRequestWithoutResponse(McpRequest request) {
+        }
+
+        @Override
+        protected void sendJson(JsonNode message) {
+            sent.set(message);
+        }
+
+        @Override
+        public void checkHealth() {
+        }
+
+        @Override
+        public void close() {
+        }
     }
 }

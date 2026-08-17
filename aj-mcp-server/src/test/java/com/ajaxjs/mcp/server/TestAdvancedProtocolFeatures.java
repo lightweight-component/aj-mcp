@@ -7,7 +7,7 @@ import com.ajaxjs.mcp.server.feature.FeatureMgr;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TestAdvancedProtocolFeatures {
     private McpServer server;

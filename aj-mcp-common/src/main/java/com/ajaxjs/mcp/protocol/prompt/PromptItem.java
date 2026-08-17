@@ -3,6 +3,7 @@ package com.ajaxjs.mcp.protocol.prompt;
 import lombok.Data;
 
 import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**

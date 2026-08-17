@@ -5,7 +5,9 @@ import lombok.Data;
 
 import java.util.List;
 
-/** One MCP list page plus the opaque cursor supplied by the remote server. */
+/**
+ * One MCP list page plus the opaque cursor supplied by the remote server.
+ */
 @Data
 @AllArgsConstructor
 public class McpPage<T> {

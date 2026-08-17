@@ -3,6 +3,9 @@ package com.ajaxjs.mcp.client;
 import com.ajaxjs.mcp.client.transport.McpTransport;
 import com.ajaxjs.mcp.common.JsonUtils;
 import com.ajaxjs.mcp.protocol.McpConstant;
+import com.ajaxjs.mcp.protocol.McpRequest;
+import com.ajaxjs.mcp.protocol.ProtocolVersion;
+import com.ajaxjs.mcp.protocol.client.*;
 import com.ajaxjs.mcp.protocol.initialize.InitializeRequest;
 import com.ajaxjs.mcp.protocol.initialize.InitializeRequestParams;
 import com.ajaxjs.mcp.protocol.prompt.PromptItem;
@@ -15,20 +18,13 @@ import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import com.ajaxjs.mcp.protocol.client.Root;
-import com.ajaxjs.mcp.protocol.client.SamplingCreateMessageParams;
-import com.ajaxjs.mcp.protocol.client.SamplingCreateMessageResult;
-import com.ajaxjs.mcp.protocol.McpRequest;
-import com.ajaxjs.mcp.protocol.ProtocolVersion;
-import com.ajaxjs.mcp.protocol.client.ElicitRequestParams;
-import com.ajaxjs.mcp.protocol.client.ElicitResult;
-import java.util.ArrayList;
 
 /**
  * Base Class for MCP Client, mainly doing the initialize job.
@@ -57,7 +53,9 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
     @Builder.Default
     String protocolVersion = "2024-11-05";
 
-    /** Revisions this client can accept if the server selects a fallback. */
+    /**
+     * Revisions this client can accept if the server selects a fallback.
+     */
     @Builder.Default
     List<String> supportedProtocolVersions = ProtocolVersion.supportedVersions();
 

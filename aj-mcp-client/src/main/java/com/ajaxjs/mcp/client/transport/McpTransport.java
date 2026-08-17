@@ -1,11 +1,13 @@
 package com.ajaxjs.mcp.client.transport;
 
-import com.ajaxjs.mcp.protocol.McpConstant;
+import com.ajaxjs.mcp.common.JsonUtils;
 import com.ajaxjs.mcp.protocol.BaseJsonRpcMessage;
+import com.ajaxjs.mcp.protocol.McpConstant;
 import com.ajaxjs.mcp.protocol.McpRequest;
 import com.ajaxjs.mcp.protocol.initialize.InitializeRequest;
 import com.ajaxjs.mcp.protocol.utils.ping.PingRequest;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.Closeable;
@@ -13,8 +15,6 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ajaxjs.mcp.common.JsonUtils;
 
 /**
  * MCP 客户端传输接口
@@ -64,7 +64,9 @@ public abstract class McpTransport implements McpConstant, Closeable {
      */
     public abstract void sendRequestWithoutResponse(McpRequest request);
 
-    /** Sends a JSON-RPC response generated for a server-initiated request. */
+    /**
+     * Sends a JSON-RPC response generated for a server-initiated request.
+     */
     protected void sendJson(JsonNode message) {
         throw new UnsupportedOperationException("This transport cannot answer server-initiated requests");
     }

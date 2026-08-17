@@ -15,9 +15,9 @@ import okhttp3.sse.EventSources;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.Map;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
@@ -211,7 +211,9 @@ public class StreamableHttpTransport extends McpTransport {
             future.completeExceptionally(failure);
     }
 
-    /** Parses all data records in an SSE response while preserving record boundaries. */
+    /**
+     * Parses all data records in an SSE response while preserving record boundaries.
+     */
     private void handleSsePayload(String payload) {
         StringBuilder data = new StringBuilder();
 

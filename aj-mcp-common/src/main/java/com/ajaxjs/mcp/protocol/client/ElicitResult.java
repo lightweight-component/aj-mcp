@@ -7,12 +7,16 @@ import lombok.NoArgsConstructor;
 
 import java.util.Map;
 
-/** Result of a 2025-06-18 elicitation request. */
+/**
+ * Result of a 2025-06-18 elicitation request.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class ElicitResult {
-    /** One of: accept, decline, cancel. */
+    /**
+     * One of: accept, decline, cancel.
+     */
     private String action;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)

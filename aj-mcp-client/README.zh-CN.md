@@ -5,6 +5,7 @@
 [![Email](https://img.shields.io/badge/Contact--me-Email-orange.svg)](mailto:frank@ajaxjs.com)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/lightweight-component/aj-mcp)
 [![QQ群](https://framework.ajaxjs.com/static/qq.svg)](https://shang.qq.com/wpa/qunwpa?idkey=3877893a4ed3a5f0be01e809e7ac120e346102bd550deb6692239bb42de38e22)
+
 # 轻量级 Java MCP 客户端
 
 AJ-MCP Client 是一个轻量级的 Java MCP 客户端。它为构建 MCP 客户端提供了一种简单而强大的方式，支持 Java 8 及以上版本。

@@ -9,7 +9,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 import static com.ajaxjs.mcp.protocol.McpConstant.Methods.PROGRESS_NOTIFICATION;
 
-/** Progress notification associated with the token supplied in request metadata. */
+/**
+ * Progress notification associated with the token supplied in request metadata.
+ */
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class ProgressNotification extends McpRequest {
@@ -24,7 +26,9 @@ public class ProgressNotification extends McpRequest {
         private double progress;
         private Double total;
 
-        /** Optional human-readable status added in MCP 2025-03-26. */
+        /**
+         * Optional human-readable status added in MCP 2025-03-26.
+         */
         @JsonInclude(JsonInclude.Include.NON_NULL)
         private String message;
 

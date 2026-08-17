@@ -4,11 +4,7 @@ import com.ajaxjs.mcp.client.transport.McpTransport;
 import com.ajaxjs.mcp.client.transport.StdioTransport;
 import com.ajaxjs.mcp.common.JsonUtils;
 import com.ajaxjs.mcp.protocol.McpConstant;
-import com.ajaxjs.mcp.protocol.tools.CallToolRequest;
-import com.ajaxjs.mcp.protocol.tools.CallToolResult;
-import com.ajaxjs.mcp.protocol.tools.GetToolListRequest;
-import com.ajaxjs.mcp.protocol.tools.JsonSchema;
-import com.ajaxjs.mcp.protocol.tools.ToolItem;
+import com.ajaxjs.mcp.protocol.tools.*;
 import com.ajaxjs.mcp.protocol.utils.CancellationNotification;
 import com.ajaxjs.mcp.protocol.utils.completion.CompleteRequest;
 import com.ajaxjs.mcp.protocol.utils.completion.CompleteResult;
@@ -45,7 +41,7 @@ public class McpClient extends McpClientResource {
 
     @Override
     public CompleteResult.CompletionResult complete(CompleteRequest.Ref ref, CompleteRequest.Argument argument,
-                                                     java.util.Map<String, String> context) {
+                                                    java.util.Map<String, String> context) {
         long operationId = idGenerator.getAndIncrement();
         CompleteRequest request = new CompleteRequest();
         request.setId(operationId);
@@ -66,6 +62,7 @@ public class McpClient extends McpClientResource {
             pendingRequests.remove(operationId);
         }
     }
+
     @Override
     public List<ToolItem> listTools() {
         return listTools(0);

@@ -5,7 +5,9 @@ import lombok.Data;
 
 import java.util.List;
 
-/** Parameters supplied by a server for sampling/createMessage. */
+/**
+ * Parameters supplied by a server for sampling/createMessage.
+ */
 @Data
 public class SamplingCreateMessageParams {
     private List<JsonNode> messages;

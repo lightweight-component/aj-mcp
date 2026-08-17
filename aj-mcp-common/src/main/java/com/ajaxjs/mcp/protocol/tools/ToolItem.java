@@ -22,7 +22,9 @@ public class ToolItem {
      */
     String name;
 
-    /** Optional human-friendly display name introduced in MCP 2025-06-18. */
+    /**
+     * Optional human-friendly display name introduced in MCP 2025-06-18.
+     */
     @JsonInclude(JsonInclude.Include.NON_NULL)
     String title;
 
@@ -38,7 +40,9 @@ public class ToolItem {
      */
     JsonSchema inputSchema;
 
-    /** Optional output schema introduced in MCP 2025-06-18. */
+    /**
+     * Optional output schema introduced in MCP 2025-06-18.
+     */
     @JsonInclude(JsonInclude.Include.NON_NULL)
     JsonSchema outputSchema;
 

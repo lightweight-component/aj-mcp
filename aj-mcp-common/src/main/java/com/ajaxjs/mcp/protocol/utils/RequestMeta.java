@@ -4,7 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/** Metadata shared by MCP requests that support progress reporting. */
+/**
+ * Metadata shared by MCP requests that support progress reporting.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

@@ -35,7 +35,9 @@ public class ContentEmbeddedResource extends Content {
          */
         String text;
 
-        /** Base64-encoded binary data. Exactly one of text and blob should be set. */
+        /**
+         * Base64-encoded binary data. Exactly one of text and blob should be set.
+         */
         @JsonInclude(JsonInclude.Include.NON_NULL)
         String blob;
     }

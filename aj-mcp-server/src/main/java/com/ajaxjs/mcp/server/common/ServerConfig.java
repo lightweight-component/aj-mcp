@@ -1,11 +1,10 @@
 package com.ajaxjs.mcp.server.common;
 
+import com.ajaxjs.mcp.protocol.ProtocolVersion;
 import lombok.Data;
 
 import java.util.Collections;
 import java.util.List;
-
-import com.ajaxjs.mcp.protocol.ProtocolVersion;
 
 /**
  * Config object

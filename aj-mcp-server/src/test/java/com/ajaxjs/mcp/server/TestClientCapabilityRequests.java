@@ -51,11 +51,27 @@ class TestClientCapabilityRequests {
 
     private static final class LoopbackTransport implements McpTransportSync {
         private final McpServer server;
-        private LoopbackTransport(McpServer server) { this.server = server; }
-        @Override public void start() { }
-        @Override public String handle(String rawJson) { return null; }
-        @Override public void initialize() { }
-        @Override public void close() { }
+
+        private LoopbackTransport(McpServer server) {
+            this.server = server;
+        }
+
+        @Override
+        public void start() {
+        }
+
+        @Override
+        public String handle(String rawJson) {
+            return null;
+        }
+
+        @Override
+        public void initialize() {
+        }
+
+        @Override
+        public void close() {
+        }
 
         @Override
         public void send(String sessionId, String json) {

@@ -205,7 +205,9 @@ public class ServerSse implements McpTransportSync {
         }
     }
 
-    /** Processes a request and sends its response only to the originating session. */
+    /**
+     * Processes a request and sends its response only to the originating session.
+     */
     public void handle(String clientId, String rawJson) {
         if (server.acceptClientResponse(clientId, rawJson))
             return;

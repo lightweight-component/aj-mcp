@@ -74,7 +74,9 @@ public class InitializeResponseResult {
         public static class Logging {
         }
 
-        /** Server supports completion/complete. */
+        /**
+         * Server supports completion/complete.
+         */
         public static class Completions {
         }
 

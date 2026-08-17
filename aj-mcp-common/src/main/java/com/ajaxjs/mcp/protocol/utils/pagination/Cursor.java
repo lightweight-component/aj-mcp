@@ -37,7 +37,9 @@ public class Cursor {
         cursor = McpUtils.base64Encode(json);
     }
 
-    /** Creates a client-side cursor without interpreting the server's opaque value. */
+    /**
+     * Creates a client-side cursor without interpreting the server's opaque value.
+     */
     public Cursor(String opaqueCursor) {
         this.cursor = opaqueCursor;
     }

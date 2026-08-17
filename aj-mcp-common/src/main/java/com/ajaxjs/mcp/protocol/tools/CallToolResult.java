@@ -23,7 +23,9 @@ public class CallToolResult extends McpResponse {
 
         List<Content> content;
 
-        /** Structured result introduced in protocol revision 2025-06-18. */
+        /**
+         * Structured result introduced in protocol revision 2025-06-18.
+         */
         @JsonInclude(JsonInclude.Include.NON_NULL)
         Map<String, Object> structuredContent;
     }

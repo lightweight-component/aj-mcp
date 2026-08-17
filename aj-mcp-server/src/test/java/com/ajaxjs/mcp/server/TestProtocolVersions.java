@@ -1,7 +1,6 @@
 package com.ajaxjs.mcp.server;
 
 import com.ajaxjs.mcp.common.JsonUtils;
-import com.ajaxjs.mcp.protocol.ProtocolVersion;
 import com.ajaxjs.mcp.protocol.client.ElicitRequestParams;
 import com.ajaxjs.mcp.protocol.client.ElicitResult;
 import com.ajaxjs.mcp.server.common.ServerConfig;
@@ -128,11 +127,27 @@ class TestProtocolVersions {
 
     private static final class ElicitationLoopback implements McpTransportSync {
         private final McpServer server;
-        private ElicitationLoopback(McpServer server) { this.server = server; }
-        @Override public void start() { }
-        @Override public String handle(String rawJson) { return null; }
-        @Override public void initialize() { }
-        @Override public void close() { }
+
+        private ElicitationLoopback(McpServer server) {
+            this.server = server;
+        }
+
+        @Override
+        public void start() {
+        }
+
+        @Override
+        public String handle(String rawJson) {
+            return null;
+        }
+
+        @Override
+        public void initialize() {
+        }
+
+        @Override
+        public void close() {
+        }
 
         @Override
         public void send(String sessionId, String json) {

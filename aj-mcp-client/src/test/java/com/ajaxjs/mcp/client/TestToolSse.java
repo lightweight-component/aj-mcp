@@ -5,8 +5,6 @@ import com.ajaxjs.mcp.client.transport.McpTransport;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 
-import static com.ajaxjs.mcp.client.McpServerHelper.*;
-
 public class TestToolSse extends TestToolBase {
     private static Process process;
 

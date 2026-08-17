@@ -45,8 +45,16 @@ class McpClientToolErrorTest {
             return CompletableFuture.completedFuture(response);
         }
 
-        @Override public void sendRequestWithoutResponse(McpRequest request) { }
-        @Override public void checkHealth() { }
-        @Override public void close() { }
+        @Override
+        public void sendRequestWithoutResponse(McpRequest request) {
+        }
+
+        @Override
+        public void checkHealth() {
+        }
+
+        @Override
+        public void close() {
+        }
     }
 }

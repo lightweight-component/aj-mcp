@@ -2,10 +2,7 @@ package com.ajaxjs.mcp.server;
 
 import com.ajaxjs.mcp.common.JsonUtils;
 import com.ajaxjs.mcp.common.McpUtils;
-import com.ajaxjs.mcp.protocol.BaseJsonRpcMessage;
-import com.ajaxjs.mcp.protocol.McpConstant;
-import com.ajaxjs.mcp.protocol.McpRequestRawInfo;
-import com.ajaxjs.mcp.protocol.McpResponse;
+import com.ajaxjs.mcp.protocol.*;
 import com.ajaxjs.mcp.protocol.initialize.InitializeRequest;
 import com.ajaxjs.mcp.protocol.initialize.InitializeRequestParams;
 import com.ajaxjs.mcp.protocol.initialize.InitializeResponse;
@@ -23,7 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import com.ajaxjs.mcp.protocol.ProtocolVersion;
 
 @Slf4j
 @Data
@@ -160,7 +156,9 @@ public abstract class McpServerInitialize implements McpConstant {
         return node != null && node.isTextual() && McpUtils.hasText(node.textValue());
     }
 
-    /** Hook used by the concrete server to bind negotiated state to its transport session. */
+    /**
+     * Hook used by the concrete server to bind negotiated state to its transport session.
+     */
     protected void onProtocolNegotiated(String version, InitializeRequestParams requestParams) {
     }
 

@@ -5,7 +5,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-/** Resource link content allowed in tool results since MCP 2025-06-18. */
+/**
+ * Resource link content allowed in tool results since MCP 2025-06-18.
+ */
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class ContentResourceLink extends Content {

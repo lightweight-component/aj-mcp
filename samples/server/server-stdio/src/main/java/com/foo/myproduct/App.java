@@ -2,8 +2,8 @@ package com.foo.myproduct;
 
 import com.ajaxjs.mcp.server.McpServer;
 import com.ajaxjs.mcp.server.ServerStdio;
-import com.ajaxjs.mcp.server.feature.FeatureMgr;
 import com.ajaxjs.mcp.server.common.ServerConfig;
+import com.ajaxjs.mcp.server.feature.FeatureMgr;
 
 public class App {
     public static void main(String[] args) {

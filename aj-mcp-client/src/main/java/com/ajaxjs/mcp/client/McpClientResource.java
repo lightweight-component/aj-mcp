@@ -195,7 +195,7 @@ public abstract class McpClientResource extends McpClientPrompt {
         GetResourceTemplateListRequest request = new GetResourceTemplateListRequest();
         request.setId(idGenerator.getAndIncrement());
 
-        if(pageNo!=0)
+        if (pageNo != 0)
             request.setParams(new Cursor(pageNo));
 
         try {
