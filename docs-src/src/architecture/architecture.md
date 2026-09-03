@@ -31,15 +31,15 @@ The AJ MCP SDK is structured around several core components that work together t
 
 ![](/asset/imgs/a-1.jpg)
 
-The architecture follows a client-server model with flexible transport options. The client exchanges JSON-RPC messages over standard I/O pipes or the legacy HTTP/SSE transport implemented by this version.
+The architecture follows a client-server model with three transports: standard I/O pipes, the legacy two-endpoint HTTP/SSE transport, and Streamable HTTP. All transports exchange JSON-RPC messages; Streamable HTTP is available for MCP `2025-03-26` and `2025-06-18`.
 
 
 # Stdio Mode vs SSE Mode Comparison
 
-| Feature            | Stdio Mode                  | SSE Mode                     |
-|--------------------|-----------------------------|------------------------------|
-| **Deployment**     | Local subprocess            | Independent server           |
-| **Use Case**       | Local development           | Distributed environments     |
-| **Configuration**  | Subprocess command required | HTTP endpoints required      |
-| **Multi-Client Support** | Not supported             | Supported                    |
-| **Network Requirement**  | None                      | Requires network connection  |
+| Feature | STDIO | Legacy HTTP/SSE | Streamable HTTP |
+|---|---|---|---|
+| **Deployment** | Local subprocess | Independent server | Independent server |
+| **Configuration** | Subprocess command | Separate SSE and POST endpoints | One MCP endpoint; optional GET event stream |
+| **Multi-client support** | One process connection | Supported | Supported by session ID |
+| **Network requirement** | None | Required | Required |
+| **Protocol revisions** | All implemented revisions | Legacy-compatible transport | `2025-03-26` / `2025-06-18` |

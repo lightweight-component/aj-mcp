@@ -19,7 +19,7 @@ Add this dependency to build MCP servers:
 <dependency>
     <groupId>com.ajaxjs</groupId>
     <artifactId>aj-mcp-server</artifactId>
-    <version>1.3</version>
+    <version>1.4</version>
 </dependency>
 ```
 
@@ -31,7 +31,7 @@ The server module includes:
 - `McpServer` core processing engine
 - `FeatureMgr` for annotation-based feature discovery
 - `@Tool`, `@Resource`, `@Prompt` annotations
-- Transport implementations for HTTP/SSE and Stdio
+- Transport implementations for STDIO, legacy HTTP/SSE, and Streamable HTTP
 
 ## Creating a Server
 
@@ -40,7 +40,7 @@ To create an MCP server, you need to:
 1. Define Service Classes: Create classes annotated with `@McpService`
 1. Annotate Methods: Use `@Tool`, `@Prompt`, or `@Resource` annotations
 1. Initialize Feature Manager: Scan packages for annotations
-1. Configure Transport: Set up HTTP/SSE or Stdio transport, and some details of server
+1. Configure Transport: Set up STDIO, legacy HTTP/SSE, or Streamable HTTP and its server details
 1. Start Server: Call `server.start()`
 
 ## Creating MCP Service Class
@@ -125,3 +125,11 @@ server.setServerConfig(serverConfig);
 
 server.start();
 ```
+
+## Transport and lifecycle rules
+
+- `ServerStdio` exchanges one JSON-RPC message per line. Keep `System.out` reserved for protocol output.
+- `ServerSse` is the legacy two-endpoint adapter: open a session with `openSession(...)`, route POST messages to `handle(sessionId, body)`, remove the connection on disconnect, and close the adapter on shutdown.
+- `ServerStreamableHttp` uses one endpoint: delegate `POST` to `post(body, headers)`, optional `GET` event streams to `openEventStream(sessionId, writer, headers)`, and `DELETE` to `delete(sessionId, headers)`. Copy the returned `HttpResult` status, headers, content type, and body to the framework response.
+
+Initialization negotiates a supported version and creates the Streamable HTTP session. With MCP `2025-06-18`, subsequent Streamable HTTP requests must include the negotiated `MCP-Protocol-Version` header. `strictLifecycle` is enabled by default, so normal requests require `initialize` followed by `notifications/initialized`. JSON-RPC batch messages are intentionally unsupported.

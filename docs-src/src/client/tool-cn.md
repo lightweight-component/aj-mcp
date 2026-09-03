@@ -38,4 +38,4 @@ assertEquals("hi", toolExecutionResultString);
 
 ## 通知处理
 
-当前 Java 客户端尚未公开进度通知或列表变更通知的回调注册 API。已支持的行为请参阅[通知处理](handling-notifications-cn)。
+可使用 `onNotification(method, handler)` 注册 progress、日志、资源更新和列表变更通知的回调；使用 `onServerRequest(method, handler)` 响应服务端主动请求。`setRoots(...)`、`setSamplingHandler(...)` 与 `setElicitationHandler(...)` 会在 `initialize()` 前配置标准 handler。生命周期与错误处理请参阅[通知处理](handling-notifications-cn)。

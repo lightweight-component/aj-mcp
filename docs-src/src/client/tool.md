@@ -43,4 +43,4 @@ The current `callTool()` convenience API returns a `String` assembled from text 
 
 ## Handling Notifications
 
-The current Java client does not expose a public callback-registration API for progress or list-change notifications. See [Handling Notifications](handling-notifications) for the supported behavior.
+Register callbacks with `onNotification(method, handler)` for progress, logging, resource updates, and list-change notifications. Use `onServerRequest(method, handler)` to answer server-initiated requests; `setRoots(...)`, `setSamplingHandler(...)`, and `setElicitationHandler(...)` configure the standard handlers before `initialize()`. See [Handling Notifications](handling-notifications) for lifecycle and error behavior.

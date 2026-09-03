@@ -104,7 +104,7 @@
 <li>Added embedded-resource <code>blob</code> representation and validated Tool, Prompt, and Resource return collections before serialization.</li>
 <li>Converted client-side server-request handler failures into JSON-RPC <code>INTERNAL_ERROR</code> without terminating receive loops.</li>
 </ul>
-<p>Streamable HTTP currently supports ordinary JSON POST responses and the optional GET event stream. Request-scoped POST SSE streaming, reconnect/resumption, and full idle-session expiry remain planned work.</p>
+<p>Streamable HTTP currently supports ordinary JSON POST responses and the optional GET event stream. POST <code>text/event-stream</code> responses are buffered rather than dispatched incrementally. GET-stream readiness is asynchronous, and reconnect/resumption plus full idle-session expiry remain planned work.</p>
 <h2>aj-mcp-common 1.5 / aj-mcp-client 1.3 / aj-mcp-server 1.2 — 2025-06-10</h2>
 <ul>
 <li>Added <a href="https://modelcontextprotocol.io/specification/2024-11-05/server/utilities/pagination">pagination support</a>.</li>

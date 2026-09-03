@@ -97,14 +97,15 @@
 <h2>架构说明</h2>
 <p>AJ MCP SDK 的结构围绕几个核心组件构建，这些组件协同工作以实现 MCP 规范：</p>
 <p><img src="/asset/imgs/a-1.jpg" alt="架构图"></p>
-<p>该架构采用客户端-服务器模型，并支持灵活的传输方式。客户端可以通过标准 I/O 管道，或当前版本实现的旧版 HTTP/SSE 传输交换 JSON-RPC 消息。</p>
+<p>该架构采用客户端-服务器模型，并支持三类传输：标准 I/O 管道、旧版双端点 HTTP/SSE，以及 Streamable HTTP。三者都交换 JSON-RPC 消息；Streamable HTTP 用于 MCP <code>2025-03-26</code> 和 <code>2025-06-18</code>。</p>
 <h1>Stdio 模式 vs SSE 模式对比</h1>
 <table>
 <thead>
 <tr>
 <th>特性</th>
-<th>Stdio 模式</th>
-<th>SSE 模式</th>
+<th>STDIO</th>
+<th>旧版 HTTP/SSE</th>
+<th>Streamable HTTP</th>
 </tr>
 </thead>
 <tbody>
@@ -112,26 +113,31 @@
 <td><strong>部署方式</strong></td>
 <td>本地子进程</td>
 <td>独立服务器</td>
-</tr>
-<tr>
-<td><strong>适用场景</strong></td>
-<td>本地开发</td>
-<td>分布式环境</td>
+<td>独立服务器</td>
 </tr>
 <tr>
 <td><strong>配置方式</strong></td>
 <td>需要子进程命令</td>
-<td>需要 HTTP 端点</td>
+<td>独立的 SSE 与 POST 端点</td>
+<td>一个 MCP 端点，可选 GET event stream</td>
 </tr>
 <tr>
 <td><strong>多客户端支持</strong></td>
-<td>不支持</td>
+<td>单个进程连接</td>
 <td>支持</td>
+<td>通过 session ID 支持</td>
 </tr>
 <tr>
 <td><strong>网络要求</strong></td>
 <td>无</td>
 <td>需要网络连接</td>
+<td>需要网络连接</td>
+</tr>
+<tr>
+<td><strong>协议版本</strong></td>
+<td>所有已实现版本</td>
+<td>兼容旧版传输</td>
+<td><code>2025-03-26</code> / <code>2025-06-18</code></td>
 </tr>
 </tbody>
 </table>

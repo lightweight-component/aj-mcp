@@ -89,7 +89,7 @@
 <pre><code class="language-xml">&lt;dependency&gt;
     &lt;groupId&gt;com.ajaxjs&lt;/groupId&gt;
     &lt;artifactId&gt;aj-mcp-server&lt;/artifactId&gt;
-    &lt;version&gt;1.3&lt;/version&gt;
+    &lt;version&gt;1.4&lt;/version&gt;
 &lt;/dependency&gt;
 </code></pre>
 <p>可在此处查看最新版本：
@@ -99,7 +99,7 @@
 <li><code>McpServer</code> 核心处理引擎</li>
 <li>基于注解的功能发现管理器 <code>FeatureMgr</code></li>
 <li><code>@Tool</code>、<code>@Resource</code>、<code>@Prompt</code> 等注解</li>
-<li>HTTP/SSE 与标准输入输出（Stdio）传输实现</li>
+<li>STDIO、旧版 HTTP/SSE 与 Streamable HTTP 传输实现</li>
 </ul>
 <h2>创建服务器</h2>
 <p>要创建 MCP 服务器，需要以下步骤：</p>
@@ -107,7 +107,7 @@
 <li>定义服务类：创建带有 <code>@McpService</code> 注解的类</li>
 <li>注解方法：使用 <code>@Tool</code>、<code>@Prompt</code> 或 <code>@Resource</code> 等注解标记方法</li>
 <li>初始化功能管理器：扫描包以发现注解</li>
-<li>配置传输层：设置 HTTP/SSE 或 Stdio 传输，并配置相关服务器参数</li>
+<li>配置传输层：设置 STDIO、旧版 HTTP/SSE 或 Streamable HTTP，并配置相关服务器参数</li>
 <li>启动服务器：调用 <code>server.start()</code></li>
 </ol>
 <h2>创建 MCP 服务类</h2>
@@ -201,6 +201,13 @@ server.setServerConfig(serverConfig);
 
 server.start();
 </code></pre>
+<h2>传输与生命周期规则</h2>
+<ul>
+<li><code>ServerStdio</code> 每行交换一个 JSON-RPC 消息，<code>System.out</code> 必须仅用于协议输出。</li>
+<li><code>ServerSse</code> 是旧版双端点适配器：用 <code>openSession(...)</code> 建立会话，把 POST 消息交给 <code>handle(sessionId, body)</code>，断开连接时移除会话，并在应用关闭时关闭适配器。</li>
+<li><code>ServerStreamableHttp</code> 使用单一端点：<code>POST</code> 委托给 <code>post(body, headers)</code>，可选 <code>GET</code> event stream 委托给 <code>openEventStream(sessionId, writer, headers)</code>，<code>DELETE</code> 委托给 <code>delete(sessionId, headers)</code>。将返回 <code>HttpResult</code> 的状态码、响应头、content type 和正文复制到框架响应中。</li>
+</ul>
+<p>初始化会协商支持的版本，并创建 Streamable HTTP session。使用 MCP <code>2025-06-18</code> 时，后续 Streamable HTTP 请求必须带上协商后的 <code>MCP-Protocol-Version</code> header。<code>strictLifecycle</code> 默认开启，普通请求必须在 <code>initialize</code> 和 <code>notifications/initialized</code> 之后发送。本项目有意不支持 JSON-RPC batch。</p>
 
                 <div id="comment-holder">
                 </div>

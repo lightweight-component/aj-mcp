@@ -139,6 +139,8 @@ Copy the returned status, headers, content type, and body from `HttpResult` to t
 
 JSON-RPC batch requests are intentionally unsupported.
 
+Current Streamable HTTP limitations: ordinary JSON POST responses and the optional GET event stream are supported, but the server does not yet produce request-scoped POST SSE responses. A session that never opens the GET stream should be terminated through the `DELETE` endpoint; automatic idle-session expiry is not implemented.
+
 ## Configuration
 
 `ServerConfig` controls:

@@ -3,9 +3,9 @@
     <head>
         <meta charset="utf-8"/>
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-        <title>AJ MCP SDK/Handling Notifications</title>
-        <meta name="description" content="A lightweight Java 8 Model Context Protocol (MCP) SDK. Notification behavior in the AJ MCP client"/>
-        <meta name="keywords" content="mcp, mcp sdk, java mcp, mcp client, mcp server, java8 mcp, notifications"/>
+        <title>AJ MCP SDK/Home</title>
+        <meta name="description" content="A lightweight Java 8 Model Context Protocol (MCP) SDK. Java 8-compatible Model Context Protocol client and server SDK"/>
+        <meta name="keywords" content="mcp, mcp sdk, java mcp, mcp client, mcp server, java8 mcp, last one"/>
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
         <link rel="stylesheet" href="/asset/style/main.css"/>
         <link rel="icon" type="image/png" href="/asset/favicon.ico"/>
@@ -84,13 +84,59 @@
                 </ul>
             </menu>
             <article>
-                <h1>Handling Notifications</h1>
-<p>JSON-RPC notifications do not contain an <code>id</code> and must not receive a response. During initialization, the client sends <code>notifications/initialized</code>; the STDIO, legacy HTTP/SSE, and Streamable HTTP server transports suppress output for that notification.</p>
-<p>Use <code>onNotification(method, handler)</code> to register callbacks for progress, resource-update, logging, and list-change notifications. Resource, resource-template, and prompt caches are invalidated automatically when the corresponding list-change notification arrives.</p>
-<p>The client can also answer server-initiated requests with <code>onServerRequest(...)</code>. The convenience methods <code>setRoots(...)</code>, <code>setSamplingHandler(...)</code>, and <code>setElicitationHandler(...)</code> configure the standard <code>roots/list</code>, <code>sampling/createMessage</code>, and <code>elicitation/create</code> handlers before <code>initialize()</code> advertises those capabilities. Elicitation requires MCP <code>2025-06-18</code>.</p>
-<p>If a server-request handler throws a runtime exception, the client catches it at the common transport boundary and sends JSON-RPC <code>INTERNAL_ERROR</code> (<code>-32603</code>) with the original request ID. The exception is logged but does not terminate the STDIO, legacy SSE, or Streamable HTTP receive loop. Returning <code>null</code> means that no handler result is available and produces <code>METHOD_NOT_FOUND</code>.</p>
-<p>When a legacy SSE channel closes or fails, or when a transport is closed, all pending request futures are completed exceptionally. Likewise, an unexpected STDIO subprocess exit fails pending requests immediately, including when <code>requestTimeout</code> is zero. Streamable HTTP currently treats a GET event-stream failure as a transport failure too; it has no reconnect/resumption policy.</p>
-<p>Cancellation is scoped by both session and JSON-RPC request ID on the server. Two clients may safely use the same request ID; cancelling one session does not interrupt the other. Closing a session interrupts only that session's running tools.</p>
+                <h1>Welcome to the AJ MCP SDK User Manual</h1>
+<p>The AJ MCP SDK is an implementation of the Model Context Protocol (MCP), an open protocol designed to enable seamless integration between Large
+Language Model (LLM) applications and external data sources and tools. The SDK provides declarative APIs that make it easy to implement MCP server features in Java applications.</p>
+<h2>Why AJ MCP SDK?</h2>
+<p>Compared with other MCP SDKs, AJ MCP SDK is designed to be lightweight and easy to use. It supports Java 8 and provides a simple and
+intuitive API for developers to implement MCP server features. The size of the SDK is small, making it easy to integrate into your application.</p>
+<h3>Why Java 8?</h3>
+<p>MCP is a protocol-based framework and should therefore be more universally applicable. It should address a broader range of market demands.</p>
+<p>Currently, the situation with developing MCP in Java is:</p>
+<table>
+<thead>
+<tr>
+<th>Framework</th>
+<th>Required JDK</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Official Java MCP SDK</td>
+<td>JDK 17+</td>
+</tr>
+<tr>
+<td>Spring AI MCP</td>
+<td>JDK 17+</td>
+</tr>
+<tr>
+<td>Quarkus MCP server</td>
+<td>JDK 17+</td>
+</tr>
+<tr>
+<td>langchain4j-mcp client</td>
+<td>JDK 11+</td>
+</tr>
+</tbody>
+</table>
+<p>Given that a large number of servers still run on JDK 8, the ability to develop MCP (or MCP Server) with Java 8 is essential to ensure broad compatibility and flexibility — that’s what real freedom for MCP means.</p>
+<h2>Learn More</h2>
+<p>For specific information about working with individual components,
+please see dedicated pages on <a href="architecture">Architecture</a>, <a href="client">Client SDK</a>, <a href="server">Server SDK</a>.</p>
+<h2>Source Code</h2>
+<p>Licensed under the GNU General Public License v3.0.</p>
+<ul>
+<li>GitHub: <a href="https://github.com/lightweight-component/aj-mcp">https://github.com/lightweight-component/aj-mcp</a></li>
+<li>GitCode: <a href="https://gitcode.com/lightweight-component/aj-mcp">https://gitcode.com/lightweight-component/aj-mcp</a>, which may be faster for users in China.</li>
+</ul>
+<h2>Links</h2>
+<p><a href="https://mcp.ajaxjs.com">Website</a> | <a href="https://deepwiki.com/lightweight-component/aj-mcp">DeepWiki</a></p>
+<h2>JavaDoc</h2>
+<ul>
+<li><a href="https://javadoc.io/doc/com.ajaxjs/aj-mcp-common">aj-mcp-common</a></li>
+<li><a href="https://javadoc.io/doc/com.ajaxjs/aj-mcp-client">aj-mcp-client</a></li>
+<li><a href="https://javadoc.io/doc/com.ajaxjs/aj-mcp-server">aj-mcp-server</a></li>
+</ul>
 
             </article>
 

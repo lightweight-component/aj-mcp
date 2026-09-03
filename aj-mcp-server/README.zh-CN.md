@@ -141,6 +141,8 @@ Controller 和 Servlet 接线方式请参考 [Spring Boot](../samples/server/spr
 
 本项目有意不支持 JSON-RPC batch 请求。
 
+当前 Streamable HTTP 的限制：支持普通 JSON POST 响应和可选 GET event stream，但服务端尚不能生成请求级的 POST SSE 响应。未打开 GET stream 的 session 应通过 `DELETE` 端点终止；当前未实现自动空闲 session 过期。
+
 ## 配置
 
 `ServerConfig` 的主要属性：

@@ -29,7 +29,7 @@ layout: layouts/docs.njk
 - Added embedded-resource `blob` representation and validated Tool, Prompt, and Resource return collections before serialization.
 - Converted client-side server-request handler failures into JSON-RPC `INTERNAL_ERROR` without terminating receive loops.
 
-Streamable HTTP currently supports ordinary JSON POST responses and the optional GET event stream. Request-scoped POST SSE streaming, reconnect/resumption, and full idle-session expiry remain planned work.
+Streamable HTTP currently supports ordinary JSON POST responses and the optional GET event stream. POST `text/event-stream` responses are buffered rather than dispatched incrementally. GET-stream readiness is asynchronous, and reconnect/resumption plus full idle-session expiry remain planned work.
 
 ## aj-mcp-common 1.5 / aj-mcp-client 1.3 / aj-mcp-server 1.2 — 2025-06-10
 

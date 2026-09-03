@@ -17,7 +17,7 @@ layout: layouts/docs-cn.njk
 <dependency>
     <groupId>com.ajaxjs</groupId>
     <artifactId>aj-mcp-server</artifactId>
-    <version>1.3</version>
+    <version>1.4</version>
 </dependency>
 ```
 
@@ -29,7 +29,7 @@ layout: layouts/docs-cn.njk
 - `McpServer` 核心处理引擎
 - 基于注解的功能发现管理器 `FeatureMgr`
 - `@Tool`、`@Resource`、`@Prompt` 等注解
-- HTTP/SSE 与标准输入输出（Stdio）传输实现
+- STDIO、旧版 HTTP/SSE 与 Streamable HTTP 传输实现
 
 ## 创建服务器
 
@@ -38,7 +38,7 @@ layout: layouts/docs-cn.njk
 1. 定义服务类：创建带有 `@McpService` 注解的类
 2. 注解方法：使用 `@Tool`、`@Prompt` 或 `@Resource` 等注解标记方法
 3. 初始化功能管理器：扫描包以发现注解
-4. 配置传输层：设置 HTTP/SSE 或 Stdio 传输，并配置相关服务器参数
+4. 配置传输层：设置 STDIO、旧版 HTTP/SSE 或 Streamable HTTP，并配置相关服务器参数
 5. 启动服务器：调用 `server.start()`
 
 ## 创建 MCP 服务类
@@ -116,3 +116,11 @@ server.setServerConfig(serverConfig);
 
 server.start();
 ```
+
+## 传输与生命周期规则
+
+- `ServerStdio` 每行交换一个 JSON-RPC 消息，`System.out` 必须仅用于协议输出。
+- `ServerSse` 是旧版双端点适配器：用 `openSession(...)` 建立会话，把 POST 消息交给 `handle(sessionId, body)`，断开连接时移除会话，并在应用关闭时关闭适配器。
+- `ServerStreamableHttp` 使用单一端点：`POST` 委托给 `post(body, headers)`，可选 `GET` event stream 委托给 `openEventStream(sessionId, writer, headers)`，`DELETE` 委托给 `delete(sessionId, headers)`。将返回 `HttpResult` 的状态码、响应头、content type 和正文复制到框架响应中。
+
+初始化会协商支持的版本，并创建 Streamable HTTP session。使用 MCP `2025-06-18` 时，后续 Streamable HTTP 请求必须带上协商后的 `MCP-Protocol-Version` header。`strictLifecycle` 默认开启，普通请求必须在 `initialize` 和 `notifications/initialized` 之后发送。本项目有意不支持 JSON-RPC batch。

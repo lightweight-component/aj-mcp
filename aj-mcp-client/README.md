@@ -99,6 +99,8 @@ try (McpClient client = McpClient.builder()
 
 `openEventStream` enables the optional long-lived GET channel for server-originated messages. The transport retains the session ID returned by initialization and sends the negotiated protocol header when required.
 
+Current Streamable HTTP limitations: a POST response with `text/event-stream` is buffered before parsing rather than consumed incrementally; the optional GET stream opens asynchronously and has no reconnect/resumption policy. Use ordinary JSON POST responses, and do not depend on incremental progress or server requests delivered through a POST response.
+
 For an older server with separate SSE and message endpoints, use `HttpMcpTransport`:
 
 ```java

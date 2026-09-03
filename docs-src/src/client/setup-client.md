@@ -19,7 +19,7 @@ Add the AJ MCP client dependency:
 <dependency>
     <groupId>com.ajaxjs</groupId>
     <artifactId>aj-mcp-client</artifactId>
-    <version>1.4</version>
+    <version>1.5</version>
 </dependency>
 ```
 
@@ -34,12 +34,11 @@ The client SDK implementation consists of two main components:
 - MCP Client: Provides a high-level API for using the transport, implementing the MCP protocol.
 
 To use the client, first create an appropriate transport and then build an `McpClient` with that transport.
-The client supports different transport mechanisms, primarily Server-Sent Events (SSE) and standard I/O (stdio).
+The client supports three transport mechanisms: standard I/O (STDIO), the legacy two-endpoint HTTP/SSE transport, and Streamable HTTP.
 
 ## Setup the Transport
 
-First, we need to create the transport. There are two types of transport you can choose from for your application, depending on the type of your MCP
-server.
+First, create the transport that matches the MCP server.
 
 ### Stdio Transport
 
@@ -65,10 +64,9 @@ McpTransport transport = StdioTransport.builder()
 
 Set `logEvents` to `true` to log outgoing protocol messages while debugging. The transport also consumes stderr so that a child process cannot block on a full error pipe.
 
-### SSE Transport
+### Legacy HTTP/SSE Transport
 
-The SSE Transport enables bidirectional communication between MCP clients and servers using the HTTP protocol with Server-Sent Events. This transport
-method is particularly useful for web-based applications.
+The legacy transport uses an SSE endpoint for server-to-client messages and a server-advertised POST endpoint for client requests. It is useful when connecting to older MCP servers.
 
 ``` java
 McpTransport transport = HttpMcpTransport.builder()
@@ -99,9 +97,9 @@ client.initialize();
 
 For OAuth, pass an `Authorization` Bearer token through `requestHeaders`. The SDK retains the returned session ID and automatically sends the negotiated `MCP-Protocol-Version` on subsequent requests.
 
-Set `openEventStream(true)` when the client advertises Roots, Sampling, or Elicitation handlers. Those server-initiated requests are received through the optional GET event stream.
+Set `openEventStream(true)` when the client advertises Roots, Sampling, or Elicitation handlers. Those server-initiated requests are received through the optional GET event stream, which opens asynchronously after initialization.
 
-> Current limitation: request-scoped streaming over a POST `text/event-stream` response is not yet implemented end to end. Ordinary JSON POST responses work, and server-originated messages use the GET event stream. Do not rely on incremental progress or server requests delivered through the POST response until this limitation is removed.
+> Current limitations: request-scoped streaming over a POST `text/event-stream` response is buffered rather than processed incrementally; use ordinary JSON POST responses. The optional GET event stream has no reconnect/resumption policy, and initialization does not wait for that stream to become ready. Do not rely on incremental POST progress or server requests delivered through a POST response until this limitation is removed.
 
 ## McpClient
 

@@ -19,7 +19,7 @@ layout: layouts/docs-cn.njk
 <dependency>
     <groupId>com.ajaxjs</groupId>
     <artifactId>aj-mcp-client</artifactId>
-    <version>1.4</version>
+    <version>1.5</version>
 </dependency>
 ```
 
@@ -33,7 +33,7 @@ layout: layouts/docs-cn.njk
 
 ## 设置传输层 Transport
 
-首先，我们需要创建传输层。根据 MCP 服务器的类型，您可以选择以下两种传输方式之一：
+首先创建与 MCP 服务端匹配的传输层。客户端支持 STDIO、旧版双端点 HTTP/SSE 和 Streamable HTTP 三类传输。
 
 ### 标准输入输出（Stdio）传输
 
@@ -59,9 +59,9 @@ McpTransport transport = StdioTransport.builder()
 
 调试时可将 `logEvents` 设置为 `true`，以记录发出的协议消息。传输层也会持续消费子进程的 stderr，避免错误输出管道写满后阻塞子进程。
 
-### SSE 传输
+### 旧版 HTTP/SSE 传输
 
-SSE（Server-Sent Events）传输使用 HTTP 协议实现 MCP 客户端与服务器之间的双向通信。这种传输方法特别适用于基于 Web 的应用程序。
+旧版传输使用 SSE 端点承载服务端到客户端的消息，并使用服务端公布的 POST 端点承载客户端请求，适用于需要对接旧 MCP 服务的场景。
 
 ```java
 McpTransport transport=HttpMcpTransport.builder()
@@ -92,9 +92,9 @@ client.initialize();
 
 如需 OAuth Bearer token，可通过 `requestHeaders` 传入 `Authorization`。SDK 会保存服务端返回的 session ID，并在后续请求中自动加入协商后的 `MCP-Protocol-Version`。
 
-如果客户端声明了 Roots、Sampling 或 Elicitation handler，请设置 `openEventStream(true)`；服务端主动请求通过可选的 GET event stream 到达客户端。
+如果客户端声明了 Roots、Sampling 或 Elicitation handler，请设置 `openEventStream(true)`；服务端主动请求通过可选的 GET event stream 到达客户端。该流会在初始化后异步打开。
 
-> 当前限制：SDK 尚未端到端实现 POST `text/event-stream` 响应上的请求级流式传输。普通 JSON POST 响应可以正常使用，服务端主动消息通过 GET event stream 发送。在该限制解除前，请勿依赖通过 POST 响应增量发送的 progress 或服务端请求。
+> 当前限制：POST `text/event-stream` 响应会先完整缓冲，尚不能按事件增量处理；请使用普通 JSON POST 响应。可选 GET event stream 目前没有断线重连/恢复策略，初始化也不会等待它就绪。在该限制解除前，请勿依赖通过 POST 响应增量发送的 progress 或服务端请求。
 
 ## MCP 客户端
 

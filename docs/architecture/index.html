@@ -100,14 +100,15 @@ functionality.</p>
 <h2>Architecture</h2>
 <p>The AJ MCP SDK is structured around several core components that work together to implement the MCP specification:</p>
 <p><img src="/asset/imgs/a-1.jpg" alt=""></p>
-<p>The architecture follows a client-server model with flexible transport options. The client exchanges JSON-RPC messages over standard I/O pipes or the legacy HTTP/SSE transport implemented by this version.</p>
+<p>The architecture follows a client-server model with three transports: standard I/O pipes, the legacy two-endpoint HTTP/SSE transport, and Streamable HTTP. All transports exchange JSON-RPC messages; Streamable HTTP is available for MCP <code>2025-03-26</code> and <code>2025-06-18</code>.</p>
 <h1>Stdio Mode vs SSE Mode Comparison</h1>
 <table>
 <thead>
 <tr>
 <th>Feature</th>
-<th>Stdio Mode</th>
-<th>SSE Mode</th>
+<th>STDIO</th>
+<th>Legacy HTTP/SSE</th>
+<th>Streamable HTTP</th>
 </tr>
 </thead>
 <tbody>
@@ -115,26 +116,31 @@ functionality.</p>
 <td><strong>Deployment</strong></td>
 <td>Local subprocess</td>
 <td>Independent server</td>
-</tr>
-<tr>
-<td><strong>Use Case</strong></td>
-<td>Local development</td>
-<td>Distributed environments</td>
+<td>Independent server</td>
 </tr>
 <tr>
 <td><strong>Configuration</strong></td>
-<td>Subprocess command required</td>
-<td>HTTP endpoints required</td>
+<td>Subprocess command</td>
+<td>Separate SSE and POST endpoints</td>
+<td>One MCP endpoint; optional GET event stream</td>
 </tr>
 <tr>
-<td><strong>Multi-Client Support</strong></td>
-<td>Not supported</td>
+<td><strong>Multi-client support</strong></td>
+<td>One process connection</td>
 <td>Supported</td>
+<td>Supported by session ID</td>
 </tr>
 <tr>
-<td><strong>Network Requirement</strong></td>
+<td><strong>Network requirement</strong></td>
 <td>None</td>
-<td>Requires network connection</td>
+<td>Required</td>
+<td>Required</td>
+</tr>
+<tr>
+<td><strong>Protocol revisions</strong></td>
+<td>All implemented revisions</td>
+<td>Legacy-compatible transport</td>
+<td><code>2025-03-26</code> / <code>2025-06-18</code></td>
 </tr>
 </tbody>
 </table>

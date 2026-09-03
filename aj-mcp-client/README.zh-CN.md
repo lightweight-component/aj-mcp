@@ -99,6 +99,8 @@ try (McpClient client = McpClient.builder()
 
 `openEventStream` 用于打开可选的长期 GET 通道，以接收服务端主动消息。传输层会保存初始化返回的 Session ID，并在需要时发送协商后的协议版本请求头。
 
+当前 Streamable HTTP 的限制：`text/event-stream` 的 POST 响应会在解析前先完整缓冲，尚不能增量消费；可选 GET stream 异步建立，且没有断线重连/恢复策略。请使用普通 JSON POST 响应，并且不要依赖通过 POST 响应传递的增量 progress 或服务端主动请求。
+
 连接分别提供 SSE 和消息端点的旧服务时，使用 `HttpMcpTransport`：
 
 ```java

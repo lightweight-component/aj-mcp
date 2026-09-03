@@ -104,7 +104,7 @@ assertEquals(&quot;hi&quot;, toolExecutionResultString);
 </code></pre>
 <p>The current <code>callTool()</code> convenience API returns a <code>String</code> assembled from text content. It does not expose image content through this method. Tool-level errors are returned as an error message string; transport and timeout failures follow the client exception/timeout behavior.</p>
 <h2>Handling Notifications</h2>
-<p>The current Java client does not expose a public callback-registration API for progress or list-change notifications. See <a href="handling-notifications">Handling Notifications</a> for the supported behavior.</p>
+<p>Register callbacks with <code>onNotification(method, handler)</code> for progress, logging, resource updates, and list-change notifications. Use <code>onServerRequest(method, handler)</code> to answer server-initiated requests; <code>setRoots(...)</code>, <code>setSamplingHandler(...)</code>, and <code>setElicitationHandler(...)</code> configure the standard handlers before <code>initialize()</code>. See <a href="handling-notifications">Handling Notifications</a> for lifecycle and error behavior.</p>
 
             </article>
 

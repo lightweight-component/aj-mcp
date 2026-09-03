@@ -101,7 +101,7 @@ assertEquals(&quot;hi&quot;, toolExecutionResultString);
 </code></pre>
 <p>当前 <code>callTool()</code> 便捷接口返回由文本内容拼接而成的 <code>String</code>，不会通过该方法暴露图片内容。工具业务错误会转换为错误消息字符串；传输错误和超时则遵循客户端的异常与超时处理逻辑。</p>
 <h2>通知处理</h2>
-<p>当前 Java 客户端尚未公开进度通知或列表变更通知的回调注册 API。已支持的行为请参阅<a href="handling-notifications-cn">通知处理</a>。</p>
+<p>可使用 <code>onNotification(method, handler)</code> 注册 progress、日志、资源更新和列表变更通知的回调；使用 <code>onServerRequest(method, handler)</code> 响应服务端主动请求。<code>setRoots(...)</code>、<code>setSamplingHandler(...)</code> 与 <code>setElicitationHandler(...)</code> 会在 <code>initialize()</code> 前配置标准 handler。生命周期与错误处理请参阅<a href="handling-notifications-cn">通知处理</a>。</p>
 
                 <div id="comment-holder">
                 </div>

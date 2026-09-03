@@ -77,7 +77,7 @@
         </url>
     
         <url>
-            <loc>https://mcp.ajaxjs.com/</loc>
+            <loc>https://mcp.ajaxjs.com/docs-index/</loc>
             <lastmod>2022-01-05T00:00:00.000Z</lastmod>
         </url>
     
@@ -169,6 +169,11 @@
         <url>
             <loc>https://mcp.ajaxjs.com/asset/style/main.css</loc>
             <lastmod>2026-07-20T02:20:38.479Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://mcp.ajaxjs.com/</loc>
+            <lastmod>2026-09-03T04:05:12.891Z</lastmod>
         </url>
     
 </urlset>

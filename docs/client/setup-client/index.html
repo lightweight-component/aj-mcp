@@ -91,7 +91,7 @@
 &lt;dependency&gt;
     &lt;groupId&gt;com.ajaxjs&lt;/groupId&gt;
     &lt;artifactId&gt;aj-mcp-client&lt;/artifactId&gt;
-    &lt;version&gt;1.4&lt;/version&gt;
+    &lt;version&gt;1.5&lt;/version&gt;
 &lt;/dependency&gt;
 </code></pre>
 <p>We can find the latest version:
@@ -103,10 +103,9 @@
 <li>MCP Client: Provides a high-level API for using the transport, implementing the MCP protocol.</li>
 </ul>
 <p>To use the client, first create an appropriate transport and then build an <code>McpClient</code> with that transport.
-The client supports different transport mechanisms, primarily Server-Sent Events (SSE) and standard I/O (stdio).</p>
+The client supports three transport mechanisms: standard I/O (STDIO), the legacy two-endpoint HTTP/SSE transport, and Streamable HTTP.</p>
 <h2>Setup the Transport</h2>
-<p>First, we need to create the transport. There are two types of transport you can choose from for your application, depending on the type of your MCP
-server.</p>
+<p>First, create the transport that matches the MCP server.</p>
 <h3>Stdio Transport</h3>
 <p>Stdio stands for standard input/output. In this transport, the client launches a local MCP server subprocess and exchanges one JSON-RPC message per line through its standard streams.</p>
 <pre><code class="language-java">// The MCP server is a Java program that communicates over stdio.
@@ -123,9 +122,8 @@ McpTransport transport = StdioTransport.builder()
     .build();
 </code></pre>
 <p>Set <code>logEvents</code> to <code>true</code> to log outgoing protocol messages while debugging. The transport also consumes stderr so that a child process cannot block on a full error pipe.</p>
-<h3>SSE Transport</h3>
-<p>The SSE Transport enables bidirectional communication between MCP clients and servers using the HTTP protocol with Server-Sent Events. This transport
-method is particularly useful for web-based applications.</p>
+<h3>Legacy HTTP/SSE Transport</h3>
+<p>The legacy transport uses an SSE endpoint for server-to-client messages and a server-advertised POST endpoint for client requests. It is useful when connecting to older MCP servers.</p>
 <pre><code class="language-java">McpTransport transport = HttpMcpTransport.builder()
     .sseUrl(&quot;http://localhost:8080/sse&quot;)
     .logRequests(true)
@@ -147,9 +145,9 @@ McpClient client = McpClient.builder()
 client.initialize();
 </code></pre>
 <p>For OAuth, pass an <code>Authorization</code> Bearer token through <code>requestHeaders</code>. The SDK retains the returned session ID and automatically sends the negotiated <code>MCP-Protocol-Version</code> on subsequent requests.</p>
-<p>Set <code>openEventStream(true)</code> when the client advertises Roots, Sampling, or Elicitation handlers. Those server-initiated requests are received through the optional GET event stream.</p>
+<p>Set <code>openEventStream(true)</code> when the client advertises Roots, Sampling, or Elicitation handlers. Those server-initiated requests are received through the optional GET event stream, which opens asynchronously after initialization.</p>
 <blockquote>
-<p>Current limitation: request-scoped streaming over a POST <code>text/event-stream</code> response is not yet implemented end to end. Ordinary JSON POST responses work, and server-originated messages use the GET event stream. Do not rely on incremental progress or server requests delivered through the POST response until this limitation is removed.</p>
+<p>Current limitations: request-scoped streaming over a POST <code>text/event-stream</code> response is buffered rather than processed incrementally; use ordinary JSON POST responses. The optional GET event stream has no reconnect/resumption policy, and initialization does not wait for that stream to become ready. Do not rely on incremental POST progress or server requests delivered through a POST response until this limitation is removed.</p>
 </blockquote>
 <h2>McpClient</h2>
 <p>The MCP Client serves as a bridge between local applications and remote tool implementations.</p>

@@ -91,7 +91,7 @@
 &lt;dependency&gt;
     &lt;groupId&gt;com.ajaxjs&lt;/groupId&gt;
     &lt;artifactId&gt;aj-mcp-server&lt;/artifactId&gt;
-    &lt;version&gt;1.3&lt;/version&gt;
+    &lt;version&gt;1.4&lt;/version&gt;
 &lt;/dependency&gt;
 </code></pre>
 <p>We can find the latest version:
@@ -101,7 +101,7 @@
 <li><code>McpServer</code> core processing engine</li>
 <li><code>FeatureMgr</code> for annotation-based feature discovery</li>
 <li><code>@Tool</code>, <code>@Resource</code>, <code>@Prompt</code> annotations</li>
-<li>Transport implementations for HTTP/SSE and Stdio</li>
+<li>Transport implementations for STDIO, legacy HTTP/SSE, and Streamable HTTP</li>
 </ul>
 <h2>Creating a Server</h2>
 <p>To create an MCP server, you need to:</p>
@@ -109,7 +109,7 @@
 <li>Define Service Classes: Create classes annotated with <code>@McpService</code></li>
 <li>Annotate Methods: Use <code>@Tool</code>, <code>@Prompt</code>, or <code>@Resource</code> annotations</li>
 <li>Initialize Feature Manager: Scan packages for annotations</li>
-<li>Configure Transport: Set up HTTP/SSE or Stdio transport, and some details of server</li>
+<li>Configure Transport: Set up STDIO, legacy HTTP/SSE, or Streamable HTTP and its server details</li>
 <li>Start Server: Call <code>server.start()</code></li>
 </ol>
 <h2>Creating MCP Service Class</h2>
@@ -209,6 +209,13 @@ server.setServerConfig(serverConfig);
 
 server.start();
 </code></pre>
+<h2>Transport and lifecycle rules</h2>
+<ul>
+<li><code>ServerStdio</code> exchanges one JSON-RPC message per line. Keep <code>System.out</code> reserved for protocol output.</li>
+<li><code>ServerSse</code> is the legacy two-endpoint adapter: open a session with <code>openSession(...)</code>, route POST messages to <code>handle(sessionId, body)</code>, remove the connection on disconnect, and close the adapter on shutdown.</li>
+<li><code>ServerStreamableHttp</code> uses one endpoint: delegate <code>POST</code> to <code>post(body, headers)</code>, optional <code>GET</code> event streams to <code>openEventStream(sessionId, writer, headers)</code>, and <code>DELETE</code> to <code>delete(sessionId, headers)</code>. Copy the returned <code>HttpResult</code> status, headers, content type, and body to the framework response.</li>
+</ul>
+<p>Initialization negotiates a supported version and creates the Streamable HTTP session. With MCP <code>2025-06-18</code>, subsequent Streamable HTTP requests must include the negotiated <code>MCP-Protocol-Version</code> header. <code>strictLifecycle</code> is enabled by default, so normal requests require <code>initialize</code> followed by <code>notifications/initialized</code>. JSON-RPC batch messages are intentionally unsupported.</p>
 
             </article>
 

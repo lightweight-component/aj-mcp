@@ -29,7 +29,7 @@ layout: layouts/docs-cn.njk
 - 增加 embedded resource 的 `blob` 表达，并在序列化前校验 Tool、Prompt 与 Resource 返回集合。
 - 将客户端 server-request handler 异常转换为 JSON-RPC `INTERNAL_ERROR`，不再终止消息接收循环。
 
-Streamable HTTP 当前支持普通 JSON POST 响应和可选 GET event stream。请求级 POST SSE 流式传输、断线重连/恢复以及完整的空闲 session 过期机制仍属于后续工作。
+Streamable HTTP 当前支持普通 JSON POST 响应和可选 GET event stream。POST `text/event-stream` 响应会先完整缓冲，尚不能增量分发；GET stream 的就绪状态为异步。请求级 POST SSE 流式传输、断线重连/恢复以及完整的空闲 session 过期机制仍属于后续工作。
 
 ## aj-mcp-common 1.5 / aj-mcp-client 1.3 / aj-mcp-server 1.2 — 2025-06-10
 
