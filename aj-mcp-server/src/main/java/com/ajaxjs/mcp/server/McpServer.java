@@ -121,7 +121,7 @@ public class McpServer extends McpServerPrompt {
         JsonNode result = requestClient(sessionId, Methods.ROOTS_LIST, null, timeout);
         List<Root> roots = new ArrayList<>();
         for (JsonNode root : result.path("roots"))
-            roots.add(JsonUtils.OBJECT_MAPPER.convertValue(root, Root.class));
+            roots.add(JsonUtils.convertValue(root, Root.class));
         return roots;
     }
 
@@ -131,8 +131,8 @@ public class McpServer extends McpServerPrompt {
         if (capabilities == null || capabilities.getSampling() == null)
             throw new IllegalStateException("Client did not advertise sampling capability");
         JsonNode result = requestClient(sessionId, Methods.SAMPLING_CREATE_MESSAGE,
-                JsonUtils.OBJECT_MAPPER.valueToTree(params), timeout);
-        return JsonUtils.OBJECT_MAPPER.convertValue(result, SamplingCreateMessageResult.class);
+                JsonUtils.valueToTree(params), timeout);
+        return JsonUtils.convertValue(result, SamplingCreateMessageResult.class);
     }
 
     /**
@@ -146,8 +146,8 @@ public class McpServer extends McpServerPrompt {
         if (capabilities == null || capabilities.getElicitation() == null)
             throw new IllegalStateException("Client did not advertise elicitation capability");
         JsonNode result = requestClient(sessionId, Methods.ELICITATION_CREATE,
-                JsonUtils.OBJECT_MAPPER.valueToTree(params), timeout);
-        return JsonUtils.OBJECT_MAPPER.convertValue(result, ElicitResult.class);
+                JsonUtils.valueToTree(params), timeout);
+        return JsonUtils.convertValue(result, ElicitResult.class);
     }
 
     private JsonNode requestClient(String sessionId, String method, JsonNode params, Duration timeout) {
@@ -155,7 +155,7 @@ public class McpServer extends McpServerPrompt {
         String key = sessionId + ":" + id;
         CompletableFuture<JsonNode> future = new CompletableFuture<>();
         pendingClientResponses.put(key, future);
-        ObjectNode request = JsonUtils.OBJECT_MAPPER.createObjectNode();
+        ObjectNode request = JsonUtils.createObjectNode();
         request.put("jsonrpc", "2.0");
         request.put(ID, id);
         request.put(METHOD, method);
@@ -323,8 +323,8 @@ public class McpServer extends McpServerPrompt {
     }
 
     public void sendProgress(String sessionId, Object progressToken, double progress, Double total) {
-        ObjectNode params = JsonUtils.OBJECT_MAPPER.createObjectNode();
-        params.set("progressToken", JsonUtils.OBJECT_MAPPER.valueToTree(progressToken));
+        ObjectNode params = JsonUtils.createObjectNode();
+        params.set("progressToken", JsonUtils.valueToTree(progressToken));
         params.put("progress", progress);
 
         if (total != null)
@@ -346,12 +346,12 @@ public class McpServer extends McpServerPrompt {
     }
 
     public void publishLog(String level, String loggerName, Object data) {
-        ObjectNode params = JsonUtils.OBJECT_MAPPER.createObjectNode();
+        ObjectNode params = JsonUtils.createObjectNode();
         params.put("level", level == null ? loggingLevel : level);
 
         if (loggerName != null)
             params.put("logger", loggerName);
-        params.set("data", JsonUtils.OBJECT_MAPPER.valueToTree(data));
+        params.set("data", JsonUtils.valueToTree(data));
 
         transport.broadcast(notificationJson(Methods.LOGGING_MESSAGE_NOTIFICATION, params));
     }
@@ -361,7 +361,7 @@ public class McpServer extends McpServerPrompt {
     }
 
     private static String notificationJson(String method, JsonNode params) {
-        ObjectNode notification = JsonUtils.OBJECT_MAPPER.createObjectNode();
+        ObjectNode notification = JsonUtils.createObjectNode();
         notification.put("jsonrpc", "2.0");
         notification.put("method", method);
 
@@ -511,7 +511,7 @@ public class McpServer extends McpServerPrompt {
         for (ServerStoreTool store : featureMgr.getToolStore().values()) {
             // Never mutate the shared feature definition while projecting it to
             // a session's negotiated schema.
-            ToolItem tool = JsonUtils.OBJECT_MAPPER.convertValue(store.getTool(), ToolItem.class);
+            ToolItem tool = JsonUtils.convertValue(store.getTool(), ToolItem.class);
             if (revision == ProtocolVersion.V_2024_11_05)
                 tool.setAnnotations(null);
             if (!revision.supportsStructuredToolOutput()) {
@@ -738,7 +738,7 @@ public class McpServer extends McpServerPrompt {
         if (targetType == double.class || targetType == Double.class)
             return number(value).doubleValue();
 
-        return JsonUtils.OBJECT_MAPPER.convertValue(value, targetType);
+        return JsonUtils.convertValue(value, targetType);
     }
 
     private static Number number(Object value) {

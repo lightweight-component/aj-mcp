@@ -80,7 +80,7 @@ public abstract class McpServerInitialize implements McpConstant {
         InitializeRequest initializeRequest;
 
         try {
-            initializeRequest = JsonUtils.OBJECT_MAPPER.treeToValue(jsonNode, InitializeRequest.class);
+            initializeRequest = JsonUtils.treeToValue(jsonNode, InitializeRequest.class);
         } catch (JsonProcessingException e) {
             log.warn("JsonNode converts to bean.", e);
             throw new JsonRpcErrorException(id, JsonRpcErrorCode.INVALID_PARAMS,
@@ -183,7 +183,7 @@ public abstract class McpServerInitialize implements McpConstant {
         JsonNode jsonNode;
 
         try {
-            jsonNode = JsonUtils.OBJECT_MAPPER.readTree(inputJson);
+            jsonNode = JsonUtils.readTree(inputJson);
         } catch (IOException e) {
             throw new JsonRpcErrorException(JsonRpcErrorCode.PARSE_ERROR, "Unable to parse the JSON message");
         }

@@ -140,7 +140,7 @@ public class McpClient extends McpClientResource {
             if (tool.has("title"))
                 toolSpecification.setTitle(tool.get("title").asText());
             if (tool.has("annotations"))
-                toolSpecification.setAnnotations(JsonUtils.OBJECT_MAPPER.convertValue(tool.get("annotations"), java.util.Map.class));
+                toolSpecification.setAnnotations(JsonUtils.convertValue(tool.get("annotations"), java.util.Map.class));
 
             JsonNode jsonNode = tool.get("inputSchema");
             JsonSchema jsonSchema = JsonUtils.jsonNode2bean(jsonNode, JsonSchema.class);
@@ -193,7 +193,7 @@ public class McpClient extends McpClientResource {
             JsonNode response = awaitResponse(transport.sendRequestWithResponse(request));
             McpException.checkForErrors(response);
 
-            return JsonUtils.OBJECT_MAPPER.convertValue(response.get(RESPONSE_RESULT), CallToolResultDetail.class);
+            return JsonUtils.convertValue(response.get(RESPONSE_RESULT), CallToolResultDetail.class);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);

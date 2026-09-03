@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -40,6 +41,29 @@ public class JsonUtils {
             log.warn("Converts a Java object to a JSON string.", e);
             throw new RuntimeException("Failed to convert object to JSON", e);
         }
+    }
+
+    /**
+     * Serializes a value to UTF-8 JSON bytes while preserving Jackson's checked exception.
+     */
+    public static byte[] toJsonBytes(Object obj) throws JsonProcessingException {
+        return OBJECT_MAPPER.writeValueAsBytes(obj);
+    }
+
+    public static ObjectNode createObjectNode() {
+        return OBJECT_MAPPER.createObjectNode();
+    }
+
+    public static JsonNode valueToTree(Object value) {
+        return OBJECT_MAPPER.valueToTree(value);
+    }
+
+    public static <T> T treeToValue(JsonNode jsonNode, Class<T> clazz) throws JsonProcessingException {
+        return OBJECT_MAPPER.treeToValue(jsonNode, clazz);
+    }
+
+    public static JsonNode readTree(String json) throws IOException {
+        return OBJECT_MAPPER.readTree(json);
     }
 
     /**
@@ -226,7 +250,7 @@ public class JsonUtils {
      */
     public static JsonNode json2Node(String json) {
         try {
-            return OBJECT_MAPPER.readTree(json);
+            return readTree(json);
         } catch (IOException e) {
             log.warn("JSON string converts to node.", e);
             throw new RuntimeException(e);
@@ -235,7 +259,7 @@ public class JsonUtils {
 
     public static <T> T jsonNode2bean(JsonNode jsonNode, Class<T> clazz) {
         try {
-            return OBJECT_MAPPER.treeToValue(jsonNode, clazz);
+            return treeToValue(jsonNode, clazz);
         } catch (JsonProcessingException e) {
             log.warn("JsonNode converts to bean.", e);
             throw new RuntimeException(e);

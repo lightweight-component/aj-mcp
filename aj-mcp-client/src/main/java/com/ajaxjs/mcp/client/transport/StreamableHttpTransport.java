@@ -101,7 +101,7 @@ public class StreamableHttpTransport extends McpTransport {
 
     private CompletableFuture<JsonNode> post(BaseJsonRpcMessage message, Long id, boolean versionHeader) {
         try {
-            return postBytes(JsonUtils.OBJECT_MAPPER.writeValueAsBytes(message), id, versionHeader);
+            return postBytes(JsonUtils.toJsonBytes(message), id, versionHeader);
         } catch (IOException e) {
             return McpUtils.failedFuture(e);
         }
@@ -109,7 +109,7 @@ public class StreamableHttpTransport extends McpTransport {
 
     private CompletableFuture<JsonNode> postJson(JsonNode message, Long id, boolean versionHeader) {
         try {
-            return postBytes(JsonUtils.OBJECT_MAPPER.writeValueAsBytes(message), id, versionHeader);
+            return postBytes(JsonUtils.toJsonBytes(message), id, versionHeader);
         } catch (IOException e) {
             return McpUtils.failedFuture(e);
         }

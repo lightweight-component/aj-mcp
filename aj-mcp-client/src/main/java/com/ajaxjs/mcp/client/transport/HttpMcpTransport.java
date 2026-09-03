@@ -201,7 +201,7 @@ public class HttpMcpTransport extends McpTransport {
     protected void sendJson(JsonNode message) {
         try {
             Request request = new Request.Builder().url(postUrl).header("Content-Type", "application/json")
-                    .post(RequestBody.create(JsonUtils.OBJECT_MAPPER.writeValueAsBytes(message))).build();
+                    .post(RequestBody.create(JsonUtils.toJsonBytes(message))).build();
             execute(request, null);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
@@ -308,7 +308,7 @@ public class HttpMcpTransport extends McpTransport {
      */
     private Request createRequest(BaseJsonRpcMessage message) throws JsonProcessingException {
         return new Request.Builder().url(postUrl).header("Content-Type", "application/json")
-                .post(RequestBody.create(JsonUtils.OBJECT_MAPPER.writeValueAsBytes(message))).build();
+                .post(RequestBody.create(JsonUtils.toJsonBytes(message))).build();
     }
 
     /**

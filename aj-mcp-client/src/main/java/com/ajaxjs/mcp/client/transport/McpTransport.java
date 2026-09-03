@@ -164,7 +164,7 @@ public abstract class McpTransport implements McpConstant, Closeable {
         // A message containing both method and id is a server-initiated request,
         // not a response to one of the client's pending operations.
         if (message.has(METHOD) && message.has(ID)) {
-            ObjectNode response = JsonUtils.OBJECT_MAPPER.createObjectNode();
+            ObjectNode response = JsonUtils.createObjectNode();
             response.put("jsonrpc", BaseJsonRpcMessage.VERSION);
             response.set(ID, message.get(ID));
 

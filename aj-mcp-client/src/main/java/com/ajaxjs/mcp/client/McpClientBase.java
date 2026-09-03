@@ -137,8 +137,8 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
         this.rootsListChanged = notifyChanges;
 
         onServerRequest(Methods.ROOTS_LIST, ignored -> {
-            com.fasterxml.jackson.databind.node.ObjectNode result = JsonUtils.OBJECT_MAPPER.createObjectNode();
-            result.set("roots", JsonUtils.OBJECT_MAPPER.valueToTree(this.roots));
+            com.fasterxml.jackson.databind.node.ObjectNode result = JsonUtils.createObjectNode();
+            result.set("roots", JsonUtils.valueToTree(this.roots));
             return result;
         });
     }
@@ -155,14 +155,14 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
 
     @Override
     public void setSamplingHandler(Function<SamplingCreateMessageParams, SamplingCreateMessageResult> handler) {
-        onServerRequest(Methods.SAMPLING_CREATE_MESSAGE, params -> JsonUtils.OBJECT_MAPPER.valueToTree(
-                handler.apply(JsonUtils.OBJECT_MAPPER.convertValue(params, SamplingCreateMessageParams.class))));
+        onServerRequest(Methods.SAMPLING_CREATE_MESSAGE, params -> JsonUtils.valueToTree(
+                handler.apply(JsonUtils.convertValue(params, SamplingCreateMessageParams.class))));
     }
 
     @Override
     public void setElicitationHandler(Function<ElicitRequestParams, ElicitResult> handler) {
-        onServerRequest(Methods.ELICITATION_CREATE, params -> JsonUtils.OBJECT_MAPPER.valueToTree(
-                handler.apply(JsonUtils.OBJECT_MAPPER.convertValue(params, ElicitRequestParams.class))));
+        onServerRequest(Methods.ELICITATION_CREATE, params -> JsonUtils.valueToTree(
+                handler.apply(JsonUtils.convertValue(params, ElicitRequestParams.class))));
     }
 
     @Override
