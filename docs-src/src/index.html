@@ -12,7 +12,10 @@
         (function () {
             var theme = null;
             try { theme = localStorage.getItem('aj-mcp-theme'); } catch (ignored) { }
-            if (theme) document.documentElement.dataset.theme = theme;
+            if (theme !== 'light' && theme !== 'dark') {
+                theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            }
+            document.documentElement.dataset.theme = theme;
         }());
     </script>
     <style>
@@ -236,12 +239,25 @@
         function read(key) { try { return localStorage.getItem(key); } catch (ignored) { return null; } }
         function save(key, value) { try { localStorage.setItem(key, value); } catch (ignored) { } }
         function language(value) { root.dataset.language = value; root.lang = value === 'zh' ? 'zh-CN' : 'en'; save('aj-mcp-language', value); }
-        function theme(value) { root.dataset.theme = value; themeButton.textContent = value === 'dark' ? '☀' : '◐'; save('aj-mcp-theme', value); }
+        function theme(value, persist) {
+            root.dataset.theme = value;
+            themeButton.textContent = value === 'dark' ? '☀' : '◐';
+            if (persist) save('aj-mcp-theme', value);
+        }
         var preferredLanguage = read('aj-mcp-language');
+        var preferredTheme = read('aj-mcp-theme');
+        var systemTheme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
         language(preferredLanguage || (navigator.language && navigator.language.toLowerCase().indexOf('zh') === 0 ? 'zh' : 'en'));
-        theme(read('aj-mcp-theme') || root.dataset.theme);
+        theme(preferredTheme || root.dataset.theme, false);
         languageButton.addEventListener('click', function () { language(root.dataset.language === 'zh' ? 'en' : 'zh'); });
-        themeButton.addEventListener('click', function () { theme(root.dataset.theme === 'dark' ? 'light' : 'dark'); });
+        themeButton.addEventListener('click', function () { theme(root.dataset.theme === 'dark' ? 'light' : 'dark', true); });
+        if (!preferredTheme && systemTheme) {
+            var followSystemTheme = function (event) {
+                if (!read('aj-mcp-theme')) theme(event.matches ? 'dark' : 'light', false);
+            };
+            if (systemTheme.addEventListener) systemTheme.addEventListener('change', followSystemTheme);
+            else systemTheme.addListener(followSystemTheme);
+        }
     }());
 </script>
 </body>
