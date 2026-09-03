@@ -3,10 +3,11 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="mcp, mcp sdk, java mcp, mcp client, mcp server, java8 mcp"/>
     <meta name="description" content="AJ-MCP：面向 Java 8 的轻量级 Model Context Protocol SDK。">
     <meta name="theme-color" content="#f3f5f9">
     <title>AJ-MCP · Java 8 MCP SDK</title>
-    <link rel="icon" href="/asset/favicon.ico">
+    <link rel="icon" href="asset/favicon.ico" />
     <script>
         (function () {
             var theme = null;
@@ -41,23 +42,38 @@
             --sidebar-ink: #f5f8fc;
             --sidebar-muted: #93a1b1;
         }
+        @font-face {
+            font-family: "DaxOT";
+            src: url("asset/style/DaxWeb.woff") format("woff");
+            font-weight: 400;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: "DaxOT";
+            src: url("asset/style/DaxWeb-Bold.woff") format("woff");
+            font-weight: 700;
+            font-style: normal;
+        }
         * { box-sizing: border-box; }
         html { background: var(--canvas); }
         body {
             margin: 0;
             background: var(--canvas);
             color: var(--ink);
-            font: 16px/1.6 Inter, "Segoe UI", "Noto Sans SC", "Microsoft YaHei", Arial, sans-serif;
+            font-family: "DaxOT", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
         }
         a { color: inherit; text-decoration: none; }
         button { font: inherit; }
-        .site { display: grid; grid-template-columns: 270px minmax(0, 1fr); min-height: 100vh; }
+        .site { display: grid; grid-template-columns: 270px minmax(0, 1fr); align-items: start; min-height: 100vh; }
         .rail {
             display: flex;
             position: sticky;
             top: 0;
+            align-self: start;
             flex-direction: column;
-            min-height: 100vh;
+            height: 100vh;
+            min-height: 0;
+            overflow-y: auto;
             padding: 34px 30px 28px;
             color: var(--sidebar-ink);
             background: var(--sidebar);
@@ -111,7 +127,7 @@
         .divider { margin: 74px 0 0; border: 0; border-top: 1px solid var(--hairline); }
         .split { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 50px; padding: 37px 0 68px; }
         .section-label { color: var(--muted); font: 700 11px/1.45 ui-monospace, Consolas, monospace; letter-spacing: .1em; text-transform: uppercase; }
-        .section-label b { display: block; margin-top: 6px; color: var(--ink); font: 700 22px/1.2 Inter, "Segoe UI", sans-serif; letter-spacing: -.04em; text-transform: none; }
+        .section-label b { display: block; margin-top: 6px; color: var(--ink); font: 700 22px/1.2 "DaxOT", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; letter-spacing: -.04em; text-transform: none; }
         .version-grid { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--hairline); }
         .version { padding: 19px 18px 20px 0; border-right: 1px solid var(--hairline); }
         .version + .version { padding-left: 18px; }
@@ -150,7 +166,7 @@
         html[data-language="zh"] body [data-copy="zh"], html[data-language="en"] body [data-copy="en"] { display: block; }
         @media (max-width: 800px) {
             .site { display: block; }
-            .rail { position: static; min-height: auto; padding: 20px 22px; }
+            .rail { position: static; align-self: auto; height: auto; min-height: auto; overflow: visible; padding: 20px 22px; }
             .rail-intro, .rail-nav, .runtime { display: none; }
             .rail-bottom { display: flex; align-items: center; margin: 0 0 0 auto; }
             .content { width: min(100% - 44px, 1050px); padding-top: 52px; }
@@ -187,7 +203,7 @@
     <main class="content">
         <section aria-labelledby="page-title">
             <p class="eyebrow">MODEL CONTEXT PROTOCOL / JAVA 8+</p>
-            <h1 class="headline" id="page-title"><span data-copy="zh">把 MCP<br>接入已有系统。</span><span data-copy="en">MCP for<br>the systems you keep.</span></h1>
+            <h1 class="headline" id="page-title"><span data-copy="zh" style="letter-spacing: 2px;">把 MCP<br>接入已有系统。</span><span data-copy="en">MCP for<br>the systems you keep.</span></h1>
             <p class="lede"><span data-copy="zh">AJ-MCP 是一个轻量 Java SDK：用熟悉的注解开放业务能力，或用同步客户端连接现有 MCP Server。</span><span data-copy="en">AJ-MCP is a lightweight Java SDK: expose business capabilities with familiar annotations, or connect to existing MCP servers through a synchronous client.</span></p>
             <a class="action" href="/docs-index/"><span data-copy="zh">从文档开始</span><span data-copy="en">Start with the documentation</span> <span>→</span></a>
         </section>
