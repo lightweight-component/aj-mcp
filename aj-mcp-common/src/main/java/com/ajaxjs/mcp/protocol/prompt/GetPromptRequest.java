@@ -17,12 +17,5 @@ import static com.ajaxjs.mcp.protocol.McpConstant.Methods.PROMPTS_GET;
 public class GetPromptRequest extends McpRequest {
     String method = PROMPTS_GET;
 
-    Params params;
-
-    @Data
-    public static class Params {
-        private String name;
-
-        private Map<String, Object> arguments;
-    }
+    GetPromptRequestParams params;
 }

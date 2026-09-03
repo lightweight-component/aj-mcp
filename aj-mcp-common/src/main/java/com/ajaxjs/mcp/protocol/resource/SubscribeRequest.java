@@ -15,5 +15,5 @@ import static com.ajaxjs.mcp.protocol.McpConstant.Methods.RESOURCES_SUBSCRIBE_RE
 public class SubscribeRequest extends McpRequest {
     String method = RESOURCES_SUBSCRIBE_REQUEST;
 
-    GetResourceRequest.Params params;
+    GetResourceRequestParams params;
 }

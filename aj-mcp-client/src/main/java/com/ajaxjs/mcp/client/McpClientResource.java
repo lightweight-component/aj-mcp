@@ -20,14 +20,14 @@ public abstract class McpClientResource extends McpClientPrompt {
     @Override
     public void subscribeResource(String uri) {
         SubscribeRequest request = new SubscribeRequest();
-        request.setParams(new GetResourceRequest.Params(uri));
+        request.setParams(new GetResourceRequestParams(uri));
         executeSubscriptionRequest(request);
     }
 
     @Override
     public void unsubscribeResource(String uri) {
         UnsubscribeRequest request = new UnsubscribeRequest();
-        request.setParams(new GetResourceRequest.Params(uri));
+        request.setParams(new GetResourceRequestParams(uri));
         executeSubscriptionRequest(request);
     }
 
@@ -83,11 +83,11 @@ public abstract class McpClientResource extends McpClientPrompt {
     }
 
     @Override
-    public GetResourceResult.ResourceResultDetail readResource(String uri) {
+    public GetResourceResultDetail readResource(String uri) {
         long operationId = idGenerator.getAndIncrement();
         GetResourceRequest request = new GetResourceRequest();
         request.setId(operationId);
-        request.setParams(new GetResourceRequest.Params(uri));
+        request.setParams(new GetResourceRequestParams(uri));
 
         try {
             CompletableFuture<JsonNode> resultFuture = transport.sendRequestWithResponse(request);
@@ -247,7 +247,7 @@ public abstract class McpClientResource extends McpClientPrompt {
         }
     }
 
-    public static GetResourceResult.ResourceResultDetail parseResourceContents(JsonNode mcpMessage) {
+    public static GetResourceResultDetail parseResourceContents(JsonNode mcpMessage) {
         McpException.checkForErrors(mcpMessage);
 
         if (mcpMessage.has(RESPONSE_RESULT)) {
@@ -277,7 +277,7 @@ public abstract class McpClientResource extends McpClientPrompt {
                     }
                 }
 
-                return new GetResourceResult.ResourceResultDetail(resourceContentsList);
+                return new GetResourceResultDetail(resourceContentsList);
             } else {
                 log.warn("Result does not contain 'contents' element: {}", resultNode);
                 throw new IllegalStateException("Result does not contain 'resources' element");

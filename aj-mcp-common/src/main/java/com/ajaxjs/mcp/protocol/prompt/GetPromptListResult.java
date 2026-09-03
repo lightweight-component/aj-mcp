@@ -13,24 +13,9 @@ import java.util.List;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class GetPromptListResult extends McpResponse {
-    private PromptResult result;
+    private GetPromptListResultDetail result;
 
-    public GetPromptListResult(PromptResult result) {
+    public GetPromptListResult(GetPromptListResultDetail result) {
         this.result = result;
-    }
-
-    @Data
-    @AllArgsConstructor
-    @RequiredArgsConstructor
-    @NoArgsConstructor
-    public static class PromptResult {
-        @NonNull
-        private List<PromptItem> prompts;
-
-        /**
-         * Pagination for response.
-         */
-        @JsonInclude(JsonInclude.Include.NON_NULL)
-        private String nextCursor;
     }
 }

@@ -16,17 +16,4 @@ import java.util.Map;
 @EqualsAndHashCode(callSuper = true)
 public class CallToolResult extends McpResponse {
     private CallToolResultDetail result;
-
-    @Data
-    public static class CallToolResultDetail {
-        Boolean isError = false;
-
-        List<Content> content;
-
-        /**
-         * Structured result introduced in protocol revision 2025-06-18.
-         */
-        @JsonInclude(JsonInclude.Include.NON_NULL)
-        Map<String, Object> structuredContent;
-    }
 }

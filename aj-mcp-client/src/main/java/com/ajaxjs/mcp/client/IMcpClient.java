@@ -2,12 +2,15 @@ package com.ajaxjs.mcp.client;
 
 import com.ajaxjs.mcp.protocol.client.*;
 import com.ajaxjs.mcp.protocol.prompt.GetPromptResult;
+import com.ajaxjs.mcp.protocol.prompt.GetPromptResultDetail;
 import com.ajaxjs.mcp.protocol.prompt.PromptItem;
 import com.ajaxjs.mcp.protocol.resource.GetResourceResult;
+import com.ajaxjs.mcp.protocol.resource.GetResourceResultDetail;
 import com.ajaxjs.mcp.protocol.resource.ResourceItem;
 import com.ajaxjs.mcp.protocol.resource.ResourceTemplate;
 import com.ajaxjs.mcp.protocol.tools.CallToolRequest;
 import com.ajaxjs.mcp.protocol.tools.CallToolResult;
+import com.ajaxjs.mcp.protocol.tools.CallToolResultDetail;
 import com.ajaxjs.mcp.protocol.tools.ToolItem;
 import com.ajaxjs.mcp.protocol.utils.completion.CompleteRequest;
 import com.ajaxjs.mcp.protocol.utils.completion.CompleteResult;
@@ -55,7 +58,7 @@ public interface IMcpClient extends AutoCloseable {
     /**
      * Returns the complete result, including 2025-06-18 structured content.
      */
-    CallToolResult.CallToolResultDetail callToolResult(CallToolRequest request);
+    CallToolResultDetail callToolResult(CallToolRequest request);
 
     /***
      * Calls a tool on the MCP server and returns the result as a String.
@@ -107,7 +110,7 @@ public interface IMcpClient extends AutoCloseable {
      * @param uri The URI of the resource to retrieve.
      * @return Resource contents.
      */
-    GetResourceResult.ResourceResultDetail readResource(String uri);
+    GetResourceResultDetail readResource(String uri);
 
     void subscribeResource(String uri);
 
@@ -137,7 +140,7 @@ public interface IMcpClient extends AutoCloseable {
      * @param arguments The arguments to pass to the prompt.
      * @return The prompt result.
      */
-    GetPromptResult.PromptResultDetail getPrompt(String name, Map<String, Object> arguments);
+    GetPromptResultDetail getPrompt(String name, Map<String, Object> arguments);
 
     /**
      * Render the contents of a prompt.
@@ -146,7 +149,7 @@ public interface IMcpClient extends AutoCloseable {
      * @param arguments The arguments to pass to the prompt.
      * @return The prompt result.
      */
-    GetPromptResult.PromptResultDetail getPrompt(String name, String arguments);
+    GetPromptResultDetail getPrompt(String name, String arguments);
 
     /**
      * Performs a health check that returns normally if the MCP server is reachable and

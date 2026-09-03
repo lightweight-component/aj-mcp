@@ -1,6 +1,7 @@
 package com.ajaxjs.mcp.server.testcase;
 
 import com.ajaxjs.mcp.protocol.common.ContentEmbeddedResource;
+import com.ajaxjs.mcp.protocol.common.ContentEmbeddedResourceDetail;
 import com.ajaxjs.mcp.protocol.common.ContentImage;
 import com.ajaxjs.mcp.protocol.common.ContentText;
 import com.ajaxjs.mcp.protocol.prompt.PromptMessage;
@@ -63,7 +64,7 @@ public class McpServerPrompts {
     @Prompt(description = "Prompt that returns an embedded binary resource")
     PromptMessage embeddedBinaryResource() {
         ContentEmbeddedResource embeddedResource = new ContentEmbeddedResource();
-        ContentEmbeddedResource.Resource resource = new ContentEmbeddedResource.Resource();
+        ContentEmbeddedResourceDetail resource = new ContentEmbeddedResourceDetail();
         resource.setUri("file:///embedded-blob");
         resource.setMimeType("application/octet-stream");
 

@@ -17,12 +17,5 @@ import static com.ajaxjs.mcp.protocol.McpConstant.Methods.RESOURCES_READ;
 public class GetResourceRequest extends McpRequest {
     String method = RESOURCES_READ;
 
-    Params params;
-
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class Params {
-        String uri;
-    }
+    GetResourceRequestParams params;
 }

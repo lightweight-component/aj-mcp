@@ -13,11 +13,5 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class GetResourceResult extends McpResponse {
-    private ResourceResultDetail result;
-
-    @Data
-    @AllArgsConstructor
-    public static class ResourceResultDetail {
-        List<ResourceContent> contents;
-    }
+    private GetResourceResultDetail result;
 }

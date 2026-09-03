@@ -3,6 +3,7 @@ package com.ajaxjs.mcp.server;
 import com.ajaxjs.mcp.common.JsonUtils;
 import com.ajaxjs.mcp.protocol.McpResponse;
 import com.ajaxjs.mcp.protocol.common.ContentEmbeddedResource;
+import com.ajaxjs.mcp.protocol.common.ContentEmbeddedResourceDetail;
 import com.ajaxjs.mcp.server.common.ServerConfig;
 import com.ajaxjs.mcp.server.error.JsonRpcErrorCode;
 import com.ajaxjs.mcp.server.error.JsonRpcErrorException;
@@ -42,7 +43,7 @@ class TestLowRiskProtocolFixes {
 
     @Test
     void embeddedResourceSupportsBlob() {
-        ContentEmbeddedResource.Resource resource = new ContentEmbeddedResource.Resource();
+        ContentEmbeddedResourceDetail resource = new ContentEmbeddedResourceDetail();
         resource.setUri("file:///binary");
         resource.setMimeType("application/octet-stream");
         resource.setBlob("AQID");

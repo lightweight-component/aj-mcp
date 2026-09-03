@@ -9,6 +9,8 @@ import com.ajaxjs.mcp.protocol.common.Content;
 import com.ajaxjs.mcp.protocol.common.ContentText;
 import com.ajaxjs.mcp.protocol.initialize.InitializeRequestParams;
 import com.ajaxjs.mcp.protocol.resource.GetResourceListRequest;
+import com.ajaxjs.mcp.protocol.resource.GetResourceRequestParams;
+import com.ajaxjs.mcp.protocol.resource.SubscriptionUpdateNotification;
 import com.ajaxjs.mcp.protocol.tools.*;
 import com.ajaxjs.mcp.protocol.utils.completion.CompleteRequest;
 import com.ajaxjs.mcp.protocol.utils.completion.CompleteResult;
@@ -406,10 +408,9 @@ public class McpServer extends McpServerPrompt {
         if (sessions == null || sessions.isEmpty())
             return;
 
-        com.ajaxjs.mcp.protocol.resource.SubscriptionUpdateNotification notification =
-                new com.ajaxjs.mcp.protocol.resource.SubscriptionUpdateNotification();
+        SubscriptionUpdateNotification notification = new SubscriptionUpdateNotification();
 
-        notification.setParams(new com.ajaxjs.mcp.protocol.resource.GetResourceRequest.Params(uri));
+        notification.setParams(new GetResourceRequestParams(uri));
         String json = JsonUtils.toJson(notification);
 
         for (String sessionId : new ArrayList<>(sessions)) {
@@ -523,18 +524,18 @@ public class McpServer extends McpServerPrompt {
         GetToolListResult result = new GetToolListResult();
         result.setId(requestRaw.getId());
 
-        GetToolListResult.ToolList toolList;
+        GetToolListResultToolList toolList;
 
         if (request.getParams() != null && request.getParams().getPageNo() != null) {
             // do the page
             PaginatedResponse<ToolItem> page = ServerUtils.paginate(tools, request.getParams(), this);
             tools = page.getList();
-            toolList = new GetToolListResult.ToolList(tools);
+            toolList = new GetToolListResultToolList(tools);
 
             if (!page.isLastPage())
                 toolList.setNextCursor(page.getNextPageNoAsBse64());
         } else
-            toolList = new GetToolListResult.ToolList(tools);
+            toolList = new GetToolListResultToolList(tools);
 
         result.setResult(toolList);
 
@@ -562,17 +563,17 @@ public class McpServer extends McpServerPrompt {
         if (paramsNode == null)
             throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_PARAMS, "params is required");
 
-        CallToolRequest.Params params = JsonUtils.jsonNode2bean(paramsNode, CallToolRequest.Params.class);
+        CallToolRequestParams params = JsonUtils.jsonNode2bean(paramsNode, CallToolRequestParams.class);
         Map<String, Object> arguments = params.getArguments();
 
         ServerStoreTool store = getStore(featureMgr.getToolStore(), params.getName(), requestRaw.getId(), "tool");
         ToolItem tool = store.getTool();
         JsonSchema inputSchema = tool.getInputSchema();
-
         Object[] argValues = null;
 
         if (inputSchema != null) {
             List<String> required = inputSchema.getRequired() == null ? Collections.emptyList() : inputSchema.getRequired();
+
             if ((arguments == null || arguments.isEmpty()) && !required.isEmpty())
                 throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_PARAMS, "arguments is required!");
 
@@ -597,6 +598,7 @@ public class McpServer extends McpServerPrompt {
                     // Missing optional reference parameters are deliberately passed as null.
                     // Primitive parameters cannot represent absence and therefore remain required.
                     Class<?> parameterType = methodParameterType(store, i);
+
                     if (arg == null && parameterType.isPrimitive())
                         throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_PARAMS,
                                 "arguments " + name + " is required for primitive parameter");
@@ -671,7 +673,7 @@ public class McpServer extends McpServerPrompt {
         else
             content = Collections.singletonList(new ContentText(returnedValue.toString()));
 
-        CallToolResult.CallToolResultDetail detail = new CallToolResult.CallToolResultDetail();
+        CallToolResultDetail detail = new CallToolResultDetail();
         detail.setContent(content);
         detail.setStructuredContent(structuredContent);
         detail.setIsError(structuredError);
@@ -798,7 +800,7 @@ public class McpServer extends McpServerPrompt {
         if (message == null || message.trim().isEmpty())
             message = cause.getClass().getSimpleName();
 
-        CallToolResult.CallToolResultDetail detail = new CallToolResult.CallToolResultDetail();
+        CallToolResultDetail detail = new CallToolResultDetail();
         detail.setIsError(true);
         detail.setContent(Collections.singletonList(new ContentText(message)));
 

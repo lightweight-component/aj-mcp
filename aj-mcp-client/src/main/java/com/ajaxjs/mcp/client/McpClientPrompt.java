@@ -3,10 +3,7 @@ package com.ajaxjs.mcp.client;
 import com.ajaxjs.mcp.common.JsonUtils;
 import com.ajaxjs.mcp.common.McpException;
 import com.ajaxjs.mcp.protocol.McpConstant;
-import com.ajaxjs.mcp.protocol.prompt.GetPromptListRequest;
-import com.ajaxjs.mcp.protocol.prompt.GetPromptRequest;
-import com.ajaxjs.mcp.protocol.prompt.GetPromptResult;
-import com.ajaxjs.mcp.protocol.prompt.PromptItem;
+import com.ajaxjs.mcp.protocol.prompt.*;
 import com.ajaxjs.mcp.protocol.utils.pagination.Cursor;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.experimental.SuperBuilder;
@@ -132,14 +129,14 @@ public abstract class McpClientPrompt extends McpClientBase {
      *
      * @param name      The name of the prompt.
      * @param arguments A map containing the arguments for the prompt.
-     * @return Returns an object of type {@link GetPromptResult.PromptResultDetail} containing the details of the prompt.
+     * @return Returns an object of type {@link GetPromptResultDetail} containing the details of the prompt.
      * @throws RuntimeException If an error occurs during the request sending process or result parsing.
      */
     @Override
-    public GetPromptResult.PromptResultDetail getPrompt(String name, Map<String, Object> arguments) {
+    public GetPromptResultDetail getPrompt(String name, Map<String, Object> arguments) {
         long operationId = idGenerator.getAndIncrement();
 
-        GetPromptRequest.Params params = new GetPromptRequest.Params();
+        GetPromptRequestParams params = new GetPromptRequestParams();
         params.setName(name);
         params.setArguments(arguments);
 
@@ -152,7 +149,7 @@ public abstract class McpClientPrompt extends McpClientBase {
             JsonNode result = awaitResponse(resultFuture);
             McpException.checkForErrors(result);
 
-            return JsonUtils.jsonNode2bean(result.get(McpConstant.RESPONSE_RESULT), GetPromptResult.PromptResultDetail.class);
+            return JsonUtils.jsonNode2bean(result.get(McpConstant.RESPONSE_RESULT), GetPromptResultDetail.class);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
@@ -170,11 +167,11 @@ public abstract class McpClientPrompt extends McpClientBase {
      *
      * @param name      The name of the prompt.
      * @param arguments A  JSON String containing the arguments for the prompt.
-     * @return Returns an object of type {@link GetPromptResult.PromptResultDetail} containing the details of the prompt.
+     * @return Returns an object of type {@link GetPromptResultDetail} containing the details of the prompt.
      * @throws RuntimeException If an error occurs during the request sending process or result parsing.
      */
     @Override
-    public GetPromptResult.PromptResultDetail getPrompt(String name, String arguments) {
+    public GetPromptResultDetail getPrompt(String name, String arguments) {
         return getPrompt(name, JsonUtils.json2map(arguments));
     }
 }

@@ -45,18 +45,18 @@ public abstract class McpServerPrompt extends McpServerResource {
             prompts.add(promptItem);
         }
 
-        GetPromptListResult.PromptResult resultList;
+        GetPromptListResultDetail resultList;
 
         if (request.getParams() != null && request.getParams().getPageNo() != null) {
             // do the page
             PaginatedResponse<PromptItem> page = ServerUtils.paginate(prompts, request.getParams(), this);
             prompts = page.getList();
-            resultList = new GetPromptListResult.PromptResult(prompts);
+            resultList = new GetPromptListResultDetail(prompts);
 
             if (!page.isLastPage())
                 resultList.setNextCursor(page.getNextPageNoAsBse64());
         } else
-            resultList = new GetPromptListResult.PromptResult(prompts);
+            resultList = new GetPromptListResultDetail(prompts);
 
         GetPromptListResult result = new GetPromptListResult(resultList);
         result.setId(requestRaw.getId());
@@ -80,7 +80,7 @@ public abstract class McpServerPrompt extends McpServerResource {
         if (paramsNode == null)
             throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_PARAMS, "params is required");
 
-        GetPromptRequest.Params params = JsonUtils.jsonNode2bean(paramsNode, GetPromptRequest.Params.class);
+        GetPromptRequestParams params = JsonUtils.jsonNode2bean(paramsNode, GetPromptRequestParams.class);
 
         GetPromptRequest request = new GetPromptRequest(); // seems to be useless
         request.setId(requestRaw.getId());
@@ -161,7 +161,7 @@ public abstract class McpServerPrompt extends McpServerResource {
         } else
             throw invalidPromptReturn(requestRaw.getId(), returnedValue);
 
-        GetPromptResult.PromptResultDetail promptResultDetail = new GetPromptResult.PromptResultDetail();
+        GetPromptResultDetail promptResultDetail = new GetPromptResultDetail();
         promptResultDetail.setDescription(prompt.getDescription());
         promptResultDetail.setMessages(promptMessages);
 
@@ -174,8 +174,7 @@ public abstract class McpServerPrompt extends McpServerResource {
 
     private static JsonRpcErrorException invalidPromptReturn(Object requestId, Object value) {
         return new JsonRpcErrorException(requestId, JsonRpcErrorCode.INTERNAL_ERROR,
-                "Prompt returned an unsupported value: "
-                        + (value == null ? "null" : value.getClass().getName()));
+                "Prompt returned an unsupported value: " + (value == null ? "null" : value.getClass().getName()));
     }
 
     private static String errorMessage(Throwable cause) {

@@ -17,6 +17,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URLDecoder;
 import java.util.*;
+import java.util.regex.Matcher;
 
 public abstract class McpServerResource extends McpServerInitialize {
     /**
@@ -39,23 +40,24 @@ public abstract class McpServerResource extends McpServerInitialize {
             request.setParams(JsonUtils.jsonNode2bean(jsonNode.get(PARAMS), Cursor.class));
 
         List<ResourceItem> resources = new ArrayList<>();
+
         for (ServerStoreResource store : featureMgr.getResourceStore().values()) {
             ResourceItem resourceItem = store.getResource();
             resources.add(resourceItem);
         }
 
-        GetResourceListResult.ResourceResult resultList;
+        GetResourceListResultDetail resultList;
 
         if (request.getParams() != null && request.getParams().getPageNo() != null) {
             // do the page
             PaginatedResponse<ResourceItem> page = ServerUtils.paginate(resources, request.getParams(), this);
             resources = page.getList();
-            resultList = new GetResourceListResult.ResourceResult(resources);
+            resultList = new GetResourceListResultDetail(resources);
 
             if (!page.isLastPage())
                 resultList.setNextCursor(page.getNextPageNoAsBse64());
         } else
-            resultList = new GetResourceListResult.ResourceResult(resources);
+            resultList = new GetResourceListResultDetail(resources);
 
         GetResourceListResult result = new GetResourceListResult(resultList);
         result.setId(requestRaw.getId());
@@ -64,16 +66,18 @@ public abstract class McpServerResource extends McpServerInitialize {
     }
 
     McpResponse resourceTemplateList(McpRequestRawInfo requestRaw) {
-        Cursor cursor = requestRaw.getJsonNode().has(PARAMS)
-                ? JsonUtils.jsonNode2bean(requestRaw.getJsonNode().get(PARAMS), Cursor.class) : null;
-        List<com.ajaxjs.mcp.protocol.resource.ResourceTemplate> templates = new ArrayList<>();
+        Cursor cursor = requestRaw.getJsonNode().has(PARAMS) ? JsonUtils.jsonNode2bean(requestRaw.getJsonNode().get(PARAMS), Cursor.class) : null;
+        List<ResourceTemplate> templates = new ArrayList<>();
+
         for (ServerStoreResourceTemplate store : featureMgr.getResourceTemplateStore().values())
             templates.add(store.getResourceTemplate());
 
-        ResourceTemplateResult.ResourceTemplatesResult detail = new ResourceTemplateResult.ResourceTemplatesResult();
+        ResourceTemplatesResultDetail detail = new ResourceTemplatesResultDetail();
+
         if (cursor != null && cursor.getPageNo() != null) {
             PaginatedResponse<com.ajaxjs.mcp.protocol.resource.ResourceTemplate> page = ServerUtils.paginate(templates, cursor, this);
             detail.setResourceTemplates(page.getList());
+
             if (!page.isLastPage())
                 detail.setNextCursor(page.getNextPageNoAsBse64());
         } else
@@ -81,6 +85,7 @@ public abstract class McpServerResource extends McpServerInitialize {
 
         ResourceTemplateResult response = new ResourceTemplateResult(detail);
         response.setId(requestRaw.getId());
+
         return response;
     }
 
@@ -101,8 +106,9 @@ public abstract class McpServerResource extends McpServerInitialize {
         if (paramsNode == null)
             throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_PARAMS, "params is required");
 
-        GetResourceRequest.Params params = JsonUtils.jsonNode2bean(paramsNode, GetResourceRequest.Params.class);
+        GetResourceRequestParams params = JsonUtils.jsonNode2bean(paramsNode, GetResourceRequestParams.class);
         ServerStoreResource store = featureMgr.getResourceStore().get(params.getUri());
+
         if (store == null)
             return readTemplateResource(requestRaw.getId(), params.getUri());
 
@@ -125,27 +131,31 @@ public abstract class McpServerResource extends McpServerInitialize {
 
         GetResourceResult result = new GetResourceResult();
         result.setId(requestRaw.getId());
-        result.setResult(new GetResourceResult.ResourceResultDetail(contents));
+        result.setResult(new GetResourceResultDetail(contents));
 
         return result;
     }
 
     private McpResponse readTemplateResource(Object requestId, String uri) {
         for (ServerStoreResourceTemplate store : featureMgr.getResourceTemplateStore().values()) {
-            java.util.regex.Matcher matcher = store.getUriPattern().matcher(uri);
+            Matcher matcher = store.getUriPattern().matcher(uri);
+
             if (!matcher.matches())
                 continue;
 
             Map<String, String> captured = new LinkedHashMap<>();
+
             for (int i = 0; i < store.getTemplateVariableNames().size(); i++)
                 captured.put(store.getTemplateVariableNames().get(i), decodeUriPart(matcher.group(i + 1)));
 
             Object[] values = new Object[store.getParameterNames().size()];
             Class<?>[] types = store.getMethod().getParameterTypes();
+
             for (int i = 0; i < values.length; i++)
                 values[i] = McpServer.convertToType(captured.get(store.getParameterNames().get(i)), types[i]);
 
             Object returned;
+
             try {
                 returned = store.getMethod().invoke(store.getInstance(), values);
             } catch (IllegalAccessException e) {
@@ -161,7 +171,7 @@ public abstract class McpServerResource extends McpServerInitialize {
 
             GetResourceResult response = new GetResourceResult();
             response.setId(requestId);
-            response.setResult(new GetResourceResult.ResourceResultDetail(contents));
+            response.setResult(new GetResourceResultDetail(contents));
 
             return response;
         }

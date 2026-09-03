@@ -20,10 +20,10 @@ import static com.ajaxjs.mcp.protocol.McpConstant.Methods.TOOLS_CALL;
 public class CallToolRequest extends McpRequest {
     String method = TOOLS_CALL;
 
-    Params params;
+    CallToolRequestParams params;
 
     public CallToolRequest(String name) {
-        this.params = new Params();
+        this.params = new CallToolRequestParams();
         this.params.setName(name);
     }
 
@@ -39,15 +39,5 @@ public class CallToolRequest extends McpRequest {
     public CallToolRequest(Long id, String name, Map<String, Object> arguments) {
         this(name, arguments);
         setId(id);
-    }
-
-    @Data
-    public static class Params {
-        private String name;
-
-        private Map<String, Object> arguments;
-
-        @JsonProperty("_meta")
-        private RequestMeta meta;
     }
 }

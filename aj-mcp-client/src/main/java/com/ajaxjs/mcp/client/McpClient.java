@@ -185,7 +185,7 @@ public class McpClient extends McpClientResource {
     }
 
     @Override
-    public CallToolResult.CallToolResultDetail callToolResult(CallToolRequest request) {
+    public CallToolResultDetail callToolResult(CallToolRequest request) {
         long operationId = idGenerator.getAndIncrement();
         request.setId(operationId);
 
@@ -193,7 +193,7 @@ public class McpClient extends McpClientResource {
             JsonNode response = awaitResponse(transport.sendRequestWithResponse(request));
             McpException.checkForErrors(response);
 
-            return JsonUtils.OBJECT_MAPPER.convertValue(response.get(RESPONSE_RESULT), CallToolResult.CallToolResultDetail.class);
+            return JsonUtils.OBJECT_MAPPER.convertValue(response.get(RESPONSE_RESULT), CallToolResultDetail.class);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);

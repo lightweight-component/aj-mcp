@@ -63,7 +63,7 @@ public abstract class TestPromptBase {
 
     @Test
     void getBasicPrompt() {
-        GetPromptResult.PromptResultDetail prompt = mcpClient.getPrompt("basic", new HashMap<>());
+        GetPromptResultDetail prompt = mcpClient.getPrompt("basic", new HashMap<>());
         assertEquals("Basic simple prompt", prompt.getDescription(), "Description should not be null");
         assertEquals(1, prompt.getMessages().size(), "Expected exactly one message");
 

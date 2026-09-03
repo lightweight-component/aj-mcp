@@ -16,19 +16,9 @@ import java.util.List;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class ResourceTemplateResult extends McpResponse {
-    private ResourceTemplatesResult result;
+    private ResourceTemplatesResultDetail result;
 
-    public ResourceTemplateResult(ResourceTemplatesResult result) {
+    public ResourceTemplateResult(ResourceTemplatesResultDetail result) {
         this.result = result;
-    }
-
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class ResourceTemplatesResult {
-        List<ResourceTemplate> resourceTemplates;
-
-        @JsonInclude(JsonInclude.Include.NON_NULL)
-        String nextCursor;
     }
 }

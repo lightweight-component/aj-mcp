@@ -1,10 +1,9 @@
 package com.ajaxjs.mcp.protocol.resource;
 
 import com.ajaxjs.mcp.protocol.McpResponse;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.*;
-
-import java.util.List;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 /**
  * Listing Resources
@@ -13,23 +12,9 @@ import java.util.List;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class GetResourceListResult extends McpResponse {
-    private ResourceResult result;
+    private GetResourceListResultDetail result;
 
-    public GetResourceListResult(ResourceResult result) {
+    public GetResourceListResult(GetResourceListResultDetail result) {
         this.result = result;
-    }
-
-    @Data
-    @RequiredArgsConstructor
-    @NoArgsConstructor
-    public static class ResourceResult {
-        @NonNull
-        List<ResourceItem> resources;
-
-        /**
-         * Pagination for response.
-         */
-        @JsonInclude(JsonInclude.Include.NON_NULL)
-        String nextCursor;
     }
 }

@@ -39,7 +39,7 @@ public abstract class TestResourceBase {
 
     @Test
     public void readTextResource() {
-        GetResourceResult.ResourceResultDetail response = mcpClient.readResource("file:///text");
+        GetResourceResultDetail response = mcpClient.readResource("file:///text");
         assertEquals(1, response.getContents().size(), "Expected exactly one content");
 
         ResourceContent contents = response.getContents().get(0);
@@ -51,7 +51,7 @@ public abstract class TestResourceBase {
 
     @Test
     public void readBlobResource() {
-        GetResourceResult.ResourceResultDetail response = mcpClient.readResource("file:///blob");
+        GetResourceResultDetail response = mcpClient.readResource("file:///blob");
         assertEquals(1, response.getContents().size(), "Expected exactly one content");
 
         ResourceContent contents = response.getContents().get(0);
@@ -63,7 +63,7 @@ public abstract class TestResourceBase {
 
     @Test
     public void readTextResourceFromTemplate() {
-        GetResourceResult.ResourceResultDetail response = mcpClient.readResource("file:///text-template/hello");
+        GetResourceResultDetail response = mcpClient.readResource("file:///text-template/hello");
         assertEquals(1, response.getContents().size(), "Expected exactly one content");
 
         ResourceContent contents = response.getContents().get(0);
@@ -75,7 +75,7 @@ public abstract class TestResourceBase {
 
     @Test
     public void readBlobResourceFromTemplate() {
-        GetResourceResult.ResourceResultDetail response = mcpClient.readResource("file:///blob-template/hello");
+        GetResourceResultDetail response = mcpClient.readResource("file:///blob-template/hello");
         assertEquals(1, response.getContents().size(), "Expected exactly one content");
 
         ResourceContent contents = response.getContents().get(0);

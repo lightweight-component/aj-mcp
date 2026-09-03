@@ -13,5 +13,5 @@ import lombok.EqualsAndHashCode;
 public class SubscriptionUpdateNotification extends BaseJsonRpcMessage {
     String method = McpConstant.Methods.RESOURCE_UPDATE_NOTIFICATION;
 
-    GetResourceRequest.Params params;
+    GetResourceRequestParams params;
 }

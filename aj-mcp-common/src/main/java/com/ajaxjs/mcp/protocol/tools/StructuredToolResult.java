@@ -18,6 +18,8 @@ import java.util.Map;
 @AllArgsConstructor
 public class StructuredToolResult {
     private List<Content> content;
+
     private Map<String, Object> structuredContent;
+
     private boolean error;
 }

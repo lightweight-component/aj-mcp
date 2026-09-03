@@ -13,5 +13,6 @@ import static com.ajaxjs.mcp.protocol.McpConstant.Methods.RESOURCES_UNSUBSCRIBE_
 @EqualsAndHashCode(callSuper = true)
 public class UnsubscribeRequest extends McpRequest {
     private String method = RESOURCES_UNSUBSCRIBE_REQUEST;
-    private GetResourceRequest.Params params;
+
+    private GetResourceRequestParams params;
 }
