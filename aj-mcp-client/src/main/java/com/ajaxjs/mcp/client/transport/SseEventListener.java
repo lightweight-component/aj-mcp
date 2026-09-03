@@ -45,6 +45,7 @@ public class SseEventListener extends EventSourceListener {
     @Override
     public void onEvent(EventSource eventSource, String id, String type, String data) {
         log.info("Event: {}, data: {}", type, data);
+
         if ("message".equals(type)) {
             if (logEvents)
                 log.info("> {}", data);
@@ -72,14 +73,14 @@ public class SseEventListener extends EventSourceListener {
     @Override
     public void onFailure(EventSource eventSource, Throwable t, Response response) {
         Throwable cause = t;
+
         if (cause == null && response != null)
             cause = new IOException("SSE server returned HTTP " + response.code() + ": " + response.message());
         if (cause == null)
             cause = new IOException("SSE channel failed");
 
-        if (!initializationFinished.isDone()) {
+        if (!initializationFinished.isDone())
             initializationFinished.completeExceptionally(cause);
-        }
 
         transport.failPendingRequests(cause);
 
@@ -95,8 +96,10 @@ public class SseEventListener extends EventSourceListener {
     @Override
     public void onClosed(EventSource eventSource) {
         IOException cause = new IOException("SSE channel closed");
+
         if (!initializationFinished.isDone())
             initializationFinished.completeExceptionally(cause);
+
         transport.failPendingRequests(cause);
         log.debug("SSE channel closed");
     }

@@ -39,6 +39,7 @@ public abstract class McpServerPrompt extends McpServerResource {
             request.setParams(JsonUtils.jsonNode2bean(jsonNode.get(PARAMS), Cursor.class));
 
         List<PromptItem> prompts = new ArrayList<>();
+
         for (ServerStorePrompt store : featureMgr.getPromptStore().values()) {
             PromptItem promptItem = store.getPrompt();
             prompts.add(promptItem);

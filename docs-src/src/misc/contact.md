@@ -7,6 +7,7 @@ tags:
   - last one
 layout: layouts/docs.njk
 ---
+
     <h1>Contact</h1>
     <br />
     Email: <a href="mailto:support@ajaxjs.com">support@ajaxjs.com</a>

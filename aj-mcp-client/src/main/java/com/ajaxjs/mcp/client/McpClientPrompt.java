@@ -46,8 +46,8 @@ public abstract class McpClientPrompt extends McpClientBase {
             JsonNode response = awaitResponse(transport.sendRequestWithResponse(request));
             McpException.checkForErrors(response);
             JsonNode result = response.get(RESPONSE_RESULT);
-            return new McpPage<>(parsePromptRefs(response),
-                    result.has("nextCursor") ? result.get("nextCursor").asText() : null);
+
+            return new McpPage<>(parsePromptRefs(response), result.has("nextCursor") ? result.get("nextCursor").asText() : null);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
@@ -57,7 +57,6 @@ public abstract class McpClientPrompt extends McpClientBase {
             pendingRequests.remove(request.getId());
         }
     }
-
 
     /**
      * Synchronized method to get the prompt list

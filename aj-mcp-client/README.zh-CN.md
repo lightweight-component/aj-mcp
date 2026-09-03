@@ -6,6 +6,7 @@
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/lightweight-component/aj-mcp)
 [![QQ群](https://framework.ajaxjs.com/static/qq.svg)](https://shang.qq.com/wpa/qunwpa?idkey=3877893a4ed3a5f0be01e809e7ac120e346102bd550deb6692239bb42de38e22)
 [![English](https://img.shields.io/badge/lang-English-blue)](./README.md)
+
 # 轻量级 Java MCP 客户端
 
 AJ-MCP Client 是一个轻量级的 Java MCP 客户端。它为构建 MCP 客户端提供了一种简单而强大的方式，支持 Java 8 及以上版本。
@@ -33,6 +34,7 @@ AJ-MCP Client 是一个轻量级的 Java MCP 客户端。它为构建 MCP 客户
 运行环境为 Java8+。Maven 配置如下：
 
 ```xml
+
 <dependency>
     <groupId>com.ajaxjs</groupId>
     <artifactId>aj-mcp-client</artifactId>
@@ -47,14 +49,23 @@ AJ-MCP Client 是一个轻量级的 Java MCP 客户端。它为构建 MCP 客户
 便捷工厂方法会启动指定子进程，并在返回前完成 MCP 初始化：
 
 ```java
-try (McpClient client = McpClient.createStdioMcpClient(
-        "java", "-jar", "/path/to/server.jar")) {
-    for (ToolItem tool : client.listTools())
-        System.out.println(tool.getName() + " - " + tool.getDescription());
+try(McpClient client = McpClient.createStdioMcpClient(
+        "java", "-jar", "/path/to/server.jar")){
+        for(
+ToolItem tool :client.
 
-    String result = client.callTool(
-            "echoString", "{\"input\":\"来自 Java 的问候\"}");
-    System.out.println(result);
+listTools())
+        System.out.
+
+println(tool.getName() +" - "+tool.
+
+getDescription());
+
+String result = client.callTool(
+        "echoString", "{\"input\":\"来自 Java 的问候\"}");
+    System.out.
+
+println(result);
 }
 ```
 
@@ -66,12 +77,17 @@ McpTransport transport = StdioTransport.builder()
         .logEvents(true)
         .build();
 
-try (McpClient client = McpClient.builder()
+try(
+McpClient client = McpClient.builder()
         .transport(transport)
         .requestTimeout(Duration.ofSeconds(30))
-        .build()) {
-    client.initialize();
-    client.checkHealth();
+        .build()){
+        client.
+
+initialize();
+    client.
+
+checkHealth();
 }
 ```
 
@@ -86,20 +102,33 @@ McpTransport transport = StreamableHttpTransport.builder()
         .timeout(Duration.ofSeconds(30))
         .build();
 
-try (McpClient client = McpClient.builder()
+try(
+McpClient client = McpClient.builder()
         .transport(transport)
         .protocolVersion(ProtocolVersion.V_2025_06_18.value())
         .requestTimeout(Duration.ofSeconds(30))
-        .build()) {
-    client.initialize();
-    System.out.println("协商版本：" + client.getNegotiatedProtocolVersion());
-    client.listResources().forEach(resource -> System.out.println(resource.getUri()));
-}
+        .build()){
+        client.
+
+initialize();
+    System.out.
+
+println("协商版本："+client.getNegotiatedProtocolVersion());
+        client.
+
+listResources().
+
+forEach(resource ->System.out.
+
+println(resource.getUri()));
+        }
 ```
 
-`openEventStream` 用于打开可选的长期 GET 通道，以接收服务端主动消息。传输层会保存初始化返回的 Session ID，并在需要时发送协商后的协议版本请求头。
+`openEventStream` 用于打开可选的长期 GET 通道，以接收服务端主动消息。传输层会保存初始化返回的 Session
+ID，并在需要时发送协商后的协议版本请求头。
 
-当前 Streamable HTTP 的限制：`text/event-stream` 的 POST 响应会在解析前先完整缓冲，尚不能增量消费；可选 GET stream 异步建立，且没有断线重连/恢复策略。请使用普通 JSON POST 响应，并且不要依赖通过 POST 响应传递的增量 progress 或服务端主动请求。
+当前 Streamable HTTP 的限制：`text/event-stream` 的 POST 响应会在解析前先完整缓冲，尚不能增量消费；可选 GET stream
+异步建立，且没有断线重连/恢复策略。请使用普通 JSON POST 响应，并且不要依赖通过 POST 响应传递的增量 progress 或服务端主动请求。
 
 连接分别提供 SSE 和消息端点的旧服务时，使用 `HttpMcpTransport`：
 
@@ -133,10 +162,12 @@ GetPromptResult.PromptResultDetail prompt =
 
 - 手动构造客户端时，应先且只调用一次 `initialize()`，再发送普通请求。
 - 为 `requestTimeout` 设置正数时长可以避免业务线程无限等待；设置为零表示明确关闭客户端超时。
-- 使用 try-with-resources，或者在 `finally` 中调用 `close()`。关闭客户端会结束等待中的请求，并释放传输层、工作线程、HTTP 连接和子进程。
+- 使用 try-with-resources，或者在 `finally` 中调用 `close()`。关闭客户端会结束等待中的请求，并释放传输层、工作线程、HTTP
+  连接和子进程。
 - `callToolResult()` 会保留完整 MCP 返回值，包括结构化内容及 `isError`；`callTool()` 是只返回文本的便捷方法。
 - 传输或协议错误会以运行时异常抛出；工具业务失败也可能通过 MCP Tool Result 返回。
 
 ## 协议版本
 
-客户端通过 `protocolVersion` 声明首选版本，并通过 `supportedProtocolVersions` 提供可接受版本列表。服务端在初始化期间选择双方都支持的版本，之后可通过 `getNegotiatedProtocolVersion()` 查看。只有协商成功后才能安全使用对应版本的特性。
+客户端通过 `protocolVersion` 声明首选版本，并通过 `supportedProtocolVersions` 提供可接受版本列表。服务端在初始化期间选择双方都支持的版本，之后可通过
+`getNegotiatedProtocolVersion()` 查看。只有协商成功后才能安全使用对应版本的特性。

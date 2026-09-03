@@ -51,6 +51,7 @@ public enum ProtocolVersion {
             if (version.value.equals(value))
                 return version;
         }
+
         throw new IllegalArgumentException("Unsupported MCP protocol version: " + value);
     }
 
@@ -67,7 +68,6 @@ public enum ProtocolVersion {
      * Newest-first order is useful for client preference and server fallback.
      */
     public static List<String> supportedVersions() {
-        return Collections.unmodifiableList(Arrays.asList(
-                V_2025_06_18.value, V_2025_03_26.value, V_2024_11_05.value));
+        return Collections.unmodifiableList(Arrays.asList(V_2025_06_18.value, V_2025_03_26.value, V_2024_11_05.value));
     }
 }

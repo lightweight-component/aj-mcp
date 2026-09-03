@@ -1,11 +1,11 @@
 package com.ajaxjs.mcp.protocol.utils;
 
 import com.ajaxjs.mcp.protocol.McpRequest;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import com.fasterxml.jackson.annotation.JsonInclude;
 
 import static com.ajaxjs.mcp.protocol.McpConstant.Methods.PROGRESS_NOTIFICATION;
 

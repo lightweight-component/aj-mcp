@@ -117,6 +117,7 @@ public class StdioTransport extends McpTransport {
     @Override
     public CompletableFuture<JsonNode> sendRequestWithResponse(McpRequest request) {
         requireInitialized();
+
         return execute(JsonUtils.toJson(request), numericId(request.getId()));
     }
 

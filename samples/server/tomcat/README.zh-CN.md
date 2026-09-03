@@ -43,6 +43,7 @@ try (McpClient client = McpClient.builder().transport(transport).build()) {
 
 ## 实现结构
 
-`StandaloneTomcat` 创建 `FeatureMgr`、`McpServer` 和 `ServerSse`，然后以编程方式注册 `SseServlet` 与 `MessageServlet`，无需 Spring 容器或 `web.xml`。
+`StandaloneTomcat` 创建 `FeatureMgr`、`McpServer` 和 `ServerSse`，然后以编程方式注册 `SseServlet` 与 `MessageServlet`，无需
+Spring 容器或 `web.xml`。
 
 生产环境还应增加关闭钩子以关闭 `ServerSse`，在 HTTP 层校验请求大小和身份认证，并根据 SSE 连接的预期生命周期配置超时。

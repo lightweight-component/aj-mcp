@@ -10,13 +10,16 @@ layout: layouts/docs.njk
 
 # MCP Server SDK Feature Management
 
-The AJ-MCP annotation system provides a declarative approach to exposing Java methods as MCP (Model Context Protocol) tools, resources, and prompts.
-This system uses Java annotations to automatically discover and register functionality, eliminating the need for manual configuration or registration
+The AJ-MCP annotation system provides a declarative approach to exposing Java methods as MCP (Model Context Protocol)
+tools, resources, and prompts.
+This system uses Java annotations to automatically discover and register functionality, eliminating the need for manual
+configuration or registration
 code.
 
 ## Resources Development
 
-Resources are exposed through the `@Resource` annotation on methods within `@McpService` classes. The annotation system automatically discovers and
+Resources are exposed through the `@Resource` annotation on methods within `@McpService` classes. The annotation system
+automatically discovers and
 registers resources during server initialization.
 
 The `@Resource` annotation exposes methods as MCP resources with the following properties:
@@ -65,7 +68,8 @@ public ResourceContentBinary blob() {
 
 ### Resource Templates
 
-`@ResourceTemplate` methods are registered by `FeatureMgr`, exposed through `resources/templates/list`, and matched when `resources/read` receives a dynamic URI.
+`@ResourceTemplate` methods are registered by `FeatureMgr`, exposed through `resources/templates/list`, and matched when
+`resources/read` receives a dynamic URI.
 
 | Property    | Required | Description                   |
 |-------------|----------|-------------------------------|
@@ -74,4 +78,5 @@ public ResourceContentBinary blob() {
 | description | No       | Template description          |
 | mimeType    | No       | Content MIME type             |
 
-Template variables must match parameters annotated with `@ResourceTemplateArg`. The current matcher supports RFC 6570 Level 1 simple variables such as `users://{id}`.
+Template variables must match parameters annotated with `@ResourceTemplateArg`. The current matcher supports RFC 6570
+Level 1 simple variables such as `users://{id}`.

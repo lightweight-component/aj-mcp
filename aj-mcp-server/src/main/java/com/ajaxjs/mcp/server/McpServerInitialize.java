@@ -55,6 +55,7 @@ public abstract class McpServerInitialize implements McpConstant {
      */
     McpResponse initialize(Object id, JsonNode jsonNode) {
         JsonNode paramsNode = jsonNode == null ? null : jsonNode.get(PARAMS);
+
         if (paramsNode == null || !paramsNode.isObject())
             throw new JsonRpcErrorException(id, JsonRpcErrorCode.INVALID_PARAMS,
                     "initialize params must be an object");
@@ -123,18 +124,22 @@ public abstract class McpServerInitialize implements McpConstant {
             tools.setListChanged(true);
             capabilities.setTools(tools);
         }
+
         if (!featureMgr.getPromptStore().isEmpty()) {
             InitializeResponseResult.Capabilities.Prompts prompts = new InitializeResponseResult.Capabilities.Prompts();
             prompts.setListChanged(true);
             capabilities.setPrompts(prompts);
         }
+
         if (!featureMgr.getResourceStore().isEmpty() || !featureMgr.getResourceTemplateStore().isEmpty()) {
             InitializeResponseResult.Capabilities.Resources resources = new InitializeResponseResult.Capabilities.Resources();
             resources.setListChanged(true);
             resources.setSubscribe(true);
             capabilities.setResources(resources);
         }
+
         capabilities.setLogging(new InitializeResponseResult.Capabilities.Logging());
+
         if (!featureMgr.getCompletionStore().isEmpty())
             capabilities.setCompletions(new InitializeResponseResult.Capabilities.Completions());
 
@@ -142,9 +147,7 @@ public abstract class McpServerInitialize implements McpConstant {
         result.setProtocolVersion(serverProtocolVersion);
         result.setServerInfo(serverInfo);
         result.setCapabilities(capabilities);
-
         onProtocolNegotiated(serverProtocolVersion, requestParams);
-
         InitializeResponse resp = new InitializeResponse();
         resp.setId(id);
         resp.setResult(result);
@@ -173,6 +176,7 @@ public abstract class McpServerInitialize implements McpConstant {
      */
     static McpRequestRawInfo jsonRpcValidate(String inputJson) {
         inputJson = inputJson.trim();
+
         if (!inputJson.startsWith("{") || !inputJson.endsWith("}")) // 先简单判断一下是否合法的 JSON
             throw new JsonRpcErrorException(JsonRpcErrorCode.INVALID_REQUEST, "Unable to parse the JSON message");
 
@@ -200,13 +204,6 @@ public abstract class McpServerInitialize implements McpConstant {
         // id 必填
         JsonNode idNode = jsonNode.get(ID);
         Object id = null;
-
-//        if (idNode == null)
-//            throw new JsonRpcErrorException(JsonRpcErrorCode.INVALID_REQUEST, "Empty id.");
-
-//        Long id = idNode.asLong();
-//        if (id == 0L)
-//            id = null;
 
         if (idNode != null) {
             if (idNode.isIntegralNumber())

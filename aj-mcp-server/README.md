@@ -8,7 +8,9 @@
 
 # Lightweight Java MCP Server
 
-AJ-MCP Server is a lightweight MCP server SDK for Java. It turns ordinary Java methods into MCP tools, resources, resource templates, prompts, and completion providers through annotations, then serves them over STDIO, legacy HTTP/SSE, or Streamable HTTP.
+AJ-MCP Server is a lightweight MCP server SDK for Java. It turns ordinary Java methods into MCP tools, resources,
+resource templates, prompts, and completion providers through annotations, then serves them over STDIO, legacy HTTP/SSE,
+or Streamable HTTP.
 
 ## Features
 
@@ -49,6 +51,7 @@ Runs on Java8+. Maven:
 Place MCP methods in a public no-argument class annotated with `@McpService`:
 
 ```java
+
 @McpService
 public class DemoFeatures {
     @Tool(description = "Adds two integers")
@@ -82,7 +85,8 @@ public class DemoFeatures {
 }
 ```
 
-Every Java parameter of a tool must have `@ToolArg`. Arguments are required by default; set `required = false` when omission is valid. A parameterless tool is valid and is advertised with an empty object input schema.
+Every Java parameter of a tool must have `@ToolArg`. Arguments are required by default; set `required = false` when
+omission is valid. A parameterless tool is valid and is advertised with an empty object input schema.
 
 ## Quick start: STDIO server
 
@@ -103,7 +107,9 @@ public static void main(String[] args) {
 }
 ```
 
-STDIO uses one JSON-RPC message per line. Do not write application output to `System.out`, because it corrupts the protocol stream. Configure logging to standard error or a file. `server.start()` blocks until standard input closes or the transport is stopped.
+STDIO uses one JSON-RPC message per line. Do not write application output to `System.out`, because it corrupts the
+protocol stream. Configure logging to standard error or a file. `server.start()` blocks until standard input closes or
+the transport is stopped.
 
 ## Legacy HTTP/SSE
 
@@ -117,15 +123,24 @@ STDIO uses one JSON-RPC message per line. Do not write application output to `Sy
 
 ```java
 McpServer server = new McpServer();
-server.setFeatureMgr(features);
-server.setServerConfig(config);
+server.
+
+setFeatureMgr(features);
+server.
+
+setServerConfig(config);
 
 ServerSse transport = new ServerSse(server);
-server.setTransport(transport);
-server.start();
+server.
+
+setTransport(transport);
+server.
+
+start();
 ```
 
-See the [Spring Boot](../samples/server/spring) and [embedded Tomcat](../samples/server/tomcat) samples for controller and Servlet wiring.
+See the [Spring Boot](../samples/server/spring) and [embedded Tomcat](../samples/server/tomcat) samples for controller
+and Servlet wiring.
 
 ## Streamable HTTP
 
@@ -135,26 +150,34 @@ See the [Spring Boot](../samples/server/spring) and [embedded Tomcat](../samples
 - optional `GET` event streams to `openEventStream(sessionId, writer, headers)`;
 - `DELETE` requests to `delete(sessionId, headers)`.
 
-Copy the returned status, headers, content type, and body from `HttpResult` to the framework response. Initialization creates the session and returns `Mcp-Session-Id`. For `2025-06-18`, subsequent requests must include the negotiated `MCP-Protocol-Version` header. Configure browser origins with `ServerConfig.allowedOrigins`; an empty list rejects requests that supply an `Origin` header.
+Copy the returned status, headers, content type, and body from `HttpResult` to the framework response. Initialization
+creates the session and returns `Mcp-Session-Id`. For `2025-06-18`, subsequent requests must include the negotiated
+`MCP-Protocol-Version` header. Configure browser origins with `ServerConfig.allowedOrigins`; an empty list rejects
+requests that supply an `Origin` header.
 
 JSON-RPC batch requests are intentionally unsupported.
 
-Current Streamable HTTP limitations: ordinary JSON POST responses and the optional GET event stream are supported, but the server does not yet produce request-scoped POST SSE responses. A session that never opens the GET stream should be terminated through the `DELETE` endpoint; automatic idle-session expiry is not implemented.
+Current Streamable HTTP limitations: ordinary JSON POST responses and the optional GET event stream are supported, but
+the server does not yet produce request-scoped POST SSE responses. A session that never opens the GET stream should be
+terminated through the `DELETE` endpoint; automatic idle-session expiry is not implemented.
 
 ## Configuration
 
 `ServerConfig` controls:
 
-| Property | Meaning | Default |
-| --- | --- | --- |
-| `name`, `version` | Server identity returned during initialization | unset |
-| `pageSize` | Number of tools/resources/prompts per page | `3` |
-| `protocolVersions` | Supported revisions, newest first | all implemented revisions |
-| `strictLifecycle` | Require initialize → initialized before normal requests | `true` |
-| `allowedOrigins` | Accepted browser Origin values for Streamable HTTP | empty |
+| Property           | Meaning                                                 | Default                   |
+|--------------------|---------------------------------------------------------|---------------------------|
+| `name`, `version`  | Server identity returned during initialization          | unset                     |
+| `pageSize`         | Number of tools/resources/prompts per page              | `3`                       |
+| `protocolVersions` | Supported revisions, newest first                       | all implemented revisions |
+| `strictLifecycle`  | Require initialize → initialized before normal requests | `true`                    |
+| `allowedOrigins`   | Accepted browser Origin values for Streamable HTTP      | empty                     |
 
-Create one `FeatureMgr` per server and assign it with `setFeatureMgr`. Feature stores are instance-scoped, so scanning one server does not populate another server.
+Create one `FeatureMgr` per server and assign it with `setFeatureMgr`. Feature stores are instance-scoped, so scanning
+one server does not populate another server.
 
 ## Shutdown
 
-Close the configured transport when the application is stopping. This removes sessions, stops heartbeat/executor threads, interrupts STDIO processing where applicable, and releases writers. Framework applications should call it from their normal destruction hook (`@PreDestroy`, servlet destruction, or equivalent).
+Close the configured transport when the application is stopping. This removes sessions, stops heartbeat/executor
+threads, interrupts STDIO processing where applicable, and releases writers. Framework applications should call it from
+their normal destruction hook (`@PreDestroy`, servlet destruction, or equivalent).

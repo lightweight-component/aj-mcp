@@ -19,7 +19,8 @@
 
 <hr />
 
-AJ-MCP 是一个轻量级 Java 模型上下文协议（MCP）SDK，为构建 MCP [客户端](./aj-mcp-client)和[服务端](./aj-mcp-server)提供简洁直接的 API，尤其适合仍需运行在 Java 8 或 Spring Boot 2.x 上的存量系统。
+AJ-MCP 是一个轻量级 Java 模型上下文协议（MCP）SDK，为构建 MCP [客户端](./aj-mcp-client)和[服务端](./aj-mcp-server)提供简洁直接的
+API，尤其适合仍需运行在 Java 8 或 Spring Boot 2.x 上的存量系统。
 
 - 支持 Java 8 及以上版本，并支持 Spring Boot 2.x。
 - 体积小，主要运行时依赖为 Jackson JSON 和 OkHttp。
@@ -49,12 +50,12 @@ AJ-MCP 适合希望把现有 Java 业务能力开放给 AI 客户端，或者需
 
 ## 模块说明
 
-| 模块 | 功能 | 当前版本 |
-| --- | --- | --- |
-| [`aj-mcp-common`](./aj-mcp-common) | 公共 JSON-RPC 消息、MCP 协议模型、内容类型、版本信息及 JSON 工具 | `1.7` |
+| 模块                                 | 功能                                             | 当前版本  |
+|------------------------------------|------------------------------------------------|-------|
+| [`aj-mcp-common`](./aj-mcp-common) | 公共 JSON-RPC 消息、MCP 协议模型、内容类型、版本信息及 JSON 工具     | `1.7` |
 | [`aj-mcp-client`](./aj-mcp-client) | 同步客户端 API，以及 STDIO、HTTP/SSE、Streamable HTTP 传输 | `1.5` |
-| [`aj-mcp-server`](./aj-mcp-server) | 基于注解的能力扫描、请求分发、错误、会话及服务端传输 | `1.4` |
-| [`samples`](./samples) | STDIO、Spring Boot/SSE 和内嵌 Tomcat 示例 | — |
+| [`aj-mcp-server`](./aj-mcp-server) | 基于注解的能力扫描、请求分发、错误、会话及服务端传输                     | `1.4` |
+| [`samples`](./samples)             | STDIO、Spring Boot/SSE 和内嵌 Tomcat 示例            | —     |
 
 Client 和 Server 已经传递依赖 `aj-mcp-common`，一般应用只需引入自己使用的客户端或服务端模块。
 
@@ -65,6 +66,7 @@ Client 和 Server 已经传递依赖 `aj-mcp-common`，一般应用只需引入�
 添加服务端依赖：
 
 ```xml
+
 <dependency>
     <groupId>com.ajaxjs</groupId>
     <artifactId>aj-mcp-server</artifactId>
@@ -75,6 +77,7 @@ Client 和 Server 已经传递依赖 `aj-mcp-common`，一般应用只需引入�
 声明服务并通过 STDIO 启动：
 
 ```java
+
 @McpService
 public class GreetingTools {
     @Tool(description = "向用户问好")
@@ -95,11 +98,13 @@ public static void main(String[] args) {
 }
 ```
 
-STDIO 模式下，标准输出必须只用于 JSON-RPC 消息；业务日志应写入标准错误或日志文件。工具、资源、提示词及 HTTP 传输方式请参阅[服务端 README](./aj-mcp-server/README.zh-CN.md)。
+STDIO 模式下，标准输出必须只用于 JSON-RPC 消息；业务日志应写入标准错误或日志文件。工具、资源、提示词及 HTTP
+传输方式请参阅[服务端 README](./aj-mcp-server/README.zh-CN.md)。
 
 ### 使用 Java 客户端连接
 
 ```xml
+
 <dependency>
     <groupId>com.ajaxjs</groupId>
     <artifactId>aj-mcp-client</artifactId>
@@ -108,15 +113,24 @@ STDIO 模式下，标准输出必须只用于 JSON-RPC 消息；业务日志应�
 ```
 
 ```java
-try (McpClient client = McpClient.createStdioMcpClient(
-        "java", "-jar", "/path/to/mcp-server.jar")) {
-    client.listTools().forEach(tool -> System.out.println(tool.getName()));
-    String result = client.callTool("greet", "{\"name\":\"AJ-MCP\"}");
-    System.out.println(result);
+try(McpClient client = McpClient.createStdioMcpClient(
+        "java", "-jar", "/path/to/mcp-server.jar")){
+        client.
+
+listTools().
+
+forEach(tool ->System.out.
+
+println(tool.getName()));
+String result = client.callTool("greet", "{\"name\":\"AJ-MCP\"}");
+    System.out.
+
+println(result);
 }
 ```
 
-客户端使用完后应始终关闭，以释放流、HTTP 连接、等待中的请求、工作线程及可能启动的子进程。HTTP 连接和其他客户端 API 请参阅[客户端 README](./aj-mcp-client/README.zh-CN.md)。
+客户端使用完后应始终关闭，以释放流、HTTP 连接、等待中的请求、工作线程及可能启动的子进程。HTTP 连接和其他客户端 API
+请参阅[客户端 README](./aj-mcp-client/README.zh-CN.md)。
 
 ## 从源码构建
 
@@ -135,9 +149,11 @@ mvn -pl aj-mcp-server -am test
 
 ## 为什么选择 MCP？
 
-模型上下文协议（Model Context Protocol, MCP）为使用你喜爱的编程语言和框架，基于你的应用数据构建智能应用带来了无限可能。通过 AJ MCP 服务器，你可以轻松搭建自己的 Java 服务器，将 AI 与任意数据源或系统相连接。
+模型上下文协议（Model Context Protocol, MCP）为使用你喜爱的编程语言和框架，基于你的应用数据构建智能应用带来了无限可能。通过
+AJ MCP 服务器，你可以轻松搭建自己的 Java 服务器，将 AI 与任意数据源或系统相连接。
 
-无论是连接常用数据库、集成公司内部系统，还是构建全新的创新应用——你都能轻松实现！使用 AJ 实现 MCP 服务器非常简单，让你专注于创造力本身，而无需纠结底层细节。
+无论是连接常用数据库、集成公司内部系统，还是构建全新的创新应用——你都能轻松实现！使用 AJ 实现 MCP
+服务器非常简单，让你专注于创造力本身，而无需纠结底层细节。
 
 还在等什么？获取代码，启动你的 IDE，立即开始构建属于你的 MCP 服务器吧。AI 驱动应用的未来已来，你也可以参与其中，共同塑造！
 

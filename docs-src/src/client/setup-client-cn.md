@@ -37,14 +37,15 @@ layout: layouts/docs-cn.njk
 
 ### 标准输入输出（Stdio）传输
 
-“Stdio” 是标准输入/输出的缩写，通常用于在程序和人之间通过命令行交互。在这里，它用于 MCP 客户端和 MCP 服务器之间的交互。通常，Stdio 用于本地应用程序，如 `*.exe` 程序或 Java Jar 程序等。
+“Stdio” 是标准输入/输出的缩写，通常用于在程序和人之间通过命令行交互。在这里，它用于 MCP 客户端和 MCP 服务器之间的交互。通常，Stdio
+用于本地应用程序，如 `*.exe` 程序或 Java Jar 程序等。
 
 ```java
 // MCP 服务器是一个 Java 程序，使用标准输入输出运行。
 McpTransport transport = StdioTransport.builder()
-        .command(Arrays.asList("java", "-jar", "C:\\app\\my-app-jar-with-dependencies.jar"))
-        .logEvents(true)
-        .build();
+                .command(Arrays.asList("java", "-jar", "C:\\app\\my-app-jar-with-dependencies.jar"))
+                .logEvents(true)
+                .build();
 ```
 
 以下是一个 `.exe` 程序的示例：
@@ -52,9 +53,9 @@ McpTransport transport = StdioTransport.builder()
 ```java
 // MCP 服务器是一个可执行程序，使用标准输入输出运行。
 McpTransport transport = StdioTransport.builder()
-        .command(Arrays.asList("C:\\app\\my-app.exe", "-token", "dd4df2sx32ds"))
-        .logEvents(true)
-        .build();
+                .command(Arrays.asList("C:\\app\\my-app.exe", "-token", "dd4df2sx32ds"))
+                .logEvents(true)
+                .build();
 ```
 
 调试时可将 `logEvents` 设置为 `true`，以记录发出的协议消息。传输层也会持续消费子进程的 stderr，避免错误输出管道写满后阻塞子进程。
@@ -64,7 +65,7 @@ McpTransport transport = StdioTransport.builder()
 旧版传输使用 SSE 端点承载服务端到客户端的消息，并使用服务端公布的 POST 端点承载客户端请求，适用于需要对接旧 MCP 服务的场景。
 
 ```java
-McpTransport transport=HttpMcpTransport.builder()
+McpTransport transport = HttpMcpTransport.builder()
         .sseUrl("http://localhost:8080/sse")
         .logRequests(true)
         .logResponses(true)
@@ -87,14 +88,19 @@ McpClient client = McpClient.builder()
         .transport(transport)
         .protocolVersion("2025-06-18")
         .build();
-client.initialize();
+client.
+
+initialize();
 ```
 
-如需 OAuth Bearer token，可通过 `requestHeaders` 传入 `Authorization`。SDK 会保存服务端返回的 session ID，并在后续请求中自动加入协商后的 `MCP-Protocol-Version`。
+如需 OAuth Bearer token，可通过 `requestHeaders` 传入 `Authorization`。SDK 会保存服务端返回的 session ID，并在后续请求中自动加入协商后的
+`MCP-Protocol-Version`。
 
-如果客户端声明了 Roots、Sampling 或 Elicitation handler，请设置 `openEventStream(true)`；服务端主动请求通过可选的 GET event stream 到达客户端。该流会在初始化后异步打开。
+如果客户端声明了 Roots、Sampling 或 Elicitation handler，请设置 `openEventStream(true)`；服务端主动请求通过可选的 GET event
+stream 到达客户端。该流会在初始化后异步打开。
 
-> 当前限制：POST `text/event-stream` 响应会先完整缓冲，尚不能按事件增量处理；请使用普通 JSON POST 响应。可选 GET event stream 目前没有断线重连/恢复策略，初始化也不会等待它就绪。在该限制解除前，请勿依赖通过 POST 响应增量发送的 progress 或服务端请求。
+> 当前限制：POST `text/event-stream` 响应会先完整缓冲，尚不能按事件增量处理；请使用普通 JSON POST 响应。可选 GET event
+> stream 目前没有断线重连/恢复策略，初始化也不会等待它就绪。在该限制解除前，请勿依赖通过 POST 响应增量发送的 progress 或服务端请求。
 
 ## MCP 客户端
 
@@ -120,7 +126,7 @@ McpClient mcpClient = McpClient.builder()
 | clientName      | 设置客户端在初始化消息中向 MCP 服务器标识自己的名称。                           | String   | myapp/foo-app            |
 | clientVersion   | 设置客户端在初始化消息中向 MCP 服务器标识自己的版本字符串。默认值为 "1.0"。             | String   | 1.0/2.1.2                |
 | protocolVersion | 设置客户端在初始化消息中声明的协议版本。当前默认值为 "2024-11-05"，但在后续版本中可能会有所更改。 | String   | 2024-11-05               |
-| requestTimeout  | 所有请求（包括初始化和健康检查）的超时时间。默认值为 60 秒；0 表示无限等待，负值不合法。       | Duration | `Duration.ofSeconds(60)` |
+| requestTimeout  | 所有请求（包括初始化和健康检查）的超时时间。默认值为 60 秒；0 表示无限等待，负值不合法。         | Duration | `Duration.ofSeconds(60)` |
 
 请注意，在创建 McpClient 后，应立即调用 `mcpClient.initialize();`。关于初始化工作将在下一小节介绍。
 
@@ -131,17 +137,24 @@ McpClient mcpClient = McpClient.builder()
         .transport(sseTransport)
         .build();
 
-mcpClient.initialize();
+mcpClient.
+
+initialize();
 ```
 
 不再使用客户端时应调用 `close()`。关闭操作会释放 HTTP/SSE 请求或 Stdio 子进程，并使尚未完成的请求以异常结束。
 
 ```java
-try (IMcpClient mcpClient2 = McpClient.builder().transport(transport).build()) {
-    mcpClient2.initialize();
+try(IMcpClient mcpClient2 = McpClient.builder().transport(transport).build()){
+        mcpClient2.
+
+initialize();
     ...
-} catch (Exception e) {
-    throw new RuntimeException(e);
+            }catch(
+Exception e){
+        throw new
+
+RuntimeException(e);
 }
 ```
 

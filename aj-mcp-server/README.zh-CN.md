@@ -11,7 +11,8 @@
 
 AJ-MCP Server 是一个轻量级的 Java MCP 服务器。它为构建 MCP 服务器提供了简单而强大的方式，支持 Java 8 及以上版本。
 
-它可以通过注解把普通 Java 方法注册为 MCP 工具、资源、资源模板、提示词和自动补全能力，并通过 STDIO、旧版 HTTP/SSE 或 Streamable HTTP 对外提供服务。
+它可以通过注解把普通 Java 方法注册为 MCP 工具、资源、资源模板、提示词和自动补全能力，并通过 STDIO、旧版 HTTP/SSE 或
+Streamable HTTP 对外提供服务。
 
 ## 主要功能
 
@@ -37,6 +38,7 @@ AJ-MCP Server 是一个轻量级的 Java MCP 服务器。它为构建 MCP 服务
 运行环境：Java 8 及以上。Maven 配置如下：
 
 ```xml
+
 <dependency>
     <groupId>com.ajaxjs</groupId>
     <artifactId>aj-mcp-server</artifactId>
@@ -51,6 +53,7 @@ AJ-MCP Server 是一个轻量级的 Java MCP 服务器。它为构建 MCP 服务
 把 MCP 方法放在带有公共无参构造方法，并标记了 `@McpService` 的类中：
 
 ```java
+
 @McpService
 public class DemoFeatures {
     @Tool(description = "两个整数相加")
@@ -84,7 +87,8 @@ public class DemoFeatures {
 }
 ```
 
-工具方法的每个 Java 参数都必须标记 `@ToolArg`。参数默认必填，允许省略时设置 `required = false`。无参数工具是合法的，并会发布为空对象输入 schema。
+工具方法的每个 Java 参数都必须标记 `@ToolArg`。参数默认必填，允许省略时设置 `required = false`。无参数工具是合法的，并会发布为空对象输入
+schema。
 
 ## 快速开始：STDIO 服务
 
@@ -105,7 +109,8 @@ public static void main(String[] args) {
 }
 ```
 
-STDIO 每行传输一个 JSON-RPC 消息。不要向 `System.out` 输出业务内容，否则会破坏协议流；日志应配置到标准错误或文件。`server.start()` 会阻塞，直到标准输入关闭或传输停止。
+STDIO 每行传输一个 JSON-RPC 消息。不要向 `System.out` 输出业务内容，否则会破坏协议流；日志应配置到标准错误或文件。
+`server.start()` 会阻塞，直到标准输入关闭或传输停止。
 
 ## 旧版 HTTP/SSE
 
@@ -119,15 +124,24 @@ STDIO 每行传输一个 JSON-RPC 消息。不要向 `System.out` 输出业务�
 
 ```java
 McpServer server = new McpServer();
-server.setFeatureMgr(features);
-server.setServerConfig(config);
+server.
+
+setFeatureMgr(features);
+server.
+
+setServerConfig(config);
 
 ServerSse transport = new ServerSse(server);
-server.setTransport(transport);
-server.start();
+server.
+
+setTransport(transport);
+server.
+
+start();
 ```
 
-Controller 和 Servlet 接线方式请参考 [Spring Boot](../samples/server/spring) 与[内嵌 Tomcat](../samples/server/tomcat) 示例。
+Controller 和 Servlet 接线方式请参考 [Spring Boot](../samples/server/spring) 与[内嵌 Tomcat](../samples/server/tomcat)
+示例。
 
 ## Streamable HTTP
 
@@ -137,26 +151,30 @@ Controller 和 Servlet 接线方式请参考 [Spring Boot](../samples/server/spr
 - 可选的 `GET` 事件流调用 `openEventStream(sessionId, writer, headers)`；
 - `DELETE` 请求调用 `delete(sessionId, headers)`。
 
-把 `HttpResult` 中的状态码、响应头、内容类型和正文复制到框架响应。初始化会创建会话并返回 `Mcp-Session-Id`。使用 `2025-06-18` 时，后续请求必须携带协商后的 `MCP-Protocol-Version` 请求头。浏览器 Origin 白名单通过 `ServerConfig.allowedOrigins` 配置；空列表会拒绝所有携带 `Origin` 的请求。
+把 `HttpResult` 中的状态码、响应头、内容类型和正文复制到框架响应。初始化会创建会话并返回 `Mcp-Session-Id`。使用 `2025-06-18`
+时，后续请求必须携带协商后的 `MCP-Protocol-Version` 请求头。浏览器 Origin 白名单通过 `ServerConfig.allowedOrigins`
+配置；空列表会拒绝所有携带 `Origin` 的请求。
 
 本项目有意不支持 JSON-RPC batch 请求。
 
-当前 Streamable HTTP 的限制：支持普通 JSON POST 响应和可选 GET event stream，但服务端尚不能生成请求级的 POST SSE 响应。未打开 GET stream 的 session 应通过 `DELETE` 端点终止；当前未实现自动空闲 session 过期。
+当前 Streamable HTTP 的限制：支持普通 JSON POST 响应和可选 GET event stream，但服务端尚不能生成请求级的 POST SSE 响应。未打开
+GET stream 的 session 应通过 `DELETE` 端点终止；当前未实现自动空闲 session 过期。
 
 ## 配置
 
 `ServerConfig` 的主要属性：
 
-| 属性 | 含义 | 默认值 |
-| --- | --- | --- |
-| `name`、`version` | 初始化时返回的服务身份 | 未设置 |
-| `pageSize` | 每页工具、资源或提示词数量 | `3` |
-| `protocolVersions` | 支持的协议版本，新版本优先 | 所有已实现版本 |
-| `strictLifecycle` | 普通请求前是否强制 initialize → initialized | `true` |
-| `allowedOrigins` | Streamable HTTP 接受的浏览器 Origin | 空列表 |
+| 属性                 | 含义                                 | 默认值     |
+|--------------------|------------------------------------|---------|
+| `name`、`version`   | 初始化时返回的服务身份                        | 未设置     |
+| `pageSize`         | 每页工具、资源或提示词数量                      | `3`     |
+| `protocolVersions` | 支持的协议版本，新版本优先                      | 所有已实现版本 |
+| `strictLifecycle`  | 普通请求前是否强制 initialize → initialized | `true`  |
+| `allowedOrigins`   | Streamable HTTP 接受的浏览器 Origin      | 空列表     |
 
 每个服务创建一个 `FeatureMgr`，并通过 `setFeatureMgr` 赋给 `McpServer`。能力存储是实例级的，扫描一个服务不会自动填充另一个服务。
 
 ## 关闭服务
 
-应用停止时应关闭已配置的传输层。关闭会清理会话、停止心跳/执行器线程、中断适用的 STDIO 处理，并释放 Writer。框架应用可放在 `@PreDestroy`、Servlet destroy 或对应的销毁钩子中执行。
+应用停止时应关闭已配置的传输层。关闭会清理会话、停止心跳/执行器线程、中断适用的 STDIO 处理，并释放 Writer。框架应用可放在
+`@PreDestroy`、Servlet destroy 或对应的销毁钩子中执行。

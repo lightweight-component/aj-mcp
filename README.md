@@ -18,18 +18,22 @@
 
 <hr />
 
-AJ-MCP is a lightweight Model Context Protocol (MCP) SDK for Java. It provides a small, direct API for building MCP [clients](./aj-mcp-client) and [servers](./aj-mcp-server), especially for existing systems that must remain on Java 8 or Spring Boot 2.x.
+AJ-MCP is a lightweight Model Context Protocol (MCP) SDK for Java. It provides a small, direct API for building
+MCP [clients](./aj-mcp-client) and [servers](./aj-mcp-server), especially for existing systems that must remain on Java
+8 or Spring Boot 2.x.
 
 - Supports Java 8 and above, and supports Spring Boot 2.x.
 - Lightweight and small, with Jackson JSON and OkHttp as its main runtime dependencies.
 - Easy to use and extend, with examples and bilingual documentation.
 - Supports STDIO, the legacy HTTP/SSE transport, and Streamable HTTP.
 - Implements MCP protocol revisions `2024-11-05`, `2025-03-26`, and `2025-06-18` with version negotiation.
-- Covers tools, resources, resource templates, prompts, completion, pagination, subscriptions, cancellation, logging, roots, sampling, and elicitation.
+- Covers tools, resources, resource templates, prompts, completion, pagination, subscriptions, cancellation, logging,
+  roots, sampling, and elicitation.
 
 Check out these three projects of MCP SDK components:
 
-- [AJ MCP Common](./aj-mcp-common), Common library for AJ-MCP, it contains the implementation of the Model Context Protocol and some other common
+- [AJ MCP Common](./aj-mcp-common), Common library for AJ-MCP, it contains the implementation of the Model Context
+  Protocol and some other common
   classes.
 - [AJ MCP Client](./aj-mcp-client), MCP Client SDK.
 - [AJ MCP Server](./aj-mcp-server), MCP Server SDK.
@@ -39,7 +43,8 @@ For further information, please refer to the [User Manual](https://mcp.ajaxjs.co
 
 ## When to use AJ-MCP
 
-AJ-MCP is intended for Java applications that need to expose existing business capabilities to AI clients, or consume MCP servers without upgrading the entire application stack. Typical uses include:
+AJ-MCP is intended for Java applications that need to expose existing business capabilities to AI clients, or consume
+MCP servers without upgrading the entire application stack. Typical uses include:
 
 - wrapping an existing Java service as MCP tools, resources, or prompts;
 - connecting a Java desktop or server application to a local STDIO MCP process;
@@ -50,12 +55,12 @@ JSON-RPC batch messages are intentionally not supported.
 
 ## Modules
 
-| Module | Purpose | Current version |
-| --- | --- | --- |
-| [`aj-mcp-common`](./aj-mcp-common) | Shared JSON-RPC messages, MCP protocol models, content types, version metadata, and JSON utilities | `1.7` |
-| [`aj-mcp-client`](./aj-mcp-client) | Synchronous client API and STDIO, HTTP/SSE, and Streamable HTTP transports | `1.5` |
-| [`aj-mcp-server`](./aj-mcp-server) | Annotation-based feature discovery, request dispatch, errors, sessions, and server transports | `1.4` |
-| [`samples`](./samples) | STDIO, Spring Boot/SSE, and embedded Tomcat examples | — |
+| Module                             | Purpose                                                                                            | Current version |
+|------------------------------------|----------------------------------------------------------------------------------------------------|-----------------|
+| [`aj-mcp-common`](./aj-mcp-common) | Shared JSON-RPC messages, MCP protocol models, content types, version metadata, and JSON utilities | `1.7`           |
+| [`aj-mcp-client`](./aj-mcp-client) | Synchronous client API and STDIO, HTTP/SSE, and Streamable HTTP transports                         | `1.5`           |
+| [`aj-mcp-server`](./aj-mcp-server) | Annotation-based feature discovery, request dispatch, errors, sessions, and server transports      | `1.4`           |
+| [`samples`](./samples)             | STDIO, Spring Boot/SSE, and embedded Tomcat examples                                               | —               |
 
 The client and server artifacts already depend on `aj-mcp-common`; applications normally add only the artifact they use.
 
@@ -66,6 +71,7 @@ The client and server artifacts already depend on `aj-mcp-common`; applications 
 Add the server dependency:
 
 ```xml
+
 <dependency>
     <groupId>com.ajaxjs</groupId>
     <artifactId>aj-mcp-server</artifactId>
@@ -76,6 +82,7 @@ Add the server dependency:
 Declare a service and start it over STDIO:
 
 ```java
+
 @McpService
 public class GreetingTools {
     @Tool(description = "Greets a user")
@@ -96,11 +103,13 @@ public static void main(String[] args) {
 }
 ```
 
-Keep standard output reserved for JSON-RPC messages when using STDIO; send application logs to standard error or a log file. See the [server README](./aj-mcp-server/README.md) for tools, resources, prompts, and HTTP transports.
+Keep standard output reserved for JSON-RPC messages when using STDIO; send application logs to standard error or a log
+file. See the [server README](./aj-mcp-server/README.md) for tools, resources, prompts, and HTTP transports.
 
 ### Connect from a Java client
 
 ```xml
+
 <dependency>
     <groupId>com.ajaxjs</groupId>
     <artifactId>aj-mcp-client</artifactId>
@@ -109,15 +118,24 @@ Keep standard output reserved for JSON-RPC messages when using STDIO; send appli
 ```
 
 ```java
-try (McpClient client = McpClient.createStdioMcpClient(
-        "java", "-jar", "/path/to/mcp-server.jar")) {
-    client.listTools().forEach(tool -> System.out.println(tool.getName()));
-    String result = client.callTool("greet", "{\"name\":\"AJ-MCP\"}");
-    System.out.println(result);
+try(McpClient client = McpClient.createStdioMcpClient(
+        "java", "-jar", "/path/to/mcp-server.jar")){
+        client.
+
+listTools().
+
+forEach(tool ->System.out.
+
+println(tool.getName()));
+String result = client.callTool("greet", "{\"name\":\"AJ-MCP\"}");
+    System.out.
+
+println(result);
 }
 ```
 
-Always close a client so its streams, HTTP connections, pending requests, worker threads, and optional child process are released. See the [client README](./aj-mcp-client/README.md) for HTTP transports and additional APIs.
+Always close a client so its streams, HTTP connections, pending requests, worker threads, and optional child process are
+released. See the [client README](./aj-mcp-client/README.md) for HTTP transports and additional APIs.
 
 ## Build from source
 
@@ -136,15 +154,19 @@ mvn -pl aj-mcp-server -am test
 
 ## Why MCP?
 
-The Model Context Protocol opens up exciting possibilities for building intelligent applications using your application data with your favourite
+The Model Context Protocol opens up exciting possibilities for building intelligent applications using your application
+data with your favourite
 programming language and framework. With AJ MCP Servers, you have a
-powerful foundation to create your own Java based servers that can bridge AI with any data source or system you can imagine.
+powerful foundation to create your own Java based servers that can bridge AI with any data source or system you can
+imagine.
 
-Whether you want to connect to your favorite database, integrate with your company’s internal systems, or build something completely new - the sky
+Whether you want to connect to your favorite database, integrate with your company’s internal systems, or build
+something completely new - the sky
 truly is the limit! The simplicity of implementing MCP servers with AJ
 means you can focus on the creative aspects rather than the plumbing.
 
-So what are you waiting for? Grab the code, fire up your IDE, and start building your own MCP server today. The future of AI-powered applications is
+So what are you waiting for? Grab the code, fire up your IDE, and start building your own MCP server today. The future
+of AI-powered applications is
 here, and you can be part of shaping it!
 
 Have Fun!

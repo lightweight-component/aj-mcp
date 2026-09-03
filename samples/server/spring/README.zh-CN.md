@@ -1,6 +1,7 @@
 # 基于 Spring Boot 2.x 与 SSE 的 MCP 服务示例
 
-本示例是在 Spring Boot 2.7 Web 应用中通过旧版 HTTP/SSE 传输运行 AJ-MCP Server。MCP 实现本身不依赖 Spring，通过 Spring MVC Controller 完成 HTTP 适配。
+本示例是在 Spring Boot 2.7 Web 应用中通过旧版 HTTP/SSE 传输运行 AJ-MCP Server。MCP 实现本身不依赖 Spring，通过 Spring MVC
+Controller 完成 HTTP 适配。
 
 [English](./README.md)
 

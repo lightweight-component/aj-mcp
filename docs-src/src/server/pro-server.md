@@ -10,10 +10,12 @@ layout: layouts/docs.njk
 
 # Prompts Development
 
-AJ-MCP uses annotations to define prompts within `@McpService` classes. The `@Prompt` annotation marks methods that serve as prompt handlers, while
+AJ-MCP uses annotations to define prompts within `@McpService` classes. The `@Prompt` annotation marks methods that
+serve as prompt handlers, while
 `@PromptArg` defines parameters for interactive prompts.
 
-Simple prompts return a single `PromptMessage` with text content. The `@Prompt` annotation requires a description and the method returns a configured
+Simple prompts return a single `PromptMessage` with text content. The `@Prompt` annotation requires a description and
+the method returns a configured
 message with role and content.
 
 ```java
@@ -29,7 +31,8 @@ public PromptMessage basic() {
 
 ## Multi-Message Prompts
 
-Prompts can return multiple messages by returning a `List<PromptMessage>`. This enables creating conversation-style prompts with multiple turns or
+Prompts can return multiple messages by returning a `List<PromptMessage>`. This enables creating conversation-style
+prompts with multiple turns or
 role-based interactions.
 
 ```java
@@ -49,7 +52,8 @@ public List<PromptMessage> multi() {
 
 ## Parameterized Prompts
 
-Prompts can accept parameters using the `@PromptArg` annotation. Parameters become available to clients when listing prompts and are passed when
+Prompts can accept parameters using the `@PromptArg` annotation. Parameters become available to clients when listing
+prompts and are passed when
 retrieving the prompt.
 
 ```java
@@ -65,7 +69,8 @@ public PromptMessage parametrized(@PromptArg(description = "The name") String na
 
 ## Content Types and Rich Media
 
-Prompts support multiple content types beyond text, including images and embedded resources. Each content type has specific properties and encoding
+Prompts support multiple content types beyond text, including images and embedded resources. Each content type has
+specific properties and encoding
 requirements.
 
 | Content Type      | Class                   | Key Properties                  | Usage                  |

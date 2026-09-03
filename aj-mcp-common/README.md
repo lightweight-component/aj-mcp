@@ -6,19 +6,23 @@
 
 # AJ-MCP Common
 
-Common library for AJ-MCP. It contains the shared JSON-RPC messages, MCP protocol models, content types, protocol-version metadata, transport contracts, exceptions, and JSON utilities used by both the client and server modules.
+Common library for AJ-MCP. It contains the shared JSON-RPC messages, MCP protocol models, content types,
+protocol-version metadata, transport contracts, exceptions, and JSON utilities used by both the client and server
+modules.
 
 [中文](./README.zh-CN.md)
 
 ## Features
 
-- Request and response models for initialization, tools, resources, resource templates, prompts, completion, ping, pagination, progress, and cancellation.
+- Request and response models for initialization, tools, resources, resource templates, prompts, completion, ping,
+  pagination, progress, and cancellation.
 - Client-side protocol models for roots, sampling, and elicitation.
 - Text, image, audio, embedded-resource, and resource-link content models.
 - Centralized support for MCP revisions `2024-11-05`, `2025-03-26`, and `2025-06-18` through `ProtocolVersion`.
 - Jackson-based `JsonUtils` helpers shared by the SDK.
 
-Applications using `aj-mcp-client` or `aj-mcp-server` receive this module transitively. Add it directly when implementing a custom transport, constructing protocol messages yourself, or reusing only the protocol model.
+Applications using `aj-mcp-client` or `aj-mcp-server` receive this module transitively. Add it directly when
+implementing a custom transport, constructing protocol messages yourself, or reusing only the protocol model.
 
 ## Install
 
@@ -52,7 +56,8 @@ List<String> supported = ProtocolVersion.supportedVersions();
 boolean structuredOutput = ProtocolVersion.V_2025_06_18.supportsStructuredToolOutput();
 ```
 
-`JsonUtils.OBJECT_MAPPER` rejects duplicate JSON object keys and ignores unknown fields when deserializing, matching the SDK's compatibility behavior.
+`JsonUtils.OBJECT_MAPPER` rejects duplicate JSON object keys and ignores unknown fields when deserializing, matching the
+SDK's compatibility behavior.
 
 ## Used by
 

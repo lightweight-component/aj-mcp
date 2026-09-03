@@ -1,10 +1,12 @@
 package com.ajaxjs.mcp.common;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.Getter;
 
 /**
  * A business exception raised over the MCP protocol
  */
+@Getter
 public class McpException extends RuntimeException {
     private final int errorCode;
     private final String errorMessage;
@@ -12,14 +14,6 @@ public class McpException extends RuntimeException {
     public McpException(int errorCode, String errorMessage) {
         this.errorCode = errorCode;
         this.errorMessage = errorMessage;
-    }
-
-    public int getErrorCode() {
-        return errorCode;
-    }
-
-    public String getErrorMessage() {
-        return errorMessage;
     }
 
     @Override

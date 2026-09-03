@@ -11,7 +11,8 @@ layout: layouts/docs.njk
 
 # MCP Server SDK Integration Samples
 
-The repository contains two integration samples: a standalone Tomcat server and a Spring Boot application, each exposing a simple MCP service.
+The repository contains two integration samples: a standalone Tomcat server and a Spring Boot application, each exposing
+a simple MCP service.
 
 ## Tomcat Application Integration
 
@@ -122,7 +123,11 @@ public class Config {
 
 The legacy HTTP/SSE transport uses two endpoints:
 
-- **SSE URL**: the client opens this connection first. The server registers the session with `openSession(clientId, writer, postPath)` and sends an `endpoint` event containing the POST path.
-- **POST URL**: the client sends JSON-RPC requests to this endpoint. The controller calls `serverSse.handle(clientId, json)`, and the response is written back only to the originating SSE session—not to the POST response and not to every connected client.
+- **SSE URL**: the client opens this connection first. The server registers the session with
+  `openSession(clientId, writer, postPath)` and sends an `endpoint` event containing the POST path.
+- **POST URL**: the client sends JSON-RPC requests to this endpoint. The controller calls
+  `serverSse.handle(clientId, json)`, and the response is written back only to the originating SSE session—not to the
+  POST response and not to every connected client.
 
-`ServerSse.start()` starts one shared heartbeat scheduler. Do not create a heartbeat thread per HTTP request. Remove the session when the request ends, and close `ServerSse` when the application shuts down.
+`ServerSse.start()` starts one shared heartbeat scheduler. Do not create a heartbeat thread per HTTP request. Remove the
+session when the request ends, and close `ServerSse` when the application shuts down.

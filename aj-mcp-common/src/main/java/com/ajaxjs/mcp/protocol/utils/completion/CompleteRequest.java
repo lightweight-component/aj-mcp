@@ -7,12 +7,12 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import static com.ajaxjs.mcp.protocol.McpConstant.Methods.COMPLETION_COMPLETE;
-
 import java.util.Map;
 
+import static com.ajaxjs.mcp.protocol.McpConstant.Methods.COMPLETION_COMPLETE;
+
 /**
- * https://modelcontextprotocol.io/specification/2024-11-05/server/utilities/completion
+ * <a href="https://modelcontextprotocol.io/specification/2024-11-05/server/utilities/completion">...</a>
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -26,6 +26,7 @@ public class CompleteRequest extends McpRequest {
     @NoArgsConstructor
     public static class Params {
         Ref ref;
+
         Argument argument;
 
         /**

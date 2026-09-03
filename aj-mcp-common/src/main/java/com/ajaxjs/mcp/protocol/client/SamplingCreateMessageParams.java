@@ -11,11 +11,18 @@ import java.util.List;
 @Data
 public class SamplingCreateMessageParams {
     private List<JsonNode> messages;
+
     private JsonNode modelPreferences;
+
     private String systemPrompt;
+
     private String includeContext;
+
     private Double temperature;
+
     private int maxTokens;
+
     private List<String> stopSequences;
+
     private JsonNode metadata;
 }

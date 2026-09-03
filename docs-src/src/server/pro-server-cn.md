@@ -7,9 +7,11 @@ tags:
   - Prompts Development
 layout: layouts/docs-cn.njk
 ---
+
 # 提示（Prompt）开发
 
-AJ-MCP 通过注解在 `@McpService` 类中定义提示（Prompt）。`@Prompt` 注解用于标记作为提示处理器的方法，`@PromptArg` 用于定义交互式提示的参数。
+AJ-MCP 通过注解在 `@McpService` 类中定义提示（Prompt）。`@Prompt` 注解用于标记作为提示处理器的方法，`@PromptArg`
+用于定义交互式提示的参数。
 
 简单提示返回单条 `PromptMessage`，内容为文本。`@Prompt` 注解要求提供描述，方法返回配置好的消息（含角色和内容）。
 
@@ -62,22 +64,22 @@ public PromptMessage parametrized(@PromptArg(description = "姓名") String name
 
 提示不仅支持文本，还支持图片和嵌入式资源等多种内容类型。每种内容类型有特定属性和编码要求。
 
-| 内容类型           | 类名                      | 关键属性                          | 用途               |
-|--------------------|---------------------------|-----------------------------------|--------------------|
-| 文本               | ContentText               | text                              | 普通文本消息       |
-| 图片               | ContentImage              | data, mimeType                    | Base64 编码图片    |
-| 嵌入式资源         | ContentEmbeddedResource   | resource.uri, resource.mimeType   | 二进制数据引用     |
+| 内容类型  | 类名                      | 关键属性                            | 用途          |
+|-------|-------------------------|---------------------------------|-------------|
+| 文本    | ContentText             | text                            | 普通文本消息      |
+| 图片    | ContentImage            | data, mimeType                  | Base64 编码图片 |
+| 嵌入式资源 | ContentEmbeddedResource | resource.uri, resource.mimeType | 二进制数据引用     |
 
 ## 协议数据结构
 
 提示系统采用特定协议结构进行客户端与服务器之间的数据通信。
 
-| 类名              | 作用                            | 关键字段                                 |
-|-------------------|---------------------------------|------------------------------------------|
-| PromptItem        | 提示元数据（用于列表）          | name, description, arguments             |
-| PromptMessage     | 单条消息内容                    | role, content                            |
-| GetPromptResult   | 响应包装                        | result.description, result.messages      |
-| PromptArgument    | 参数定义                        | name, description, required              |
+| 类名              | 作用          | 关键字段                                |
+|-----------------|-------------|-------------------------------------|
+| PromptItem      | 提示元数据（用于列表） | name, description, arguments        |
+| PromptMessage   | 单条消息内容      | role, content                       |
+| GetPromptResult | 响应包装        | result.description, result.messages |
+| PromptArgument  | 参数定义        | name, description, required         |
 
 ## 角色枚举
 

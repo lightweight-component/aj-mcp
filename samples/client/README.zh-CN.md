@@ -1,6 +1,7 @@
 # AJ-MCP Client 示例
 
-本模块是使用 `aj-mcp-client` 创建 Java 8 小型应用的起点。当前 `MyApp` 类有意保持最小内容，可以把下面任一示例复制进去，并改为实际 MCP 服务地址。
+本模块是使用 `aj-mcp-client` 创建 Java 8 小型应用的起点。当前 `MyApp` 类有意保持最小内容，可以把下面任一示例复制进去，并改为实际
+MCP 服务地址。
 
 [English](./README.md)
 

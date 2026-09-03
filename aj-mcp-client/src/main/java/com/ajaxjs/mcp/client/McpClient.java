@@ -3,6 +3,7 @@ package com.ajaxjs.mcp.client;
 import com.ajaxjs.mcp.client.transport.McpTransport;
 import com.ajaxjs.mcp.client.transport.StdioTransport;
 import com.ajaxjs.mcp.common.JsonUtils;
+import com.ajaxjs.mcp.common.McpException;
 import com.ajaxjs.mcp.protocol.McpConstant;
 import com.ajaxjs.mcp.protocol.tools.*;
 import com.ajaxjs.mcp.protocol.utils.CancellationNotification;
@@ -19,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
@@ -40,19 +42,19 @@ public class McpClient extends McpClientResource {
     }
 
     @Override
-    public CompleteResult.CompletionResult complete(CompleteRequest.Ref ref, CompleteRequest.Argument argument,
-                                                    java.util.Map<String, String> context) {
+    public CompleteResult.CompletionResult complete(CompleteRequest.Ref ref, CompleteRequest.Argument argument, Map<String, String> context) {
         long operationId = idGenerator.getAndIncrement();
         CompleteRequest request = new CompleteRequest();
         request.setId(operationId);
         CompleteRequest.Params params = new CompleteRequest.Params(ref, argument);
         params.setContext(context);
         request.setParams(params);
+
         try {
             JsonNode response = awaitResponse(transport.sendRequestWithResponse(request));
-            com.ajaxjs.mcp.common.McpException.checkForErrors(response);
-            return JsonUtils.jsonNode2bean(response.get(RESPONSE_RESULT).get("completion"),
-                    CompleteResult.CompletionResult.class);
+            McpException.checkForErrors(response);
+
+            return JsonUtils.jsonNode2bean(response.get(RESPONSE_RESULT).get("completion"), CompleteResult.CompletionResult.class);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
@@ -81,9 +83,10 @@ public class McpClient extends McpClientResource {
         try {
             CompletableFuture<JsonNode> resultFuture = transport.sendRequestWithResponse(request);
             result = awaitResponse(resultFuture);
-            com.ajaxjs.mcp.common.McpException.checkForErrors(result);
+            McpException.checkForErrors(result);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+
             throw new RuntimeException(e);
         } catch (ExecutionException | TimeoutException e) {
             throw new RuntimeException(e);
@@ -98,13 +101,16 @@ public class McpClient extends McpClientResource {
     public McpPage<ToolItem> listToolPage(String cursor) {
         GetToolListRequest request = new GetToolListRequest();
         request.setId(idGenerator.getAndIncrement());
+
         if (cursor != null)
             request.setParams(new Cursor(cursor));
+
         try {
             JsonNode response = awaitResponse(transport.sendRequestWithResponse(request));
-            com.ajaxjs.mcp.common.McpException.checkForErrors(response);
+            McpException.checkForErrors(response);
             JsonNode result = response.get(RESPONSE_RESULT);
             List<ToolItem> items = toolListFromMcpResponse((ArrayNode) result.get("tools"));
+
             return new McpPage<>(items, result.has("nextCursor") ? result.get("nextCursor").asText() : null);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -182,11 +188,12 @@ public class McpClient extends McpClientResource {
     public CallToolResult.CallToolResultDetail callToolResult(CallToolRequest request) {
         long operationId = idGenerator.getAndIncrement();
         request.setId(operationId);
+
         try {
             JsonNode response = awaitResponse(transport.sendRequestWithResponse(request));
-            com.ajaxjs.mcp.common.McpException.checkForErrors(response);
-            return JsonUtils.OBJECT_MAPPER.convertValue(response.get(RESPONSE_RESULT),
-                    CallToolResult.CallToolResultDetail.class);
+            McpException.checkForErrors(response);
+
+            return JsonUtils.OBJECT_MAPPER.convertValue(response.get(RESPONSE_RESULT), CallToolResult.CallToolResultDetail.class);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
@@ -277,6 +284,7 @@ public class McpClient extends McpClientResource {
             errorMessage = errorNode.get("message").asText(McpConstant.EMPTY_STR);
 
         Integer errorCode = null;
+
         if (errorNode.get("code") != null)
             errorCode = errorNode.get("code").asInt();
 

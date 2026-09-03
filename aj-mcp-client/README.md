@@ -8,7 +8,8 @@
 
 # Lightweight Java MCP Client
 
-AJ-MCP Client is a lightweight MCP client for Java. It provides a synchronous, Java-8-friendly API for discovering and calling tools, reading resources, rendering prompts, and using the other capabilities exposed by an MCP server.
+AJ-MCP Client is a lightweight MCP client for Java. It provides a synchronous, Java-8-friendly API for discovering and
+calling tools, reading resources, rendering prompts, and using the other capabilities exposed by an MCP server.
 
 ## Features
 
@@ -16,7 +17,8 @@ AJ-MCP Client is a lightweight MCP client for Java. It provides a synchronous, J
 - Legacy HTTP/SSE transport for MCP servers that expose separate SSE and POST endpoints.
 - Streamable HTTP transport for MCP `2025-03-26` and `2025-06-18` servers.
 - Negotiation of protocol revisions `2024-11-05`, `2025-03-26`, and `2025-06-18`.
-- Tools, resources, resource templates, prompts, completion, pagination, subscriptions, notifications, cancellation, and health checks.
+- Tools, resources, resource templates, prompts, completion, pagination, subscriptions, notifications, cancellation, and
+  health checks.
 - Client handlers for roots, sampling, and `2025-06-18` elicitation.
 - Configurable request timeout and cleanup of pending requests when a transport closes.
 
@@ -33,6 +35,7 @@ AJ-MCP Client is a lightweight MCP client for Java. It provides a synchronous, J
 Runs on Java8+. Maven:
 
 ```xml
+
 <dependency>
     <groupId>com.ajaxjs</groupId>
     <artifactId>aj-mcp-client</artifactId>
@@ -47,14 +50,23 @@ Runs on Java8+. Maven:
 The convenience factory starts the command as a child process and completes MCP initialization before returning:
 
 ```java
-try (McpClient client = McpClient.createStdioMcpClient(
-        "java", "-jar", "/path/to/server.jar")) {
-    for (ToolItem tool : client.listTools())
-        System.out.println(tool.getName() + " - " + tool.getDescription());
+try(McpClient client = McpClient.createStdioMcpClient(
+        "java", "-jar", "/path/to/server.jar")){
+        for(
+ToolItem tool :client.
 
-    String result = client.callTool(
-            "echoString", "{\"input\":\"Hello from Java\"}");
-    System.out.println(result);
+listTools())
+        System.out.
+
+println(tool.getName() +" - "+tool.
+
+getDescription());
+
+String result = client.callTool(
+        "echoString", "{\"input\":\"Hello from Java\"}");
+    System.out.
+
+println(result);
 }
 ```
 
@@ -66,16 +78,22 @@ McpTransport transport = StdioTransport.builder()
         .logEvents(true)
         .build();
 
-try (McpClient client = McpClient.builder()
+try(
+McpClient client = McpClient.builder()
         .transport(transport)
         .requestTimeout(Duration.ofSeconds(30))
-        .build()) {
-    client.initialize();
-    client.checkHealth();
+        .build()){
+        client.
+
+initialize();
+    client.
+
+checkHealth();
 }
 ```
 
-The child server must reserve standard output for newline-delimited JSON-RPC messages. Its logs should go to standard error.
+The child server must reserve standard output for newline-delimited JSON-RPC messages. Its logs should go to standard
+error.
 
 ## Quick start: Streamable HTTP
 
@@ -86,20 +104,35 @@ McpTransport transport = StreamableHttpTransport.builder()
         .timeout(Duration.ofSeconds(30))
         .build();
 
-try (McpClient client = McpClient.builder()
+try(
+McpClient client = McpClient.builder()
         .transport(transport)
         .protocolVersion(ProtocolVersion.V_2025_06_18.value())
         .requestTimeout(Duration.ofSeconds(30))
-        .build()) {
-    client.initialize();
-    System.out.println("Negotiated: " + client.getNegotiatedProtocolVersion());
-    client.listResources().forEach(resource -> System.out.println(resource.getUri()));
-}
+        .build()){
+        client.
+
+initialize();
+    System.out.
+
+println("Negotiated: "+client.getNegotiatedProtocolVersion());
+        client.
+
+listResources().
+
+forEach(resource ->System.out.
+
+println(resource.getUri()));
+        }
 ```
 
-`openEventStream` enables the optional long-lived GET channel for server-originated messages. The transport retains the session ID returned by initialization and sends the negotiated protocol header when required.
+`openEventStream` enables the optional long-lived GET channel for server-originated messages. The transport retains the
+session ID returned by initialization and sends the negotiated protocol header when required.
 
-Current Streamable HTTP limitations: a POST response with `text/event-stream` is buffered before parsing rather than consumed incrementally; the optional GET stream opens asynchronously and has no reconnect/resumption policy. Use ordinary JSON POST responses, and do not depend on incremental progress or server requests delivered through a POST response.
+Current Streamable HTTP limitations: a POST response with `text/event-stream` is buffered before parsing rather than
+consumed incrementally; the optional GET stream opens asynchronously and has no reconnect/resumption policy. Use
+ordinary JSON POST responses, and do not depend on incremental progress or server requests delivered through a POST
+response.
 
 For an older server with separate SSE and message endpoints, use `HttpMcpTransport`:
 
@@ -127,16 +160,23 @@ GetPromptResult.PromptResultDetail prompt =
         client.getPrompt("review", Collections.<String, Object>singletonMap("language", "Java"));
 ```
 
-Cursor methods such as `listToolPage`, `listResourcePage`, and `listPromptPage` are preferred when a server returns opaque cursors. The older integer page methods remain available for compatibility.
+Cursor methods such as `listToolPage`, `listResourcePage`, and `listPromptPage` are preferred when a server returns
+opaque cursors. The older integer page methods remain available for compatibility.
 
 ## Lifecycle and errors
 
 - Call `initialize()` exactly once before normal requests when constructing a client manually.
-- Set `requestTimeout` to a positive duration for bounded behavior. A zero duration explicitly disables the client-side timeout.
-- Use try-with-resources or call `close()` in `finally`. Closing fails pending requests and releases the transport, worker threads, HTTP connections, and child process.
-- `callToolResult()` preserves the full MCP result, including structured content and `isError`. `callTool()` is a text convenience method.
-- Transport and protocol failures are surfaced as runtime exceptions; tool-level failures may be represented by MCP tool results.
+- Set `requestTimeout` to a positive duration for bounded behavior. A zero duration explicitly disables the client-side
+  timeout.
+- Use try-with-resources or call `close()` in `finally`. Closing fails pending requests and releases the transport,
+  worker threads, HTTP connections, and child process.
+- `callToolResult()` preserves the full MCP result, including structured content and `isError`. `callTool()` is a text
+  convenience method.
+- Transport and protocol failures are surfaced as runtime exceptions; tool-level failures may be represented by MCP tool
+  results.
 
 ## Protocol support
 
-The client advertises a preferred `protocolVersion` and a list of `supportedProtocolVersions`. The server selects one supported revision during initialization; inspect it through `getNegotiatedProtocolVersion()`. Use revision-specific features only after negotiation succeeds.
+The client advertises a preferred `protocolVersion` and a list of `supportedProtocolVersions`. The server selects one
+supported revision during initialization; inspect it through `getNegotiatedProtocolVersion()`. Use revision-specific
+features only after negotiation succeeds.

@@ -1,6 +1,7 @@
 # MCP Server STDIO Sample
 
-This sample packages an annotation-based AJ-MCP server as a standalone executable JAR that communicates through standard input and standard output.
+This sample packages an annotation-based AJ-MCP server as a standalone executable JAR that communicates through standard
+input and standard output.
 
 [中文](./README.zh-CN.md)
 
@@ -18,7 +19,8 @@ mvn package
 java -jar target/my-app-jar-with-dependencies.jar
 ```
 
-The process waits for newline-delimited JSON-RPC requests on standard input. It is normally started by an MCP client rather than used interactively:
+The process waits for newline-delimited JSON-RPC requests on standard input. It is normally started by an MCP client
+rather than used interactively:
 
 ```java
 try (McpClient client = McpClient.createStdioMcpClient(
@@ -29,4 +31,5 @@ try (McpClient client = McpClient.createStdioMcpClient(
 
 Standard output is the protocol channel and must contain only JSON-RPC messages. Send logs to standard error or a file.
 
-When adapting this sample, assign the scanned `FeatureMgr` to the server with `server.setFeatureMgr(mgr)` before starting it.
+When adapting this sample, assign the scanned `FeatureMgr` to the server with `server.setFeatureMgr(mgr)` before
+starting it.

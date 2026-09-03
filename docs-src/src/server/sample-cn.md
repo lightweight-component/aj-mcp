@@ -7,6 +7,7 @@ tags:
   - MCP Server SDK 整合演示
 layout: layouts/docs-cn.njk
 ---
+
 # MCP 服务器 SDK 集成示例
 
 本项目的源代码仓库包含两个集成示例：一个是带有简单 MCP 服务的独立 Tomcat 服务器，另一个是带有 MCP 服务的 Spring Boot 应用程序。
@@ -14,7 +15,6 @@ layout: layouts/docs-cn.njk
 ## Tomcat 应用集成
 
 Tomcat 部署展示了一个完整的服务器搭建模式：
-
 
 ```java
 package com.foo.myapp;
@@ -79,11 +79,9 @@ public class StandaloneTomcat {
 }
 ```
 
-
 ## Spring 应用集成
 
 Spring 配置采用相同的初始化方式，并由 Spring 容器管理 `ServerSse` Bean。
-
 
 ```java
 package com.foo.myapp;
@@ -118,11 +116,15 @@ public class Config {
     }
 }
 ```
+
 ## 设计说明
 
 旧版 HTTP/SSE 传输包含两个端点：
 
-- **SSE URL**：客户端首先建立该连接。服务端通过 `openSession(clientId, writer, postPath)` 注册会话，并发送包含 POST 路径的 `endpoint` 事件。
-- **POST URL**：客户端把 JSON-RPC 请求发送到该端点。控制器调用 `serverSse.handle(clientId, json)`；响应只写回发起请求的 SSE 会话，不写入 POST 响应，也不会广播给其他客户端。
+- **SSE URL**：客户端首先建立该连接。服务端通过 `openSession(clientId, writer, postPath)` 注册会话，并发送包含 POST 路径的
+  `endpoint` 事件。
+- **POST URL**：客户端把 JSON-RPC 请求发送到该端点。控制器调用 `serverSse.handle(clientId, json)`；响应只写回发起请求的 SSE
+  会话，不写入 POST 响应，也不会广播给其他客户端。
 
-`ServerSse.start()` 会启动一个共享的心跳调度器，不要为每个 HTTP 请求单独创建心跳线程。请求结束时应移除对应会话，应用关闭时应关闭 `ServerSse`。
+`ServerSse.start()` 会启动一个共享的心跳调度器，不要为每个 HTTP 请求单独创建心跳线程。请求结束时应移除对应会话，应用关闭时应关闭
+`ServerSse`。

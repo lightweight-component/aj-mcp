@@ -7,7 +7,6 @@ import com.ajaxjs.mcp.server.error.JsonRpcErrorException;
 import com.ajaxjs.mcp.transport.McpTransportSync;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
 import java.util.Objects;
@@ -28,6 +27,7 @@ public class ServerSse implements McpTransportSync {
     final Map<String, SseSession> connections = new ConcurrentHashMap<>();
 
     private final AtomicBoolean started = new AtomicBoolean(false);
+
     private final AtomicBoolean closed = new AtomicBoolean(false);
 
     private volatile ScheduledExecutorService heartbeatExecutor;
@@ -151,6 +151,7 @@ public class ServerSse implements McpTransportSync {
         synchronized (this) {
             if (closed.get())
                 throw new IllegalStateException("SSE server transport is closed");
+
             if (heartbeatExecutor != null)
                 return;
 
@@ -211,7 +212,9 @@ public class ServerSse implements McpTransportSync {
     public void handle(String clientId, String rawJson) {
         if (server.acceptClientResponse(clientId, rawJson))
             return;
+
         server.bindSession(clientId);
+
         try {
             returnMessage(clientId, handle(rawJson));
         } finally {
@@ -258,7 +261,7 @@ public class ServerSse implements McpTransportSync {
     }
 
     @Override
-    public synchronized void close() throws IOException {
+    public synchronized void close() {
         if (!closed.compareAndSet(false, true))
             return;
 

@@ -7,9 +7,11 @@ tags:
   - 资源使用
 layout: layouts/docs-cn.njk
 ---
+
 ## 资源（Resource）使用
 
-资源系统使 LLM 驱动的应用能够通过统一接口访问结构化内容。每个资源通过 URI 标识，可以表示任何对 LLM 有用的内容类型。AJ MCP 客户端提供发现和访问服务器端资源的方法。
+资源系统使 LLM 驱动的应用能够通过统一接口访问结构化内容。每个资源通过 URI 标识，可以表示任何对 LLM 有用的内容类型。AJ MCP
+客户端提供发现和访问服务器端资源的方法。
 
 ### 列出资源
 
@@ -27,8 +29,8 @@ assertEquals("image/jpg", blob.getMimeType(), "MIME 类型不符（'blob'）");
 assertEquals("A nice pic", blob.getDescription(), "描述不符（'blob'）");
 ```
 
-
-`listResources()` 请求并缓存第一页（默认页）。如需获取其他页，请调用 `listResources(int pageNo)`。各页独立缓存，请求第 2 页不会覆盖第 0 页。
+`listResources()` 请求并缓存第一页（默认页）。如需获取其他页，请调用 `listResources(int pageNo)`。各页独立缓存，请求第 2
+页不会覆盖第 0 页。
 
 ``` java
 List<ResourceItem> resourceList = mcpClient.listResources(1);
@@ -63,7 +65,8 @@ assertEquals("file:///blob", blobContents.getUri(), "URI 应为 'file:///blob'")
 assertEquals("blob", blobContents.getBlob(), "二进制内容应为 'blob'");
 ```
 
-客户端可以列出服务端注册的资源模板，并通过展开后的 URI 读取资源。跨实现分页时建议使用 `listResourceTemplatePage(cursor)`，并原样传回服务端返回的 opaque `nextCursor`。
+客户端可以列出服务端注册的资源模板，并通过展开后的 URI 读取资源。跨实现分页时建议使用 `listResourceTemplatePage(cursor)`
+，并原样传回服务端返回的 opaque `nextCursor`。
 
 ```java
 GetResourceResult.ResourceResultDetail response = mcpClient.readResource("file:///text-template/hello");

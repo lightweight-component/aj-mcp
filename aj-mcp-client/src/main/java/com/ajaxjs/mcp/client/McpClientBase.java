@@ -82,7 +82,7 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
 
     final Map<String, Function<JsonNode, JsonNode>> serverRequestHandlers = new ConcurrentHashMap<>();
 
-    volatile List<Root> roots = java.util.Collections.emptyList();
+    volatile List<Root> roots;
 
     volatile boolean rootsListChanged;
 
@@ -216,6 +216,7 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
         // CompletableFuture only accepts a numeric timeout. Preserve positive
         // sub-millisecond durations instead of accidentally turning them into zero.
         long timeoutMillis = Math.max(1L, requestTimeout.toMillis());
+
         return future.get(timeoutMillis, TimeUnit.MILLISECONDS);
     }
 

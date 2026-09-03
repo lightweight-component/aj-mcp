@@ -1,11 +1,11 @@
 package com.ajaxjs.mcp.protocol.resource;
 
 import com.ajaxjs.mcp.protocol.McpResponse;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.List;
 

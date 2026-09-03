@@ -1,6 +1,7 @@
 # AJ-MCP Client Sample
 
-This module is the starting point for a small Java 8 application using `aj-mcp-client`. The current `MyApp` class is intentionally minimal; copy one of the examples below into it and point it at an MCP server.
+This module is the starting point for a small Java 8 application using `aj-mcp-client`. The current `MyApp` class is
+intentionally minimal; copy one of the examples below into it and point it at an MCP server.
 
 [中文](./README.zh-CN.md)
 

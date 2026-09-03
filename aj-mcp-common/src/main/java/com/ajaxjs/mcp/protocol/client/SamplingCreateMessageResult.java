@@ -9,7 +9,10 @@ import lombok.Data;
 @Data
 public class SamplingCreateMessageResult {
     private String role;
+
     private JsonNode content;
+
     private String model;
+
     private String stopReason;
 }

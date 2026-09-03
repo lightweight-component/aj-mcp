@@ -1,128 +1,156 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8"/>
-        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-        <title>AJ MCP SDK/Release History</title>
-        <meta name="description" content="A lightweight Java 8 Model Context Protocol (MCP) SDK. AJ MCP SDK release history"/>
-        <meta name="keywords" content="mcp, mcp sdk, java mcp, mcp client, mcp server, java8 mcp, releases"/>
-        <meta name="viewport" content="width=device-width, initial-scale=1"/>
-        <link rel="stylesheet" href="/asset/style/main.css"/>
-        <link rel="icon" type="image/png" href="/asset/favicon.ico"/>
-        <script src="/asset/common.js"></script>
-        <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200..900&family=Noto+Serif+TC:wght@200..900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet" />
-    </head>
-    <body>
-        <nav>
-            <div>
-                <div class="links">
-                    <a href="/">🏠 Home</a>
-                    | ⚙️ Source:
-                    <a target="_blank" href="https://github.com/lightweight-component/aj-mcp">Github</a>/<a target="_blank" href="https://gitcode.com/lightweight-component/aj-mcp">Gitcode</a>
-                    |
-                    <a href="/cn">Chinese Version</a>
-                </div>
-                <h1>AJ MCP SDK</h1>
-                <h3>User Manual</h3>
-            </div>
-        </nav>
-        <div>
-            <menu>
-                
-                <ul>
-                    <li class="selected">
-                        <a href="/">Home</a>
-                    </li>
-                    <li>
-                        <a href="/architecture/index">Architecture</a>
-                    </li>
-                </ul>
-                <h3>MCP Client SDK</h3>
-                <ul>
-                    <li>
-                        <a href="/client/setup-client">Client SDK Setup</a>
-                    </li>
-                    <li>
-                       <a href="/client/initialization">Initialization</a>
-                    </li>
-                    <li>
-                       <a href="/client/resource">Resources Usage</a>
-                    </li>
-                     <li>
-                       <a href="/client/prompt">Prompts Usage</a>
-                    </li>
-                     <li>
-                       <a href="/client/tool">Tools Usage</a>
-                    </li>
-                    <li>
-                       <a href="/client/handling-notifications">Notifications</a>
-                    </li>
-                </ul>
-                <h3>MCP Server SDK</h3>
-                <ul>
-                      <li>
-                           <a href="/server/usage-server">Server SDK Usage</a>
-                      </li>
-                      <li>
-                           <a href="/server/res-server">Resources Usage</a>
-                      </li>
-                      <li>
-                           <a href="/server/pro-server">Prompts Usage</a>
-                      </li>
-                      <li>
-                             <a href="/server/tool-server">Tools Usage</a>
-                       </li>
-                      <li>
-                         <a href="/server/sample">Integration Samples</a>
-                      </li>
-                </ul>
-
-                <h3>Misc</h3>
-                <ul>
-                    <li><a href="/misc/versions">Release History</a></li>
-                    <li><a href="/misc/contact">Contact</a></li>
-                </ul>
-            </menu>
-            <article>
-                <h1>Release History</h1>
-<h2>Unreleased maintenance changes</h2>
-<ul>
-<li>Fixed HTTP response leaks and pending-request cleanup after SSE or stdio failures.</li>
-<li>Completed stdio and server-side SSE shutdown lifecycles.</li>
-<li>Corrected notification response behavior and request timeout consistency.</li>
-<li>Isolated feature stores per server and made package scanning tolerate unloadable optional classes.</li>
-<li>Added per-page caches for prompt, resource, and resource-template lists.</li>
-<li>Added string JSON-RPC IDs, strict initialization lifecycle checks, and truthful dynamic capabilities.</li>
-<li>Completed resource templates, completion, resource subscriptions, cancellation, logging, progress, Roots, Sampling, and generic notification callbacks.</li>
-<li>Added opaque-cursor page APIs while retaining the page-number APIs for compatibility.</li>
-<li>Added negotiation for MCP <code>2024-11-05</code>, <code>2025-03-26</code>, and <code>2025-06-18</code> in one SDK; server version lists are preference ordered.</li>
-<li>Added client and server Streamable HTTP adapters. JSON-RPC batching, removed again in <code>2025-06-18</code>, is intentionally unsupported.</li>
-<li>Added tool annotations, progress messages, completion-context request models, resource links, structured tool output, and elicitation. Passing completion context into server provider methods remains planned work.</li>
-<li>Ensured parameterless tools always expose a non-null object <code>inputSchema</code> and made every tool parameter require <code>@ToolArg</code> during scanning.</li>
-<li>Scoped tool cancellation by session and request ID; session shutdown now interrupts only its own running tools.</li>
-<li>Added strict initialize field validation and capability checks before server-initiated Roots or Sampling requests.</li>
-<li>Added embedded-resource <code>blob</code> representation and validated Tool, Prompt, and Resource return collections before serialization.</li>
-<li>Converted client-side server-request handler failures into JSON-RPC <code>INTERNAL_ERROR</code> without terminating receive loops.</li>
-</ul>
-<p>Streamable HTTP currently supports ordinary JSON POST responses and the optional GET event stream. POST <code>text/event-stream</code> responses are buffered rather than dispatched incrementally. GET-stream readiness is asynchronous, and reconnect/resumption plus full idle-session expiry remain planned work.</p>
-<h2>aj-mcp-common 1.5 / aj-mcp-client 1.3 / aj-mcp-server 1.2 — 2025-06-10</h2>
-<ul>
-<li>Added <a href="https://modelcontextprotocol.io/specification/2024-11-05/server/utilities/pagination">pagination support</a>.</li>
-</ul>
-<h2>1.0 — 2025-06-01</h2>
-<ul>
-<li>Initial release.</li>
-</ul>
-
-            </article>
-
-            <div></div>
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <title>AJ MCP SDK/Release History</title>
+    <meta name="description"
+          content="A lightweight Java 8 Model Context Protocol (MCP) SDK. AJ MCP SDK release history"/>
+    <meta name="keywords" content="mcp, mcp sdk, java mcp, mcp client, mcp server, java8 mcp, releases"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" href="/asset/style/main.css"/>
+    <link rel="icon" type="image/png" href="/asset/favicon.ico"/>
+    <script src="/asset/common.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200..900&family=Noto+Serif+TC:wght@200..900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap"
+          rel="stylesheet"/>
+</head>
+<body>
+<nav>
+    <div>
+        <div class="links">
+            <a href="/">🏠 Home</a>
+            | ⚙️ Source:
+            <a target="_blank" href="https://github.com/lightweight-component/aj-mcp">Github</a>/<a target="_blank"
+                                                                                                    href="https://gitcode.com/lightweight-component/aj-mcp">Gitcode</a>
+            |
+            <a href="/cn">Chinese Version</a>
         </div>
-        <footer>
-            AJ MCP SDK, a part of
-            <a href="https://framework.ajaxjs.com" target="_blank">AJ-Framework</a>
-            open source. Mail:frank@ajaxjs.com, visit
-            <a href="https://blog.csdn.net/zhangxin09" target="_blank">my blog(In Chinese)</a>. <br/> <br/> Copyright © 2025 Frank Cheung. All rights reserved.
-        </footer>
-    </body>
+        <h1>AJ MCP SDK</h1>
+        <h3>User Manual</h3>
+    </div>
+</nav>
+<div>
+    <menu>
+
+        <ul>
+            <li class="selected">
+                <a href="/">Home</a>
+            </li>
+            <li>
+                <a href="/architecture/index">Architecture</a>
+            </li>
+        </ul>
+        <h3>MCP Client SDK</h3>
+        <ul>
+            <li>
+                <a href="/client/setup-client">Client SDK Setup</a>
+            </li>
+            <li>
+                <a href="/client/initialization">Initialization</a>
+            </li>
+            <li>
+                <a href="/client/resource">Resources Usage</a>
+            </li>
+            <li>
+                <a href="/client/prompt">Prompts Usage</a>
+            </li>
+            <li>
+                <a href="/client/tool">Tools Usage</a>
+            </li>
+            <li>
+                <a href="/client/handling-notifications">Notifications</a>
+            </li>
+        </ul>
+        <h3>MCP Server SDK</h3>
+        <ul>
+            <li>
+                <a href="/server/usage-server">Server SDK Usage</a>
+            </li>
+            <li>
+                <a href="/server/res-server">Resources Usage</a>
+            </li>
+            <li>
+                <a href="/server/pro-server">Prompts Usage</a>
+            </li>
+            <li>
+                <a href="/server/tool-server">Tools Usage</a>
+            </li>
+            <li>
+                <a href="/server/sample">Integration Samples</a>
+            </li>
+        </ul>
+
+        <h3>Misc</h3>
+        <ul>
+            <li><a href="/misc/versions">Release History</a></li>
+            <li><a href="/misc/contact">Contact</a></li>
+        </ul>
+    </menu>
+    <article>
+        <h1>Release History</h1>
+        <h2>Unreleased maintenance changes</h2>
+        <ul>
+            <li>Fixed HTTP response leaks and pending-request cleanup after SSE or stdio failures.</li>
+            <li>Completed stdio and server-side SSE shutdown lifecycles.</li>
+            <li>Corrected notification response behavior and request timeout consistency.</li>
+            <li>Isolated feature stores per server and made package scanning tolerate unloadable optional classes.</li>
+            <li>Added per-page caches for prompt, resource, and resource-template lists.</li>
+            <li>Added string JSON-RPC IDs, strict initialization lifecycle checks, and truthful dynamic capabilities.
+            </li>
+            <li>Completed resource templates, completion, resource subscriptions, cancellation, logging, progress,
+                Roots, Sampling, and generic notification callbacks.
+            </li>
+            <li>Added opaque-cursor page APIs while retaining the page-number APIs for compatibility.</li>
+            <li>Added negotiation for MCP <code>2024-11-05</code>, <code>2025-03-26</code>, and <code>2025-06-18</code>
+                in one SDK; server version lists are preference ordered.
+            </li>
+            <li>Added client and server Streamable HTTP adapters. JSON-RPC batching, removed again in
+                <code>2025-06-18</code>, is intentionally unsupported.
+            </li>
+            <li>Added tool annotations, progress messages, completion-context request models, resource links, structured
+                tool output, and elicitation. Passing completion context into server provider methods remains planned
+                work.
+            </li>
+            <li>Ensured parameterless tools always expose a non-null object <code>inputSchema</code> and made every tool
+                parameter require <code>@ToolArg</code> during scanning.
+            </li>
+            <li>Scoped tool cancellation by session and request ID; session shutdown now interrupts only its own running
+                tools.
+            </li>
+            <li>Added strict initialize field validation and capability checks before server-initiated Roots or Sampling
+                requests.
+            </li>
+            <li>Added embedded-resource <code>blob</code> representation and validated Tool, Prompt, and Resource return
+                collections before serialization.
+            </li>
+            <li>Converted client-side server-request handler failures into JSON-RPC <code>INTERNAL_ERROR</code> without
+                terminating receive loops.
+            </li>
+        </ul>
+        <p>Streamable HTTP currently supports ordinary JSON POST responses and the optional GET event stream. POST
+            <code>text/event-stream</code> responses are buffered rather than dispatched incrementally. GET-stream
+            readiness is asynchronous, and reconnect/resumption plus full idle-session expiry remain planned work.</p>
+        <h2>aj-mcp-common 1.5 / aj-mcp-client 1.3 / aj-mcp-server 1.2 — 2025-06-10</h2>
+        <ul>
+            <li>Added <a href="https://modelcontextprotocol.io/specification/2024-11-05/server/utilities/pagination">pagination
+                support</a>.
+            </li>
+        </ul>
+        <h2>1.0 — 2025-06-01</h2>
+        <ul>
+            <li>Initial release.</li>
+        </ul>
+
+    </article>
+
+    <div></div>
+</div>
+<footer>
+    AJ MCP SDK, a part of
+    <a href="https://framework.ajaxjs.com" target="_blank">AJ-Framework</a>
+    open source. Mail:frank@ajaxjs.com, visit
+    <a href="https://blog.csdn.net/zhangxin09" target="_blank">my blog(In Chinese)</a>. <br/> <br/> Copyright © 2025
+    Frank Cheung. All rights reserved.
+</footer>
+</body>
 </html>

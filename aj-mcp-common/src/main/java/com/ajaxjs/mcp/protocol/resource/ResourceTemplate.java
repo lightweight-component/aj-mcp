@@ -1,7 +1,7 @@
 package com.ajaxjs.mcp.protocol.resource;
 
-import lombok.Data;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Data;
 
 /**
  * The 'ResourceTemplate' object from the MCP protocol schema.

@@ -7,6 +7,7 @@ tags:
   - MCP Server SDK 用法指南
 layout: layouts/docs-cn.njk
 ---
+
 # MCP 服务器 SDK 使用说明
 
 ## MCP 服务器 SDK 安装
@@ -14,6 +15,7 @@ layout: layouts/docs-cn.njk
 添加如下依赖以构建 MCP 服务器：
 
 ```xml
+
 <dependency>
     <groupId>com.ajaxjs</groupId>
     <artifactId>aj-mcp-server</artifactId>
@@ -43,9 +45,11 @@ layout: layouts/docs-cn.njk
 
 ## 创建 MCP 服务类
 
-AJ-MCP 通过注解扫描自动发现、注册和管理 MCP 功能（工具、资源、提示）。开发者只需在带有 `@McpService` 注解的类中，使用 `@Tool`、`@Resource` 或 `@Prompt` 注解标记方法，即可暴露相应功能。
+AJ-MCP 通过注解扫描自动发现、注册和管理 MCP 功能（工具、资源、提示）。开发者只需在带有 `@McpService` 注解的类中，使用 `@Tool`、
+`@Resource` 或 `@Prompt` 注解标记方法，即可暴露相应功能。
 
 ```java
+
 @McpService
 public class MyServerFeatures {
     @Tool(description = "回显字符串")
@@ -71,16 +75,17 @@ public class MyServerFeatures {
 
 注解体系围绕几个核心注解展开，用于标记类和方法以供 MCP 识别和暴露：
 
-| 注解         | 目标      | 作用描述                      |
-|--------------|-----------|-------------------------------|
-| @McpService  | 类        | 标记服务发现类                |
-| @Tool        | 方法      | 将方法暴露为 MCP 工具         |
-| @ToolArg     | 参数      | 定义工具方法参数              |
-| @Resource    | 方法      | 将方法暴露为 MCP 资源         |
-| @Prompt      | 方法      | 将方法暴露为 MCP 提示         |
-| @PromptArg   | 参数      | 定义提示方法参数              |
+| 注解          | 目标 | 作用描述          |
+|-------------|----|---------------|
+| @McpService | 类  | 标记服务发现类       |
+| @Tool       | 方法 | 将方法暴露为 MCP 工具 |
+| @ToolArg    | 参数 | 定义工具方法参数      |
+| @Resource   | 方法 | 将方法暴露为 MCP 资源 |
+| @Prompt     | 方法 | 将方法暴露为 MCP 提示 |
+| @PromptArg  | 参数 | 定义提示方法参数      |
 
-调用 `FeatureMgr.init()` 会扫描指定包，并注册 `@McpService` 类中的 `@Tool`、`@Resource` 和 `@Prompt` 方法。单个类无法加载时会记录日志并跳过，不会中断整个扫描过程。
+调用 `FeatureMgr.init()` 会扫描指定包，并注册 `@McpService` 类中的 `@Tool`、`@Resource` 和 `@Prompt`
+方法。单个类无法加载时会记录日志并跳过，不会中断整个扫描过程。
 
 ### 初始化功能管理器
 
@@ -88,7 +93,9 @@ public class MyServerFeatures {
 
 ```java
 FeatureMgr mgr = new FeatureMgr();
-mgr.init("com.foo.myproduct");
+mgr.
+
+init("com.foo.myproduct");
 ```
 
 ## 服务器配置
@@ -103,24 +110,43 @@ mgr.init("com.foo.myproduct");
 
 ```java
 FeatureMgr mgr = new FeatureMgr();
-mgr.init("com.foo.myproduct");
+mgr.
+
+init("com.foo.myproduct");
 
 McpServer server = new McpServer();
-server.setFeatureMgr(mgr);
-server.setTransport(new ServerStdio(server));
+server.
+
+setFeatureMgr(mgr);
+server.
+
+setTransport(new ServerStdio(server));
 
 ServerConfig serverConfig = new ServerConfig();
-serverConfig.setName("MY_MCP_Server");
-serverConfig.setVersion("1.0");
-server.setServerConfig(serverConfig);
+serverConfig.
 
-server.start();
+setName("MY_MCP_Server");
+serverConfig.
+
+setVersion("1.0");
+server.
+
+setServerConfig(serverConfig);
+
+server.
+
+start();
 ```
 
 ## 传输与生命周期规则
 
 - `ServerStdio` 每行交换一个 JSON-RPC 消息，`System.out` 必须仅用于协议输出。
-- `ServerSse` 是旧版双端点适配器：用 `openSession(...)` 建立会话，把 POST 消息交给 `handle(sessionId, body)`，断开连接时移除会话，并在应用关闭时关闭适配器。
-- `ServerStreamableHttp` 使用单一端点：`POST` 委托给 `post(body, headers)`，可选 `GET` event stream 委托给 `openEventStream(sessionId, writer, headers)`，`DELETE` 委托给 `delete(sessionId, headers)`。将返回 `HttpResult` 的状态码、响应头、content type 和正文复制到框架响应中。
+- `ServerSse` 是旧版双端点适配器：用 `openSession(...)` 建立会话，把 POST 消息交给 `handle(sessionId, body)`
+  ，断开连接时移除会话，并在应用关闭时关闭适配器。
+- `ServerStreamableHttp` 使用单一端点：`POST` 委托给 `post(body, headers)`，可选 `GET` event stream 委托给
+  `openEventStream(sessionId, writer, headers)`，`DELETE` 委托给 `delete(sessionId, headers)`。将返回 `HttpResult`
+  的状态码、响应头、content type 和正文复制到框架响应中。
 
-初始化会协商支持的版本，并创建 Streamable HTTP session。使用 MCP `2025-06-18` 时，后续 Streamable HTTP 请求必须带上协商后的 `MCP-Protocol-Version` header。`strictLifecycle` 默认开启，普通请求必须在 `initialize` 和 `notifications/initialized` 之后发送。本项目有意不支持 JSON-RPC batch。
+初始化会协商支持的版本，并创建 Streamable HTTP session。使用 MCP `2025-06-18` 时，后续 Streamable HTTP 请求必须带上协商后的
+`MCP-Protocol-Version` header。`strictLifecycle` 默认开启，普通请求必须在 `initialize` 和 `notifications/initialized`
+之后发送。本项目有意不支持 JSON-RPC batch。

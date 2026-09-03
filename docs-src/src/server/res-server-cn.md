@@ -7,9 +7,11 @@ tags:
   - 资源内容
 layout: layouts/docs-cn.njk
 ---
+
 # MCP 服务器 SDK 功能管理
 
-AJ-MCP 注解体系为将 Java 方法声明式地暴露为 MCP（模型上下文协议，Model Context Protocol）工具、资源和提示提供了便捷方式。该体系通过 Java 注解自动发现和注册功能，无需手动配置或注册代码。
+AJ-MCP 注解体系为将 Java 方法声明式地暴露为 MCP（模型上下文协议，Model Context Protocol）工具、资源和提示提供了便捷方式。该体系通过
+Java 注解自动发现和注册功能，无需手动配置或注册代码。
 
 ## 资源开发
 
@@ -17,12 +19,12 @@ AJ-MCP 注解体系为将 Java 方法声明式地暴露为 MCP（模型上下文
 
 `@Resource` 注解将方法暴露为 MCP 资源，具有以下属性：
 
-| 属性         | 是否必需 | 描述                          |
-|--------------|----------|-------------------------------|
-| uri          | 是       | 资源的唯一标识符              |
-| description  | 否       | 人类可读的描述                |
-| mimeType     | 否       | 资源内容的 MIME 类型           |
-| value        | 否       | 人类可读的名称（默认为空）     |
+| 属性          | 是否必需 | 描述            |
+|-------------|------|---------------|
+| uri         | 是    | 资源的唯一标识符      |
+| description | 否    | 人类可读的描述       |
+| mimeType    | 否    | 资源内容的 MIME 类型 |
+| value       | 否    | 人类可读的名称（默认为空） |
 
 ### 资源内容类型
 
@@ -61,13 +63,14 @@ public ResourceContentBinary blob() {
 
 ### 资源模板
 
-`FeatureMgr` 会注册 `@ResourceTemplate` 方法，通过 `resources/templates/list` 暴露模板，并在 `resources/read` 收到动态 URI 时执行匹配。
+`FeatureMgr` 会注册 `@ResourceTemplate` 方法，通过 `resources/templates/list` 暴露模板，并在 `resources/read` 收到动态 URI
+时执行匹配。
 
-| 属性         | 是否必需 | 描述                          |
-|--------------|----------|-------------------------------|
-| uriTemplate  | 是       | RFC 6570 Level 1 URI 模板     |
-| name         | 否       | 人类可读的名称                |
-| description  | 否       | 模板描述                      |
-| mimeType     | 否       | 内容的 MIME 类型              |
+| 属性          | 是否必需 | 描述                      |
+|-------------|------|-------------------------|
+| uriTemplate | 是    | RFC 6570 Level 1 URI 模板 |
+| name        | 否    | 人类可读的名称                 |
+| description | 否    | 模板描述                    |
+| mimeType    | 否    | 内容的 MIME 类型             |
 
 模板变量必须与 `@ResourceTemplateArg` 参数对应。当前匹配器支持 RFC 6570 Level 1 简单变量，例如 `users://{id}`。

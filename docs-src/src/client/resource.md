@@ -9,6 +9,7 @@ layout: layouts/docs.njk
 ---
 
 ## Working with Resources
+
 The resource system enables LLM-powered applications to access structured content through a unified interface.
 Resources are identified by URIs and can represent any type of content that might be useful for an LLM to process.
 The AJ MCP client provides methods for discovering and accessing resources exposed by the server.
@@ -29,8 +30,8 @@ assertEquals("image/jpg", blob.getMimeType(), "MIME type mismatch for 'blob'");
 assertEquals("A nice pic", blob.getDescription(), "Description mismatch for 'blob'");
 ```
 
-
-`listResources()` requests and caches the first/default page. Use `listResources(int pageNo)` for another page. Each page is cached independently, so requesting page 2 does not overwrite page 0.
+`listResources()` requests and caches the first/default page. Use `listResources(int pageNo)` for another page. Each
+page is cached independently, so requesting page 2 does not overwrite page 0.
 
 ``` java
 List<ResourceItem> resourceList = mcpClient.listResources(1);
@@ -67,7 +68,8 @@ assertEquals("file:///blob", blobContents.getUri(), "URI should be 'file:///blob
 assertEquals("blob", blobContents.getBlob(), "Blob content should be 'blob'");
 ```
 
-Resource templates registered by the server can be listed and read through their expanded URI. For interoperable pagination, prefer `listResourceTemplatePage(cursor)` and pass the returned opaque `nextCursor` unchanged.
+Resource templates registered by the server can be listed and read through their expanded URI. For interoperable
+pagination, prefer `listResourceTemplatePage(cursor)` and pass the returned opaque `nextCursor` unchanged.
 
 ``` java
 GetResourceResult.ResourceResultDetail response = mcpClient.readResource("file:///text-template/hello");

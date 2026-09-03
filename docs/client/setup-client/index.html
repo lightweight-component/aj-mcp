@@ -1,139 +1,149 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8"/>
-        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-        <title>AJ MCP SDK/MCP Client SDK Setup</title>
-        <meta name="description" content="A lightweight Java 8 Model Context Protocol (MCP) SDK. MCP Client SDK Setup"/>
-        <meta name="keywords" content="mcp, mcp sdk, java mcp, mcp client, mcp server, java8 mcp, client setup"/>
-        <meta name="viewport" content="width=device-width, initial-scale=1"/>
-        <link rel="stylesheet" href="/asset/style/main.css"/>
-        <link rel="icon" type="image/png" href="/asset/favicon.ico"/>
-        <script src="/asset/common.js"></script>
-        <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200..900&family=Noto+Serif+TC:wght@200..900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet" />
-    </head>
-    <body>
-        <nav>
-            <div>
-                <div class="links">
-                    <a href="/">🏠 Home</a>
-                    | ⚙️ Source:
-                    <a target="_blank" href="https://github.com/lightweight-component/aj-mcp">Github</a>/<a target="_blank" href="https://gitcode.com/lightweight-component/aj-mcp">Gitcode</a>
-                    |
-                    <a href="/cn">Chinese Version</a>
-                </div>
-                <h1>AJ MCP SDK</h1>
-                <h3>User Manual</h3>
-            </div>
-        </nav>
-        <div>
-            <menu>
-                
-                <ul>
-                    <li class="selected">
-                        <a href="/">Home</a>
-                    </li>
-                    <li>
-                        <a href="/architecture/index">Architecture</a>
-                    </li>
-                </ul>
-                <h3>MCP Client SDK</h3>
-                <ul>
-                    <li>
-                        <a href="/client/setup-client">Client SDK Setup</a>
-                    </li>
-                    <li>
-                       <a href="/client/initialization">Initialization</a>
-                    </li>
-                    <li>
-                       <a href="/client/resource">Resources Usage</a>
-                    </li>
-                     <li>
-                       <a href="/client/prompt">Prompts Usage</a>
-                    </li>
-                     <li>
-                       <a href="/client/tool">Tools Usage</a>
-                    </li>
-                    <li>
-                       <a href="/client/handling-notifications">Notifications</a>
-                    </li>
-                </ul>
-                <h3>MCP Server SDK</h3>
-                <ul>
-                      <li>
-                           <a href="/server/usage-server">Server SDK Usage</a>
-                      </li>
-                      <li>
-                           <a href="/server/res-server">Resources Usage</a>
-                      </li>
-                      <li>
-                           <a href="/server/pro-server">Prompts Usage</a>
-                      </li>
-                      <li>
-                             <a href="/server/tool-server">Tools Usage</a>
-                       </li>
-                      <li>
-                         <a href="/server/sample">Integration Samples</a>
-                      </li>
-                </ul>
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <title>AJ MCP SDK/MCP Client SDK Setup</title>
+    <meta name="description" content="A lightweight Java 8 Model Context Protocol (MCP) SDK. MCP Client SDK Setup"/>
+    <meta name="keywords" content="mcp, mcp sdk, java mcp, mcp client, mcp server, java8 mcp, client setup"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" href="/asset/style/main.css"/>
+    <link rel="icon" type="image/png" href="/asset/favicon.ico"/>
+    <script src="/asset/common.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200..900&family=Noto+Serif+TC:wght@200..900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap"
+          rel="stylesheet"/>
+</head>
+<body>
+<nav>
+    <div>
+        <div class="links">
+            <a href="/">🏠 Home</a>
+            | ⚙️ Source:
+            <a target="_blank" href="https://github.com/lightweight-component/aj-mcp">Github</a>/<a target="_blank"
+                                                                                                    href="https://gitcode.com/lightweight-component/aj-mcp">Gitcode</a>
+            |
+            <a href="/cn">Chinese Version</a>
+        </div>
+        <h1>AJ MCP SDK</h1>
+        <h3>User Manual</h3>
+    </div>
+</nav>
+<div>
+    <menu>
 
-                <h3>Misc</h3>
-                <ul>
-                    <li><a href="/misc/versions">Release History</a></li>
-                    <li><a href="/misc/contact">Contact</a></li>
-                </ul>
-            </menu>
-            <article>
-                <h1>MCP Client SDK Setup</h1>
-<h2>Install the Dependency</h2>
-<p>Add the AJ MCP client dependency:</p>
-<pre><code class="language-xml">
+        <ul>
+            <li class="selected">
+                <a href="/">Home</a>
+            </li>
+            <li>
+                <a href="/architecture/index">Architecture</a>
+            </li>
+        </ul>
+        <h3>MCP Client SDK</h3>
+        <ul>
+            <li>
+                <a href="/client/setup-client">Client SDK Setup</a>
+            </li>
+            <li>
+                <a href="/client/initialization">Initialization</a>
+            </li>
+            <li>
+                <a href="/client/resource">Resources Usage</a>
+            </li>
+            <li>
+                <a href="/client/prompt">Prompts Usage</a>
+            </li>
+            <li>
+                <a href="/client/tool">Tools Usage</a>
+            </li>
+            <li>
+                <a href="/client/handling-notifications">Notifications</a>
+            </li>
+        </ul>
+        <h3>MCP Server SDK</h3>
+        <ul>
+            <li>
+                <a href="/server/usage-server">Server SDK Usage</a>
+            </li>
+            <li>
+                <a href="/server/res-server">Resources Usage</a>
+            </li>
+            <li>
+                <a href="/server/pro-server">Prompts Usage</a>
+            </li>
+            <li>
+                <a href="/server/tool-server">Tools Usage</a>
+            </li>
+            <li>
+                <a href="/server/sample">Integration Samples</a>
+            </li>
+        </ul>
+
+        <h3>Misc</h3>
+        <ul>
+            <li><a href="/misc/versions">Release History</a></li>
+            <li><a href="/misc/contact">Contact</a></li>
+        </ul>
+    </menu>
+    <article>
+        <h1>MCP Client SDK Setup</h1>
+        <h2>Install the Dependency</h2>
+        <p>Add the AJ MCP client dependency:</p>
+        <pre><code class="language-xml">
 &lt;dependency&gt;
     &lt;groupId&gt;com.ajaxjs&lt;/groupId&gt;
     &lt;artifactId&gt;aj-mcp-client&lt;/artifactId&gt;
     &lt;version&gt;1.5&lt;/version&gt;
 &lt;/dependency&gt;
 </code></pre>
-<p>We can find the latest version:
-<a href="https://central.sonatype.com/artifact/com.ajaxjs/aj-mcp-client"><img src="https://img.shields.io/maven-central/v/com.ajaxjs/aj-mcp-client?label=Latest%20Release" alt="Maven Central"></a></p>
-<h2>Concepts</h2>
-<p>The client SDK implementation consists of two main components:</p>
-<ul>
-<li>Transport: Manages the subprocess and handles low-level message exchange.</li>
-<li>MCP Client: Provides a high-level API for using the transport, implementing the MCP protocol.</li>
-</ul>
-<p>To use the client, first create an appropriate transport and then build an <code>McpClient</code> with that transport.
-The client supports three transport mechanisms: standard I/O (STDIO), the legacy two-endpoint HTTP/SSE transport, and Streamable HTTP.</p>
-<h2>Setup the Transport</h2>
-<p>First, create the transport that matches the MCP server.</p>
-<h3>Stdio Transport</h3>
-<p>Stdio stands for standard input/output. In this transport, the client launches a local MCP server subprocess and exchanges one JSON-RPC message per line through its standard streams.</p>
-<pre><code class="language-java">// The MCP server is a Java program that communicates over stdio.
+        <p>We can find the latest version:
+            <a href="https://central.sonatype.com/artifact/com.ajaxjs/aj-mcp-client"><img
+                    src="https://img.shields.io/maven-central/v/com.ajaxjs/aj-mcp-client?label=Latest%20Release"
+                    alt="Maven Central"></a></p>
+        <h2>Concepts</h2>
+        <p>The client SDK implementation consists of two main components:</p>
+        <ul>
+            <li>Transport: Manages the subprocess and handles low-level message exchange.</li>
+            <li>MCP Client: Provides a high-level API for using the transport, implementing the MCP protocol.</li>
+        </ul>
+        <p>To use the client, first create an appropriate transport and then build an <code>McpClient</code> with that
+            transport.
+            The client supports three transport mechanisms: standard I/O (STDIO), the legacy two-endpoint HTTP/SSE
+            transport, and Streamable HTTP.</p>
+        <h2>Setup the Transport</h2>
+        <p>First, create the transport that matches the MCP server.</p>
+        <h3>Stdio Transport</h3>
+        <p>Stdio stands for standard input/output. In this transport, the client launches a local MCP server subprocess
+            and exchanges one JSON-RPC message per line through its standard streams.</p>
+        <pre><code class="language-java">// The MCP server is a Java program that communicates over stdio.
 McpTransport transport = StdioTransport.builder()
     .command(Arrays.asList(&quot;java&quot;, &quot;-jar&quot;, &quot;C:\\app\\my-app-jar-with-dependencies.jar&quot;))
     .logEvents(true)
     .build();
 </code></pre>
-<p>Here is an example using a <code>.exe</code> program:</p>
-<pre><code class="language-java">// The MCP server is a native executable that communicates over stdio.
+        <p>Here is an example using a <code>.exe</code> program:</p>
+        <pre><code class="language-java">// The MCP server is a native executable that communicates over stdio.
 McpTransport transport = StdioTransport.builder()
     .command(Arrays.asList(&quot;C:\\app\\my-app.exe&quot;, &quot;-token&quot;, &quot;dd4df2sx32ds&quot;))
     .logEvents(true)
     .build();
 </code></pre>
-<p>Set <code>logEvents</code> to <code>true</code> to log outgoing protocol messages while debugging. The transport also consumes stderr so that a child process cannot block on a full error pipe.</p>
-<h3>Legacy HTTP/SSE Transport</h3>
-<p>The legacy transport uses an SSE endpoint for server-to-client messages and a server-advertised POST endpoint for client requests. It is useful when connecting to older MCP servers.</p>
-<pre><code class="language-java">McpTransport transport = HttpMcpTransport.builder()
+        <p>Set <code>logEvents</code> to <code>true</code> to log outgoing protocol messages while debugging. The
+            transport also consumes stderr so that a child process cannot block on a full error pipe.</p>
+        <h3>Legacy HTTP/SSE Transport</h3>
+        <p>The legacy transport uses an SSE endpoint for server-to-client messages and a server-advertised POST endpoint
+            for client requests. It is useful when connecting to older MCP servers.</p>
+        <pre><code class="language-java">McpTransport transport = HttpMcpTransport.builder()
     .sseUrl(&quot;http://localhost:8080/sse&quot;)
     .logRequests(true)
     .logResponses(true)
     .build();
 </code></pre>
-<p>The <code>sseUrl</code> is required. It specifies the URL of the SSE endpoint where the MCP server is listening for incoming connections.</p>
-<h3>Streamable HTTP (2025-03-26 / 2025-06-18)</h3>
-<p>Newer revisions use one HTTP endpoint:</p>
-<pre><code class="language-java">McpTransport transport = StreamableHttpTransport.builder()
+        <p>The <code>sseUrl</code> is required. It specifies the URL of the SSE endpoint where the MCP server is
+            listening for incoming connections.</p>
+        <h3>Streamable HTTP (2025-03-26 / 2025-06-18)</h3>
+        <p>Newer revisions use one HTTP endpoint:</p>
+        <pre><code class="language-java">McpTransport transport = StreamableHttpTransport.builder()
         .endpointUrl(&quot;http://localhost:8080/mcp&quot;)
         .openEventStream(true)
         .build();
@@ -144,62 +154,80 @@ McpClient client = McpClient.builder()
         .build();
 client.initialize();
 </code></pre>
-<p>For OAuth, pass an <code>Authorization</code> Bearer token through <code>requestHeaders</code>. The SDK retains the returned session ID and automatically sends the negotiated <code>MCP-Protocol-Version</code> on subsequent requests.</p>
-<p>Set <code>openEventStream(true)</code> when the client advertises Roots, Sampling, or Elicitation handlers. Those server-initiated requests are received through the optional GET event stream, which opens asynchronously after initialization.</p>
-<blockquote>
-<p>Current limitations: request-scoped streaming over a POST <code>text/event-stream</code> response is buffered rather than processed incrementally; use ordinary JSON POST responses. The optional GET event stream has no reconnect/resumption policy, and initialization does not wait for that stream to become ready. Do not rely on incremental POST progress or server requests delivered through a POST response until this limitation is removed.</p>
-</blockquote>
-<h2>McpClient</h2>
-<p>The MCP Client serves as a bridge between local applications and remote tool implementations.</p>
-<pre><code class="language-java">McpClient mcpClient = McpClient.builder()
+        <p>For OAuth, pass an <code>Authorization</code> Bearer token through <code>requestHeaders</code>. The SDK
+            retains the returned session ID and automatically sends the negotiated <code>MCP-Protocol-Version</code> on
+            subsequent requests.</p>
+        <p>Set <code>openEventStream(true)</code> when the client advertises Roots, Sampling, or Elicitation handlers.
+            Those server-initiated requests are received through the optional GET event stream, which opens
+            asynchronously after initialization.</p>
+        <blockquote>
+            <p>Current limitations: request-scoped streaming over a POST <code>text/event-stream</code> response is
+                buffered rather than processed incrementally; use ordinary JSON POST responses. The optional GET event
+                stream has no reconnect/resumption policy, and initialization does not wait for that stream to become
+                ready. Do not rely on incremental POST progress or server requests delivered through a POST response
+                until this limitation is removed.</p>
+        </blockquote>
+        <h2>McpClient</h2>
+        <p>The MCP Client serves as a bridge between local applications and remote tool implementations.</p>
+        <pre><code class="language-java">McpClient mcpClient = McpClient.builder()
         .clientName(&quot;my-host&quot;)
         .clientVersion(&quot;1.2&quot;)
         .transport(transport)
         .build();
 </code></pre>
-<p>Usually, you should set the <code>clientName</code> and <code>clientVersion</code> properties.
-The <code>clientName</code> property is used to identify the client to the MCP server, while the  <code>clientVersion</code> property is used to indicate the version of the
-client.</p>
-<p>All properties are listing below:</p>
-<table>
-<thead>
-<tr>
-<th>Property</th>
-<th>Note</th>
-<th>Type of value</th>
-<th>Example of value</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>clientName</td>
-<td>Sets the name that the client will use to identify itself to the MCP server in the initialization message.</td>
-<td>String</td>
-<td>myapp/foo-app</td>
-</tr>
-<tr>
-<td>clientVersion</td>
-<td>Sets the version string that the client will use to identify itself to the MCP server in the initialization message. The default value is &quot;1.0&quot;.</td>
-<td>String</td>
-<td>1.0/2.1.2</td>
-</tr>
-<tr>
-<td>protocolVersion</td>
-<td>Sets the protocol version that the client will advertise in the initialization message. The default value right now is &quot;2024-11-05&quot;, but will change over time in later versions.</td>
-<td>String</td>
-<td>2024-11-05</td>
-</tr>
-<tr>
-<td>requestTimeout</td>
-<td>Timeout applied to every request, including initialization and health checks. The default is 60 seconds; zero means wait indefinitely, and negative values are rejected.</td>
-<td>Duration</td>
-<td><code>Duration.ofSeconds(60)</code></td>
-</tr>
-</tbody>
-</table>
-<p>Please note that after creating the McpClient, you should call <code>mcpClient.initialize();</code> right away.
-The next section describes protocol initialization.</p>
-<pre><code class="language-java">McpClient mcpClient = McpClient.builder()
+        <p>Usually, you should set the <code>clientName</code> and <code>clientVersion</code> properties.
+            The <code>clientName</code> property is used to identify the client to the MCP server, while the <code>clientVersion</code>
+            property is used to indicate the version of the
+            client.</p>
+        <p>All properties are listing below:</p>
+        <table>
+            <thead>
+            <tr>
+                <th>Property</th>
+                <th>Note</th>
+                <th>Type of value</th>
+                <th>Example of value</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>clientName</td>
+                <td>Sets the name that the client will use to identify itself to the MCP server in the initialization
+                    message.
+                </td>
+                <td>String</td>
+                <td>myapp/foo-app</td>
+            </tr>
+            <tr>
+                <td>clientVersion</td>
+                <td>Sets the version string that the client will use to identify itself to the MCP server in the
+                    initialization message. The default value is &quot;1.0&quot;.
+                </td>
+                <td>String</td>
+                <td>1.0/2.1.2</td>
+            </tr>
+            <tr>
+                <td>protocolVersion</td>
+                <td>Sets the protocol version that the client will advertise in the initialization message. The default
+                    value right now is &quot;2024-11-05&quot;, but will change over time in later versions.
+                </td>
+                <td>String</td>
+                <td>2024-11-05</td>
+            </tr>
+            <tr>
+                <td>requestTimeout</td>
+                <td>Timeout applied to every request, including initialization and health checks. The default is 60
+                    seconds; zero means wait indefinitely, and negative values are rejected.
+                </td>
+                <td>Duration</td>
+                <td><code>Duration.ofSeconds(60)</code></td>
+            </tr>
+            </tbody>
+        </table>
+        <p>Please note that after creating the McpClient, you should call <code>mcpClient.initialize();</code> right
+            away.
+            The next section describes protocol initialization.</p>
+        <pre><code class="language-java">McpClient mcpClient = McpClient.builder()
         .clientName(&quot;my-host&quot;)
         .clientVersion(&quot;1.2&quot;)
         .transport(sseTransport)
@@ -207,39 +235,43 @@ The next section describes protocol initialization.</p>
         
 mcpClient.initialize();
 </code></pre>
-<p>Close the client when it is no longer needed. Closing the transport releases HTTP/SSE requests or the stdio subprocess and completes outstanding requests exceptionally.</p>
-<pre><code class="language-java">try (IMcpClient mcpClient2 = McpClient.builder().transport(transport).build()) {
+        <p>Close the client when it is no longer needed. Closing the transport releases HTTP/SSE requests or the stdio
+            subprocess and completes outstanding requests exceptionally.</p>
+        <pre><code class="language-java">try (IMcpClient mcpClient2 = McpClient.builder().transport(transport).build()) {
     mcpClient2.initialize();
     ...
 } catch (Exception e) {
    throw new RuntimeException(e);
 }
 </code></pre>
-<p>The MCP Client follows a layered architecture with a clean separation between the interface definition and its implementation. The client relies on
-the transport layer for actual communication with the server, abstracting the communication details to support different transport mechanisms.</p>
-<style>
-table th:nth-child(2) {
- min-width: 400px;
-}
-table th:nth-child(3), table td:nth-child(3) {
- min-width: 120px!important;
- width: 120px;
-}
+        <p>The MCP Client follows a layered architecture with a clean separation between the interface definition and
+            its implementation. The client relies on
+            the transport layer for actual communication with the server, abstracting the communication details to
+            support different transport mechanisms.</p>
+        <style>
+            table th:nth-child(2) {
+             min-width: 400px;
+            }
+            table th:nth-child(3), table td:nth-child(3) {
+             min-width: 120px!important;
+             width: 120px;
+            }
 
-table td:nth-child(2) {
- text-align: left;
-}
-</style>
+            table td:nth-child(2) {
+             text-align: left;
+            }
+        </style>
 
-            </article>
+    </article>
 
-            <div></div>
-        </div>
-        <footer>
-            AJ MCP SDK, a part of
-            <a href="https://framework.ajaxjs.com" target="_blank">AJ-Framework</a>
-            open source. Mail:frank@ajaxjs.com, visit
-            <a href="https://blog.csdn.net/zhangxin09" target="_blank">my blog(In Chinese)</a>. <br/> <br/> Copyright © 2025 Frank Cheung. All rights reserved.
-        </footer>
-    </body>
+    <div></div>
+</div>
+<footer>
+    AJ MCP SDK, a part of
+    <a href="https://framework.ajaxjs.com" target="_blank">AJ-Framework</a>
+    open source. Mail:frank@ajaxjs.com, visit
+    <a href="https://blog.csdn.net/zhangxin09" target="_blank">my blog(In Chinese)</a>. <br/> <br/> Copyright © 2025
+    Frank Cheung. All rights reserved.
+</footer>
+</body>
 </html>

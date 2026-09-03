@@ -37,17 +37,17 @@ public class McpServerPrompts {
         return Arrays.asList(message1, message2);
     }
 
-@Prompt(description = "Parametrized prompt")
-public PromptMessage parametrized(@PromptArg(description = "The name") String name) {
-    PromptMessage message = new PromptMessage();
-    message.setRole(Role.USER);
-    message.setContent(new ContentText("Hello " + name));
+    @Prompt(description = "Parametrized prompt")
+    public PromptMessage parametrized(@PromptArg(description = "The name") String name) {
+        PromptMessage message = new PromptMessage();
+        message.setRole(Role.USER);
+        message.setContent(new ContentText("Hello " + name));
 
-    return message;
-}
+        return message;
+    }
 
     @Prompt(description = "Prompt that returns an image")
-    public  PromptMessage image() {
+    public PromptMessage image() {
         String base64EncodedImage = ServerUtils.encodeImageToBase64("/com/ajaxjs/mcp/server/testcase/bird.jpg");
         ContentImage image = new ContentImage();
         image.setMimeType("image/jpg");
@@ -61,7 +61,7 @@ public PromptMessage parametrized(@PromptArg(description = "The name") String na
     }
 
     @Prompt(description = "Prompt that returns an embedded binary resource")
-    public  PromptMessage embeddedBinaryResource() {
+    public PromptMessage embeddedBinaryResource() {
         ContentEmbeddedResource embeddedResource = new ContentEmbeddedResource();
         ContentEmbeddedResource.Resource resource = new ContentEmbeddedResource.Resource();
         resource.setUri("file:///embedded-blob");

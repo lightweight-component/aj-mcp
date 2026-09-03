@@ -7,6 +7,7 @@ tags:
   - last one
 layout: layouts/docs-cn.njk
 ---
+
     <h1>联系</h1>
     <br />
     Email：<a href="mailto:support@ajaxjs.com">support@ajaxjs.com</a>

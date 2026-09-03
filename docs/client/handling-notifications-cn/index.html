@@ -1,106 +1,120 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8"/>
-        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-        <title>AJ MCP SDK/通知处理</title>
-        <meta name="description" content="轻量级的 Java 8 Model Context Protocol (MCP) SDK. AJ MCP 客户端的通知行为"/>
-        <meta name="keywords" content="mcp, mcp sdk, java mcp, mcp client, mcp server, java8 mcp, 通知"/>
-        <meta name="viewport" content="width=device-width, initial-scale=1"/>
-        <link rel="stylesheet" href="/asset/style/main.css"/>
-        <link rel="icon" type="image/png" href="/asset/favicon.ico"/>
-        <script src="/asset/common.js"></script>
-    </head>
-    <body>
-        <nav>
-            <div>
-                <div class="links">
-                    <a href="/">🏠 首页</a>
-                    | ⚙️ 源码:
-                    <a target="_blank" href="https://github.com/lightweight-component/aj-mcp">Github</a>/<a target="_blank" href="https://gitcode.com/lightweight-component/aj-mcp">Gitcode</a>
-                    |
-                    <a href="/">英文版本</a>
-                </div>
-                <h1>AJ MCP SDK</h1>
-                <h3>用户手册</h3>
-            </div>
-        </nav>
-        <div>
-            <menu>
-                
-                <ul>
-                    <li class="selected">
-                        <a href="/cn">首页</a>
-                    </li>
-                    <li>
-                        <a href="/architecture/index-cn">架构原理</a>
-                    </li>
-                </ul>
-                <h3>MCP 客户端 SDK</h3>
-                <ul>
-                    <li>
-                        <a href="/client/setup-client-cn">安装与配置</a>
-                    </li>
-                    <li>
-                       <a href="/client/initialization-cn">初始化</a>
-                    </li>
-                    <li>
-                       <a href="/client/resource-cn">资源用法</a>
-                    </li>
-                     <li>
-                       <a href="/client/prompt-cn">提示用法</a>
-                    </li>
-                     <li>
-                       <a href="/client/tool-cn">工具用法</a>
-                    </li>
-                    <li>
-                       <a href="/client/handling-notifications-cn">通知处理</a>
-                    </li>
-                </ul>
-                <h3>MCP 服务端 SDK</h3>
-                <ul>
-                      <li>
-                           <a href="/server/usage-server-cn">Server SDK 用法指南</a>
-                      </li>
-                      <li>
-                           <a href="/server/res-server-cn">Resources 用法</a>
-                      </li>
-                      <li>
-                           <a href="/server/pro-server-cn">Prompts 用法</a>
-                      </li>
-                      <li>
-                             <a href="/server/tool-server-cn">Tools 用法</a>
-                       </li>
-                      <li>
-                         <a href="/server/sample-cn">整合例子</a>
-                      </li>
-                </ul>
-
-                <h3>其他</h3>
-                <ul>
-                    <li><a href="/misc/versions-cn">版本记录</a></li>
-                    <li><a href="/misc/contact-cn">联系方式</a></li>
-                </ul>
-            </menu>
-            <article>
-                <h1>通知处理</h1>
-<p>JSON-RPC notification 不包含 <code>id</code>，服务端不得返回响应。初始化期间客户端会发送 <code>notifications/initialized</code>；STDIO、旧版 HTTP/SSE 和 Streamable HTTP 服务端传输都不会为该通知输出响应。</p>
-<p>可通过 <code>onNotification(method, handler)</code> 注册进度、资源更新、日志和列表变更通知。收到对应的列表变更通知后，Resource、ResourceTemplate 和 Prompt 缓存会自动失效。</p>
-<p>客户端还可通过 <code>onServerRequest(...)</code> 响应服务端发起的请求。便捷方法 <code>setRoots(...)</code>、<code>setSamplingHandler(...)</code> 和 <code>setElicitationHandler(...)</code> 应在 <code>initialize()</code> 前调用，用于配置标准的 <code>roots/list</code>、<code>sampling/createMessage</code> 和 <code>elicitation/create</code> 处理器并声明相应能力；Elicitation 需要 MCP <code>2025-06-18</code>。</p>
-<p>如果 server-request handler 抛出运行时异常，客户端会在公共 transport 边界捕获异常，并使用原始请求 ID 返回 JSON-RPC <code>INTERNAL_ERROR</code>（<code>-32603</code>）。异常会被记录，但不会终止 STDIO、旧版 SSE 或 Streamable HTTP 接收循环。handler 返回 <code>null</code> 表示没有可用结果，此时返回 <code>METHOD_NOT_FOUND</code>。</p>
-<p>旧版 SSE 通道关闭或失败、transport 被关闭时，所有 pending request future 都会以异常完成。STDIO 子进程意外退出时也会立即使 pending request 失败，即使 <code>requestTimeout</code> 设置为 0 也不会永久等待。当前 Streamable HTTP 会把 GET event stream 的失败也视为传输失败，且还没有断线重连/恢复策略。</p>
-<p>服务端的取消状态同时以 session 和 JSON-RPC request ID 隔离。两个客户端可以安全地使用相同 request ID；取消其中一个 session 的请求不会中断另一个 session。关闭 session 时也只会中断该 session 正在运行的工具。</p>
-
-                <div id="comment-holder">
-                </div>
-            </article>
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <title>AJ MCP SDK/通知处理</title>
+    <meta name="description" content="轻量级的 Java 8 Model Context Protocol (MCP) SDK. AJ MCP 客户端的通知行为"/>
+    <meta name="keywords" content="mcp, mcp sdk, java mcp, mcp client, mcp server, java8 mcp, 通知"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" href="/asset/style/main.css"/>
+    <link rel="icon" type="image/png" href="/asset/favicon.ico"/>
+    <script src="/asset/common.js"></script>
+</head>
+<body>
+<nav>
+    <div>
+        <div class="links">
+            <a href="/">🏠 首页</a>
+            | ⚙️ 源码:
+            <a target="_blank" href="https://github.com/lightweight-component/aj-mcp">Github</a>/<a target="_blank"
+                                                                                                    href="https://gitcode.com/lightweight-component/aj-mcp">Gitcode</a>
+            |
+            <a href="/">英文版本</a>
         </div>
-        <footer>
-             AJ-Util，开源框架 <a href="https://framework.ajaxjs.com" target="_blank">AJ-Framework</a> 的一部分。联系方式：
-             frank@ajaxjs.com，<a href="https://blog.csdn.net/zhangxin09" target="_blank">作者博客</a>
-             <br />
-             <br />
-             Copyright © 2025 Frank Cheung. All rights reserved.
-         </footer>
-    </body>
+        <h1>AJ MCP SDK</h1>
+        <h3>用户手册</h3>
+    </div>
+</nav>
+<div>
+    <menu>
+
+        <ul>
+            <li class="selected">
+                <a href="/cn">首页</a>
+            </li>
+            <li>
+                <a href="/architecture/index-cn">架构原理</a>
+            </li>
+        </ul>
+        <h3>MCP 客户端 SDK</h3>
+        <ul>
+            <li>
+                <a href="/client/setup-client-cn">安装与配置</a>
+            </li>
+            <li>
+                <a href="/client/initialization-cn">初始化</a>
+            </li>
+            <li>
+                <a href="/client/resource-cn">资源用法</a>
+            </li>
+            <li>
+                <a href="/client/prompt-cn">提示用法</a>
+            </li>
+            <li>
+                <a href="/client/tool-cn">工具用法</a>
+            </li>
+            <li>
+                <a href="/client/handling-notifications-cn">通知处理</a>
+            </li>
+        </ul>
+        <h3>MCP 服务端 SDK</h3>
+        <ul>
+            <li>
+                <a href="/server/usage-server-cn">Server SDK 用法指南</a>
+            </li>
+            <li>
+                <a href="/server/res-server-cn">Resources 用法</a>
+            </li>
+            <li>
+                <a href="/server/pro-server-cn">Prompts 用法</a>
+            </li>
+            <li>
+                <a href="/server/tool-server-cn">Tools 用法</a>
+            </li>
+            <li>
+                <a href="/server/sample-cn">整合例子</a>
+            </li>
+        </ul>
+
+        <h3>其他</h3>
+        <ul>
+            <li><a href="/misc/versions-cn">版本记录</a></li>
+            <li><a href="/misc/contact-cn">联系方式</a></li>
+        </ul>
+    </menu>
+    <article>
+        <h1>通知处理</h1>
+        <p>JSON-RPC notification 不包含 <code>id</code>，服务端不得返回响应。初始化期间客户端会发送 <code>notifications/initialized</code>；STDIO、旧版
+            HTTP/SSE 和 Streamable HTTP 服务端传输都不会为该通知输出响应。</p>
+        <p>可通过 <code>onNotification(method, handler)</code>
+            注册进度、资源更新、日志和列表变更通知。收到对应的列表变更通知后，Resource、ResourceTemplate 和 Prompt 缓存会自动失效。
+        </p>
+        <p>客户端还可通过 <code>onServerRequest(...)</code> 响应服务端发起的请求。便捷方法
+            <code>setRoots(...)</code>、<code>setSamplingHandler(...)</code> 和 <code>setElicitationHandler(...)</code>
+            应在 <code>initialize()</code> 前调用，用于配置标准的
+            <code>roots/list</code>、<code>sampling/createMessage</code> 和 <code>elicitation/create</code>
+            处理器并声明相应能力；Elicitation 需要 MCP <code>2025-06-18</code>。</p>
+        <p>如果 server-request handler 抛出运行时异常，客户端会在公共 transport 边界捕获异常，并使用原始请求 ID 返回
+            JSON-RPC <code>INTERNAL_ERROR</code>（<code>-32603</code>）。异常会被记录，但不会终止 STDIO、旧版 SSE 或
+            Streamable HTTP 接收循环。handler 返回 <code>null</code> 表示没有可用结果，此时返回
+            <code>METHOD_NOT_FOUND</code>。</p>
+        <p>旧版 SSE 通道关闭或失败、transport 被关闭时，所有 pending request future 都会以异常完成。STDIO 子进程意外退出时也会立即使
+            pending request 失败，即使 <code>requestTimeout</code> 设置为 0 也不会永久等待。当前 Streamable HTTP 会把 GET
+            event stream 的失败也视为传输失败，且还没有断线重连/恢复策略。</p>
+        <p>服务端的取消状态同时以 session 和 JSON-RPC request ID 隔离。两个客户端可以安全地使用相同 request ID；取消其中一个
+            session 的请求不会中断另一个 session。关闭 session 时也只会中断该 session 正在运行的工具。</p>
+
+        <div id="comment-holder">
+        </div>
+    </article>
+</div>
+<footer>
+    AJ-Util，开源框架 <a href="https://framework.ajaxjs.com" target="_blank">AJ-Framework</a> 的一部分。联系方式：
+    frank@ajaxjs.com，<a href="https://blog.csdn.net/zhangxin09" target="_blank">作者博客</a>
+    <br/>
+    <br/>
+    Copyright © 2025 Frank Cheung. All rights reserved.
+</footer>
+</body>
 </html>

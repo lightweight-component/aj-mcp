@@ -8,6 +8,8 @@ import com.ajaxjs.mcp.protocol.initialize.InitializeRequest;
 import com.ajaxjs.mcp.protocol.utils.ping.PingRequest;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.Closeable;
@@ -83,10 +85,14 @@ public abstract class McpTransport implements McpConstant, Closeable {
      */
     public abstract void checkHealth();
 
+    @Setter
     private Map<Long, CompletableFuture<JsonNode>> pendingRequests;
     private Consumer<JsonNode> notificationHandler;
     private Function<JsonNode, JsonNode> serverRequestHandler;
     private volatile boolean initialized;
+
+    @Getter
+    @Setter
     private volatile String negotiatedProtocolVersion;
 
     public void setMessageHandlers(Consumer<JsonNode> notificationHandler,
@@ -99,14 +105,6 @@ public abstract class McpTransport implements McpConstant, Closeable {
         initialized = true;
     }
 
-    public void setNegotiatedProtocolVersion(String negotiatedProtocolVersion) {
-        this.negotiatedProtocolVersion = negotiatedProtocolVersion;
-    }
-
-    public String getNegotiatedProtocolVersion() {
-        return negotiatedProtocolVersion;
-    }
-
     protected void requireInitialized() {
         if (!initialized)
             throw new IllegalStateException("MCP client is not initialized");
@@ -115,6 +113,7 @@ public abstract class McpTransport implements McpConstant, Closeable {
     protected static Long numericId(Object id) {
         if (!(id instanceof Number))
             throw new IllegalArgumentException("Client-generated request id must be numeric: " + id);
+
         return ((Number) id).longValue();
     }
 
@@ -132,10 +131,6 @@ public abstract class McpTransport implements McpConstant, Closeable {
             throw new UnsupportedOperationException("MCP Client is NOT initialized");
 
         pendingRequests.put(id, future);
-    }
-
-    public void setPendingRequests(Map<Long, CompletableFuture<JsonNode>> pendingRequests) {
-        this.pendingRequests = pendingRequests;
     }
 
     /**
@@ -179,6 +174,7 @@ public abstract class McpTransport implements McpConstant, Closeable {
             else {
                 try {
                     JsonNode result = serverRequestHandler.apply(message);
+
                     if (result != null)
                         response.set(RESPONSE_RESULT, result);
                     else

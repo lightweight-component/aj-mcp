@@ -9,8 +9,11 @@ layout: layouts/docs.njk
 ---
 
 # Working with Prompts
-The prompt system in MCP provides a standardized way to define, store, and retrieve prompt templates for use with Large Language Models (LLMs). 
-Prompts in MCP are predefined message sequences that can be either static (with fixed content) or templated (with customizable parameters).
+
+The prompt system in MCP provides a standardized way to define, store, and retrieve prompt templates for use with Large
+Language Models (LLMs).
+Prompts in MCP are predefined message sequences that can be either static (with fixed content) or templated (with
+customizable parameters).
 
 ## Listing Prompts
 
@@ -35,7 +38,8 @@ static PromptItem findPromptByName(String name, List<PromptItem> promptRefs) {
 }
 ```
 
-`listPrompts()` requests and caches the first/default page. Use `listPrompts(int pageNo)` for another page. Each page is cached independently.
+`listPrompts()` requests and caches the first/default page. Use `listPrompts(int pageNo)` for another page. Each page is
+cached independently.
 
 ``` java
 List<PromptItem> prompts = mcpClient.listPrompts(1);
@@ -58,14 +62,16 @@ assertEquals("Hello", ((ContentText) message.getContent()).getText(), "Text cont
 
 The `getPrompt()` method returns a `PromptResultDetail` containing the prompt's description and messages.
 
-Normally, the prompt system receives a prompt name and a map of arguments. The arguments are used to fill in the placeholders in the prompt template.
+Normally, the prompt system receives a prompt name and a map of arguments. The arguments are used to fill in the
+placeholders in the prompt template.
 Arguments may be supplied as a map, where each key is an argument name, or as a JSON object string.
 
 If you don't want to use arguments, you can pass an empty map.
 
 ## Embedded Binary Resources
 
-`ContentEmbeddedResource.Resource` supports either textual content through `text` or base64-encoded binary content through `blob`. Set the URI and MIME type as well, and set only one of `text` and `blob`.
+`ContentEmbeddedResource.Resource` supports either textual content through `text` or base64-encoded binary content
+through `blob`. Set the URI and MIME type as well, and set only one of `text` and `blob`.
 
 ```java
 ContentEmbeddedResource.Resource resource = new ContentEmbeddedResource.Resource();

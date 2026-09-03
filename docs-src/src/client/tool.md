@@ -20,10 +20,12 @@ To list available tools:
 
 ```java
 List<ToolItem> tools = mcpClient.listTools();
-assertEquals(7, tools.size());
+
+assertEquals(7,tools.size());
 ```
 
-`listTools()` requests the first/default page. It does not automatically follow `nextCursor`. Use `listTools(int pageNo)` to request another page.
+`listTools()` requests the first/default page. It does not automatically follow `nextCursor`. Use
+`listTools(int pageNo)` to request another page.
 
 ``` java
 List<ToolItem> tools = mcpClient.listTools(1);
@@ -36,11 +38,17 @@ To call a tool:
 
 ```java
 String toolExecutionResultString = mcpClient.callTool("echoString", "{\"input\": \"hi\"}");
-assertEquals("hi", toolExecutionResultString);
+
+assertEquals("hi",toolExecutionResultString);
 ```
 
-The current `callTool()` convenience API returns a `String` assembled from text content. It does not expose image content through this method. Tool-level errors are returned as an error message string; transport and timeout failures follow the client exception/timeout behavior.
+The current `callTool()` convenience API returns a `String` assembled from text content. It does not expose image
+content through this method. Tool-level errors are returned as an error message string; transport and timeout failures
+follow the client exception/timeout behavior.
 
 ## Handling Notifications
 
-Register callbacks with `onNotification(method, handler)` for progress, logging, resource updates, and list-change notifications. Use `onServerRequest(method, handler)` to answer server-initiated requests; `setRoots(...)`, `setSamplingHandler(...)`, and `setElicitationHandler(...)` configure the standard handlers before `initialize()`. See [Handling Notifications](handling-notifications) for lifecycle and error behavior.
+Register callbacks with `onNotification(method, handler)` for progress, logging, resource updates, and list-change
+notifications. Use `onServerRequest(method, handler)` to answer server-initiated requests; `setRoots(...)`,
+`setSamplingHandler(...)`, and `setElicitationHandler(...)` configure the standard handlers before `initialize()`.
+See [Handling Notifications](handling-notifications) for lifecycle and error behavior.

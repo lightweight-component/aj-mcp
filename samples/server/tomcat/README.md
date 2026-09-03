@@ -1,5 +1,7 @@
 # Example for MCP Server in SSE
-Here is a simple example of how to use MCP in Java to implement a server that sends messages over Server-Sent Events (SSE).
+
+Here is a simple example of how to use MCP in Java to implement a server that sends messages over Server-Sent Events (
+SSE).
 
 [中文](./README.zh-CN.md)
 
@@ -45,6 +47,8 @@ try (McpClient client = McpClient.builder().transport(transport).build()) {
 
 ## How it is wired
 
-`StandaloneTomcat` creates `FeatureMgr`, `McpServer`, and `ServerSse`, then registers `SseServlet` and `MessageServlet` programmatically. No Spring container or `web.xml` is required.
+`StandaloneTomcat` creates `FeatureMgr`, `McpServer`, and `ServerSse`, then registers `SseServlet` and `MessageServlet`
+programmatically. No Spring container or `web.xml` is required.
 
-For production use, add an application shutdown hook that closes `ServerSse`, validate request sizes and authentication at the HTTP layer, and configure timeouts for the expected lifetime of SSE connections.
+For production use, add an application shutdown hook that closes `ServerSse`, validate request sizes and authentication
+at the HTTP layer, and configure timeouts for the expected lifetime of SSE connections.

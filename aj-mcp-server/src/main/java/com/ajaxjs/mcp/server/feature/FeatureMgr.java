@@ -188,6 +188,7 @@ public class FeatureMgr {
             paramsOrder = new ArrayList<>();
             for (int index = 0; index < parameters.length; index++) {
                 Parameter parameter = parameters[index];
+
                 if (!parameter.isAnnotationPresent(ToolArg.class))
                     throw new IllegalArgumentException("Every tool parameter must be annotated with @ToolArg: "
                             + method.getDeclaringClass().getName() + "#" + method.getName()
@@ -219,6 +220,7 @@ public class FeatureMgr {
         toolItem.setDescription(description);
         toolItem.setTitle(McpUtils.isEmptyText(tool.title()) ? null : tool.title());
         toolItem.setInputSchema(inputSchema);
+
         if (!McpUtils.isEmptyText(tool.outputSchema())) {
             try {
                 toolItem.setOutputSchema(com.ajaxjs.mcp.common.JsonUtils.fromJson(tool.outputSchema(), JsonSchema.class));
@@ -226,6 +228,7 @@ public class FeatureMgr {
                 throw new IllegalArgumentException("Invalid outputSchema for tool " + toolName, e);
             }
         }
+
         Map<String, Object> annotations = new LinkedHashMap<>();
         annotations.put("readOnlyHint", tool.readOnlyHint());
         annotations.put("destructiveHint", tool.destructiveHint());
@@ -272,8 +275,7 @@ public class FeatureMgr {
                 return "string";
         }
 
-        // 其他类型默认返回 Object
-        return "object";
+        return "object";// 其他类型默认返回 Object
     }
 
     /**
@@ -345,17 +347,6 @@ public class FeatureMgr {
         promptItem.setTitle(McpUtils.isEmptyText(prompt.title()) ? null : prompt.title());
         promptItem.setDescription(description);
         promptItem.setArguments(arguments);
-
-//        Class<?> returnType = method.getReturnType();
-//        List<PromptMessage> messages = null;
-//        if (returnType == List.class) {
-//
-//        } else {
-//            messages = Arrays.asList();
-//        }
-//        GetPromptResultDetail.PromptResultDetail result = new GetPromptResultDetail.PromptResultDetail();
-//        result.setDescription(description);
-//        result.setMessages(messages);
 
         ServerStorePrompt store = new ServerStorePrompt();
         store.setMethod(method);

@@ -40,12 +40,12 @@ public class HttpMcpTransport extends McpTransport {
     /**
      * The HTTP client used for making requests.
      */
-    private OkHttpClient client;
+    private final OkHttpClient client;
 
     /**
      * Flag indicating whether to log server responses.
      */
-    private boolean logResponses;
+    private final boolean logResponses;
 
     /**
      * Flag indicating whether to log client requests.

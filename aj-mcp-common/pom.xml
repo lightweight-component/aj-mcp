@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.ajaxjs</groupId>
         <artifactId>ajaxjs-parent</artifactId>
-        <version>1.35</version>
+        <version>1.36</version>
         <relativePath/>
     </parent>
 
@@ -39,6 +39,7 @@
             <artifactId>okhttp</artifactId>
             <version>4.12.0</version>
         </dependency>
+
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp-sse</artifactId>

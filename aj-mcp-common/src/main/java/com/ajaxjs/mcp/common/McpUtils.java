@@ -133,9 +133,9 @@ public class McpUtils {
      * @return The given object surrounded by quotes.
      */
     public static String quoted(Object object) {
-        if (object == null) {
+        if (object == null)
             return "null";
-        }
+
         return "\"" + object + "\"";
     }
 

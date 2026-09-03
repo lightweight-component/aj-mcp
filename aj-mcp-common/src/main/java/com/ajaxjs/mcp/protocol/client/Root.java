@@ -12,5 +12,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Root {
     private String uri;
+
     private String name;
 }

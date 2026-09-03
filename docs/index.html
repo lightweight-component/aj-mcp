@@ -7,7 +7,7 @@
     <meta name="description" content="AJ-MCP：面向 Java 8 的轻量级 Model Context Protocol SDK。">
     <meta name="theme-color" content="#f3f5f9">
     <title>AJ-MCP · Java 8 MCP SDK</title>
-    <link rel="icon" href="asset/favicon.ico" />
+    <link rel="icon" href="asset/favicon.ico"/>
     <script>
         (function () {
             var theme = null;
@@ -190,45 +190,92 @@
 <body>
 <div class="site">
     <aside class="rail">
-        <a class="brand" href="/"><span class="brand-sign">AJ</span><span>AJ-MCP<small>JAVA 8 / MCP SDK</small></span></a>
-        <p class="rail-intro"><span data-copy="zh">为仍在运行的 Java 系统，提供一条清晰、稳定的 MCP 接入路径。</span><span data-copy="en">A clear, stable MCP path for Java systems that are already in production.</span></p>
+        <a class="brand" href="/"><span
+                class="brand-sign">AJ</span><span>AJ-MCP<small>JAVA 8 / MCP SDK</small></span></a>
+        <p class="rail-intro"><span data-copy="zh">为仍在运行的 Java 系统，提供一条清晰、稳定的 MCP 接入路径。</span><span
+                data-copy="en">A clear, stable MCP path for Java systems that are already in production.</span></p>
         <nav class="rail-nav" aria-label="Documentation navigation">
             <a class="rail-link" href="/docs-index/"><span data-copy="zh">文档首页</span><span data-copy="en">Documentation</span><span>01</span></a>
             <a class="rail-link" href="/client/setup-client/"><span data-copy="zh">客户端</span><span data-copy="en">Client SDK</span><span>02</span></a>
             <a class="rail-link" href="/server/usage-server/"><span data-copy="zh">服务端</span><span data-copy="en">Server SDK</span><span>03</span></a>
-            <a class="rail-link" href="https://github.com/lightweight-component/aj-mcp" target="_blank" rel="noreferrer"><span data-copy="zh">源码仓库</span><span data-copy="en">Source code</span><span>↗</span></a>
+            <a class="rail-link" href="https://github.com/lightweight-component/aj-mcp" target="_blank"
+               rel="noreferrer"><span data-copy="zh">源码仓库</span><span
+                    data-copy="en">Source code</span><span>↗</span></a>
         </nav>
         <div class="rail-bottom">
-            <div class="runtime"><b>●</b> Java 8+<br><span data-copy="zh">三种传输方式</span><span data-copy="en">Three transports</span></div>
-            <div class="controls"><button class="control" id="language-toggle" type="button" aria-label="Switch language">EN / 中</button><button class="control" id="theme-toggle" type="button" aria-label="Toggle theme">◐</button></div>
+            <div class="runtime"><b>●</b> Java 8+<br><span data-copy="zh">三种传输方式</span><span data-copy="en">Three transports</span>
+            </div>
+            <div class="controls">
+                <button class="control" id="language-toggle" type="button" aria-label="Switch language">EN / 中</button>
+                <button class="control" id="theme-toggle" type="button" aria-label="Toggle theme">◐</button>
+            </div>
         </div>
     </aside>
     <main class="content">
         <section aria-labelledby="page-title">
             <p class="eyebrow">MODEL CONTEXT PROTOCOL / JAVA 8+</p>
-            <h1 class="headline" id="page-title"><span data-copy="zh" style="letter-spacing: 2px;">把 MCP<br>接入已有系统。</span><span data-copy="en">MCP for<br>the systems you keep.</span></h1>
-            <p class="lede"><span data-copy="zh">AJ-MCP 是一个轻量 Java SDK：用熟悉的注解开放业务能力，或用同步客户端连接现有 MCP Server。</span><span data-copy="en">AJ-MCP is a lightweight Java SDK: expose business capabilities with familiar annotations, or connect to existing MCP servers through a synchronous client.</span></p>
-            <a class="action" href="/docs-index/"><span data-copy="zh">从文档开始</span><span data-copy="en">Start with the documentation</span> <span>→</span></a>
+            <h1 class="headline" id="page-title"><span data-copy="zh" style="letter-spacing: 2px;">把 MCP<br>接入已有系统。</span><span
+                    data-copy="en">MCP for<br>the systems you keep.</span></h1>
+            <p class="lede"><span data-copy="zh">AJ-MCP 是一个轻量 Java SDK：用熟悉的注解开放业务能力，或用同步客户端连接现有 MCP Server。</span><span
+                    data-copy="en">AJ-MCP is a lightweight Java SDK: expose business capabilities with familiar annotations, or connect to existing MCP servers through a synchronous client.</span>
+            </p>
+            <a class="action" href="/docs-index/"><span data-copy="zh">从文档开始</span><span data-copy="en">Start with the documentation</span>
+                <span>→</span></a>
         </section>
         <hr class="divider">
         <section class="split" aria-labelledby="protocol-title">
-            <div class="section-label"><span data-copy="zh">协议能力</span><span data-copy="en">Protocol support</span><b id="protocol-title"><span data-copy="zh">一个版本边界</span><span data-copy="en">One version boundary</span></b></div>
+            <div class="section-label"><span data-copy="zh">协议能力</span><span
+                    data-copy="en">Protocol support</span><b id="protocol-title"><span
+                    data-copy="zh">一个版本边界</span><span data-copy="en">One version boundary</span></b></div>
             <div class="version-grid">
-                <article class="version"><code>2024-11-05</code><p><span data-copy="zh">核心 MCP 能力</span><span data-copy="en">Core MCP capability</span></p></article>
-                <article class="version"><code>2025-03-26</code><p><span data-copy="zh">Streamable HTTP</span><span data-copy="en">Streamable HTTP</span></p></article>
-                <article class="version"><code>2025-06-18</code><p><span data-copy="zh">结构化结果与 Elicitation</span><span data-copy="en">Structured results and elicitation</span></p></article>
+                <article class="version"><code>2024-11-05</code>
+                    <p><span data-copy="zh">核心 MCP 能力</span><span data-copy="en">Core MCP capability</span></p>
+                </article>
+                <article class="version"><code>2025-03-26</code>
+                    <p><span data-copy="zh">Streamable HTTP</span><span data-copy="en">Streamable HTTP</span></p>
+                </article>
+                <article class="version"><code>2025-06-18</code>
+                    <p><span data-copy="zh">结构化结果与 Elicitation</span><span data-copy="en">Structured results and elicitation</span>
+                    </p></article>
             </div>
         </section>
         <section class="split" aria-labelledby="path-title">
-            <div class="section-label"><span data-copy="zh">组件路径</span><span data-copy="en">Component path</span><b id="path-title"><span data-copy="zh">只保留必要层次</span><span data-copy="en">Only the necessary layers</span></b></div>
+            <div class="section-label"><span data-copy="zh">组件路径</span><span data-copy="en">Component path</span><b
+                    id="path-title"><span data-copy="zh">只保留必要层次</span><span data-copy="en">Only the necessary layers</span></b>
+            </div>
             <div class="path">
-                <article class="path-item"><div class="path-number">01</div><h2>aj-mcp-common</h2><p><span data-copy="zh">共享 JSON-RPC 与 MCP 模型、协议版本和内容类型。</span><span data-copy="en">Shared JSON-RPC/MCP models, protocol revisions, and content types.</span></p><a href="/docs-index/"><span data-copy="zh">了解更多 →</span><span data-copy="en">Learn more →</span></a></article>
-                <article class="path-item"><div class="path-number">02</div><h2>aj-mcp-client</h2><p><span data-copy="zh">通过 STDIO、旧版 HTTP/SSE 或 Streamable HTTP 发现并调用 MCP 能力。</span><span data-copy="en">Discover and call MCP capabilities over STDIO, legacy HTTP/SSE, or Streamable HTTP.</span></p><a href="/client/setup-client/"><span data-copy="zh">客户端指南 →</span><span data-copy="en">Client guide →</span></a></article>
-                <article class="path-item"><div class="path-number">03</div><h2>aj-mcp-server</h2><p><span data-copy="zh">用注解把 Java 方法开放为工具、资源、提示词和补全能力。</span><span data-copy="en">Turn Java methods into tools, resources, prompts, and completion providers through annotations.</span></p><a href="/server/usage-server/"><span data-copy="zh">服务端指南 →</span><span data-copy="en">Server guide →</span></a></article>
+                <article class="path-item">
+                    <div class="path-number">01</div>
+                    <h2>aj-mcp-common</h2>
+                    <p><span data-copy="zh">共享 JSON-RPC 与 MCP 模型、协议版本和内容类型。</span><span data-copy="en">Shared JSON-RPC/MCP models, protocol revisions, and content types.</span>
+                    </p><a href="/docs-index/"><span data-copy="zh">了解更多 →</span><span
+                        data-copy="en">Learn more →</span></a></article>
+                <article class="path-item">
+                    <div class="path-number">02</div>
+                    <h2>aj-mcp-client</h2>
+                    <p><span data-copy="zh">通过 STDIO、旧版 HTTP/SSE 或 Streamable HTTP 发现并调用 MCP 能力。</span><span
+                            data-copy="en">Discover and call MCP capabilities over STDIO, legacy HTTP/SSE, or Streamable HTTP.</span>
+                    </p><a href="/client/setup-client/"><span data-copy="zh">客户端指南 →</span><span data-copy="en">Client guide →</span></a>
+                </article>
+                <article class="path-item">
+                    <div class="path-number">03</div>
+                    <h2>aj-mcp-server</h2>
+                    <p><span data-copy="zh">用注解把 Java 方法开放为工具、资源、提示词和补全能力。</span><span
+                            data-copy="en">Turn Java methods into tools, resources, prompts, and completion providers through annotations.</span>
+                    </p><a href="/server/usage-server/"><span data-copy="zh">服务端指南 →</span><span data-copy="en">Server guide →</span></a>
+                </article>
             </div>
         </section>
-        <section class="closing"><div><h2><span data-copy="zh">从一个工具开始。</span><span data-copy="en">Start with one tool.</span></h2><p><span data-copy="zh">选择服务端接入指南，或查看客户端 transport 配置。</span><span data-copy="en">Choose the server guide or review client transport configuration.</span></p></div><a href="/docs-index/"><span data-copy="zh">打开文档 →</span><span data-copy="en">Open docs →</span></a></section>
-        <footer>AJ-MCP · GPLv3 · <a href="https://github.com/lightweight-component/aj-mcp" target="_blank" rel="noreferrer">GitHub</a> · <a href="https://gitcode.com/lightweight-component/aj-mcp" target="_blank" rel="noreferrer">GitCode</a></footer>
+        <section class="closing">
+            <div><h2><span data-copy="zh">从一个工具开始。</span><span data-copy="en">Start with one tool.</span></h2>
+                <p><span data-copy="zh">选择服务端接入指南，或查看客户端 transport 配置。</span><span data-copy="en">Choose the server guide or review client transport configuration.</span>
+                </p></div>
+            <a href="/docs-index/"><span data-copy="zh">打开文档 →</span><span data-copy="en">Open docs →</span></a>
+        </section>
+        <footer>AJ-MCP · GPLv3 · <a href="https://github.com/lightweight-component/aj-mcp" target="_blank"
+                                    rel="noreferrer">GitHub</a> · <a
+                href="https://gitcode.com/lightweight-component/aj-mcp" target="_blank" rel="noreferrer">GitCode</a>
+        </footer>
     </main>
 </div>
 <script>
