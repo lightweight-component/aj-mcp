@@ -14,6 +14,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
+/**
+ * Represents mcp client resource.
+ */
 @Slf4j
 @SuperBuilder
 public abstract class McpClientResource extends McpClientPrompt {
@@ -31,6 +34,11 @@ public abstract class McpClientResource extends McpClientPrompt {
         executeSubscriptionRequest(request);
     }
 
+    /**
+     * Executes the execute subscription request operation.
+     *
+     * @param request the request value.
+     */
     private void executeSubscriptionRequest(com.ajaxjs.mcp.protocol.McpRequest request) {
         long operationId = idGenerator.getAndIncrement();
         request.setId(operationId);
@@ -137,6 +145,12 @@ public abstract class McpClientResource extends McpClientPrompt {
         }
     }
 
+    /**
+     * Executes the next cursor operation.
+     *
+     * @param result the result value.
+     * @return the result of the next cursor operation.
+     */
     private static String nextCursor(JsonNode result) {
         return result.has("nextCursor") ? result.get("nextCursor").asText() : null;
     }
@@ -186,6 +200,12 @@ public abstract class McpClientResource extends McpClientPrompt {
         }
     }
 
+    /**
+     * Executes the obtain resource template list operation.
+     *
+     * @param pageNo the page no value.
+     * @return the result of the obtain resource template list operation.
+     */
     private synchronized List<ResourceTemplate> obtainResourceTemplateList(int pageNo) {
         List<ResourceTemplate> cached = resourceTemplateRefs.get(pageNo);
 
@@ -247,6 +267,12 @@ public abstract class McpClientResource extends McpClientPrompt {
         }
     }
 
+    /**
+     * Executes the parse resource contents operation.
+     *
+     * @param mcpMessage the mcp message value.
+     * @return the result of the parse resource contents operation.
+     */
     public static GetResourceResultDetail parseResourceContents(JsonNode mcpMessage) {
         McpException.checkForErrors(mcpMessage);
 
@@ -288,6 +314,12 @@ public abstract class McpClientResource extends McpClientPrompt {
         }
     }
 
+    /**
+     * Executes the parse resource template refs operation.
+     *
+     * @param mcpMessage the mcp message value.
+     * @return the result of the parse resource template refs operation.
+     */
     public static List<ResourceTemplate> parseResourceTemplateRefs(JsonNode mcpMessage) {
         McpException.checkForErrors(mcpMessage);
 

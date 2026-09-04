@@ -15,7 +15,13 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/**
+ * Represents test session scoped cancellation.
+ */
 class TestSessionScopedCancellation {
+    /**
+     * Holds the server value.
+     */
     private McpServer server;
 
     @BeforeEach

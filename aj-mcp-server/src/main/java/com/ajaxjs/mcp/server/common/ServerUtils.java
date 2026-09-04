@@ -45,6 +45,15 @@ public class ServerUtils {
         }
     }
 
+    /**
+     * Executes the paginate operation.
+     *
+     * @param <T>      the t type.
+     * @param list     the list value.
+     * @param params   the params value.
+     * @param instance the instance value.
+     * @return the result of the paginate operation.
+     */
     public static <T> PaginatedResponse<T> paginate(List<T> list, Cursor params, McpServerInitialize instance) {
         Integer pageNo = params.getPageNo();
         Integer pageSize = instance.getServerConfig().getPageSize();
@@ -55,6 +64,7 @@ public class ServerUtils {
     /**
      * Paginates a list based on the given page number and page size.
      *
+     * @param <T>      The element type of the paginated list.
      * @param list     The list to paginate.
      * @param pageNo   The page number (1-based).
      * @param pageSize The number of items per page.

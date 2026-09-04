@@ -29,6 +29,7 @@ implementing a custom transport, constructing protocol messages yourself, or reu
 Runs on Java8+. Maven:
 
 ```xml
+
 <dependency>
     <groupId>com.ajaxjs</groupId>
     <artifactId>aj-mcp-common</artifactId>
@@ -43,7 +44,9 @@ Serialize and parse protocol objects with the SDK's configured Jackson mapper:
 ```java
 CallToolRequest request = new CallToolRequest(
         "weather", Collections.<String, Object>singletonMap("city", "Guangzhou"));
-request.setId(1L);
+request.
+
+setId(1L);
 
 String json = JsonUtils.toJson(request);
 JsonNode node = JsonUtils.json2Node(json);

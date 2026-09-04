@@ -39,7 +39,9 @@ AJ-MCP 的公共模块，包含 Client 和 Server 共用的 JSON-RPC 消息、MC
 ```java
 CallToolRequest request = new CallToolRequest(
         "weather", Collections.<String, Object>singletonMap("city", "Guangzhou"));
-request.setId(1L);
+request.
+
+setId(1L);
 
 String json = JsonUtils.toJson(request);
 JsonNode node = JsonUtils.json2Node(json);

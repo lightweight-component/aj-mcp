@@ -14,6 +14,9 @@ import com.ajaxjs.mcp.server.feature.annotation.PromptArg;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Represents mcp server prompts.
+ */
 @McpService
 public class McpServerPrompts {
     @Prompt(description = "Basic simple prompt")

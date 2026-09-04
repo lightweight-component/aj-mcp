@@ -43,30 +43,83 @@ import java.util.concurrent.atomic.AtomicLong;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class McpServer extends McpServerPrompt {
+    /**
+     * Holds the current session value.
+     */
     private final ThreadLocal<String> currentSession = new ThreadLocal<>();
+    /**
+     * Holds the session protocol versions value.
+     */
     private final Map<String, String> sessionProtocolVersions = new ConcurrentHashMap<>();
+    /**
+     * Holds the client capabilities value.
+     */
     private final Map<String, InitializeRequestParams.Capabilities> clientCapabilities = new ConcurrentHashMap<>();
+    /**
+     * Holds the resource subscriptions value.
+     */
     private final Map<String, Set<String>> resourceSubscriptions = new ConcurrentHashMap<>();
+    /**
+     * Holds the logging level value.
+     */
     private volatile String loggingLevel = "info";
     /**
      * JSON-RPC request IDs are scoped to a connection. Keep the session in the
      * key so two clients using the same ID cannot cancel each other's tools.
      */
     private final Map<RequestKey, RunningRequest> runningRequests = new ConcurrentHashMap<>();
+    /**
+     * Holds the session states value.
+     */
     private final Map<String, SessionState> sessionStates = new ConcurrentHashMap<>();
+    /**
+     * Holds the server request ids value.
+     */
     private final AtomicLong serverRequestIds = new AtomicLong(1);
+    /**
+     * Holds the pending client responses value.
+     */
     private final Map<String, CompletableFuture<JsonNode>> pendingClientResponses = new ConcurrentHashMap<>();
 
-    private enum SessionState {NEW, INITIALIZING, READY}
+    /**
+     * Represents session state.
+     */
+    private enum SessionState {
+        /**
+         * The session is allocated but has not initialized.
+         */
+        NEW,
+        /**
+         * The session has received initialization but is not ready yet.
+         */
+        INITIALIZING,
+        /**
+         * The session completed initialization and can handle requests.
+         */
+        READY
+    }
 
+    /**
+     * Executes the bind session operation.
+     *
+     * @param sessionId the session id value.
+     */
     void bindSession(String sessionId) {
         currentSession.set(sessionId);
     }
 
+    /**
+     * Executes the clear session operation.
+     */
     void clearSession() {
         currentSession.remove();
     }
 
+    /**
+     * Executes the remove session operation.
+     *
+     * @param sessionId the session id value.
+     */
     void removeSession(String sessionId) {
         resourceSubscriptions.forEach((uri, ignored) ->
                 resourceSubscriptions.computeIfPresent(uri, (key, sessions) -> {
@@ -95,6 +148,12 @@ public class McpServer extends McpServerPrompt {
         clientCapabilities.put(sessionId, requestParams.getCapabilities());
     }
 
+    /**
+     * Executes the get negotiated protocol version operation.
+     *
+     * @param sessionId the session id value.
+     * @return the result of the get negotiated protocol version operation.
+     */
     public String getNegotiatedProtocolVersion(String sessionId) {
         return sessionProtocolVersions.get(sessionId);
     }
@@ -114,6 +173,13 @@ public class McpServer extends McpServerPrompt {
         return true;
     }
 
+    /**
+     * Executes the list roots operation.
+     *
+     * @param sessionId the session id value.
+     * @param timeout   the timeout value.
+     * @return the result of the list roots operation.
+     */
     public List<Root> listRoots(String sessionId, Duration timeout) {
         InitializeRequestParams.Capabilities capabilities = clientCapabilities.get(sessionId);
         if (capabilities == null || capabilities.getRoots() == null)
@@ -125,6 +191,14 @@ public class McpServer extends McpServerPrompt {
         return roots;
     }
 
+    /**
+     * Executes the create message operation.
+     *
+     * @param sessionId the session id value.
+     * @param params    the params value.
+     * @param timeout   the timeout value.
+     * @return the result of the create message operation.
+     */
     public SamplingCreateMessageResult createMessage(String sessionId, SamplingCreateMessageParams params,
                                                      Duration timeout) {
         InitializeRequestParams.Capabilities capabilities = clientCapabilities.get(sessionId);
@@ -137,6 +211,11 @@ public class McpServer extends McpServerPrompt {
 
     /**
      * Requests structured user input from a 2025-06-18 capable client.
+     *
+     * @param sessionId the initialized client session identifier.
+     * @param params    the elicitation request parameters.
+     * @param timeout   the maximum time to wait for the client response.
+     * @return the client's elicitation result.
      */
     public ElicitResult elicit(String sessionId, ElicitRequestParams params, Duration timeout) {
         String version = sessionProtocolVersions.get(sessionId);
@@ -150,6 +229,15 @@ public class McpServer extends McpServerPrompt {
         return JsonUtils.convertValue(result, ElicitResult.class);
     }
 
+    /**
+     * Executes the request client operation.
+     *
+     * @param sessionId the session id value.
+     * @param method    the method value.
+     * @param params    the params value.
+     * @param timeout   the timeout value.
+     * @return the result of the request client operation.
+     */
     private JsonNode requestClient(String sessionId, String method, JsonNode params, Duration timeout) {
         long id = serverRequestIds.getAndIncrement();
         String key = sessionId + ":" + id;
@@ -181,6 +269,9 @@ public class McpServer extends McpServerPrompt {
         }
     }
 
+    /**
+     * Executes the start operation.
+     */
     public void start() {
         log.info("MCP Server started, waiting for input...");
         transport.start();
@@ -263,6 +354,11 @@ public class McpServer extends McpServerPrompt {
         }
     }
 
+    /**
+     * Executes the cancel request operation.
+     *
+     * @param requestRaw the request raw value.
+     */
     private void cancelRequest(McpRequestRawInfo requestRaw) {
         JsonNode params = requestRaw.getJsonNode().get(PARAMS);
         JsonNode requestId = params == null ? null : params.get("requestId");
@@ -282,6 +378,12 @@ public class McpServer extends McpServerPrompt {
         }
     }
 
+    /**
+     * Executes the request id value operation.
+     *
+     * @param requestId the request id value.
+     * @return the result of the request id value operation.
+     */
     private static Object requestIdValue(JsonNode requestId) {
         if (requestId.isIntegralNumber())
             return requestId.longValue();
@@ -290,11 +392,23 @@ public class McpServer extends McpServerPrompt {
         throw new IllegalArgumentException("Cancellation requestId must be a string or integer");
     }
 
+    /**
+     * Executes the request key operation.
+     *
+     * @param requestId the request id value.
+     * @return the result of the request key operation.
+     */
     private RequestKey requestKey(Object requestId) {
         String sessionId = currentSession.get();
         return new RequestKey(sessionId == null ? "direct" : sessionId, requestId);
     }
 
+    /**
+     * Executes the set logging level operation.
+     *
+     * @param requestRaw the request raw value.
+     * @return the result of the set logging level operation.
+     */
     private McpResponse setLoggingLevel(McpRequestRawInfo requestRaw) {
         JsonNode params = requestRaw.getJsonNode().get(PARAMS);
         String level = params == null || params.get("level") == null ? null : params.get("level").asText();
@@ -310,18 +424,35 @@ public class McpServer extends McpServerPrompt {
         return response;
     }
 
+    /**
+     * Executes the publish tools changed operation.
+     */
     public void publishToolsChanged() {
         broadcastNotification(Methods.TOOLS_LIST_CHANGED_NOTIFICATION, null);
     }
 
+    /**
+     * Executes the publish prompts changed operation.
+     */
     public void publishPromptsChanged() {
         broadcastNotification(Methods.PROMPTS_LIST_CHANGED_NOTIFICATION, null);
     }
 
+    /**
+     * Executes the publish resources changed operation.
+     */
     public void publishResourcesChanged() {
         broadcastNotification(Methods.RESOURCE_LIST_CHANGED_NOTIFICATION, null);
     }
 
+    /**
+     * Executes the send progress operation.
+     *
+     * @param sessionId     the session id value.
+     * @param progressToken the progress token value.
+     * @param progress      the progress value.
+     * @param total         the total value.
+     */
     public void sendProgress(String sessionId, Object progressToken, double progress, Double total) {
         ObjectNode params = JsonUtils.createObjectNode();
         params.set("progressToken", JsonUtils.valueToTree(progressToken));
@@ -335,6 +466,10 @@ public class McpServer extends McpServerPrompt {
 
     /**
      * Sends progress to the session currently executing a request.
+     *
+     * @param progressToken the progress token supplied by the caller.
+     * @param progress      the completed amount of work.
+     * @param total         the total amount of work, when known.
      */
     public void sendProgress(Object progressToken, double progress, Double total) {
         String sessionId = currentSession.get();
@@ -345,6 +480,13 @@ public class McpServer extends McpServerPrompt {
         sendProgress(sessionId, progressToken, progress, total);
     }
 
+    /**
+     * Executes the publish log operation.
+     *
+     * @param level      the level value.
+     * @param loggerName the logger name value.
+     * @param data       the data value.
+     */
     public void publishLog(String level, String loggerName, Object data) {
         ObjectNode params = JsonUtils.createObjectNode();
         params.put("level", level == null ? loggingLevel : level);
@@ -356,10 +498,23 @@ public class McpServer extends McpServerPrompt {
         transport.broadcast(notificationJson(Methods.LOGGING_MESSAGE_NOTIFICATION, params));
     }
 
+    /**
+     * Executes the broadcast notification operation.
+     *
+     * @param method the method value.
+     * @param params the params value.
+     */
     private void broadcastNotification(String method, JsonNode params) {
         transport.broadcast(notificationJson(method, params));
     }
 
+    /**
+     * Executes the notification json operation.
+     *
+     * @param method the method value.
+     * @param params the params value.
+     * @return the result of the notification json operation.
+     */
     private static String notificationJson(String method, JsonNode params) {
         ObjectNode notification = JsonUtils.createObjectNode();
         notification.put("jsonrpc", "2.0");
@@ -371,6 +526,13 @@ public class McpServer extends McpServerPrompt {
         return notification.toString();
     }
 
+    /**
+     * Executes the change subscription operation.
+     *
+     * @param requestRaw the request raw value.
+     * @param subscribe  the subscribe value.
+     * @return the result of the change subscription operation.
+     */
     private McpResponse changeSubscription(McpRequestRawInfo requestRaw, boolean subscribe) {
         String sessionId = currentSession.get();
 
@@ -401,6 +563,8 @@ public class McpServer extends McpServerPrompt {
 
     /**
      * Publishes a resource update only to sessions subscribed to the exact URI.
+     *
+     * @param uri the URI of the updated resource.
      */
     public void publishResourceUpdated(String uri) {
         Set<String> sessions = resourceSubscriptions.get(uri);
@@ -423,6 +587,12 @@ public class McpServer extends McpServerPrompt {
         }
     }
 
+    /**
+     * Executes the complete operation.
+     *
+     * @param requestRaw the request raw value.
+     * @return the result of the complete operation.
+     */
     McpResponse complete(McpRequestRawInfo requestRaw) {
         JsonNode paramsNode = requestRaw.getJsonNode().get(PARAMS);
         if (paramsNode == null)
@@ -473,6 +643,12 @@ public class McpServer extends McpServerPrompt {
         return response;
     }
 
+    /**
+     * Executes the resource template name operation.
+     *
+     * @param uriTemplate the uri template value.
+     * @return the result of the resource template name operation.
+     */
     private String resourceTemplateName(String uriTemplate) {
         for (com.ajaxjs.mcp.server.feature.model.ServerStoreResourceTemplate store
                 : featureMgr.getResourceTemplateStore().values())
@@ -685,6 +861,13 @@ public class McpServer extends McpServerPrompt {
         return result;
     }
 
+    /**
+     * Executes the tool content list operation.
+     *
+     * @param requestId the request id value.
+     * @param values    the values value.
+     * @return the result of the tool content list operation.
+     */
     private static List<Content> toolContentList(Object requestId, List<?> values) {
         if (values == null)
             throw new JsonRpcErrorException(requestId, JsonRpcErrorCode.INTERNAL_ERROR,
@@ -701,6 +884,13 @@ public class McpServer extends McpServerPrompt {
         return content;
     }
 
+    /**
+     * Executes the method parameter type operation.
+     *
+     * @param store the store value.
+     * @param index the index value.
+     * @return the result of the method parameter type operation.
+     */
     private static Class<?> methodParameterType(ServerStoreTool store, int index) {
         return store.getMethod().getParameterTypes()[index];
     }
@@ -709,6 +899,10 @@ public class McpServer extends McpServerPrompt {
      * Converts JSON-compatible values to the exact Java reflection parameter type.
      * Keeping conversion close to the invocation boundary avoids schema spelling
      * differences such as "number" versus "Number" from affecting execution.
+     *
+     * @param value      the value received from the JSON-RPC request.
+     * @param targetType the Java parameter type required by the target method.
+     * @return {@code value} converted to {@code targetType}.
      */
     public static Object convertToType(Object value, Class<?> targetType) {
         if (value == null)
@@ -741,6 +935,12 @@ public class McpServer extends McpServerPrompt {
         return JsonUtils.convertValue(value, targetType);
     }
 
+    /**
+     * Executes the number operation.
+     *
+     * @param value the value value.
+     * @return the result of the number operation.
+     */
     private static Number number(Object value) {
         if (value instanceof Number)
             return (Number) value;
@@ -752,15 +952,36 @@ public class McpServer extends McpServerPrompt {
         }
     }
 
+    /**
+     * Represents request key.
+     */
     private static final class RequestKey {
+        /**
+         * Holds the session id value.
+         */
         private final String sessionId;
+        /**
+         * Holds the request id value.
+         */
         private final Object requestId;
 
+        /**
+         * Creates a new request key.
+         *
+         * @param sessionId the session id value.
+         * @param requestId the request id value.
+         */
         private RequestKey(String sessionId, Object requestId) {
             this.sessionId = Objects.requireNonNull(sessionId, "sessionId");
             this.requestId = Objects.requireNonNull(requestId, "requestId");
         }
 
+        /**
+         * Executes the belongs to operation.
+         *
+         * @param sessionId the session id value.
+         * @return the result of the belongs to operation.
+         */
         private boolean belongsTo(String sessionId) {
             return this.sessionId.equals(sessionId);
         }
@@ -781,20 +1002,44 @@ public class McpServer extends McpServerPrompt {
         }
     }
 
+    /**
+     * Represents running request.
+     */
     private static final class RunningRequest {
+        /**
+         * Holds the thread value.
+         */
         private final Thread thread;
+        /**
+         * Holds the cancelled value.
+         */
         private final AtomicBoolean cancelled = new AtomicBoolean();
 
+        /**
+         * Creates a new running request.
+         *
+         * @param thread the thread value.
+         */
         private RunningRequest(Thread thread) {
             this.thread = thread;
         }
 
+        /**
+         * Executes the cancel operation.
+         */
         private void cancel() {
             if (cancelled.compareAndSet(false, true))
                 thread.interrupt();
         }
     }
 
+    /**
+     * Executes the tool error result operation.
+     *
+     * @param requestId the request id value.
+     * @param cause     the cause value.
+     * @return the result of the tool error result operation.
+     */
     private static McpResponse toolErrorResult(Object requestId, Throwable cause) {
         String message = cause.getMessage();
         if (message == null || message.trim().isEmpty())

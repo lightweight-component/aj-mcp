@@ -9,6 +9,9 @@ import java.io.Writer;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Represents test server sse lifecycle.
+ */
 class TestServerSseLifecycle {
     @Test
     void closeStopsHeartbeatAndClosesConnections() throws Exception {
@@ -65,8 +68,17 @@ class TestServerSseLifecycle {
         transport.close();
     }
 
+    /**
+     * Represents tracking writer.
+     */
     private static class TrackingWriter extends Writer {
+        /**
+         * Holds the fail writes value.
+         */
         private final boolean failWrites;
+        /**
+         * Holds the closed value.
+         */
         private boolean closed;
 
         private TrackingWriter(boolean failWrites) {

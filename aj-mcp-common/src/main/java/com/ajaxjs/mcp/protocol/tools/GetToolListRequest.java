@@ -15,8 +15,14 @@ import static com.ajaxjs.mcp.protocol.McpConstant.Methods.TOOLS_LIST;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class GetToolListRequest extends McpRequest {
+    /**
+     * Holds the method value.
+     */
     String method = TOOLS_LIST;
 
+    /**
+     * Holds the params value.
+     */
     @JsonInclude(JsonInclude.Include.NON_NULL)
     Cursor params;
 }

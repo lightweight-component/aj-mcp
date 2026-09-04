@@ -11,7 +11,13 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class McpPage<T> {
+    /**
+     * Holds the items value.
+     */
     private List<T> items;
 
+    /**
+     * Holds the next cursor value.
+     */
     private String nextCursor;
 }

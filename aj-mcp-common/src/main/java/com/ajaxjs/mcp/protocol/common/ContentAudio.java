@@ -20,6 +20,9 @@ public class ContentAudio extends Content {
      */
     String mimeType;
 
+    /**
+     * Creates a new content audio.
+     */
     public ContentAudio() {
         this.type = McpConstant.ContentType.AUDIO;
     }

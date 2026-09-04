@@ -10,6 +10,9 @@ import java.util.Map;
  */
 @Data
 public class ElicitRequestParams {
+    /**
+     * Holds the message value.
+     */
     private String message;
 
     /**
@@ -17,6 +20,9 @@ public class ElicitRequestParams {
      */
     private Map<String, Object> requestedSchema;
 
+    /**
+     * Holds the  meta value.
+     */
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Map<String, Object> _meta;
 }

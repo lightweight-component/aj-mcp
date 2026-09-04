@@ -9,6 +9,9 @@ import com.ajaxjs.mcp.server.feature.annotation.*;
 import java.util.Arrays;
 import java.util.Collections;
 
+/**
+ * Represents advanced features.
+ */
 @McpService
 public class AdvancedFeatures {
     @Tool

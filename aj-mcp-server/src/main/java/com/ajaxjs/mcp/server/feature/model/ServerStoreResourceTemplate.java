@@ -13,8 +13,20 @@ import java.util.regex.Pattern;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class ServerStoreResourceTemplate extends ServerStoreBase {
+    /**
+     * Holds the resource template value.
+     */
     private ResourceTemplate resourceTemplate;
+    /**
+     * Holds the parameter names value.
+     */
     private List<String> parameterNames;
+    /**
+     * Holds the template variable names value.
+     */
     private List<String> templateVariableNames;
+    /**
+     * Holds the uri pattern value.
+     */
     private Pattern uriPattern;
 }

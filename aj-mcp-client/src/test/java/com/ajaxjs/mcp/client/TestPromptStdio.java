@@ -8,6 +8,9 @@ import org.junit.jupiter.api.BeforeAll;
 
 import java.util.Arrays;
 
+/**
+ * Represents test prompt stdio.
+ */
 class TestPromptStdio extends TestPromptBase {
     @BeforeAll
     static void setup() {

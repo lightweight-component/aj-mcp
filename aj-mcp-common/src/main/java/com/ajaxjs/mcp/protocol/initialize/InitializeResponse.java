@@ -10,5 +10,8 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class InitializeResponse extends McpResponse {
+    /**
+     * Holds the result value.
+     */
     private InitializeResponseResult result;
 }

@@ -12,6 +12,9 @@ import java.util.concurrent.CompletableFuture;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * Represents mcp client version negotiation test.
+ */
 class McpClientVersionNegotiationTest {
     @Test
     void acceptsAConfiguredServerFallbackAndStoresItOnTransport() {
@@ -26,6 +29,9 @@ class McpClientVersionNegotiationTest {
         assertEquals("2025-03-26", transport.getNegotiatedProtocolVersion());
     }
 
+    /**
+     * Represents negotiating transport.
+     */
     private static final class NegotiatingTransport extends McpTransport {
         @Override
         public void start(Map<Long, CompletableFuture<JsonNode>> pending) {

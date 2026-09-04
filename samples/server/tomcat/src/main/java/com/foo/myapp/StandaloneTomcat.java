@@ -11,7 +11,15 @@ import org.apache.catalina.startup.Tomcat;
 
 import java.io.File;
 
+/**
+ * Represents standalone tomcat.
+ */
 public class StandaloneTomcat {
+    /**
+     * Executes the main operation.
+     * @param args the args value.
+     * @throws Exception if the operation cannot complete.
+     */
     public static void main(String[] args) throws Exception {
         FeatureMgr mgr = new FeatureMgr();
         mgr.init("com.foo.myapp");

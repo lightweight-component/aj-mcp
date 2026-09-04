@@ -18,6 +18,9 @@ import java.util.concurrent.CompletableFuture;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * Represents mcp client pagination cache test.
+ */
 class McpClientPaginationCacheTest {
     @Test
     void promptAndResourceCachesAreScopedByPage() {
@@ -45,7 +48,13 @@ class McpClientPaginationCacheTest {
         assertEquals(1, transport.calls.get("resources/templates/list:2"));
     }
 
+    /**
+     * Represents paging transport.
+     */
     private static class PagingTransport extends McpTransport {
+        /**
+         * Holds the calls value.
+         */
         private final Map<String, Integer> calls = new HashMap<>();
 
         @Override

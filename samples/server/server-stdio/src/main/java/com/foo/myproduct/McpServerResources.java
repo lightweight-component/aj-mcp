@@ -6,8 +6,15 @@ import com.ajaxjs.mcp.server.common.ServerUtils;
 import com.ajaxjs.mcp.server.feature.annotation.McpService;
 import com.ajaxjs.mcp.server.feature.annotation.Resource;
 
+/**
+ * Represents mcp server resources.
+ */
 @McpService
 public class McpServerResources {
+    /**
+     * Executes the blob operation.
+     * @return the result of the blob operation.
+     */
     @Resource(uri = "file:///blob", description = "A nice pic", mimeType = "image/jpg")
     public ResourceContentBinary blob() {
         String base64EncodedImage = ServerUtils.encodeImageToBase64("bird-eye.jpg");
@@ -20,6 +27,10 @@ public class McpServerResources {
         return content;
     }
 
+    /**
+     * Executes the text operation.
+     * @return the result of the text operation.
+     */
     @Resource(uri = "file:///text", description = "A nice piece of text", mimeType = "text/plain")
     public ResourceContentText text() {
         ResourceContentText content = new ResourceContentText();

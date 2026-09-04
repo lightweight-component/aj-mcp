@@ -1,15 +1,12 @@
 package com.ajaxjs.mcp.client;
 
 import com.ajaxjs.mcp.protocol.client.*;
-import com.ajaxjs.mcp.protocol.prompt.GetPromptResult;
 import com.ajaxjs.mcp.protocol.prompt.GetPromptResultDetail;
 import com.ajaxjs.mcp.protocol.prompt.PromptItem;
-import com.ajaxjs.mcp.protocol.resource.GetResourceResult;
 import com.ajaxjs.mcp.protocol.resource.GetResourceResultDetail;
 import com.ajaxjs.mcp.protocol.resource.ResourceItem;
 import com.ajaxjs.mcp.protocol.resource.ResourceTemplate;
 import com.ajaxjs.mcp.protocol.tools.CallToolRequest;
-import com.ajaxjs.mcp.protocol.tools.CallToolResult;
 import com.ajaxjs.mcp.protocol.tools.CallToolResultDetail;
 import com.ajaxjs.mcp.protocol.tools.ToolItem;
 import com.ajaxjs.mcp.protocol.utils.completion.CompleteRequest;
@@ -45,6 +42,12 @@ public interface IMcpClient extends AutoCloseable {
      */
     List<ToolItem> listTools(int pageNo);
 
+    /**
+     * Executes the list tool page operation.
+     *
+     * @param cursor the cursor value.
+     * @return the result of the list tool page operation.
+     */
     McpPage<ToolItem> listToolPage(String cursor);
 
     /**
@@ -57,6 +60,9 @@ public interface IMcpClient extends AutoCloseable {
 
     /**
      * Returns the complete result, including 2025-06-18 structured content.
+     *
+     * @param request the tool invocation request.
+     * @return the complete tool result.
      */
     CallToolResultDetail callToolResult(CallToolRequest request);
 
@@ -84,6 +90,12 @@ public interface IMcpClient extends AutoCloseable {
      */
     List<ResourceItem> listResources(int pageNo);
 
+    /**
+     * Executes the list resource page operation.
+     *
+     * @param cursor the cursor value.
+     * @return the result of the list resource page operation.
+     */
     McpPage<ResourceItem> listResourcePage(String cursor);
 
     /**
@@ -101,6 +113,12 @@ public interface IMcpClient extends AutoCloseable {
      */
     List<ResourceTemplate> listResourceTemplates(int pageNo);
 
+    /**
+     * Executes the list resource template page operation.
+     *
+     * @param cursor the cursor value.
+     * @return the result of the list resource template page operation.
+     */
     McpPage<ResourceTemplate> listResourceTemplatePage(String cursor);
 
     /**
@@ -112,8 +130,18 @@ public interface IMcpClient extends AutoCloseable {
      */
     GetResourceResultDetail readResource(String uri);
 
+    /**
+     * Executes the subscribe resource operation.
+     *
+     * @param uri the uri value.
+     */
     void subscribeResource(String uri);
 
+    /**
+     * Executes the unsubscribe resource operation.
+     *
+     * @param uri the uri value.
+     */
     void unsubscribeResource(String uri);
 
     /**
@@ -131,6 +159,12 @@ public interface IMcpClient extends AutoCloseable {
      */
     List<PromptItem> listPrompts(int pageNo);
 
+    /**
+     * Executes the list prompt page operation.
+     *
+     * @param cursor the cursor value.
+     * @return the result of the list prompt page operation.
+     */
     McpPage<PromptItem> listPromptPage(String cursor);
 
     /**
@@ -160,38 +194,71 @@ public interface IMcpClient extends AutoCloseable {
 
     /**
      * Requests argument completion for a prompt or resource template.
+     *
+     * @param ref      the prompt or resource-template reference.
+     * @param argument the argument whose values should be completed.
+     * @return the completion result.
      */
     CompleteResult.CompletionResult complete(CompleteRequest.Ref ref, CompleteRequest.Argument argument);
 
     /**
      * 2025-06-18 completion request with previously resolved arguments.
+     *
+     * @param ref      the prompt or resource-template reference.
+     * @param argument the argument whose values should be completed.
+     * @param context  the previously resolved argument values.
+     * @return the completion result.
      */
     CompleteResult.CompletionResult complete(CompleteRequest.Ref ref, CompleteRequest.Argument argument,
                                              Map<String, String> context);
 
     /**
      * Registers an observer for a JSON-RPC notification method.
+     *
+     * @param method  the JSON-RPC notification method.
+     * @param handler the notification handler.
      */
     void onNotification(String method, Consumer<JsonNode> handler);
 
     /**
      * Registers a handler for a server-initiated JSON-RPC request such as roots/list or sampling/createMessage.
+     *
+     * @param method  the JSON-RPC request method.
+     * @param handler the handler that produces the JSON-RPC result.
      */
     void onServerRequest(String method, Function<JsonNode, JsonNode> handler);
 
+    /**
+     * Executes the set roots operation.
+     *
+     * @param roots         the roots value.
+     * @param notifyChanges the notify changes value.
+     */
     void setRoots(List<Root> roots, boolean notifyChanges);
 
+    /**
+     * Executes the notify roots changed operation.
+     */
     void notifyRootsChanged();
 
+    /**
+     * Executes the set sampling handler operation.
+     *
+     * @param handler the handler value.
+     */
     void setSamplingHandler(Function<SamplingCreateMessageParams, SamplingCreateMessageResult> handler);
 
     /**
      * Registers the user-interaction handler advertised by MCP 2025-06-18 clients.
+     *
+     * @param handler the handler that resolves an elicitation request.
      */
     void setElicitationHandler(Function<ElicitRequestParams, ElicitResult> handler);
 
     /**
      * Returns the protocol revision selected during initialization.
+     *
+     * @return the negotiated MCP protocol revision, or {@code null} before initialization.
      */
     String getNegotiatedProtocolVersion();
 }

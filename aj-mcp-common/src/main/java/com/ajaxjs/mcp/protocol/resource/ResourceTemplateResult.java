@@ -1,24 +1,19 @@
 package com.ajaxjs.mcp.protocol.resource;
 
 import com.ajaxjs.mcp.protocol.McpResponse;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Listing Resource Templates
  */
 @Data
-@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@RequiredArgsConstructor
 public class ResourceTemplateResult extends McpResponse {
-    private ResourceTemplatesResultDetail result;
-
-    public ResourceTemplateResult(ResourceTemplatesResultDetail result) {
-        this.result = result;
-    }
+    /**
+     * Holds the result value.
+     */
+    private final ResourceTemplatesResultDetail result;
 }

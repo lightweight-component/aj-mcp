@@ -9,7 +9,13 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/**
+ * Represents test advanced protocol features.
+ */
 class TestAdvancedProtocolFeatures {
+    /**
+     * Holds the server value.
+     */
     private McpServer server;
 
     @BeforeEach

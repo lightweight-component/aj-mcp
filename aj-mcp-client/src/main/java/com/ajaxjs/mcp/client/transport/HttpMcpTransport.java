@@ -63,6 +63,9 @@ public class HttpMcpTransport extends McpTransport {
      */
     private volatile String postUrl;
 
+    /**
+     * Holds the closed value.
+     */
     private volatile boolean closed;
 
     /**
@@ -74,6 +77,13 @@ public class HttpMcpTransport extends McpTransport {
         this(sseUrl, false, false);
     }
 
+    /**
+     * Creates a new http mcp transport.
+     *
+     * @param sseUrl       the sse url value.
+     * @param logResponses the log responses value.
+     * @param logRequests  the log requests value.
+     */
     @Builder
     public HttpMcpTransport(String sseUrl, boolean logResponses, boolean logRequests) {
         Objects.requireNonNull(sseUrl, "Missing SSE endpoint URL");
@@ -295,6 +305,13 @@ public class HttpMcpTransport extends McpTransport {
         return eventSource;
     }
 
+    /**
+     * Executes the create event source operation.
+     *
+     * @param request  the request value.
+     * @param listener the listener value.
+     * @return the result of the create event source operation.
+     */
     EventSource createEventSource(Request request, SseEventListener listener) {
         return EventSources.createFactory(client).newEventSource(request, listener);
     }

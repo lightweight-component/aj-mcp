@@ -12,5 +12,8 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class PromptListChangedNotification extends BaseJsonRpcMessage {
+    /**
+     * Holds the method value.
+     */
     String method = McpConstant.Methods.PROMPTS_LIST_CHANGED_NOTIFICATION;
 }

@@ -12,6 +12,9 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * Represents mcp transport message routing test.
+ */
 class McpTransportMessageRoutingTest {
     @Test
     void routesNotificationWithoutProducingResponse() {
@@ -54,7 +57,13 @@ class McpTransportMessageRoutingTest {
                 transport.sent.get().get("error").get("message").asText());
     }
 
+    /**
+     * Represents capturing transport.
+     */
     private static final class CapturingTransport extends McpTransport {
+        /**
+         * Holds the sent value.
+         */
         final AtomicReference<JsonNode> sent = new AtomicReference<>();
 
         @Override

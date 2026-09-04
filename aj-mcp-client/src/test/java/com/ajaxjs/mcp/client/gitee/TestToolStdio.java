@@ -13,6 +13,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+/**
+ * Represents test tool stdio.
+ */
 public class TestToolStdio extends TestToolBase {
     @BeforeAll
     static void setup() {
@@ -33,6 +36,9 @@ public class TestToolStdio extends TestToolBase {
             mcpClient.close();
     }
 
+    /**
+     * Holds the map value.
+     */
     static Map<String, String> map;
 
     public static Map<String, String> getConfig() {

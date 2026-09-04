@@ -32,6 +32,9 @@ import java.util.function.Function;
 @Slf4j
 @SuperBuilder
 public abstract class McpClientBase implements IMcpClient, McpConstant {
+    /**
+     * Holds the transport value.
+     */
     McpTransport transport;
 
     /**
@@ -59,6 +62,9 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
     @Builder.Default
     List<String> supportedProtocolVersions = ProtocolVersion.supportedVersions();
 
+    /**
+     * Holds the negotiated protocol version value.
+     */
     private volatile String negotiatedProtocolVersion;
 
     /**
@@ -68,22 +74,49 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
     @Builder.Default
     Duration requestTimeout = Duration.ofSeconds(60);
 
+    /**
+     * Holds the pending requests value.
+     */
     final Map<Long, CompletableFuture<JsonNode>> pendingRequests = new ConcurrentHashMap<>();
 
+    /**
+     * Holds the id generator value.
+     */
     final AtomicLong idGenerator = new AtomicLong(1);
 
+    /**
+     * Holds the resource refs value.
+     */
     final Map<Integer, List<ResourceItem>> resourceRefs = new ConcurrentHashMap<>();
 
+    /**
+     * Holds the resource template refs value.
+     */
     final Map<Integer, List<ResourceTemplate>> resourceTemplateRefs = new ConcurrentHashMap<>();
 
+    /**
+     * Holds the prompt refs value.
+     */
     final Map<Integer, List<PromptItem>> promptRefs = new ConcurrentHashMap<>();
 
+    /**
+     * Holds the notification handlers value.
+     */
     final Map<String, Consumer<JsonNode>> notificationHandlers = new ConcurrentHashMap<>();
 
+    /**
+     * Holds the server request handlers value.
+     */
     final Map<String, Function<JsonNode, JsonNode>> serverRequestHandlers = new ConcurrentHashMap<>();
 
+    /**
+     * Holds the roots value.
+     */
     volatile List<Root> roots;
 
+    /**
+     * Holds the roots list changed value.
+     */
     volatile boolean rootsListChanged;
 
     @Override
@@ -170,6 +203,11 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
         return negotiatedProtocolVersion;
     }
 
+    /**
+     * Executes the handle notification operation.
+     *
+     * @param message the message value.
+     */
     private void handleNotification(JsonNode message) {
         String method = message.get(METHOD).asText();
         // List-change notifications invalidate all pages because an insertion can
@@ -195,6 +233,12 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
             log.info("MCP log message: {}", message.get(PARAMS));
     }
 
+    /**
+     * Executes the handle server request operation.
+     *
+     * @param message the message value.
+     * @return the result of the handle server request operation.
+     */
     private JsonNode handleServerRequest(JsonNode message) {
         Function<JsonNode, JsonNode> handler = serverRequestHandlers.get(message.get(METHOD).asText());
 
@@ -204,6 +248,12 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
     /**
      * Waits for an MCP response using the timeout policy shared by every client operation.
      * A zero duration means an unlimited wait.
+     *
+     * @param future the pending response future.
+     * @return the received JSON-RPC response.
+     * @throws InterruptedException if the waiting thread is interrupted.
+     * @throws ExecutionException   if the request completes exceptionally.
+     * @throws TimeoutException     if the configured request timeout expires.
      */
     protected JsonNode awaitResponse(CompletableFuture<JsonNode> future)
             throws InterruptedException, ExecutionException, TimeoutException {

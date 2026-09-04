@@ -15,6 +15,9 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+/**
+ * Represents test client capability requests.
+ */
 class TestClientCapabilityRequests {
     @Test
     void serverCorrelatesRootsAndSamplingResponsesBySessionAndId() {
@@ -49,7 +52,13 @@ class TestClientCapabilityRequests {
         server.getClientCapabilities().put(sessionId, capabilities);
     }
 
+    /**
+     * Represents loopback transport.
+     */
     private static final class LoopbackTransport implements McpTransportSync {
+        /**
+         * Holds the server value.
+         */
         private final McpServer server;
 
         private LoopbackTransport(McpServer server) {

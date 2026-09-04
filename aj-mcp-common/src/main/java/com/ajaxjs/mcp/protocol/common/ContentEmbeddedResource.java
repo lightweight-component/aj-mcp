@@ -17,6 +17,9 @@ public class ContentEmbeddedResource extends Content {
      */
     ContentEmbeddedResourceDetail resource;
 
+    /**
+     * Creates a new content embedded resource.
+     */
     public ContentEmbeddedResource() {
         this.type = McpConstant.ContentType.RESOURCE;
     }

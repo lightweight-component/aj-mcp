@@ -8,6 +8,9 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * Represents test stdio server resource.
+ */
 class TestStdioServerResource extends TestStdioServerBase {
     @Test
     void testList() {

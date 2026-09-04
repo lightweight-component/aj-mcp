@@ -10,6 +10,9 @@ import java.io.PrintStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Represents test server stdio close.
+ */
 class TestServerStdioClose {
     @Test
     @Timeout(10)
@@ -60,7 +63,13 @@ class TestServerStdioClose {
         assertTrue(transport.getRunning().get(), "STDIO server did not start in time");
     }
 
+    /**
+     * Represents close aware blocking input stream.
+     */
     private static class CloseAwareBlockingInputStream extends InputStream {
+        /**
+         * Holds the closed value.
+         */
         private boolean closed;
 
         @Override

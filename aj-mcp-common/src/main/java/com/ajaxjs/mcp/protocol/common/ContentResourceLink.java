@@ -11,18 +11,36 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class ContentResourceLink extends Content {
+    /**
+     * Holds the uri value.
+     */
     private String uri;
+    /**
+     * Holds the name value.
+     */
     private String name;
 
+    /**
+     * Holds the description value.
+     */
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String description;
 
+    /**
+     * Holds the mime type value.
+     */
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String mimeType;
 
+    /**
+     * Holds the size value.
+     */
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Long size;
 
+    /**
+     * Creates a new content resource link.
+     */
     public ContentResourceLink() {
         this.type = McpConstant.ContentType.RESOURCE_LINK;
     }

@@ -5,7 +5,13 @@ import com.ajaxjs.mcp.client.transport.McpTransport;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 
+/**
+ * Represents test resource sse.
+ */
 public class TestResourceSse extends TestResourceBase {
+    /**
+     * Holds the process value.
+     */
     private static Process process;
 
     @BeforeAll

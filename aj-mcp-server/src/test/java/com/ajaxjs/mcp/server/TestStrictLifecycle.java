@@ -7,6 +7,9 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+/**
+ * Represents test strict lifecycle.
+ */
 class TestStrictLifecycle {
     @Test
     void rejectsFeatureCallsUntilInitializedNotificationArrives() {

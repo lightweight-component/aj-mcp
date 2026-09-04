@@ -18,6 +18,9 @@ public class ResourceItem {
      */
     String name;
 
+    /**
+     * Holds the title value.
+     */
     @JsonInclude(JsonInclude.Include.NON_NULL)
     String title;
 

@@ -13,6 +13,9 @@ import java.util.concurrent.TimeoutException;
 
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
+/**
+ * Represents mcp server helper.
+ */
 @Slf4j
 public class McpServerHelper {
     public static Process startGiteeServerHttp() {

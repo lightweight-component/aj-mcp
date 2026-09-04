@@ -68,6 +68,8 @@ public abstract class McpTransport implements McpConstant, Closeable {
 
     /**
      * Sends a JSON-RPC response generated for a server-initiated request.
+     *
+     * @param message the JSON-RPC response message to send.
      */
     protected void sendJson(JsonNode message) {
         throw new UnsupportedOperationException("This transport cannot answer server-initiated requests");
@@ -85,31 +87,64 @@ public abstract class McpTransport implements McpConstant, Closeable {
      */
     public abstract void checkHealth();
 
+    /**
+     * Holds the pending requests value.
+     */
     @Setter
     private Map<Long, CompletableFuture<JsonNode>> pendingRequests;
+    /**
+     * Holds the notification handler value.
+     */
     private Consumer<JsonNode> notificationHandler;
+    /**
+     * Holds the server request handler value.
+     */
     private Function<JsonNode, JsonNode> serverRequestHandler;
+    /**
+     * Holds the initialized value.
+     */
     private volatile boolean initialized;
 
+    /**
+     * Holds the negotiated protocol version value.
+     */
     @Getter
     @Setter
     private volatile String negotiatedProtocolVersion;
 
+    /**
+     * Executes the set message handlers operation.
+     *
+     * @param notificationHandler  the notification handler value.
+     * @param serverRequestHandler the server request handler value.
+     */
     public void setMessageHandlers(Consumer<JsonNode> notificationHandler,
                                    Function<JsonNode, JsonNode> serverRequestHandler) {
         this.notificationHandler = notificationHandler;
         this.serverRequestHandler = serverRequestHandler;
     }
 
+    /**
+     * Executes the mark initialized operation.
+     */
     public void markInitialized() {
         initialized = true;
     }
 
+    /**
+     * Executes the require initialized operation.
+     */
     protected void requireInitialized() {
         if (!initialized)
             throw new IllegalStateException("MCP client is not initialized");
     }
 
+    /**
+     * Executes the numeric id operation.
+     *
+     * @param id the id value.
+     * @return the result of the numeric id operation.
+     */
     protected static Long numericId(Object id) {
         if (!(id instanceof Number))
             throw new IllegalArgumentException("Client-generated request id must be numeric: " + id);

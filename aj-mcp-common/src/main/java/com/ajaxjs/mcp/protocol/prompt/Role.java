@@ -2,8 +2,18 @@ package com.ajaxjs.mcp.protocol.prompt;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 
+/**
+ * Represents role.
+ */
 public enum Role {
-    USER, ASSISTANT;
+    /**
+     * Represents a user-authored prompt message.
+     */
+    USER,
+    /**
+     * Represents an assistant-authored prompt message.
+     */
+    ASSISTANT;
 
     /**
      * To allow case-insensitive deserialization

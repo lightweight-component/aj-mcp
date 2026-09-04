@@ -12,5 +12,8 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class ToolListChangedNotification extends BaseJsonRpcMessage {
+    /**
+     * Holds the method value.
+     */
     String method = McpConstant.Methods.TOOLS_LIST_CHANGED_NOTIFICATION;
 }

@@ -209,6 +209,9 @@ public class McpClient extends McpClientResource {
         return callTool(new CallToolRequest(name, arguments));
     }
 
+    /**
+     * Defines the execution error message constant.
+     */
     private static final String EXECUTION_ERROR_MESSAGE = "There was an error executing the tool";
 
     /**

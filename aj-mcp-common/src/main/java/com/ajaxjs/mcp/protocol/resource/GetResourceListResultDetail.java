@@ -8,10 +8,16 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
+/**
+ * Represents get resource list result detail.
+ */
 @Data
 @RequiredArgsConstructor
 @NoArgsConstructor
-public  class GetResourceListResultDetail {
+public class GetResourceListResultDetail {
+    /**
+     * Holds the resources value.
+     */
     @NonNull
     List<ResourceItem> resources;
 

@@ -6,6 +6,9 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Data;
 
+/**
+ * Represents content.
+ */
 @Data
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,      // 使用名称来区分子类
@@ -20,6 +23,9 @@ import lombok.Data;
         @JsonSubTypes.Type(value = ContentResourceLink.class, name = McpConstant.ContentType.RESOURCE_LINK)
 })
 public abstract class Content {
+    /**
+     * Holds the type value.
+     */
     @JsonIgnore
     String type;
 }

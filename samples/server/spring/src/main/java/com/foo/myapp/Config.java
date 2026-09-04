@@ -7,8 +7,15 @@ import com.ajaxjs.mcp.server.feature.FeatureMgr;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Represents config.
+ */
 @Configuration
 public class Config {
+    /**
+     * Executes the server sse operation.
+     * @return the result of the server sse operation.
+     */
     @Bean
     public ServerSse serverSse() {
         FeatureMgr mgr = new FeatureMgr();

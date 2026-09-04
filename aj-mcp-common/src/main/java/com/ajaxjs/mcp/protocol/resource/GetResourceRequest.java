@@ -1,10 +1,8 @@
 package com.ajaxjs.mcp.protocol.resource;
 
 import com.ajaxjs.mcp.protocol.McpRequest;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 
 import static com.ajaxjs.mcp.protocol.McpConstant.Methods.RESOURCES_READ;
 
@@ -15,7 +13,13 @@ import static com.ajaxjs.mcp.protocol.McpConstant.Methods.RESOURCES_READ;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class GetResourceRequest extends McpRequest {
+    /**
+     * Holds the method value.
+     */
     String method = RESOURCES_READ;
 
+    /**
+     * Holds the params value.
+     */
     GetResourceRequestParams params;
 }

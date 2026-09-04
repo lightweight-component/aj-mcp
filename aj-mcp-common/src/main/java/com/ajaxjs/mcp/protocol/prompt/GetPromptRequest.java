@@ -4,8 +4,6 @@ import com.ajaxjs.mcp.protocol.McpRequest;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.Map;
-
 import static com.ajaxjs.mcp.protocol.McpConstant.Methods.PROMPTS_GET;
 
 /**
@@ -15,7 +13,13 @@ import static com.ajaxjs.mcp.protocol.McpConstant.Methods.PROMPTS_GET;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class GetPromptRequest extends McpRequest {
+    /**
+     * Holds the method value.
+     */
     String method = PROMPTS_GET;
 
+    /**
+     * Holds the params value.
+     */
     GetPromptRequestParams params;
 }

@@ -8,6 +8,9 @@ import com.ajaxjs.mcp.server.feature.annotation.Tool;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Represents invalid feature returns.
+ */
 @McpService
 public class InvalidFeatureReturns {
     @Tool

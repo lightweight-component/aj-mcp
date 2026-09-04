@@ -51,6 +51,11 @@ public @interface Resource {
      */
     String mimeType() default McpConstant.EMPTY_STR;
 
+    /**
+     * Executes the title operation.
+     *
+     * @return the result of the title operation.
+     */
     String title() default McpConstant.EMPTY_STR;
 
 }

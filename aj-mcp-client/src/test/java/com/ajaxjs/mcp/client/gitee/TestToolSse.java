@@ -13,7 +13,13 @@ import static com.ajaxjs.mcp.client.McpServerHelper.startGiteeServerHttp;
 import static org.junit.jupiter.api.Assertions.fail;
 
 
+/**
+ * Represents test tool sse.
+ */
 class TestToolSse extends TestToolBase {
+    /**
+     * Holds the process value.
+     */
     private static Process process;
 
     @BeforeAll

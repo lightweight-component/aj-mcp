@@ -20,6 +20,9 @@ public class ContentImage extends Content {
      */
     String mimeType;
 
+    /**
+     * Creates a new content image.
+     */
     public ContentImage() {
         this.type = McpConstant.ContentType.IMAGE;
     }

@@ -15,6 +15,9 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Represents stdio transport unexpected exit test.
+ */
 class StdioTransportUnexpectedExitTest {
     @Test
     @Timeout(5)

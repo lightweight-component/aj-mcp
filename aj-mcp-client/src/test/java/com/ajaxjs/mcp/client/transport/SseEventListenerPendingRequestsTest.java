@@ -13,6 +13,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Represents sse event listener pending requests test.
+ */
 class SseEventListenerPendingRequestsTest {
     @Test
     void failureCompletesAndRemovesAllPendingRequests() {
@@ -55,6 +58,9 @@ class SseEventListenerPendingRequestsTest {
         return exception.getCause();
     }
 
+    /**
+     * Represents test transport.
+     */
     private static class TestTransport extends McpTransport {
         @Override
         public void start(Map<Long, CompletableFuture<JsonNode>> pendingRequest) {

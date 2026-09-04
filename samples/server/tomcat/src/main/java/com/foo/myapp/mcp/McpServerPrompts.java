@@ -13,8 +13,15 @@ import com.ajaxjs.mcp.server.feature.annotation.PromptArg;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Represents mcp server prompts.
+ */
 @McpService
 public class McpServerPrompts {
+    /**
+     * Executes the basic operation.
+     * @return the result of the basic operation.
+     */
     @Prompt(description = "Basic simple prompt")
     public PromptMessage basic() {
         PromptMessage message = new PromptMessage();
@@ -24,6 +31,10 @@ public class McpServerPrompts {
         return message;
     }
 
+    /**
+     * Executes the multi operation.
+     * @return the result of the multi operation.
+     */
     @Prompt(description = "Prompt that returns two messages")
     public List<PromptMessage> multi() {
         PromptMessage message1 = new PromptMessage();
@@ -37,6 +48,11 @@ public class McpServerPrompts {
         return Arrays.asList(message1, message2);
     }
 
+    /**
+     * Executes the parametrized operation.
+     * @param name the name value.
+     * @return the result of the parametrized operation.
+     */
     @Prompt(description = "Parametrized prompt")
     public PromptMessage parametrized(@PromptArg(description = "The name") String name) {
         PromptMessage message = new PromptMessage();
@@ -46,6 +62,10 @@ public class McpServerPrompts {
         return message;
     }
 
+    /**
+     * Executes the image operation.
+     * @return the result of the image operation.
+     */
     @Prompt(description = "Prompt that returns an image")
     public PromptMessage image() {
         String base64EncodedImage = ServerUtils.encodeImageToBase64("/com/ajaxjs/mcp/server/testcase/bird.jpg");
@@ -60,6 +80,10 @@ public class McpServerPrompts {
         return message;
     }
 
+    /**
+     * Executes the embedded binary resource operation.
+     * @return the result of the embedded binary resource operation.
+     */
     @Prompt(description = "Prompt that returns an embedded binary resource")
     public PromptMessage embeddedBinaryResource() {
         ContentEmbeddedResource embeddedResource = new ContentEmbeddedResource();

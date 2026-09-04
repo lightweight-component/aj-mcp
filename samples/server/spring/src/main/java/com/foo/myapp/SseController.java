@@ -12,11 +12,22 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.UUID;
 
+/**
+ * Represents sse controller.
+ */
 @RestController
 public class SseController {
+    /**
+     * Holds the server sse value.
+     */
     @Autowired
     ServerSse serverSse;
 
+    /**
+     * Executes the stream sse operation.
+     * @param req the req value.
+     * @param resp the resp value.
+     */
     @GetMapping(value = "/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public void streamSse(HttpServletRequest req, HttpServletResponse resp) {
         resp.setContentType("text/event-stream");

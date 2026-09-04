@@ -8,10 +8,14 @@ import static com.ajaxjs.mcp.protocol.McpConstant.Methods.RESOURCES_TEMPLATES_LI
 
 /**
  * Resource Templates
- * It allows that the servers to expose parameterized resources using URI templates. Arguments may be auto-completed through the completion API.
+ * It allows that the servers to expose parameterized resources using URI templates.
+ * Arguments may be auto-completed through the completion API.
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class ResourceTemplateRequest extends McpRequest {
+    /**
+     * Holds the method value.
+     */
     String method = RESOURCES_TEMPLATES_LIST;
 }

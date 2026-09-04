@@ -12,9 +12,18 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class McpRequestRawInfo {
+    /**
+     * Holds the id value.
+     */
     private Object id;
 
+    /**
+     * Holds the method value.
+     */
     private String method;
 
+    /**
+     * Holds the json node value.
+     */
     private JsonNode jsonNode;
 }

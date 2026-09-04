@@ -2,7 +2,6 @@ package com.ajaxjs.mcp.server;
 
 import com.ajaxjs.mcp.common.JsonUtils;
 import com.ajaxjs.mcp.protocol.McpResponse;
-import com.ajaxjs.mcp.protocol.common.ContentEmbeddedResource;
 import com.ajaxjs.mcp.protocol.common.ContentEmbeddedResourceDetail;
 import com.ajaxjs.mcp.server.common.ServerConfig;
 import com.ajaxjs.mcp.server.error.JsonRpcErrorCode;
@@ -12,7 +11,13 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Represents test low risk protocol fixes.
+ */
 class TestLowRiskProtocolFixes {
+    /**
+     * Holds the server value.
+     */
     private McpServer server;
 
     @BeforeEach

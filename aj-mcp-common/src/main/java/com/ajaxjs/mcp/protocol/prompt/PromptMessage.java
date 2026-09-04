@@ -13,5 +13,8 @@ public class PromptMessage {
      */
     private Role role;
 
+    /**
+     * Holds the content value.
+     */
     private Content content;
 }

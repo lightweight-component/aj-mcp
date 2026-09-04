@@ -12,7 +12,13 @@ import java.util.function.Function;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+/**
+ * Represents test tool base.
+ */
 public abstract class TestToolBase {
+    /**
+     * Holds the mcp client value.
+     */
     static IMcpClient mcpClient;
 
     @Test

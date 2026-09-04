@@ -13,7 +13,13 @@ import static com.ajaxjs.mcp.protocol.McpConstant.Methods.RESOURCES_SUBSCRIBE_RE
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class SubscribeRequest extends McpRequest {
+    /**
+     * Holds the method value.
+     */
     String method = RESOURCES_SUBSCRIBE_REQUEST;
 
+    /**
+     * Holds the params value.
+     */
     GetResourceRequestParams params;
 }

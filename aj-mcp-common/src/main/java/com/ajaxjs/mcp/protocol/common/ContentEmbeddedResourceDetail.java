@@ -3,6 +3,9 @@ package com.ajaxjs.mcp.protocol.common;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
+/**
+ * Represents content embedded resource detail.
+ */
 @Data
 public class ContentEmbeddedResourceDetail {
     /**

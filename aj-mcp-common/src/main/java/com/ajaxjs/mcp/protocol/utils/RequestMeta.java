@@ -11,5 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RequestMeta {
+    /**
+     * Holds the progress token value.
+     */
     private Object progressToken;
 }

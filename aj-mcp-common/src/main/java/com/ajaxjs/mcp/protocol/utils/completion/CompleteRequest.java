@@ -17,16 +17,31 @@ import static com.ajaxjs.mcp.protocol.McpConstant.Methods.COMPLETION_COMPLETE;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class CompleteRequest extends McpRequest {
+    /**
+     * Holds the method value.
+     */
     String method = COMPLETION_COMPLETE;
 
+    /**
+     * Holds the params value.
+     */
     Params params;
 
+    /**
+     * Represents params.
+     */
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
     public static class Params {
+        /**
+         * Holds the ref value.
+         */
         Ref ref;
 
+        /**
+         * Holds the argument value.
+         */
         Argument argument;
 
         /**
@@ -35,6 +50,12 @@ public class CompleteRequest extends McpRequest {
         @JsonInclude(JsonInclude.Include.NON_NULL)
         Map<String, String> context;
 
+        /**
+         * Creates a new params.
+         *
+         * @param ref      the ref value.
+         * @param argument the argument value.
+         */
         public Params(Ref ref, Argument argument) {
             this.ref = ref;
             this.argument = argument;
@@ -67,11 +88,20 @@ public class CompleteRequest extends McpRequest {
         String uri;
     }
 
+    /**
+     * Represents argument.
+     */
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
     public static class Argument {
+        /**
+         * Holds the name value.
+         */
         String name;
+        /**
+         * Holds the value value.
+         */
         String value;
     }
 }

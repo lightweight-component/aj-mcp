@@ -7,6 +7,9 @@ import org.junit.jupiter.api.BeforeAll;
 
 import java.util.Arrays;
 
+/**
+ * Represents test tool stdio.
+ */
 class TestToolStdio extends TestToolBase {
     @BeforeAll
     static void setup() {

@@ -11,6 +11,9 @@ import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Represents stdio transport close test.
+ */
 class StdioTransportCloseTest {
     @Test
     @Timeout(10)
@@ -52,6 +55,9 @@ class StdioTransportCloseTest {
         return type.cast(field.get(target));
     }
 
+    /**
+     * Represents persistent fake mcp server.
+     */
     public static class PersistentFakeMcpServer {
         public static void main(String[] args) throws Exception {
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));

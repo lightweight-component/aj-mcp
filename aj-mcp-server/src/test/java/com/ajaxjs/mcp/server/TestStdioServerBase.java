@@ -10,11 +10,23 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.PrintStream;
 
+/**
+ * Represents test stdio server base.
+ */
 class TestStdioServerBase {
+    /**
+     * Holds the original out value.
+     */
     final PrintStream originalOut = System.out;
 
+    /**
+     * Holds the test out value.
+     */
     final ByteArrayOutputStream testOut = new ByteArrayOutputStream();
 
+    /**
+     * Holds the original in value.
+     */
     final InputStream originalIn = System.in;
 
     @BeforeEach

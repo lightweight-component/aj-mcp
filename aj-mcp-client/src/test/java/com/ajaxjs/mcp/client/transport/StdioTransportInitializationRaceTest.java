@@ -9,7 +9,13 @@ import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
+/**
+ * Represents stdio transport initialization race test.
+ */
 class StdioTransportInitializationRaceTest {
+    /**
+     * Defines the initialize response constant.
+     */
     private static final String INITIALIZE_RESPONSE =
             "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{"
                     + "\"protocolVersion\":\"2024-11-05\","
@@ -47,6 +53,9 @@ class StdioTransportInitializationRaceTest {
                 + java.io.File.separator + "java";
     }
 
+    /**
+     * Represents fake mcp server.
+     */
     public static class FakeMcpServer {
         public static void main(String[] args) throws Exception {
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));

@@ -2,17 +2,49 @@ package com.ajaxjs.mcp.server.error;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
+/**
+ * Represents json rpc error code.
+ */
 public enum JsonRpcErrorCode {
+    /**
+     * Defines the resource not found constant.
+     */
     RESOURCE_NOT_FOUND(-32002),
+    /**
+     * Defines the internal error constant.
+     */
     INTERNAL_ERROR(-32603),
+    /**
+     * Defines the invalid params constant.
+     */
     INVALID_PARAMS(-32602),
+    /**
+     * Defines the method not found constant.
+     */
     METHOD_NOT_FOUND(-32601),
+    /**
+     * Defines the invalid request constant.
+     */
     INVALID_REQUEST(-32600),
+    /**
+     * Defines the parse error constant.
+     */
     PARSE_ERROR(-32700),
+    /**
+     * Defines the security error constant.
+     */
     SECURITY_ERROR(-32001);
 
+    /**
+     * Holds the code value.
+     */
     private final int code;
 
+    /**
+     * Creates a new json rpc error code.
+     *
+     * @param code the code value.
+     */
     JsonRpcErrorCode(int code) {
         this.code = code;
     }

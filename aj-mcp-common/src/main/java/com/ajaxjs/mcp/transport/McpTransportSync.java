@@ -6,6 +6,9 @@ import java.io.Closeable;
  * 同步的 MCP 通讯
  */
 public interface McpTransportSync extends Closeable {
+    /**
+     * Executes the start operation.
+     */
     void start();
 
     /**
@@ -16,15 +19,26 @@ public interface McpTransportSync extends Closeable {
      */
     String handle(String rawJson);
 
+    /**
+     * Executes the initialize operation.
+     */
     void initialize();
 
     /**
      * Sends a server-originated message to one logical transport session.
+     *
+     * @param sessionId the target transport session identifier.
+     * @param json      the JSON message to send.
      */
     default void send(String sessionId, String json) {
         throw new UnsupportedOperationException("Server-originated messages are not supported by this transport");
     }
 
+    /**
+     * Executes the broadcast operation.
+     *
+     * @param json the json value.
+     */
     default void broadcast(String json) {
         throw new UnsupportedOperationException("Broadcast is not supported by this transport");
     }

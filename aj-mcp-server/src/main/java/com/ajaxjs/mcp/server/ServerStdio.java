@@ -16,33 +16,71 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * Represents server stdio.
+ */
 @Data
 @Slf4j
 public class ServerStdio implements McpTransportSync {
+    /**
+     * Holds the input value.
+     */
     private final InputStream input = System.in;
 
+    /**
+     * Holds the reader value.
+     */
     private final BufferedReader reader = new BufferedReader(new InputStreamReader(input));
 
+    /**
+     * Holds the writer value.
+     */
     private final PrintWriter writer = new PrintWriter(System.out, true);
 
+    /**
+     * Holds the running value.
+     */
     private final AtomicBoolean running = new AtomicBoolean(false);
 
+    /**
+     * Holds the started value.
+     */
     private final AtomicBoolean started = new AtomicBoolean(false);
 
+    /**
+     * Holds the closed value.
+     */
     private final AtomicBoolean closed = new AtomicBoolean(false);
 
+    /**
+     * Holds the lifecycle lock value.
+     */
     private final Object lifecycleLock = new Object();
 
+    /**
+     * Holds the input thread value.
+     */
     private volatile Thread inputThread;
 
+    /**
+     * Holds the request executor value.
+     */
     private final ExecutorService requestExecutor = Executors.newCachedThreadPool(runnable -> {
         Thread thread = new Thread(runnable, "aj-mcp-server-stdio-request");
         thread.setDaemon(true);
         return thread;
     });
 
+    /**
+     * Holds the server value.
+     */
     private McpServer server;
 
+    /**
+     * Creates a new server stdio.
+     *
+     * @param server the server value.
+     */
     public ServerStdio(McpServer server) {
         this.server = server;
     }
@@ -75,6 +113,9 @@ public class ServerStdio implements McpTransportSync {
         }
     }
 
+    /**
+     * Executes the process input operation.
+     */
     private void processInput() {
         try {
             String line;
@@ -102,6 +143,11 @@ public class ServerStdio implements McpTransportSync {
         }
     }
 
+    /**
+     * Executes the process line operation.
+     *
+     * @param line the line value.
+     */
     private void processLine(String line) {
         boolean expectsResponse = false;
         try {

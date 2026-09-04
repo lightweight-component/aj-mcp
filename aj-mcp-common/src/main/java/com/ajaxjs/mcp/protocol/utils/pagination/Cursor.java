@@ -14,11 +14,22 @@ import java.util.Map;
 @Data
 @NoArgsConstructor
 public class Cursor {
+    /**
+     * Holds the cursor value.
+     */
     private String cursor;
 
+    /**
+     * Holds the page no value.
+     */
     @JsonIgnore
     private Integer pageNo;
 
+    /**
+     * Executes the set cursor operation.
+     *
+     * @param cursor the cursor value.
+     */
     public void setCursor(String cursor) {
         String json = McpUtils.base64Decode(cursor);
         this.cursor = json;
@@ -31,6 +42,11 @@ public class Cursor {
         this.pageNo = (Integer) page;
     }
 
+    /**
+     * Creates a new cursor.
+     *
+     * @param pageNo the page no value.
+     */
     public Cursor(int pageNo) {
         this.pageNo = pageNo;
         String json = "{\"page\":" + pageNo + "}";
@@ -39,6 +55,8 @@ public class Cursor {
 
     /**
      * Creates a client-side cursor without interpreting the server's opaque value.
+     *
+     * @param opaqueCursor the opaque cursor value supplied by the server.
      */
     public Cursor(String opaqueCursor) {
         this.cursor = opaqueCursor;

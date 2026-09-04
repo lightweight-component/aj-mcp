@@ -12,12 +12,24 @@ import java.util.Map;
  */
 @Data
 public class JsonSchema {
+    /**
+     * Holds the type value.
+     */
     String type;
 
+    /**
+     * Holds the properties value.
+     */
     Map<String, JsonSchemaProperty> properties;
 
+    /**
+     * Holds the required value.
+     */
     List<String> required;
 
+    /**
+     * Holds the additional properties value.
+     */
     @JsonInclude(JsonInclude.Include.NON_NULL)
     Boolean additionalProperties;
 }

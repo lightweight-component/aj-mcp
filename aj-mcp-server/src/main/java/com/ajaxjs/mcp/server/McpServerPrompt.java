@@ -20,6 +20,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Represents mcp server prompt.
+ */
 @Slf4j
 public abstract class McpServerPrompt extends McpServerResource {
     /**
@@ -172,16 +175,36 @@ public abstract class McpServerPrompt extends McpServerResource {
         return result;
     }
 
+    /**
+     * Executes the invalid prompt return operation.
+     *
+     * @param requestId the request id value.
+     * @param value     the value value.
+     * @return the result of the invalid prompt return operation.
+     */
     private static JsonRpcErrorException invalidPromptReturn(Object requestId, Object value) {
         return new JsonRpcErrorException(requestId, JsonRpcErrorCode.INTERNAL_ERROR,
                 "Prompt returned an unsupported value: " + (value == null ? "null" : value.getClass().getName()));
     }
 
+    /**
+     * Executes the error message operation.
+     *
+     * @param cause the cause value.
+     * @return the result of the error message operation.
+     */
     private static String errorMessage(Throwable cause) {
         String message = cause.getMessage();
         return message == null || message.trim().isEmpty() ? cause.getClass().getSimpleName() : message;
     }
 
+    /**
+     * Executes the extract values operation.
+     *
+     * @param map        the map value.
+     * @param paramOrder the param order value.
+     * @return the result of the extract values operation.
+     */
     static Object[] extractValues(Map<String, Object> map, String[] paramOrder) {
         // 创建一个 Object 数组用于存储结果
         Object[] result = new Object[paramOrder.length];

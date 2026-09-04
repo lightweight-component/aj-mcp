@@ -6,6 +6,9 @@ import com.ajaxjs.mcp.server.common.ServerUtils;
 import com.ajaxjs.mcp.server.feature.annotation.McpService;
 import com.ajaxjs.mcp.server.feature.annotation.Resource;
 
+/**
+ * Represents mcp server resources.
+ */
 @McpService
 public class McpServerResources {
     @Resource(uri = "file:///blob", description = "A nice pic", mimeType = "image/jpg")

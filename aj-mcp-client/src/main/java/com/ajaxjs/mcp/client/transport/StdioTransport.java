@@ -14,23 +14,50 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Represents stdio transport.
+ */
 @Builder
 @Slf4j
 public class StdioTransport extends McpTransport {
+    /**
+     * Holds the command value.
+     */
     private final List<String> command;
 
+    /**
+     * Holds the environment value.
+     */
     private final Map<String, String> environment;
 
+    /**
+     * Holds the log events value.
+     */
     private boolean logEvents;
 
+    /**
+     * Holds the process value.
+     */
     private Process process;
 
+    /**
+     * Holds the out value.
+     */
     private PrintStream out;
 
+    /**
+     * Holds the stdout reader thread value.
+     */
     private Thread stdoutReaderThread;
 
+    /**
+     * Holds the stderr reader thread value.
+     */
     private Thread stderrReaderThread;
 
+    /**
+     * Holds the closed value.
+     */
     private volatile boolean closed;
 
     @Override
@@ -229,6 +256,11 @@ public class StdioTransport extends McpTransport {
             Thread.currentThread().interrupt();
     }
 
+    /**
+     * Executes the close quietly operation.
+     *
+     * @param closeable the closeable value.
+     */
     private static void closeQuietly(Closeable closeable) {
         try {
             closeable.close();
@@ -237,6 +269,12 @@ public class StdioTransport extends McpTransport {
         }
     }
 
+    /**
+     * Executes the join quietly operation.
+     *
+     * @param thread the thread value.
+     * @return the result of the join quietly operation.
+     */
     private static boolean joinQuietly(Thread thread) {
         if (thread == null || thread == Thread.currentThread())
             return false;

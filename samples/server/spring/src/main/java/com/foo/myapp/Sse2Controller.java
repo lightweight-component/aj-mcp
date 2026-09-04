@@ -6,8 +6,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+/**
+ * Represents sse2 controller.
+ */
 @RestController
 public class Sse2Controller {
+    /**
+     * Executes the stream sse operation.
+     * @return the result of the stream sse operation.
+     */
     @GetMapping(value = "/ss2", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter streamSse() {
         SseEmitter emitter = new SseEmitter();

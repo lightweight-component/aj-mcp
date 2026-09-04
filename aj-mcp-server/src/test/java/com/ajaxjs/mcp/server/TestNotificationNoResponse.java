@@ -9,7 +9,13 @@ import java.io.StringWriter;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+/**
+ * Represents test notification no response.
+ */
 class TestNotificationNoResponse extends TestStdioServerBase {
+    /**
+     * Defines the initialized notification constant.
+     */
     private static final String INITIALIZED_NOTIFICATION =
             "{\"jsonrpc\":\"2.0\",\"method\":\"notifications/initialized\"}\n";
 

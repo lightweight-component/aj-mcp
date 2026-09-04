@@ -17,8 +17,17 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Represents test protocol versions.
+ */
 class TestProtocolVersions {
+    /**
+     * Holds the server value.
+     */
     private McpServer server;
+    /**
+     * Holds the transport value.
+     */
     private ServerStreamableHttp transport;
 
     @BeforeEach
@@ -125,7 +134,13 @@ class TestProtocolVersions {
         return headers;
     }
 
+    /**
+     * Represents elicitation loopback.
+     */
     private static final class ElicitationLoopback implements McpTransportSync {
+        /**
+         * Holds the server value.
+         */
         private final McpServer server;
 
         private ElicitationLoopback(McpServer server) {

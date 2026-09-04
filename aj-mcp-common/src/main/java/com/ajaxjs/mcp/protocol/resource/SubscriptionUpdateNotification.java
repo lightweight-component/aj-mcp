@@ -11,7 +11,13 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class SubscriptionUpdateNotification extends BaseJsonRpcMessage {
-    String method = McpConstant.Methods.RESOURCE_UPDATE_NOTIFICATION;
+    /**
+     * Holds the method value.
+     */
+    private String method = McpConstant.Methods.RESOURCE_UPDATE_NOTIFICATION;
 
-    GetResourceRequestParams params;
+    /**
+     * Holds the params value.
+     */
+    private GetResourceRequestParams params;
 }

@@ -12,5 +12,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class GetToolListResult extends McpResponse {
+    /**
+     * Holds the result value.
+     */
     private GetToolListResultToolList result;
 }

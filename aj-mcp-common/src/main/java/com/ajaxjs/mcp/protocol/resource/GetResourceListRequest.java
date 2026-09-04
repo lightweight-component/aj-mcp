@@ -10,13 +10,20 @@ import static com.ajaxjs.mcp.protocol.McpConstant.Methods.RESOURCES_LIST;
 
 /**
  * Listing Resources
- * To discover available resources, clients send a resources/list request. This operation supports pagination.
+ * To discover available resources, clients send a resources/list request.
+ * This operation supports pagination.
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class GetResourceListRequest extends McpRequest {
+    /**
+     * Holds the method value.
+     */
     String method = RESOURCES_LIST;
 
+    /**
+     * Holds the params value.
+     */
     @JsonInclude(JsonInclude.Include.NON_NULL)
     Cursor params;
 }

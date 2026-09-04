@@ -7,10 +7,19 @@ import lombok.Data;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Represents call tool result detail.
+ */
 @Data
 public class CallToolResultDetail {
+    /**
+     * Holds the is error value.
+     */
     Boolean isError = false;
 
+    /**
+     * Holds the content value.
+     */
     List<Content> content;
 
     /**

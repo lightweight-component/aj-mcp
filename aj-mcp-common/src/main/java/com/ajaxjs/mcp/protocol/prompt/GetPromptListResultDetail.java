@@ -5,11 +5,17 @@ import lombok.*;
 
 import java.util.List;
 
+/**
+ * Represents get prompt list result detail.
+ */
 @Data
 @AllArgsConstructor
 @RequiredArgsConstructor
 @NoArgsConstructor
 public class GetPromptListResultDetail {
+    /**
+     * Holds the prompts value.
+     */
     @NonNull
     private List<PromptItem> prompts;
 

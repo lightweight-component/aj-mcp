@@ -11,5 +11,8 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class InitializationNotification extends BaseJsonRpcMessage {
+    /**
+     * Holds the method value.
+     */
     private String method = McpConstant.Methods.NOTIFICATION_INITIALIZED;
 }

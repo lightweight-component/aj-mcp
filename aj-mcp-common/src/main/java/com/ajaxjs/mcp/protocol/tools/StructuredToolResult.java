@@ -17,9 +17,18 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class StructuredToolResult {
+    /**
+     * Holds the content value.
+     */
     private List<Content> content;
 
+    /**
+     * Holds the structured content value.
+     */
     private Map<String, Object> structuredContent;
 
+    /**
+     * Holds the error value.
+     */
     private boolean error;
 }

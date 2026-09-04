@@ -32,6 +32,11 @@ public class McpToolProvider {
      */
     private boolean failIfOneServerFails;
 
+    /**
+     * Executes the set mcp client operation.
+     *
+     * @param client the client value.
+     */
     public void setMcpClient(IMcpClient client) {
         setMcpClients(Collections.singletonList(client));
     }
@@ -65,6 +70,12 @@ public class McpToolProvider {
      * Tool provider result
      */
     public static class McpToolProviderResult extends LinkedHashMap<ToolItem, Function<CallToolRequest, String>> {
+        /**
+         * Executes the find tool by name operation.
+         *
+         * @param name the name value.
+         * @return the result of the find tool by name operation.
+         */
         public ToolItem findToolByName(String name) {
             for (ToolItem tool : keySet()) {
                 if (tool.getName().equals(name))
@@ -74,6 +85,12 @@ public class McpToolProvider {
             return null;
         }
 
+        /**
+         * Executes the find tool executor by name operation.
+         *
+         * @param name the name value.
+         * @return the result of the find tool executor by name operation.
+         */
         public Function<CallToolRequest, String> findToolExecutorByName(String name) {
             for (Map.Entry<ToolItem, Function<CallToolRequest, String>> entry : entrySet()) {
                 if (entry.getKey().getName().equals(name))

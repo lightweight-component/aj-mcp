@@ -6,9 +6,15 @@ import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
+/**
+ * Represents server store tool.
+ */
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class ServerStoreTool extends ServerStoreBase {
+    /**
+     * Holds the tool value.
+     */
     ToolItem tool;
 
     /**

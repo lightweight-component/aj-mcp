@@ -6,6 +6,9 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.util.Set;
 
+/**
+ * Represents test package annotation scanner.
+ */
 class TestPackageAnnotationScanner {
     @Test
     void testScan() throws IOException, ClassNotFoundException {

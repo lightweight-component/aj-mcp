@@ -16,6 +16,9 @@ import java.util.concurrent.TimeoutException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Represents mcp client timeout test.
+ */
 class McpClientTimeoutTest {
     @Test
     @Timeout(2)
@@ -69,7 +72,13 @@ class McpClientTimeoutTest {
         assertThrows(IllegalArgumentException.class, client::checkHealth);
     }
 
+    /**
+     * Represents test transport.
+     */
     private static class TestTransport extends McpTransport {
+        /**
+         * Holds the response value.
+         */
         private final CompletableFuture<JsonNode> response;
 
         private TestTransport(CompletableFuture<JsonNode> response) {

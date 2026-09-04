@@ -16,20 +16,43 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * Represents server sse.
+ */
 @Slf4j
 public class ServerSse implements McpTransportSync {
+    /**
+     * Holds the server value.
+     */
     private final McpServer server;
 
+    /**
+     * Creates a new server sse.
+     *
+     * @param server the server value.
+     */
     public ServerSse(McpServer server) {
         this.server = Objects.requireNonNull(server, "server is required");
     }
 
+    /**
+     * Holds the connections value.
+     */
     final Map<String, SseSession> connections = new ConcurrentHashMap<>();
 
+    /**
+     * Holds the started value.
+     */
     private final AtomicBoolean started = new AtomicBoolean(false);
 
+    /**
+     * Holds the closed value.
+     */
     private final AtomicBoolean closed = new AtomicBoolean(false);
 
+    /**
+     * Holds the heartbeat executor value.
+     */
     private volatile ScheduledExecutorService heartbeatExecutor;
 
     /**
@@ -44,6 +67,10 @@ public class ServerSse implements McpTransportSync {
 
     /**
      * Registers a client and atomically sends the endpoint event required by the MCP SSE transport.
+     *
+     * @param clientId     the logical client session identifier.
+     * @param writer       the response writer for the SSE stream.
+     * @param endpointPath the relative POST endpoint advertised to the client.
      */
     public void openSession(String clientId, PrintWriter writer, String endpointPath) {
         if (endpointPath == null || endpointPath.trim().isEmpty())
@@ -59,6 +86,13 @@ public class ServerSse implements McpTransportSync {
         }
     }
 
+    /**
+     * Executes the register session operation.
+     *
+     * @param clientId the client id value.
+     * @param writer   the writer value.
+     * @return the result of the register session operation.
+     */
     private synchronized SseSession registerSession(String clientId, PrintWriter writer) {
         if (closed.get())
             throw new IllegalStateException("SSE server transport is closed");
@@ -92,6 +126,12 @@ public class ServerSse implements McpTransportSync {
         server.removeSession(clientId);
     }
 
+    /**
+     * Executes the remove connection operation.
+     *
+     * @param clientId the client id value.
+     * @param session  the session value.
+     */
     private void removeConnection(String clientId, SseSession session) {
         if (connections.remove(clientId, session)) {
             session.close();
@@ -99,23 +139,49 @@ public class ServerSse implements McpTransportSync {
         }
     }
 
+    /**
+     * Executes the is session open operation.
+     *
+     * @param clientId the client id value.
+     * @return the result of the is session open operation.
+     */
     public boolean isSessionOpen(String clientId) {
         SseSession session = connections.get(clientId);
         return session != null && !session.isClosed();
     }
 
+    /**
+     * Executes the get session count operation.
+     *
+     * @return the result of the get session count operation.
+     */
     public int getSessionCount() {
         return connections.size();
     }
 
+    /**
+     * Executes the is started operation.
+     *
+     * @return the result of the is started operation.
+     */
     public boolean isStarted() {
         return started.get();
     }
 
+    /**
+     * Executes the is closed operation.
+     *
+     * @return the result of the is closed operation.
+     */
     public boolean isClosed() {
         return closed.get();
     }
 
+    /**
+     * Executes the is heartbeat running operation.
+     *
+     * @return the result of the is heartbeat running operation.
+     */
     public boolean isHeartbeatRunning() {
         ScheduledExecutorService executor = heartbeatExecutor;
         return executor != null && !executor.isShutdown();
@@ -164,6 +230,9 @@ public class ServerSse implements McpTransportSync {
         }
     }
 
+    /**
+     * Executes the send heartbeats operation.
+     */
     private void sendHeartbeats() {
         for (Map.Entry<String, SseSession> entry : connections.entrySet()) {
             try {
@@ -175,10 +244,22 @@ public class ServerSse implements McpTransportSync {
         }
     }
 
+    /**
+     * Executes the output operation.
+     *
+     * @param writer the writer value.
+     * @param data   the data value.
+     */
     public static void output(PrintWriter writer, String data) {
         writeFrame(writer, "data: " + data + "\n\n");
     }
 
+    /**
+     * Executes the write frame operation.
+     *
+     * @param writer the writer value.
+     * @param frame  the frame value.
+     */
     private static void writeFrame(PrintWriter writer, String frame) {
         synchronized (writer) {
             writer.write(frame);
@@ -189,6 +270,12 @@ public class ServerSse implements McpTransportSync {
         }
     }
 
+    /**
+     * Executes the return message operation.
+     *
+     * @param uuid the uuid value.
+     * @param data the data value.
+     */
     public void returnMessage(String uuid, String data) {
         if (data == null)
             return;
@@ -208,6 +295,9 @@ public class ServerSse implements McpTransportSync {
 
     /**
      * Processes a request and sends its response only to the originating session.
+     *
+     * @param clientId the originating client session identifier.
+     * @param rawJson  the JSON-RPC request payload.
      */
     public void handle(String clientId, String rawJson) {
         if (server.acceptClientResponse(clientId, rawJson))
@@ -285,18 +375,42 @@ public class ServerSse implements McpTransportSync {
             removeConnection(clientId);
     }
 
+    /**
+     * Represents sse session.
+     */
     static final class SseSession {
+        /**
+         * Holds the writer value.
+         */
         private final PrintWriter writer;
+        /**
+         * Holds the closed value.
+         */
         private final AtomicBoolean closed = new AtomicBoolean(false);
 
+        /**
+         * Creates a new sse session.
+         *
+         * @param writer the writer value.
+         */
         SseSession(PrintWriter writer) {
             this.writer = writer;
         }
 
+        /**
+         * Executes the send data operation.
+         *
+         * @param data the data value.
+         */
         void sendData(String data) {
             sendFrame("data: " + data + "\n\n");
         }
 
+        /**
+         * Executes the send frame operation.
+         *
+         * @param frame the frame value.
+         */
         void sendFrame(String frame) {
             synchronized (writer) {
                 if (closed.get())
@@ -308,10 +422,18 @@ public class ServerSse implements McpTransportSync {
             }
         }
 
+        /**
+         * Executes the is closed operation.
+         *
+         * @return the result of the is closed operation.
+         */
         boolean isClosed() {
             return closed.get();
         }
 
+        /**
+         * Executes the close operation.
+         */
         void close() {
             synchronized (writer) {
                 if (closed.compareAndSet(false, true))

@@ -5,7 +5,14 @@ import com.ajaxjs.mcp.server.ServerStdio;
 import com.ajaxjs.mcp.server.common.ServerConfig;
 import com.ajaxjs.mcp.server.feature.FeatureMgr;
 
+/**
+ * Represents app.
+ */
 public class App {
+    /**
+     * Executes the main operation.
+     * @param args the args value.
+     */
     public static void main(String[] args) {
         FeatureMgr mgr = new FeatureMgr();
         mgr.init("com.foo.myproduct");

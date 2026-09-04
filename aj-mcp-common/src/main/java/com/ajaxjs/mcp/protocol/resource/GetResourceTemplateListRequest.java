@@ -9,13 +9,20 @@ import lombok.EqualsAndHashCode;
 import static com.ajaxjs.mcp.protocol.McpConstant.Methods.RESOURCES_TEMPLATES_LIST;
 
 /**
- * Resource Template allows servers to expose parameterized resources using URI templates. Arguments may be auto-completed through the completion API.
+ * Resource Template allows servers to expose parameterized resources using URI templates.
+ * Arguments may be auto-completed through the completion API.
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class GetResourceTemplateListRequest extends McpRequest {
+    /**
+     * Holds the method value.
+     */
     String method = RESOURCES_TEMPLATES_LIST;
 
+    /**
+     * Holds the params value.
+     */
     @JsonInclude(JsonInclude.Include.NON_NULL)
     Cursor params;
 }

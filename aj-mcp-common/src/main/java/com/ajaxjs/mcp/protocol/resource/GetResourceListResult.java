@@ -12,8 +12,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class GetResourceListResult extends McpResponse {
+    /**
+     * Holds the result value.
+     */
     private GetResourceListResultDetail result;
 
+    /**
+     * Creates a new get resource list result.
+     *
+     * @param result the result value.
+     */
     public GetResourceListResult(GetResourceListResultDetail result) {
         this.result = result;
     }

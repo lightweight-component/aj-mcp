@@ -9,6 +9,9 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Represents test stdio server tool.
+ */
 class TestStdioServerTool extends TestStdioServerBase {
     @Test
     void testList() {

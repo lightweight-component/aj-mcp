@@ -10,5 +10,8 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class GetPromptResult extends McpResponse {
+    /**
+     * Holds the result value.
+     */
     private GetPromptResultDetail result;
 }

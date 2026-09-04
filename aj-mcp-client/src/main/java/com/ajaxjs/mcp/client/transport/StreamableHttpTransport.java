@@ -28,22 +28,65 @@ import java.util.concurrent.CompletableFuture;
  * server messages.
  */
 public class StreamableHttpTransport extends McpTransport {
+    /**
+     * Defines the protocol version header constant.
+     */
     public static final String PROTOCOL_VERSION_HEADER = "MCP-Protocol-Version";
+    /**
+     * Defines the session id header constant.
+     */
     public static final String SESSION_ID_HEADER = "Mcp-Session-Id";
 
+    /**
+     * Holds the endpoint url value.
+     */
     private final String endpointUrl;
+    /**
+     * Holds the client value.
+     */
     private final OkHttpClient client;
+    /**
+     * Holds the open event stream value.
+     */
     private final boolean openEventStream;
+    /**
+     * Holds the request headers value.
+     */
     private final Map<String, String> requestHeaders;
+    /**
+     * Holds the session id value.
+     */
     private volatile String sessionId;
+    /**
+     * Holds the initialization version value.
+     */
     private volatile String initializationVersion;
+    /**
+     * Holds the event source value.
+     */
     private volatile EventSource eventSource;
+    /**
+     * Holds the closed value.
+     */
     private volatile boolean closed;
 
+    /**
+     * Creates a new streamable http transport.
+     *
+     * @param endpointUrl the endpoint url value.
+     */
     public StreamableHttpTransport(String endpointUrl) {
         this(endpointUrl, true, Duration.ofSeconds(60), null);
     }
 
+    /**
+     * Creates a new streamable http transport.
+     *
+     * @param endpointUrl     the endpoint url value.
+     * @param openEventStream the open event stream value.
+     * @param timeout         the timeout value.
+     * @param requestHeaders  the request headers value.
+     */
     @Builder
     public StreamableHttpTransport(String endpointUrl, boolean openEventStream, Duration timeout,
                                    Map<String, String> requestHeaders) {
@@ -99,6 +142,14 @@ public class StreamableHttpTransport extends McpTransport {
         postJson(message, null, true);
     }
 
+    /**
+     * Executes the post operation.
+     *
+     * @param message       the message value.
+     * @param id            the id value.
+     * @param versionHeader the version header value.
+     * @return the result of the post operation.
+     */
     private CompletableFuture<JsonNode> post(BaseJsonRpcMessage message, Long id, boolean versionHeader) {
         try {
             return postBytes(JsonUtils.toJsonBytes(message), id, versionHeader);
@@ -107,6 +158,14 @@ public class StreamableHttpTransport extends McpTransport {
         }
     }
 
+    /**
+     * Executes the post json operation.
+     *
+     * @param message       the message value.
+     * @param id            the id value.
+     * @param versionHeader the version header value.
+     * @return the result of the post json operation.
+     */
     private CompletableFuture<JsonNode> postJson(JsonNode message, Long id, boolean versionHeader) {
         try {
             return postBytes(JsonUtils.toJsonBytes(message), id, versionHeader);
@@ -115,6 +174,14 @@ public class StreamableHttpTransport extends McpTransport {
         }
     }
 
+    /**
+     * Executes the post bytes operation.
+     *
+     * @param json          the json value.
+     * @param id            the id value.
+     * @param versionHeader the version header value.
+     * @return the result of the post bytes operation.
+     */
     private CompletableFuture<JsonNode> postBytes(byte[] json, Long id, boolean versionHeader) {
         CompletableFuture<JsonNode> future = new CompletableFuture<>();
 
@@ -176,6 +243,12 @@ public class StreamableHttpTransport extends McpTransport {
         return future;
     }
 
+    /**
+     * Executes the base request operation.
+     *
+     * @param includeVersion the include version value.
+     * @return the result of the base request operation.
+     */
     private Request.Builder baseRequest(boolean includeVersion) {
         Request.Builder builder = new Request.Builder().url(endpointUrl);
         // Authorization (for example Bearer tokens) remains application-owned.
@@ -197,6 +270,11 @@ public class StreamableHttpTransport extends McpTransport {
         return builder;
     }
 
+    /**
+     * Executes the capture session operation.
+     *
+     * @param response the response value.
+     */
     private void captureSession(Response response) {
         String received = response.header(SESSION_ID_HEADER);
 
@@ -204,6 +282,13 @@ public class StreamableHttpTransport extends McpTransport {
             sessionId = received;
     }
 
+    /**
+     * Executes the fail one operation.
+     *
+     * @param id      the id value.
+     * @param future  the future value.
+     * @param failure the failure value.
+     */
     private void failOne(Long id, CompletableFuture<JsonNode> future, Throwable failure) {
         if (id != null)
             future.completeExceptionally(failure);
@@ -232,11 +317,19 @@ public class StreamableHttpTransport extends McpTransport {
         dispatchSseData(data);
     }
 
+    /**
+     * Executes the dispatch sse data operation.
+     *
+     * @param data the data value.
+     */
     private void dispatchSseData(StringBuilder data) {
         if (data.length() > 0)
             handle(JsonUtils.json2Node(data.toString()));
     }
 
+    /**
+     * Executes the open get stream operation.
+     */
     private void openGetStream() {
         Request request = baseRequest(true).header("Accept", "text/event-stream").get().build();
         eventSource = EventSources.createFactory(client).newEventSource(request, new EventSourceListener() {
@@ -276,6 +369,11 @@ public class StreamableHttpTransport extends McpTransport {
         client.connectionPool().evictAll();
     }
 
+    /**
+     * Executes the get session id operation.
+     *
+     * @return the result of the get session id operation.
+     */
     public String getSessionId() {
         return sessionId;
     }

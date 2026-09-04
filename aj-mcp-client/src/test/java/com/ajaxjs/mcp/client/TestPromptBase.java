@@ -9,7 +9,13 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Represents test prompt base.
+ */
 public abstract class TestPromptBase {
+    /**
+     * Holds the mcp client value.
+     */
     static IMcpClient mcpClient;
 
     PromptItem findPromptByName(String name, List<PromptItem> promptRefs) {

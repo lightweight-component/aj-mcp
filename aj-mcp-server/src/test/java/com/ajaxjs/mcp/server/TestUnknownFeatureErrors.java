@@ -6,6 +6,9 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * Represents test unknown feature errors.
+ */
 class TestUnknownFeatureErrors extends TestStdioServerBase {
     @Test
     void unknownToolReturnsInvalidParams() {

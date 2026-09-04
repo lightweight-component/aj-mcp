@@ -10,6 +10,9 @@ import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+/**
+ * Represents test initialize stdio.
+ */
 class TestInitializeStdio extends TestInitializeBase {
     @BeforeAll
     static void setup() {

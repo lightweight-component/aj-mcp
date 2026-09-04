@@ -9,8 +9,14 @@ import lombok.Data;
  */
 @Data
 public class JsonSchemaProperty {
+    /**
+     * Holds the type value.
+     */
     private String type;
 
+    /**
+     * Holds the description value.
+     */
     private String description;
 
 // for complexParameter

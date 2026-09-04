@@ -15,8 +15,14 @@ import static com.ajaxjs.mcp.protocol.McpConstant.Methods.PROMPTS_LIST;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class GetPromptListRequest extends McpRequest {
+    /**
+     * Holds the method value.
+     */
     String method = PROMPTS_LIST;
 
+    /**
+     * Holds the params value.
+     */
     @JsonInclude(JsonInclude.Include.NON_NULL)
     Cursor params;
 }

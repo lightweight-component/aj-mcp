@@ -16,6 +16,9 @@ import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+/**
+ * Represents package annotation scanner.
+ */
 @Slf4j
 public class PackageAnnotationScanner {
     /**
@@ -79,8 +82,21 @@ public class PackageAnnotationScanner {
         }
     }
 
+    /**
+     * Defines the class file extension constant.
+     */
     private static final String CLASS_FILE_EXTENSION = ".class";
 
+    /**
+     * Executes the find classes in jar operation.
+     *
+     * @param jarFile     the jar file value.
+     * @param packagePath the package path value.
+     * @param annotation  the annotation value.
+     * @param classLoader the class loader value.
+     * @param classes     the classes value.
+     * @throws ClassNotFoundException if the operation cannot complete.
+     */
     private static void findClassesInJar(JarFile jarFile, String packagePath, Class<? extends Annotation> annotation,
                                          ClassLoader classLoader, Set<Class<?>> classes) throws ClassNotFoundException {
         Enumeration<JarEntry> entries = jarFile.entries();
@@ -97,6 +113,14 @@ public class PackageAnnotationScanner {
         }
     }
 
+    /**
+     * Executes the add if annotated operation.
+     *
+     * @param className   the class name value.
+     * @param annotation  the annotation value.
+     * @param classLoader the class loader value.
+     * @param classes     the classes value.
+     */
     private static void addIfAnnotated(String className, Class<? extends Annotation> annotation,
                                        ClassLoader classLoader, Set<Class<?>> classes) {
         try {

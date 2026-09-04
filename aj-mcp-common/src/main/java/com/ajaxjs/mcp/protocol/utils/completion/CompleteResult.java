@@ -13,14 +13,26 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class CompleteResult extends McpResponse {
+    /**
+     * Holds the result value.
+     */
     private CompleteResultDetail result;
 
+    /**
+     * Represents complete result detail.
+     */
     @Data
     @AllArgsConstructor
     public static class CompleteResultDetail {
+        /**
+         * Holds the completion value.
+         */
         CompletionResult completion;
     }
 
+    /**
+     * Represents completion result.
+     */
     @Data
     @AllArgsConstructor
     public static class CompletionResult {

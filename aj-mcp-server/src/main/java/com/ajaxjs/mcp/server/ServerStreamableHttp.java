@@ -27,19 +27,43 @@ import java.util.concurrent.ConcurrentHashMap;
  * are registered through {@link #openEventStream(String, PrintWriter, Map)}.</p>
  */
 public class ServerStreamableHttp implements McpTransportSync {
+    /**
+     * Defines the protocol version header constant.
+     */
     public static final String PROTOCOL_VERSION_HEADER = "MCP-Protocol-Version";
+    /**
+     * Defines the session id header constant.
+     */
     public static final String SESSION_ID_HEADER = "Mcp-Session-Id";
 
+    /**
+     * Holds the server value.
+     */
     private final McpServer server;
+    /**
+     * Holds the streams value.
+     */
     private final Map<String, StreamSession> streams = new ConcurrentHashMap<>();
+    /**
+     * Holds the closed value.
+     */
     private volatile boolean closed;
 
+    /**
+     * Creates a new server streamable http.
+     *
+     * @param server the server value.
+     */
     public ServerStreamableHttp(McpServer server) {
         this.server = server;
     }
 
     /**
      * Processes one Streamable HTTP POST request. JSON-RPC batching is intentionally unsupported.
+     *
+     * @param body    the request body containing one JSON-RPC message.
+     * @param headers the HTTP request headers.
+     * @return the HTTP response to send to the client.
      */
     public HttpResult post(String body, Map<String, String> headers) {
         if (closed)
@@ -115,6 +139,11 @@ public class ServerStreamableHttp implements McpTransportSync {
 
     /**
      * Registers the optional long-lived GET stream used for server-originated messages.
+     *
+     * @param sessionId the initialized MCP session identifier.
+     * @param writer    the response writer for the event stream.
+     * @param headers   the HTTP request headers.
+     * @return the HTTP response that opens or rejects the event stream.
      */
     public HttpResult openEventStream(String sessionId, PrintWriter writer, Map<String, String> headers) {
         HttpResult originFailure = validateOrigin(headers);
@@ -142,6 +171,13 @@ public class ServerStreamableHttp implements McpTransportSync {
         return new HttpResult(200, Collections.<String, String>emptyMap(), "text/event-stream", null);
     }
 
+    /**
+     * Executes the delete operation.
+     *
+     * @param sessionId the session id value.
+     * @param headers   the headers value.
+     * @return the result of the delete operation.
+     */
     public HttpResult delete(String sessionId, Map<String, String> headers) {
         HttpResult originFailure = validateOrigin(headers);
 
@@ -156,6 +192,12 @@ public class ServerStreamableHttp implements McpTransportSync {
         return new HttpResult(204, Collections.<String, String>emptyMap(), null, null);
     }
 
+    /**
+     * Executes the validate origin operation.
+     *
+     * @param headers the headers value.
+     * @return the result of the validate origin operation.
+     */
     private HttpResult validateOrigin(Map<String, String> headers) {
         String origin = header(headers, "Origin");
 
@@ -166,6 +208,13 @@ public class ServerStreamableHttp implements McpTransportSync {
         return null;
     }
 
+    /**
+     * Executes the header operation.
+     *
+     * @param headers the headers value.
+     * @param name    the name value.
+     * @return the result of the header operation.
+     */
     private static String header(Map<String, String> headers, String name) {
         if (headers == null)
             return null;
@@ -200,6 +249,11 @@ public class ServerStreamableHttp implements McpTransportSync {
             send(sessionId, json);
     }
 
+    /**
+     * Executes the remove session operation.
+     *
+     * @param sessionId the session id value.
+     */
     private void removeSession(String sessionId) {
         StreamSession stream = streams.remove(sessionId);
 
@@ -237,26 +291,66 @@ public class ServerStreamableHttp implements McpTransportSync {
             removeSession(sessionId);
     }
 
+    /**
+     * Represents http result.
+     */
     @Data
     @AllArgsConstructor
     public static class HttpResult {
+        /**
+         * Holds the status value.
+         */
         private int status;
+        /**
+         * Holds the headers value.
+         */
         private Map<String, String> headers;
+        /**
+         * Holds the content type value.
+         */
         private String contentType;
+        /**
+         * Holds the body value.
+         */
         private String body;
 
+        /**
+         * Executes the json operation.
+         *
+         * @param status the status value.
+         * @param body   the body value.
+         * @return the result of the json operation.
+         */
         static HttpResult json(int status, String body) {
             return new HttpResult(status, Collections.<String, String>emptyMap(), "application/json", body);
         }
 
+        /**
+         * Executes the text operation.
+         *
+         * @param status the status value.
+         * @param body   the body value.
+         * @return the result of the text operation.
+         */
         static HttpResult text(int status, String body) {
             return new HttpResult(status, Collections.<String, String>emptyMap(), "text/plain", body);
         }
     }
 
+    /**
+     * Represents stream session.
+     */
     private static final class StreamSession {
+        /**
+         * Holds the writer value.
+         */
         private final PrintWriter writer;
 
+        /**
+         * Creates a new stream session.
+         *
+         * @param writer the writer value.
+         */
         private StreamSession(PrintWriter writer) {
             if (writer == null)
                 throw new IllegalArgumentException("writer is required");
@@ -264,6 +358,11 @@ public class ServerStreamableHttp implements McpTransportSync {
             this.writer = writer;
         }
 
+        /**
+         * Executes the send operation.
+         *
+         * @param json the json value.
+         */
         private void send(String json) {
             synchronized (writer) {
                 writer.write("event: message\ndata: " + json + "\n\n");
@@ -274,6 +373,9 @@ public class ServerStreamableHttp implements McpTransportSync {
             }
         }
 
+        /**
+         * Executes the close operation.
+         */
         private void close() {
             synchronized (writer) {
                 writer.close();

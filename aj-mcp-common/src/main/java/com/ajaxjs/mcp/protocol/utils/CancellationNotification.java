@@ -16,23 +16,49 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class CancellationNotification extends McpRequest {
+    /**
+     * Holds the method value.
+     */
     private String method = McpConstant.Methods.NOTIFICATION_CANCELLED;
 
+    /**
+     * Holds the params value.
+     */
     private Params params;
 
+    /**
+     * Represents params.
+     */
     @Data
     public static class Params {
+        /**
+         * Holds the request id value.
+         */
         private Object requestId;
 
+        /**
+         * Holds the reason value.
+         */
         @JsonInclude(JsonInclude.Include.NON_NULL)
         private String reason;
     }
 
+    /**
+     * Creates a new cancellation notification.
+     *
+     * @param requestId the request id value.
+     */
     public CancellationNotification(Object requestId) {
         this.params = new Params();
         this.params.setRequestId(requestId);
     }
 
+    /**
+     * Creates a new cancellation notification.
+     *
+     * @param requestId the request id value.
+     * @param message   the message value.
+     */
     public CancellationNotification(Object requestId, String message) {
         this(requestId);
         this.params.setReason(message);

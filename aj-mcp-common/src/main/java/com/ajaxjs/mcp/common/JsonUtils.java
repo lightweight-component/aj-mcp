@@ -18,6 +18,9 @@ import java.util.Map;
  */
 @Slf4j
 public class JsonUtils {
+    /**
+     * Defines the object mapper constant.
+     */
     public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     static {
@@ -45,23 +48,54 @@ public class JsonUtils {
 
     /**
      * Serializes a value to UTF-8 JSON bytes while preserving Jackson's checked exception.
+     *
+     * @param obj the value to serialize.
+     * @return the UTF-8 JSON representation of {@code obj}.
+     * @throws JsonProcessingException if Jackson cannot serialize the value.
      */
     public static byte[] toJsonBytes(Object obj) throws JsonProcessingException {
         return OBJECT_MAPPER.writeValueAsBytes(obj);
     }
 
+    /**
+     * Executes the create object node operation.
+     *
+     * @return the result of the create object node operation.
+     */
     public static ObjectNode createObjectNode() {
         return OBJECT_MAPPER.createObjectNode();
     }
 
+    /**
+     * Executes the value to tree operation.
+     *
+     * @param value the value value.
+     * @return the result of the value to tree operation.
+     */
     public static JsonNode valueToTree(Object value) {
         return OBJECT_MAPPER.valueToTree(value);
     }
 
+    /**
+     * Executes the tree to value operation.
+     *
+     * @param <T>      the t type.
+     * @param jsonNode the json node value.
+     * @param clazz    the clazz value.
+     * @return the result of the tree to value operation.
+     * @throws JsonProcessingException if the operation cannot complete.
+     */
     public static <T> T treeToValue(JsonNode jsonNode, Class<T> clazz) throws JsonProcessingException {
         return OBJECT_MAPPER.treeToValue(jsonNode, clazz);
     }
 
+    /**
+     * Executes the read tree operation.
+     *
+     * @param json the json value.
+     * @return the result of the read tree operation.
+     * @throws IOException if the operation cannot complete.
+     */
     public static JsonNode readTree(String json) throws IOException {
         return OBJECT_MAPPER.readTree(json);
     }
@@ -188,6 +222,12 @@ public class JsonUtils {
         return fromJson(jsonArrayStr, type);
     }
 
+    /**
+     * Executes the json2map list operation.
+     *
+     * @param jsonArrayStr the json array str value.
+     * @return the result of the json2map list operation.
+     */
     public static List<Map<String, Object>> json2mapList(String jsonArrayStr) {
         try {
             return OBJECT_MAPPER.readValue(jsonArrayStr, new TypeReference<List<Map<String, Object>>>() {
@@ -238,6 +278,14 @@ public class JsonUtils {
         return OBJECT_MAPPER.convertValue(obj, type);
     }
 
+    /**
+     * Executes the map2pojo operation.
+     *
+     * @param <T>   the t type.
+     * @param map   the map value.
+     * @param clazz the clazz value.
+     * @return the result of the map2pojo operation.
+     */
     public static <T> T map2pojo(Map<String, Object> map, Class<T> clazz) {
         return OBJECT_MAPPER.convertValue(map, clazz);
     }
@@ -257,6 +305,14 @@ public class JsonUtils {
         }
     }
 
+    /**
+     * Executes the json node2bean operation.
+     *
+     * @param <T>      the t type.
+     * @param jsonNode the json node value.
+     * @param clazz    the clazz value.
+     * @return the result of the json node2bean operation.
+     */
     public static <T> T jsonNode2bean(JsonNode jsonNode, Class<T> clazz) {
         try {
             return treeToValue(jsonNode, clazz);

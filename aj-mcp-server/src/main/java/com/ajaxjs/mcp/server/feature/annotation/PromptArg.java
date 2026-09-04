@@ -15,8 +15,18 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Target(ElementType.PARAMETER)
 public @interface PromptArg {
+    /**
+     * Executes the value operation.
+     *
+     * @return the result of the value operation.
+     */
     String value() default McpConstant.EMPTY_STR;
 
+    /**
+     * Executes the description operation.
+     *
+     * @return the result of the description operation.
+     */
     String description() default McpConstant.EMPTY_STR;
 
     /**

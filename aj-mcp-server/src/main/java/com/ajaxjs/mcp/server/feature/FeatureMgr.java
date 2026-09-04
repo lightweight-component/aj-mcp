@@ -20,20 +20,38 @@ import java.lang.reflect.Parameter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Represents feature mgr.
+ */
 @Slf4j
 public class FeatureMgr {
+    /**
+     * Holds the prompt store value.
+     */
     @Getter
     private final Map<String, ServerStorePrompt> promptStore = new ConcurrentHashMap<>();
 
+    /**
+     * Holds the resource store value.
+     */
     @Getter
     private final Map<String, ServerStoreResource> resourceStore = new ConcurrentHashMap<>();
 
+    /**
+     * Holds the tool store value.
+     */
     @Getter
     private final Map<String, ServerStoreTool> toolStore = new ConcurrentHashMap<>();
 
+    /**
+     * Holds the resource template store value.
+     */
     @Getter
     private final Map<String, ServerStoreResourceTemplate> resourceTemplateStore = new ConcurrentHashMap<>();
 
+    /**
+     * Holds the completion store value.
+     */
     @Getter
     private final Map<String, ServerStoreCompletion> completionStore = new ConcurrentHashMap<>();
 
@@ -86,6 +104,13 @@ public class FeatureMgr {
         }
     }
 
+    /**
+     * Executes the add resource template operation.
+     *
+     * @param annotation the annotation value.
+     * @param method     the method value.
+     * @param instance   the instance value.
+     */
     private void addResourceTemplate(com.ajaxjs.mcp.server.feature.annotation.ResourceTemplate annotation,
                                      Method method, Object instance) {
         String templateName = McpUtils.isEmptyText(annotation.name()) ? method.getName() : annotation.name();
@@ -133,6 +158,14 @@ public class FeatureMgr {
         resourceTemplateStore.put(templateName, store);
     }
 
+    /**
+     * Executes the add completion operation.
+     *
+     * @param referenceType the reference type value.
+     * @param referenceName the reference name value.
+     * @param method        the method value.
+     * @param instance      the instance value.
+     */
     private void addCompletion(String referenceType, String referenceName, Method method, Object instance) {
         if (method.getParameterTypes().length != 1 || method.getParameterTypes()[0] != String.class)
             throw new IllegalArgumentException("Completion method must accept exactly one String parameter: " + method);
@@ -149,6 +182,12 @@ public class FeatureMgr {
         completionStore.put(referenceType + ":" + referenceName + ":" + argumentName, store);
     }
 
+    /**
+     * Executes the new instance operation.
+     *
+     * @param clazz the clazz value.
+     * @return the result of the new instance operation.
+     */
     static Object newInstance(Class<?> clazz) {
         try {
             return clazz.newInstance();

@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Represents mcp utils.
+ */
 public class McpUtils {
     /**
      * Check whether the given {@code String} contains actual <em>text</em>.
@@ -21,10 +24,22 @@ public class McpUtils {
         return (str != null && !str.isEmpty() && containsText(str));
     }
 
+    /**
+     * Executes the is empty text operation.
+     *
+     * @param str the str value.
+     * @return the result of the is empty text operation.
+     */
     public static boolean isEmptyText(String str) {
         return !hasText(str);
     }
 
+    /**
+     * Executes the contains text operation.
+     *
+     * @param str the str value.
+     * @return the result of the contains text operation.
+     */
     private static boolean containsText(CharSequence str) {
         int strLen = str.length();
 
@@ -115,10 +130,22 @@ public class McpUtils {
         return map;
     }
 
+    /**
+     * Executes the base64 encode operation.
+     *
+     * @param str the str value.
+     * @return the result of the base64 encode operation.
+     */
     public static String base64Encode(String str) {
         return Base64.getEncoder().encodeToString(str.getBytes());
     }
 
+    /**
+     * Executes the base64 decode operation.
+     *
+     * @param str the str value.
+     * @return the result of the base64 decode operation.
+     */
     public static String base64Decode(String str) {
         byte[] decodedBytes = Base64.getDecoder().decode(str);
         return new String(decodedBytes);
@@ -140,6 +167,14 @@ public class McpUtils {
     }
 
     // 模拟 failedFuture 的静态方法
+
+    /**
+     * Executes the failed future operation.
+     *
+     * @param <T>       the t type.
+     * @param throwable the throwable value.
+     * @return the result of the failed future operation.
+     */
     public static <T> CompletableFuture<T> failedFuture(Throwable throwable) {
         CompletableFuture<T> future = new CompletableFuture<>();
         future.completeExceptionally(throwable); // 标记为异常完成
@@ -147,6 +182,14 @@ public class McpUtils {
         return future;
     }
 
+    /**
+     * Executes the get or default operation.
+     *
+     * @param <T>          the t type.
+     * @param value        the value value.
+     * @param defaultValue the default value value.
+     * @return the result of the get or default operation.
+     */
     public static <T> T getOrDefault(T value, T defaultValue) {
         return value != null ? value : defaultValue;
     }

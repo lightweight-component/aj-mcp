@@ -15,6 +15,9 @@ import java.util.concurrent.CompletableFuture;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+/**
+ * Represents mcp client tool error test.
+ */
 class McpClientToolErrorTest {
     @Test
     void legacyListToolsPropagatesJsonRpcError() {
@@ -27,6 +30,9 @@ class McpClientToolErrorTest {
         assertEquals(-32602, error.getErrorCode());
     }
 
+    /**
+     * Represents error transport.
+     */
     private static final class ErrorTransport extends McpTransport {
         @Override
         public void start(Map<Long, CompletableFuture<JsonNode>> pendingRequest) {

@@ -10,6 +10,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/**
+ * Represents http mcp transport start failure test.
+ */
 class HttpMcpTransportStartFailureTest {
     @Test
     void failedEndpointInitializationCancelsCreatedEventSource() {
@@ -31,7 +34,13 @@ class HttpMcpTransportStartFailureTest {
         assertTrue(transport.eventSource.cancelled);
     }
 
+    /**
+     * Represents failing transport.
+     */
     private static class FailingTransport extends HttpMcpTransport {
+        /**
+         * Holds the event source value.
+         */
         private TestEventSource eventSource;
 
         private FailingTransport() {
@@ -46,7 +55,13 @@ class HttpMcpTransportStartFailureTest {
         }
     }
 
+    /**
+     * Represents one arg failing transport.
+     */
     private static class OneArgFailingTransport extends HttpMcpTransport {
+        /**
+         * Holds the event source value.
+         */
         private TestEventSource eventSource;
 
         private OneArgFailingTransport() {
@@ -61,8 +76,17 @@ class HttpMcpTransportStartFailureTest {
         }
     }
 
+    /**
+     * Represents test event source.
+     */
     private static class TestEventSource implements EventSource {
+        /**
+         * Holds the request value.
+         */
         private final Request request;
+        /**
+         * Holds the cancelled value.
+         */
         private boolean cancelled;
 
         private TestEventSource(Request request) {

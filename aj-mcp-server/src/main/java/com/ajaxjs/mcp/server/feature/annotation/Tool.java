@@ -31,6 +31,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Target(METHOD)
 public @interface Tool {
+    /**
+     * Executes the value operation.
+     *
+     * @return the result of the value operation.
+     */
     String value() default McpConstant.EMPTY_STR;
 
     /**
@@ -42,23 +47,44 @@ public @interface Tool {
 
     /**
      * Optional human-facing display name (2025-06-18).
+     *
+     * @return the display name, or an empty string when unspecified.
      */
     String title() default McpConstant.EMPTY_STR;
 
     /**
      * Optional JSON Schema object encoded as JSON (2025-06-18).
+     *
+     * @return the output schema JSON, or an empty string when unspecified.
      */
     String outputSchema() default McpConstant.EMPTY_STR;
 
     /**
      * Behavioral hints introduced in 2025-03-26. They are advisory, not security controls.
+     *
+     * @return whether the tool is expected to avoid modifying its environment.
      */
     boolean readOnlyHint() default false;
 
+    /**
+     * Executes the destructive hint operation.
+     *
+     * @return the result of the destructive hint operation.
+     */
     boolean destructiveHint() default true;
 
+    /**
+     * Executes the idempotent hint operation.
+     *
+     * @return the result of the idempotent hint operation.
+     */
     boolean idempotentHint() default false;
 
+    /**
+     * Executes the open world hint operation.
+     *
+     * @return the result of the open world hint operation.
+     */
     boolean openWorldHint() default true;
 
 }

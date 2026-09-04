@@ -11,7 +11,13 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class InitializeRequest extends BaseJsonRpcMessage {
+    /**
+     * Holds the method value.
+     */
     private String method = McpConstant.Methods.INITIALIZE;
 
+    /**
+     * Holds the params value.
+     */
     private InitializeRequestParams params;
 }

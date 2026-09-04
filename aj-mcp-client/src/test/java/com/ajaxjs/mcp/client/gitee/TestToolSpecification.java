@@ -13,7 +13,13 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Represents test tool specification.
+ */
 class TestToolSpecification {
+    /**
+     * Holds the tool text value.
+     */
     String toolText = "[ {\n" +
             "                      \"name\" : \"operation\",\n" +
             "                      \"description\" : \"Super operation\",\n" +
@@ -86,6 +92,9 @@ class TestToolSpecification {
         assertEquals("Message to echo", messageParameter.get("stringParameter").getDescription(), "Description mismatch for stringParameter");
     }
 
+    /**
+     * Holds the obj text value.
+     */
     String objText = "[\n" +
             "                  {\n" +
             "                    \"name\": \"operation\",\n" +
@@ -150,6 +159,9 @@ class TestToolSpecification {
 //        assertEquals("A nested number", nestedNumberParameter.getDescription(), "Description mismatch for nestedNumber");
     }
 
+    /**
+     * Holds the no params text value.
+     */
     String noParamsText = "[{\n" +
             "                    \"name\" : \"getTinyImage\",\n" +
             "                    \"description\" : \"Returns the MCP_TINY_IMAGE\",\n" +

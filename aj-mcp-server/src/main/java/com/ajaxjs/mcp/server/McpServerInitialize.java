@@ -21,15 +21,37 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Represents mcp server initialize.
+ */
 @Slf4j
 @Data
 public abstract class McpServerInitialize implements McpConstant {
+    /**
+     * Holds the feature mgr value.
+     */
     FeatureMgr featureMgr = new FeatureMgr();
 
+    /**
+     * Holds the server config value.
+     */
     ServerConfig serverConfig;
 
+    /**
+     * Holds the transport value.
+     */
     McpTransportSync transport;
 
+    /**
+     * Executes the get store operation.
+     *
+     * @param <T>         the t type.
+     * @param map         the map value.
+     * @param name        the name value.
+     * @param requestId   the request id value.
+     * @param featureType the feature type value.
+     * @return the result of the get store operation.
+     */
     static <T> T getStore(Map<String, T> map, String name, Object requestId, String featureType) {
         if (McpUtils.isEmptyText(name))
             throw new JsonRpcErrorException(requestId, JsonRpcErrorCode.INVALID_PARAMS,
@@ -155,12 +177,21 @@ public abstract class McpServerInitialize implements McpConstant {
         return resp;
     }
 
+    /**
+     * Executes the non empty text operation.
+     *
+     * @param node the node value.
+     * @return the result of the non empty text operation.
+     */
     private static boolean nonEmptyText(JsonNode node) {
         return node != null && node.isTextual() && McpUtils.hasText(node.textValue());
     }
 
     /**
      * Hook used by the concrete server to bind negotiated state to its transport session.
+     *
+     * @param version       the negotiated protocol version.
+     * @param requestParams the client's initialization parameters.
      */
     protected void onProtocolNegotiated(String version, InitializeRequestParams requestParams) {
     }

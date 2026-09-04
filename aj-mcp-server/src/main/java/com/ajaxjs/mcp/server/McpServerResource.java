@@ -19,6 +19,9 @@ import java.net.URLDecoder;
 import java.util.*;
 import java.util.regex.Matcher;
 
+/**
+ * Represents mcp server resource.
+ */
 public abstract class McpServerResource extends McpServerInitialize {
     /**
      * Retrieves a list of resources based on the request information.
@@ -65,6 +68,12 @@ public abstract class McpServerResource extends McpServerInitialize {
         return result;
     }
 
+    /**
+     * Executes the resource template list operation.
+     *
+     * @param requestRaw the request raw value.
+     * @return the result of the resource template list operation.
+     */
     McpResponse resourceTemplateList(McpRequestRawInfo requestRaw) {
         Cursor cursor = requestRaw.getJsonNode().has(PARAMS) ? JsonUtils.jsonNode2bean(requestRaw.getJsonNode().get(PARAMS), Cursor.class) : null;
         List<ResourceTemplate> templates = new ArrayList<>();
@@ -136,6 +145,13 @@ public abstract class McpServerResource extends McpServerInitialize {
         return result;
     }
 
+    /**
+     * Executes the read template resource operation.
+     *
+     * @param requestId the request id value.
+     * @param uri       the uri value.
+     * @return the result of the read template resource operation.
+     */
     private McpResponse readTemplateResource(Object requestId, String uri) {
         for (ServerStoreResourceTemplate store : featureMgr.getResourceTemplateStore().values()) {
             Matcher matcher = store.getUriPattern().matcher(uri);
@@ -178,6 +194,14 @@ public abstract class McpServerResource extends McpServerInitialize {
         throw new JsonRpcErrorException(requestId, JsonRpcErrorCode.INVALID_PARAMS, "Unknown resource: " + uri);
     }
 
+    /**
+     * Executes the resource contents operation.
+     *
+     * @param requestId the request id value.
+     * @param returned  the returned value.
+     * @param feature   the feature value.
+     * @return the result of the resource contents operation.
+     */
     private static List<ResourceContent> resourceContents(Object requestId, Object returned, String feature) {
         if (returned instanceof ResourceContent)
             return Collections.singletonList((ResourceContent) returned);
@@ -195,12 +219,26 @@ public abstract class McpServerResource extends McpServerInitialize {
         throw invalidResourceReturn(requestId, feature, returned);
     }
 
+    /**
+     * Executes the invalid resource return operation.
+     *
+     * @param requestId the request id value.
+     * @param feature   the feature value.
+     * @param value     the value value.
+     * @return the result of the invalid resource return operation.
+     */
     private static JsonRpcErrorException invalidResourceReturn(Object requestId, String feature, Object value) {
         return new JsonRpcErrorException(requestId, JsonRpcErrorCode.INTERNAL_ERROR,
                 feature + " returned an unsupported value: "
                         + (value == null ? "null" : value.getClass().getName()));
     }
 
+    /**
+     * Executes the decode uri part operation.
+     *
+     * @param value the value value.
+     * @return the result of the decode uri part operation.
+     */
     private static String decodeUriPart(String value) {
         try {
             // URLDecoder treats '+' as a space; preserve it because URI paths do not.
@@ -210,6 +248,12 @@ public abstract class McpServerResource extends McpServerInitialize {
         }
     }
 
+    /**
+     * Executes the error message operation.
+     *
+     * @param cause the cause value.
+     * @return the result of the error message operation.
+     */
     private static String errorMessage(Throwable cause) {
         String message = cause.getMessage();
         return message == null || message.trim().isEmpty() ? cause.getClass().getSimpleName() : message;

@@ -8,7 +8,13 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Represents test resource base.
+ */
 public abstract class TestResourceBase {
+    /**
+     * Holds the mcp client value.
+     */
     static IMcpClient mcpClient;
 
     @Test

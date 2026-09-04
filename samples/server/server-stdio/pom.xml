@@ -9,7 +9,7 @@
     <parent>
         <groupId>com.ajaxjs</groupId>
         <artifactId>ajaxjs-parent</artifactId>
-        <version>1.27</version>
+        <version>1.36</version>
         <relativePath/>
     </parent>
 

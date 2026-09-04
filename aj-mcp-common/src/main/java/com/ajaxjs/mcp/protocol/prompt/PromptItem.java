@@ -10,12 +10,24 @@ import java.util.List;
  */
 @Data
 public class PromptItem {
+    /**
+     * Holds the name value.
+     */
     String name;
 
+    /**
+     * Holds the title value.
+     */
     @JsonInclude(JsonInclude.Include.NON_NULL)
     String title;
 
+    /**
+     * Holds the description value.
+     */
     String description;
 
+    /**
+     * Holds the arguments value.
+     */
     List<PromptArgument> arguments;
 }

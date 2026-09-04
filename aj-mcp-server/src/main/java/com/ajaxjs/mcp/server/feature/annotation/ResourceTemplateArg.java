@@ -17,5 +17,10 @@ public @interface ResourceTemplateArg {
      */
     String ELEMENT_NAME = "<<element name>>";
 
+    /**
+     * Executes the name operation.
+     *
+     * @return the result of the name operation.
+     */
     String name() default ELEMENT_NAME;
 }

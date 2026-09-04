@@ -14,6 +14,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Target(METHOD)
 public @interface Prompt {
+    /**
+     * Executes the value operation.
+     *
+     * @return the result of the value operation.
+     */
     String value() default McpConstant.EMPTY_STR;
 
     /**
@@ -23,5 +28,10 @@ public @interface Prompt {
      */
     String description() default McpConstant.EMPTY_STR;
 
+    /**
+     * Executes the title operation.
+     *
+     * @return the result of the title operation.
+     */
     String title() default McpConstant.EMPTY_STR;
 }

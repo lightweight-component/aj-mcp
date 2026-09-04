@@ -10,10 +10,20 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.UUID;
 
+/**
+ * Represents sse servlet.
+ */
 @Slf4j
 public class SseServlet extends HttpServlet {
+    /**
+     * Holds the server sse value.
+     */
     ServerSse serverSse;
 
+    /**
+     * Creates a new sse servlet.
+     * @param serverSse the server sse value.
+     */
     public SseServlet(ServerSse serverSse) {
         this.serverSse = serverSse;
     }

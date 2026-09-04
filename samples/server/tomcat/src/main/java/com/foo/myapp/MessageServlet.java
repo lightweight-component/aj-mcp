@@ -8,9 +8,19 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 
+/**
+ * Represents message servlet.
+ */
 public class MessageServlet extends HttpServlet {
+    /**
+     * Holds the server sse value.
+     */
     ServerSse serverSse;
 
+    /**
+     * Creates a new message servlet.
+     * @param serverSse the server sse value.
+     */
     public MessageServlet(ServerSse serverSse) {
         this.serverSse = serverSse;
     }
@@ -27,6 +37,12 @@ public class MessageServlet extends HttpServlet {
         serverSse.handle(uuid, body);
     }
 
+    /**
+     * Executes the get body operation.
+     * @param req the req value.
+     * @return the result of the get body operation.
+     * @throws IOException if the operation cannot complete.
+     */
     static String getBody(HttpServletRequest req) throws IOException {
         StringBuilder requestBody = new StringBuilder();
 

@@ -15,6 +15,9 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * Represents streamable http transport test.
+ */
 class StreamableHttpTransportTest {
     @Test
     void retainsSessionAndSendsNegotiatedVersionOnSubsequentPosts() throws Exception {

@@ -9,7 +9,16 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class ServerStoreCompletion extends ServerStoreBase {
+    /**
+     * Holds the reference type value.
+     */
     private String referenceType;
+    /**
+     * Holds the reference name value.
+     */
     private String referenceName;
+    /**
+     * Holds the argument name value.
+     */
     private String argumentName;
 }

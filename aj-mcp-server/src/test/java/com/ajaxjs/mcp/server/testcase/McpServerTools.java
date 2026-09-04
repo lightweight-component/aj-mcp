@@ -12,6 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Represents mcp server tools.
+ */
 @McpService
 public class McpServerTools {
     @Tool(description = "Echoes a string")

@@ -8,11 +8,23 @@ import lombok.Data;
  */
 @Data
 public class SamplingCreateMessageResult {
+    /**
+     * Holds the role value.
+     */
     private String role;
 
+    /**
+     * Holds the content value.
+     */
     private JsonNode content;
 
+    /**
+     * Holds the model value.
+     */
     private String model;
 
+    /**
+     * Holds the stop reason value.
+     */
     private String stopReason;
 }
