@@ -1,141 +1,136 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="utf-8"/>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-    <title>AJ MCP SDK/MCP Client SDK 安装与配置</title>
-    <meta name="description" content="轻量级的 Java 8 Model Context Protocol (MCP) SDK. MCP Client SDK 安装与配置"/>
-    <meta name="keywords" content="mcp, mcp sdk, java mcp, mcp client, mcp server, java8 mcp, 安装与配置"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <link rel="stylesheet" href="/asset/style/main.css"/>
-    <link rel="icon" type="image/png" href="/asset/favicon.ico"/>
-    <script src="/asset/common.js"></script>
-</head>
-<body>
-<nav>
-    <div>
-        <div class="links">
-            <a href="/">🏠 首页</a>
-            | ⚙️ 源码:
-            <a target="_blank" href="https://github.com/lightweight-component/aj-mcp">Github</a>/<a target="_blank"
-                                                                                                    href="https://gitcode.com/lightweight-component/aj-mcp">Gitcode</a>
-            |
-            <a href="/">英文版本</a>
-        </div>
-        <h1>AJ MCP SDK</h1>
-        <h3>用户手册</h3>
-    </div>
-</nav>
-<div>
-    <menu>
+    <head>
+        <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+        <title>AJ MCP SDK/MCP Client SDK 安装与配置</title>
+        <meta name="description" content="轻量级的 Java 8 Model Context Protocol (MCP) SDK. MCP Client SDK 安装与配置"/>
+        <meta name="keywords" content="mcp, mcp sdk, java mcp, mcp client, mcp server, java8 mcp, 安装与配置"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <link rel="stylesheet" href="/asset/style/main.css"/>
+        <link rel="icon" type="image/png" href="/asset/favicon.ico"/>
+        <script src="/asset/common.js"></script>
+    </head>
+    <body>
+        <nav>
+            <div>
+                <div class="links">
+                    <a href="/">🏠 首页</a>
+                    | ⚙️ 源码:
+                    <a target="_blank" href="https://github.com/lightweight-component/aj-mcp">Github</a>/<a target="_blank" href="https://gitcode.com/lightweight-component/aj-mcp">Gitcode</a>
+                    |
+                    <a href="/">英文版本</a>
+                </div>
+                <h1>AJ MCP SDK</h1>
+                <h3>用户手册</h3>
+            </div>
+        </nav>
+        <div>
+            <menu>
+                
+                <ul>
+                    <li class="selected">
+                        <a href="/cn">首页</a>
+                    </li>
+                    <li>
+                        <a href="/architecture/index-cn">架构原理</a>
+                    </li>
+                </ul>
+                <h3>MCP 客户端 SDK</h3>
+                <ul>
+                    <li>
+                        <a href="/client/setup-client-cn">安装与配置</a>
+                    </li>
+                    <li>
+                       <a href="/client/initialization-cn">初始化</a>
+                    </li>
+                    <li>
+                       <a href="/client/resource-cn">资源用法</a>
+                    </li>
+                     <li>
+                       <a href="/client/prompt-cn">提示用法</a>
+                    </li>
+                     <li>
+                       <a href="/client/tool-cn">工具用法</a>
+                    </li>
+                    <li>
+                       <a href="/client/handling-notifications-cn">通知处理</a>
+                    </li>
+                </ul>
+                <h3>MCP 服务端 SDK</h3>
+                <ul>
+                      <li>
+                           <a href="/server/usage-server-cn">Server SDK 用法指南</a>
+                      </li>
+                      <li>
+                           <a href="/server/res-server-cn">Resources 用法</a>
+                      </li>
+                      <li>
+                           <a href="/server/pro-server-cn">Prompts 用法</a>
+                      </li>
+                      <li>
+                             <a href="/server/tool-server-cn">Tools 用法</a>
+                       </li>
+                      <li>
+                         <a href="/server/sample-cn">整合例子</a>
+                      </li>
+                </ul>
 
-        <ul>
-            <li class="selected">
-                <a href="/cn">首页</a>
-            </li>
-            <li>
-                <a href="/architecture/index-cn">架构原理</a>
-            </li>
-        </ul>
-        <h3>MCP 客户端 SDK</h3>
-        <ul>
-            <li>
-                <a href="/client/setup-client-cn">安装与配置</a>
-            </li>
-            <li>
-                <a href="/client/initialization-cn">初始化</a>
-            </li>
-            <li>
-                <a href="/client/resource-cn">资源用法</a>
-            </li>
-            <li>
-                <a href="/client/prompt-cn">提示用法</a>
-            </li>
-            <li>
-                <a href="/client/tool-cn">工具用法</a>
-            </li>
-            <li>
-                <a href="/client/handling-notifications-cn">通知处理</a>
-            </li>
-        </ul>
-        <h3>MCP 服务端 SDK</h3>
-        <ul>
-            <li>
-                <a href="/server/usage-server-cn">Server SDK 用法指南</a>
-            </li>
-            <li>
-                <a href="/server/res-server-cn">Resources 用法</a>
-            </li>
-            <li>
-                <a href="/server/pro-server-cn">Prompts 用法</a>
-            </li>
-            <li>
-                <a href="/server/tool-server-cn">Tools 用法</a>
-            </li>
-            <li>
-                <a href="/server/sample-cn">整合例子</a>
-            </li>
-        </ul>
-
-        <h3>其他</h3>
-        <ul>
-            <li><a href="/misc/versions-cn">版本记录</a></li>
-            <li><a href="/misc/contact-cn">联系方式</a></li>
-        </ul>
-    </menu>
-    <article>
-        <h1>MCP 客户端 SDK 设置</h1>
-        <h2>安装依赖</h2>
-        <p>我们需要使用 AJ MCP SDK 来进行 API 请求。安装依赖如下：</p>
-        <pre><code class="language-xml">
+                <h3>其他</h3>
+                <ul>
+                    <li><a href="/misc/versions-cn">版本记录</a></li>
+                    <li><a href="/misc/contact-cn">联系方式</a></li>
+                </ul>
+            </menu>
+            <article>
+                <h1>MCP 客户端 SDK 设置</h1>
+<h2>安装依赖</h2>
+<p>我们需要使用 AJ MCP SDK 来进行 API 请求。安装依赖如下：</p>
+<pre><code class="language-xml">
 &lt;dependency&gt;
     &lt;groupId&gt;com.ajaxjs&lt;/groupId&gt;
     &lt;artifactId&gt;aj-mcp-client&lt;/artifactId&gt;
-    &lt;version&gt;1.5&lt;/version&gt;
+    &lt;version&gt;1.6&lt;/version&gt;
 &lt;/dependency&gt;
 </code></pre>
-        <p>您可以通过以下链接找到最新版本：
-            <a href="https://central.sonatype.com/artifact/com.ajaxjs/aj-mcp-client"><img
-                    src="https://img.shields.io/maven-central/v/com.ajaxjs/aj-mcp-client?label=Latest%20Release"
-                    alt="Maven Central"></a></p>
-        <p>客户端 SDK 的实现由两个主要组件组成：</p>
-        <ul>
-            <li><strong>传输层</strong>：管理子进程并处理底层消息交换。</li>
-            <li><strong>MCP 客户端</strong>：提供高层次的 API，使用传输层实现 MCP 协议。</li>
-        </ul>
-        <h2>设置传输层 Transport</h2>
-        <p>首先创建与 MCP 服务端匹配的传输层。客户端支持 STDIO、旧版双端点 HTTP/SSE 和 Streamable HTTP 三类传输。</p>
-        <h3>标准输入输出（Stdio）传输</h3>
-        <p>“Stdio” 是标准输入/输出的缩写，通常用于在程序和人之间通过命令行交互。在这里，它用于 MCP 客户端和 MCP
-            服务器之间的交互。通常，Stdio 用于本地应用程序，如 <code>*.exe</code> 程序或 Java Jar 程序等。</p>
-        <pre><code class="language-java">// MCP 服务器是一个 Java 程序，使用标准输入输出运行。
+<p>您可以通过以下链接找到最新版本：
+<a href="https://central.sonatype.com/artifact/com.ajaxjs/aj-mcp-client"><img src="https://img.shields.io/maven-central/v/com.ajaxjs/aj-mcp-client?label=Latest%20Release" alt="Maven Central"></a></p>
+<p>客户端 SDK 的实现由两个主要组件组成：</p>
+<ul>
+<li><strong>传输层</strong>：管理子进程并处理底层消息交换。</li>
+<li><strong>MCP 客户端</strong>：提供高层次的 API，使用传输层实现 MCP 协议。</li>
+</ul>
+<h2>设置传输层 Transport</h2>
+<p>首先创建与 MCP 服务端匹配的传输层。客户端支持 STDIO、旧版双端点 HTTP/SSE 和 Streamable HTTP 三类传输。</p>
+<h3>标准输入输出（Stdio）传输</h3>
+<p>“Stdio” 是标准输入/输出的缩写，通常用于在程序和人之间通过命令行交互。在这里，它用于 MCP 客户端和 MCP 服务器之间的交互。通常，Stdio
+用于本地应用程序，如 <code>*.exe</code> 程序或 Java Jar 程序等。</p>
+<pre><code class="language-java">// MCP 服务器是一个 Java 程序，使用标准输入输出运行。
 McpTransport transport = StdioTransport.builder()
-        .command(Arrays.asList(&quot;java&quot;, &quot;-jar&quot;, &quot;C:\\app\\my-app-jar-with-dependencies.jar&quot;))
-        .logEvents(true)
-        .build();
+                .command(Arrays.asList(&quot;java&quot;, &quot;-jar&quot;, &quot;C:\\app\\my-app-jar-with-dependencies.jar&quot;))
+                .logEvents(true)
+                .build();
 </code></pre>
-        <p>以下是一个 <code>.exe</code> 程序的示例：</p>
-        <pre><code class="language-java">// MCP 服务器是一个可执行程序，使用标准输入输出运行。
+<p>以下是一个 <code>.exe</code> 程序的示例：</p>
+<pre><code class="language-java">// MCP 服务器是一个可执行程序，使用标准输入输出运行。
 McpTransport transport = StdioTransport.builder()
-        .command(Arrays.asList(&quot;C:\\app\\my-app.exe&quot;, &quot;-token&quot;, &quot;dd4df2sx32ds&quot;))
-        .logEvents(true)
-        .build();
+                .command(Arrays.asList(&quot;C:\\app\\my-app.exe&quot;, &quot;-token&quot;, &quot;dd4df2sx32ds&quot;))
+                .logEvents(true)
+                .build();
 </code></pre>
-        <p>调试时可将 <code>logEvents</code> 设置为 <code>true</code>，以记录发出的协议消息。传输层也会持续消费子进程的
-            stderr，避免错误输出管道写满后阻塞子进程。</p>
-        <h3>旧版 HTTP/SSE 传输</h3>
-        <p>旧版传输使用 SSE 端点承载服务端到客户端的消息，并使用服务端公布的 POST 端点承载客户端请求，适用于需要对接旧 MCP
-            服务的场景。</p>
-        <pre><code class="language-java">McpTransport transport=HttpMcpTransport.builder()
+<p>调试时可将 <code>logEvents</code> 设置为 <code>true</code>，以记录发出的协议消息。传输层也会持续消费子进程的 stderr，避免错误输出管道写满后阻塞子进程。</p>
+<h3>旧版 HTTP/SSE 传输</h3>
+<p>旧版传输使用 SSE 端点承载服务端到客户端的消息，并使用服务端公布的 POST 端点承载客户端请求，适用于需要对接旧 MCP 服务的场景。</p>
+<pre><code class="language-java">McpTransport transport = HttpMcpTransport.builder()
         .sseUrl(&quot;http://localhost:8080/sse&quot;)
         .logRequests(true)
         .logResponses(true)
         .build();
 </code></pre>
-        <p><code>sseUrl</code> 是必需的，它指定 MCP 服务器的 SSE 端点 URL。</p>
-        <h3>Streamable HTTP（2025-03-26 / 2025-06-18）</h3>
-        <p>较新的协议版本使用单一 HTTP 端点：</p>
-        <pre><code class="language-java">McpTransport transport = StreamableHttpTransport.builder()
+<p><code>sseUrl</code> 是必需的，它指定 MCP 服务器的 SSE 端点 URL。</p>
+<h3>Streamable HTTP（2025-03-26 / 2025-06-18）</h3>
+<p>较新的协议版本使用单一 HTTP 端点：</p>
+<pre><code class="language-java">McpTransport transport = StreamableHttpTransport.builder()
         .endpointUrl(&quot;http://localhost:8080/mcp&quot;)
         .openEventStream(true)
         .build();
@@ -144,114 +139,117 @@ McpClient client = McpClient.builder()
         .transport(transport)
         .protocolVersion(&quot;2025-06-18&quot;)
         .build();
-client.initialize();
+client.
+
+initialize();
 </code></pre>
-        <p>如需 OAuth Bearer token，可通过 <code>requestHeaders</code> 传入 <code>Authorization</code>。SDK 会保存服务端返回的
-            session ID，并在后续请求中自动加入协商后的 <code>MCP-Protocol-Version</code>。</p>
-        <p>如果客户端声明了 Roots、Sampling 或 Elicitation handler，请设置 <code>openEventStream(true)</code>；服务端主动请求通过可选的
-            GET event stream 到达客户端。该流会在初始化后异步打开。</p>
-        <blockquote>
-            <p>当前限制：POST <code>text/event-stream</code> 响应会先完整缓冲，尚不能按事件增量处理；请使用普通 JSON POST
-                响应。可选 GET event stream 目前没有断线重连/恢复策略，初始化也不会等待它就绪。在该限制解除前，请勿依赖通过
-                POST 响应增量发送的 progress 或服务端请求。</p>
-        </blockquote>
-        <h2>MCP 客户端</h2>
-        <p>MCP 客户端充当本地应用程序与远程工具实现之间的桥梁。</p>
-        <pre><code class="language-java">McpClient mcpClient = McpClient.builder()
+<p>如需 OAuth Bearer token，可通过 <code>requestHeaders</code> 传入 <code>Authorization</code>。SDK 会保存服务端返回的 session ID，并在后续请求中自动加入协商后的
+<code>MCP-Protocol-Version</code>。</p>
+<p>如果客户端声明了 Roots、Sampling 或 Elicitation handler，请设置 <code>openEventStream(true)</code>；服务端主动请求通过可选的 GET event
+stream 到达客户端。该流会在初始化后异步打开。</p>
+<blockquote>
+<p>当前限制：POST <code>text/event-stream</code> 响应会先完整缓冲，尚不能按事件增量处理；请使用普通 JSON POST 响应。可选 GET event
+stream 目前没有断线重连/恢复策略，初始化也不会等待它就绪。在该限制解除前，请勿依赖通过 POST 响应增量发送的 progress 或服务端请求。</p>
+</blockquote>
+<h2>MCP 客户端</h2>
+<p>MCP 客户端充当本地应用程序与远程工具实现之间的桥梁。</p>
+<pre><code class="language-java">McpClient mcpClient = McpClient.builder()
         .clientName(&quot;my-host&quot;)
         .clientVersion(&quot;1.2&quot;)
         .transport(transport)
         .build();
 </code></pre>
-        <p>通常我们会填写 <code>clientName</code> 和 <code>clientVersion</code> 属性：</p>
-        <ul>
-            <li><code>clientName</code> 属性用于向 MCP 服务器标识客户端。</li>
-            <li><code>clientVersion</code> 属性用于指示客户端的版本。</li>
-        </ul>
-        <p>所有属性如下所示：</p>
-        <table>
-            <thead>
-            <tr>
-                <th>属性</th>
-                <th>说明</th>
-                <th>值类型</th>
-                <th>示例值</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td>clientName</td>
-                <td>设置客户端在初始化消息中向 MCP 服务器标识自己的名称。</td>
-                <td>String</td>
-                <td>myapp/foo-app</td>
-            </tr>
-            <tr>
-                <td>clientVersion</td>
-                <td>设置客户端在初始化消息中向 MCP 服务器标识自己的版本字符串。默认值为 &quot;1.0&quot;。</td>
-                <td>String</td>
-                <td>1.0/2.1.2</td>
-            </tr>
-            <tr>
-                <td>protocolVersion</td>
-                <td>设置客户端在初始化消息中声明的协议版本。当前默认值为
-                    &quot;2024-11-05&quot;，但在后续版本中可能会有所更改。
-                </td>
-                <td>String</td>
-                <td>2024-11-05</td>
-            </tr>
-            <tr>
-                <td>requestTimeout</td>
-                <td>所有请求（包括初始化和健康检查）的超时时间。默认值为 60 秒；0 表示无限等待，负值不合法。</td>
-                <td>Duration</td>
-                <td><code>Duration.ofSeconds(60)</code></td>
-            </tr>
-            </tbody>
-        </table>
-        <p>请注意，在创建 McpClient 后，应立即调用 <code>mcpClient.initialize();</code>。关于初始化工作将在下一小节介绍。
-        </p>
-        <pre><code class="language-java">McpClient mcpClient = McpClient.builder()
+<p>通常我们会填写 <code>clientName</code> 和 <code>clientVersion</code> 属性：</p>
+<ul>
+<li><code>clientName</code> 属性用于向 MCP 服务器标识客户端。</li>
+<li><code>clientVersion</code> 属性用于指示客户端的版本。</li>
+</ul>
+<p>所有属性如下所示：</p>
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th>说明</th>
+<th>值类型</th>
+<th>示例值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>clientName</td>
+<td>设置客户端在初始化消息中向 MCP 服务器标识自己的名称。</td>
+<td>String</td>
+<td>myapp/foo-app</td>
+</tr>
+<tr>
+<td>clientVersion</td>
+<td>设置客户端在初始化消息中向 MCP 服务器标识自己的版本字符串。默认值为 &quot;1.0&quot;。</td>
+<td>String</td>
+<td>1.0/2.1.2</td>
+</tr>
+<tr>
+<td>protocolVersion</td>
+<td>设置客户端在初始化消息中声明的协议版本。当前默认值为 &quot;2024-11-05&quot;，但在后续版本中可能会有所更改。</td>
+<td>String</td>
+<td>2024-11-05</td>
+</tr>
+<tr>
+<td>requestTimeout</td>
+<td>所有请求（包括初始化和健康检查）的超时时间。默认值为 60 秒；0 表示无限等待，负值不合法。</td>
+<td>Duration</td>
+<td><code>Duration.ofSeconds(60)</code></td>
+</tr>
+</tbody>
+</table>
+<p>请注意，在创建 McpClient 后，应立即调用 <code>mcpClient.initialize();</code>。关于初始化工作将在下一小节介绍。</p>
+<pre><code class="language-java">McpClient mcpClient = McpClient.builder()
         .clientName(&quot;my-host&quot;)
         .clientVersion(&quot;1.2&quot;)
         .transport(sseTransport)
         .build();
 
-mcpClient.initialize();
+mcpClient.
+
+initialize();
 </code></pre>
-        <p>不再使用客户端时应调用 <code>close()</code>。关闭操作会释放 HTTP/SSE 请求或 Stdio 子进程，并使尚未完成的请求以异常结束。
-        </p>
-        <pre><code class="language-java">try (IMcpClient mcpClient2 = McpClient.builder().transport(transport).build()) {
-    mcpClient2.initialize();
+<p>不再使用客户端时应调用 <code>close()</code>。关闭操作会释放 HTTP/SSE 请求或 Stdio 子进程，并使尚未完成的请求以异常结束。</p>
+<pre><code class="language-java">try(IMcpClient mcpClient2 = McpClient.builder().transport(transport).build()){
+        mcpClient2.
+
+initialize();
     ...
-} catch (Exception e) {
-    throw new RuntimeException(e);
+            }catch(
+Exception e){
+        throw new
+
+RuntimeException(e);
 }
 </code></pre>
-        <p>MCP
-            客户端遵循分层架构，接口定义与实现之间有清晰的分离。客户端依赖传输层与服务器进行实际通信，并抽象通信细节以支持不同的传输机制。</p>
-        <style>
-            table th:nth-child(2) {
-             min-width: 400px;
-            }
-            table th:nth-child(3), table td:nth-child(3) {
-             min-width: 120px!important;
-             width: 120px;
-            }
+<p>MCP 客户端遵循分层架构，接口定义与实现之间有清晰的分离。客户端依赖传输层与服务器进行实际通信，并抽象通信细节以支持不同的传输机制。</p>
+<style>
+table th:nth-child(2) {
+ min-width: 400px;
+}
+table th:nth-child(3), table td:nth-child(3) {
+ min-width: 120px!important;
+ width: 120px;
+}
 
-            table td:nth-child(2) {
-             text-align: left;
-            }
-        </style>
+table td:nth-child(2) {
+ text-align: left;
+}
+</style>
 
-        <div id="comment-holder">
+                <div id="comment-holder">
+                </div>
+            </article>
         </div>
-    </article>
-</div>
-<footer>
-    AJ-Util，开源框架 <a href="https://framework.ajaxjs.com" target="_blank">AJ-Framework</a> 的一部分。联系方式：
-    frank@ajaxjs.com，<a href="https://blog.csdn.net/zhangxin09" target="_blank">作者博客</a>
-    <br/>
-    <br/>
-    Copyright © 2025 Frank Cheung. All rights reserved.
-</footer>
-</body>
+        <footer>
+             AJ-Util，开源框架 <a href="https://framework.ajaxjs.com" target="_blank">AJ-Framework</a> 的一部分。联系方式：
+             frank@ajaxjs.com，<a href="https://blog.csdn.net/zhangxin09" target="_blank">作者博客</a>
+             <br />
+             <br />
+             Copyright © 2025 Frank Cheung. All rights reserved.
+         </footer>
+    </body>
 </html>

@@ -1,98 +1,95 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="utf-8"/>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-    <title>AJ MCP SDK/MCP Server SDK Integration Samples</title>
-    <meta name="description"
-          content="A lightweight Java 8 Model Context Protocol (MCP) SDK. MCP Server SDK Integration Samples"/>
-    <meta name="keywords" content="mcp, mcp sdk, java mcp, mcp client, mcp server, java8 mcp, Integration,Samples"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <link rel="stylesheet" href="/asset/style/main.css"/>
-    <link rel="icon" type="image/png" href="/asset/favicon.ico"/>
-    <script src="/asset/common.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200..900&family=Noto+Serif+TC:wght@200..900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap"
-          rel="stylesheet"/>
-</head>
-<body>
-<nav>
-    <div>
-        <div class="links">
-            <a href="/">🏠 Home</a>
-            | ⚙️ Source:
-            <a target="_blank" href="https://github.com/lightweight-component/aj-mcp">Github</a>/<a target="_blank"
-                                                                                                    href="https://gitcode.com/lightweight-component/aj-mcp">Gitcode</a>
-            |
-            <a href="/cn">Chinese Version</a>
-        </div>
-        <h1>AJ MCP SDK</h1>
-        <h3>User Manual</h3>
-    </div>
-</nav>
-<div>
-    <menu>
+    <head>
+        <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+        <title>AJ MCP SDK/MCP Server SDK Integration Samples</title>
+        <meta name="description" content="A lightweight Java 8 Model Context Protocol (MCP) SDK. MCP Server SDK Integration Samples"/>
+        <meta name="keywords" content="mcp, mcp sdk, java mcp, mcp client, mcp server, java8 mcp, Integration,Samples"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <link rel="stylesheet" href="/asset/style/main.css"/>
+        <link rel="icon" type="image/png" href="/asset/favicon.ico"/>
+        <script src="/asset/common.js"></script>
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200..900&family=Noto+Serif+TC:wght@200..900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet" />
+    </head>
+    <body>
+        <nav>
+            <div>
+                <div class="links">
+                    <a href="/">🏠 Home</a>
+                    | ⚙️ Source:
+                    <a target="_blank" href="https://github.com/lightweight-component/aj-mcp">Github</a>/<a target="_blank" href="https://gitcode.com/lightweight-component/aj-mcp">Gitcode</a>
+                    |
+                    <a href="/cn">Chinese Version</a>
+                </div>
+                <h1>AJ MCP SDK</h1>
+                <h3>User Manual</h3>
+            </div>
+        </nav>
+        <div>
+            <menu>
+                
+                <ul>
+                    <li class="selected">
+                        <a href="/">Home</a>
+                    </li>
+                    <li>
+                        <a href="/architecture/index">Architecture</a>
+                    </li>
+                </ul>
+                <h3>MCP Client SDK</h3>
+                <ul>
+                    <li>
+                        <a href="/client/setup-client">Client SDK Setup</a>
+                    </li>
+                    <li>
+                       <a href="/client/initialization">Initialization</a>
+                    </li>
+                    <li>
+                       <a href="/client/resource">Resources Usage</a>
+                    </li>
+                     <li>
+                       <a href="/client/prompt">Prompts Usage</a>
+                    </li>
+                     <li>
+                       <a href="/client/tool">Tools Usage</a>
+                    </li>
+                    <li>
+                       <a href="/client/handling-notifications">Notifications</a>
+                    </li>
+                </ul>
+                <h3>MCP Server SDK</h3>
+                <ul>
+                      <li>
+                           <a href="/server/usage-server">Server SDK Usage</a>
+                      </li>
+                      <li>
+                           <a href="/server/res-server">Resources Usage</a>
+                      </li>
+                      <li>
+                           <a href="/server/pro-server">Prompts Usage</a>
+                      </li>
+                      <li>
+                             <a href="/server/tool-server">Tools Usage</a>
+                       </li>
+                      <li>
+                         <a href="/server/sample">Integration Samples</a>
+                      </li>
+                </ul>
 
-        <ul>
-            <li class="selected">
-                <a href="/">Home</a>
-            </li>
-            <li>
-                <a href="/architecture/index">Architecture</a>
-            </li>
-        </ul>
-        <h3>MCP Client SDK</h3>
-        <ul>
-            <li>
-                <a href="/client/setup-client">Client SDK Setup</a>
-            </li>
-            <li>
-                <a href="/client/initialization">Initialization</a>
-            </li>
-            <li>
-                <a href="/client/resource">Resources Usage</a>
-            </li>
-            <li>
-                <a href="/client/prompt">Prompts Usage</a>
-            </li>
-            <li>
-                <a href="/client/tool">Tools Usage</a>
-            </li>
-            <li>
-                <a href="/client/handling-notifications">Notifications</a>
-            </li>
-        </ul>
-        <h3>MCP Server SDK</h3>
-        <ul>
-            <li>
-                <a href="/server/usage-server">Server SDK Usage</a>
-            </li>
-            <li>
-                <a href="/server/res-server">Resources Usage</a>
-            </li>
-            <li>
-                <a href="/server/pro-server">Prompts Usage</a>
-            </li>
-            <li>
-                <a href="/server/tool-server">Tools Usage</a>
-            </li>
-            <li>
-                <a href="/server/sample">Integration Samples</a>
-            </li>
-        </ul>
-
-        <h3>Misc</h3>
-        <ul>
-            <li><a href="/misc/versions">Release History</a></li>
-            <li><a href="/misc/contact">Contact</a></li>
-        </ul>
-    </menu>
-    <article>
-        <h1>MCP Server SDK Integration Samples</h1>
-        <p>The repository contains two integration samples: a standalone Tomcat server and a Spring Boot application,
-            each exposing a simple MCP service.</p>
-        <h2>Tomcat Application Integration</h2>
-        <p>The Tomcat deployment shows a complete server setup pattern:</p>
-        <pre><code class="language-java">package com.foo.myapp;
+                <h3>Misc</h3>
+                <ul>
+                    <li><a href="/misc/versions">Release History</a></li>
+                    <li><a href="/misc/contact">Contact</a></li>
+                </ul>
+            </menu>
+            <article>
+                <h1>MCP Server SDK Integration Samples</h1>
+<p>The repository contains two integration samples: a standalone Tomcat server and a Spring Boot application, each exposing
+a simple MCP service.</p>
+<h2>Tomcat Application Integration</h2>
+<p>The Tomcat deployment shows a complete server setup pattern:</p>
+<pre><code class="language-java">package com.foo.myapp;
 
 
 import com.ajaxjs.mcp.server.McpServer;
@@ -153,10 +150,9 @@ public class StandaloneTomcat {
     }
 }
 </code></pre>
-        <h2>Spring Application Integration</h2>
-        <p>The Spring configuration uses the same setup pattern, with <code>ServerSse</code> managed by the Spring
-            container.</p>
-        <pre><code class="language-java">package com.foo.myapp;
+<h2>Spring Application Integration</h2>
+<p>The Spring configuration uses the same setup pattern, with <code>ServerSse</code> managed by the Spring container.</p>
+<pre><code class="language-java">package com.foo.myapp;
 
 import com.ajaxjs.mcp.server.McpServer;
 import com.ajaxjs.mcp.server.ServerSse;
@@ -188,32 +184,27 @@ public class Config {
     }
 }
 </code></pre>
-        <h2>Design Note</h2>
-        <p>The legacy HTTP/SSE transport uses two endpoints:</p>
-        <ul>
-            <li><strong>SSE URL</strong>: the client opens this connection first. The server registers the session with
-                <code>openSession(clientId, writer, postPath)</code> and sends an <code>endpoint</code> event containing
-                the POST path.
-            </li>
-            <li><strong>POST URL</strong>: the client sends JSON-RPC requests to this endpoint. The controller calls
-                <code>serverSse.handle(clientId, json)</code>, and the response is written back only to the originating
-                SSE session—not to the POST response and not to every connected client.
-            </li>
-        </ul>
-        <p><code>ServerSse.start()</code> starts one shared heartbeat scheduler. Do not create a heartbeat thread per
-            HTTP request. Remove the session when the request ends, and close <code>ServerSse</code> when the
-            application shuts down.</p>
+<h2>Design Note</h2>
+<p>The legacy HTTP/SSE transport uses two endpoints:</p>
+<ul>
+<li><strong>SSE URL</strong>: the client opens this connection first. The server registers the session with
+<code>openSession(clientId, writer, postPath)</code> and sends an <code>endpoint</code> event containing the POST path.</li>
+<li><strong>POST URL</strong>: the client sends JSON-RPC requests to this endpoint. The controller calls
+<code>serverSse.handle(clientId, json)</code>, and the response is written back only to the originating SSE session—not to the
+POST response and not to every connected client.</li>
+</ul>
+<p><code>ServerSse.start()</code> starts one shared heartbeat scheduler. Do not create a heartbeat thread per HTTP request. Remove the
+session when the request ends, and close <code>ServerSse</code> when the application shuts down.</p>
 
-    </article>
+            </article>
 
-    <div></div>
-</div>
-<footer>
-    AJ MCP SDK, a part of
-    <a href="https://framework.ajaxjs.com" target="_blank">AJ-Framework</a>
-    open source. Mail:frank@ajaxjs.com, visit
-    <a href="https://blog.csdn.net/zhangxin09" target="_blank">my blog(In Chinese)</a>. <br/> <br/> Copyright © 2025
-    Frank Cheung. All rights reserved.
-</footer>
-</body>
+            <div></div>
+        </div>
+        <footer>
+            AJ MCP SDK, a part of
+            <a href="https://framework.ajaxjs.com" target="_blank">AJ-Framework</a>
+            open source. Mail:frank@ajaxjs.com, visit
+            <a href="https://blog.csdn.net/zhangxin09" target="_blank">my blog(In Chinese)</a>. <br/> <br/> Copyright © 2025 Frank Cheung. All rights reserved.
+        </footer>
+    </body>
 </html>

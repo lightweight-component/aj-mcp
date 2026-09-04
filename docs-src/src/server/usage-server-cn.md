@@ -19,7 +19,7 @@ layout: layouts/docs-cn.njk
 <dependency>
     <groupId>com.ajaxjs</groupId>
     <artifactId>aj-mcp-server</artifactId>
-    <version>1.4</version>
+    <version>1.5</version>
 </dependency>
 ```
 

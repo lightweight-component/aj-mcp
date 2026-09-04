@@ -1,179 +1,179 @@
 <?xml version="1.0" encoding="utf-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-
-    <url>
-        <loc>https://mcp.ajaxjs.com/architecture/</loc>
-        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-    </url>
-
-    <url>
-        <loc>https://mcp.ajaxjs.com/architecture/index-cn/</loc>
-        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-    </url>
-
-    <url>
-        <loc>https://mcp.ajaxjs.com/client/handling-notifications-cn/</loc>
-        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-    </url>
-
-    <url>
-        <loc>https://mcp.ajaxjs.com/client/handling-notifications/</loc>
-        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-    </url>
-
-    <url>
-        <loc>https://mcp.ajaxjs.com/client/initialization-cn/</loc>
-        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-    </url>
-
-    <url>
-        <loc>https://mcp.ajaxjs.com/client/initialization/</loc>
-        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-    </url>
-
-    <url>
-        <loc>https://mcp.ajaxjs.com/client/prompt-cn/</loc>
-        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-    </url>
-
-    <url>
-        <loc>https://mcp.ajaxjs.com/client/prompt/</loc>
-        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-    </url>
-
-    <url>
-        <loc>https://mcp.ajaxjs.com/client/resource-cn/</loc>
-        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-    </url>
-
-    <url>
-        <loc>https://mcp.ajaxjs.com/client/resource/</loc>
-        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-    </url>
-
-    <url>
-        <loc>https://mcp.ajaxjs.com/client/setup-client-cn/</loc>
-        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-    </url>
-
-    <url>
-        <loc>https://mcp.ajaxjs.com/client/setup-client/</loc>
-        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-    </url>
-
-    <url>
-        <loc>https://mcp.ajaxjs.com/client/tool-cn/</loc>
-        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-    </url>
-
-    <url>
-        <loc>https://mcp.ajaxjs.com/client/tool/</loc>
-        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-    </url>
-
-    <url>
-        <loc>https://mcp.ajaxjs.com/cn/</loc>
-        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-    </url>
-
-    <url>
-        <loc>https://mcp.ajaxjs.com/docs-index/</loc>
-        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-    </url>
-
-    <url>
-        <loc>https://mcp.ajaxjs.com/misc/contact-cn/</loc>
-        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-    </url>
-
-    <url>
-        <loc>https://mcp.ajaxjs.com/misc/contact/</loc>
-        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-    </url>
-
-    <url>
-        <loc>https://mcp.ajaxjs.com/misc/versions-cn/</loc>
-        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-    </url>
-
-    <url>
-        <loc>https://mcp.ajaxjs.com/misc/versions/</loc>
-        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-    </url>
-
-    <url>
-        <loc>https://mcp.ajaxjs.com/server/pro-server-cn/</loc>
-        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-    </url>
-
-    <url>
-        <loc>https://mcp.ajaxjs.com/server/pro-server/</loc>
-        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-    </url>
-
-    <url>
-        <loc>https://mcp.ajaxjs.com/server/res-server-cn/</loc>
-        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-    </url>
-
-    <url>
-        <loc>https://mcp.ajaxjs.com/server/res-server/</loc>
-        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-    </url>
-
-    <url>
-        <loc>https://mcp.ajaxjs.com/server/sample-cn/</loc>
-        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-    </url>
-
-    <url>
-        <loc>https://mcp.ajaxjs.com/server/sample/</loc>
-        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-    </url>
-
-    <url>
-        <loc>https://mcp.ajaxjs.com/server/tool-server-cn/</loc>
-        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-    </url>
-
-    <url>
-        <loc>https://mcp.ajaxjs.com/server/tool-server/</loc>
-        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-    </url>
-
-    <url>
-        <loc>https://mcp.ajaxjs.com/server/usage-server-cn/</loc>
-        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-    </url>
-
-    <url>
-        <loc>https://mcp.ajaxjs.com/server/usage-server/</loc>
-        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-    </url>
-
-    <url>
-        <loc>https://mcp.ajaxjs.com/asset/style/common.css</loc>
-        <lastmod>2025-06-25T01:24:34.533Z</lastmod>
-    </url>
-
-    <url>
-        <loc>https://mcp.ajaxjs.com/baidu_verify_codeva-05U1Ak03ZG/</loc>
-        <lastmod>2025-06-25T01:24:34.534Z</lastmod>
-    </url>
-
-    <url>
-        <loc>https://mcp.ajaxjs.com/google9ecf72d780b8e5c8/</loc>
-        <lastmod>2025-06-25T01:24:34.538Z</lastmod>
-    </url>
-
-    <url>
-        <loc>https://mcp.ajaxjs.com/asset/style/main.css</loc>
-        <lastmod>2026-07-20T02:20:38.479Z</lastmod>
-    </url>
-
-    <url>
-        <loc>https://mcp.ajaxjs.com/</loc>
-        <lastmod>2026-09-03T04:05:12.891Z</lastmod>
-    </url>
-
+    
+        <url>
+            <loc>https://mcp.ajaxjs.com/architecture/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://mcp.ajaxjs.com/architecture/index-cn/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://mcp.ajaxjs.com/client/handling-notifications-cn/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://mcp.ajaxjs.com/client/handling-notifications/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://mcp.ajaxjs.com/client/initialization-cn/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://mcp.ajaxjs.com/client/initialization/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://mcp.ajaxjs.com/client/prompt-cn/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://mcp.ajaxjs.com/client/prompt/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://mcp.ajaxjs.com/client/resource-cn/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://mcp.ajaxjs.com/client/resource/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://mcp.ajaxjs.com/client/setup-client-cn/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://mcp.ajaxjs.com/client/setup-client/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://mcp.ajaxjs.com/client/tool-cn/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://mcp.ajaxjs.com/client/tool/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://mcp.ajaxjs.com/cn/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://mcp.ajaxjs.com/docs-index/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://mcp.ajaxjs.com/misc/contact-cn/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://mcp.ajaxjs.com/misc/contact/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://mcp.ajaxjs.com/misc/versions-cn/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://mcp.ajaxjs.com/misc/versions/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://mcp.ajaxjs.com/server/pro-server-cn/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://mcp.ajaxjs.com/server/pro-server/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://mcp.ajaxjs.com/server/res-server-cn/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://mcp.ajaxjs.com/server/res-server/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://mcp.ajaxjs.com/server/sample-cn/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://mcp.ajaxjs.com/server/sample/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://mcp.ajaxjs.com/server/tool-server-cn/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://mcp.ajaxjs.com/server/tool-server/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://mcp.ajaxjs.com/server/usage-server-cn/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://mcp.ajaxjs.com/server/usage-server/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://mcp.ajaxjs.com/asset/style/common.css</loc>
+            <lastmod>2025-06-25T01:24:34.533Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://mcp.ajaxjs.com/baidu_verify_codeva-05U1Ak03ZG/</loc>
+            <lastmod>2025-06-25T01:24:34.534Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://mcp.ajaxjs.com/google9ecf72d780b8e5c8/</loc>
+            <lastmod>2025-06-25T01:24:34.538Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://mcp.ajaxjs.com/asset/style/main.css</loc>
+            <lastmod>2026-07-20T02:20:38.479Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://mcp.ajaxjs.com/</loc>
+            <lastmod>2026-09-03T04:05:12.891Z</lastmod>
+        </url>
+    
 </urlset>

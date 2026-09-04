@@ -19,7 +19,7 @@ Add this dependency to build MCP servers:
 <dependency>
     <groupId>com.ajaxjs</groupId>
     <artifactId>aj-mcp-server</artifactId>
-    <version>1.4</version>
+    <version>1.5</version>
 </dependency>
 ```
 

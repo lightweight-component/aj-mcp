@@ -1,96 +1,93 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="utf-8"/>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-    <title>AJ MCP SDK/MCP Server SDK Prompts Development</title>
-    <meta name="description"
-          content="轻量级的 Java 8 Model Context Protocol (MCP) SDK. MCP Server SDK Prompts Development"/>
-    <meta name="keywords" content="mcp, mcp sdk, java mcp, mcp client, mcp server, java8 mcp, Prompts Development"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <link rel="stylesheet" href="/asset/style/main.css"/>
-    <link rel="icon" type="image/png" href="/asset/favicon.ico"/>
-    <script src="/asset/common.js"></script>
-</head>
-<body>
-<nav>
-    <div>
-        <div class="links">
-            <a href="/">🏠 首页</a>
-            | ⚙️ 源码:
-            <a target="_blank" href="https://github.com/lightweight-component/aj-mcp">Github</a>/<a target="_blank"
-                                                                                                    href="https://gitcode.com/lightweight-component/aj-mcp">Gitcode</a>
-            |
-            <a href="/">英文版本</a>
-        </div>
-        <h1>AJ MCP SDK</h1>
-        <h3>用户手册</h3>
-    </div>
-</nav>
-<div>
-    <menu>
+    <head>
+        <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+        <title>AJ MCP SDK/MCP Server SDK Prompts Development</title>
+        <meta name="description" content="轻量级的 Java 8 Model Context Protocol (MCP) SDK. MCP Server SDK Prompts Development"/>
+        <meta name="keywords" content="mcp, mcp sdk, java mcp, mcp client, mcp server, java8 mcp, Prompts Development"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <link rel="stylesheet" href="/asset/style/main.css"/>
+        <link rel="icon" type="image/png" href="/asset/favicon.ico"/>
+        <script src="/asset/common.js"></script>
+    </head>
+    <body>
+        <nav>
+            <div>
+                <div class="links">
+                    <a href="/">🏠 首页</a>
+                    | ⚙️ 源码:
+                    <a target="_blank" href="https://github.com/lightweight-component/aj-mcp">Github</a>/<a target="_blank" href="https://gitcode.com/lightweight-component/aj-mcp">Gitcode</a>
+                    |
+                    <a href="/">英文版本</a>
+                </div>
+                <h1>AJ MCP SDK</h1>
+                <h3>用户手册</h3>
+            </div>
+        </nav>
+        <div>
+            <menu>
+                
+                <ul>
+                    <li class="selected">
+                        <a href="/cn">首页</a>
+                    </li>
+                    <li>
+                        <a href="/architecture/index-cn">架构原理</a>
+                    </li>
+                </ul>
+                <h3>MCP 客户端 SDK</h3>
+                <ul>
+                    <li>
+                        <a href="/client/setup-client-cn">安装与配置</a>
+                    </li>
+                    <li>
+                       <a href="/client/initialization-cn">初始化</a>
+                    </li>
+                    <li>
+                       <a href="/client/resource-cn">资源用法</a>
+                    </li>
+                     <li>
+                       <a href="/client/prompt-cn">提示用法</a>
+                    </li>
+                     <li>
+                       <a href="/client/tool-cn">工具用法</a>
+                    </li>
+                    <li>
+                       <a href="/client/handling-notifications-cn">通知处理</a>
+                    </li>
+                </ul>
+                <h3>MCP 服务端 SDK</h3>
+                <ul>
+                      <li>
+                           <a href="/server/usage-server-cn">Server SDK 用法指南</a>
+                      </li>
+                      <li>
+                           <a href="/server/res-server-cn">Resources 用法</a>
+                      </li>
+                      <li>
+                           <a href="/server/pro-server-cn">Prompts 用法</a>
+                      </li>
+                      <li>
+                             <a href="/server/tool-server-cn">Tools 用法</a>
+                       </li>
+                      <li>
+                         <a href="/server/sample-cn">整合例子</a>
+                      </li>
+                </ul>
 
-        <ul>
-            <li class="selected">
-                <a href="/cn">首页</a>
-            </li>
-            <li>
-                <a href="/architecture/index-cn">架构原理</a>
-            </li>
-        </ul>
-        <h3>MCP 客户端 SDK</h3>
-        <ul>
-            <li>
-                <a href="/client/setup-client-cn">安装与配置</a>
-            </li>
-            <li>
-                <a href="/client/initialization-cn">初始化</a>
-            </li>
-            <li>
-                <a href="/client/resource-cn">资源用法</a>
-            </li>
-            <li>
-                <a href="/client/prompt-cn">提示用法</a>
-            </li>
-            <li>
-                <a href="/client/tool-cn">工具用法</a>
-            </li>
-            <li>
-                <a href="/client/handling-notifications-cn">通知处理</a>
-            </li>
-        </ul>
-        <h3>MCP 服务端 SDK</h3>
-        <ul>
-            <li>
-                <a href="/server/usage-server-cn">Server SDK 用法指南</a>
-            </li>
-            <li>
-                <a href="/server/res-server-cn">Resources 用法</a>
-            </li>
-            <li>
-                <a href="/server/pro-server-cn">Prompts 用法</a>
-            </li>
-            <li>
-                <a href="/server/tool-server-cn">Tools 用法</a>
-            </li>
-            <li>
-                <a href="/server/sample-cn">整合例子</a>
-            </li>
-        </ul>
-
-        <h3>其他</h3>
-        <ul>
-            <li><a href="/misc/versions-cn">版本记录</a></li>
-            <li><a href="/misc/contact-cn">联系方式</a></li>
-        </ul>
-    </menu>
-    <article>
-        <h1>提示（Prompt）开发</h1>
-        <p>AJ-MCP 通过注解在 <code>@McpService</code> 类中定义提示（Prompt）。<code>@Prompt</code> 注解用于标记作为提示处理器的方法，<code>@PromptArg</code>
-            用于定义交互式提示的参数。</p>
-        <p>简单提示返回单条 <code>PromptMessage</code>，内容为文本。<code>@Prompt</code> 注解要求提供描述，方法返回配置好的消息（含角色和内容）。
-        </p>
-        <pre><code class="language-java">@Prompt(description = &quot;基础简单提示&quot;)
+                <h3>其他</h3>
+                <ul>
+                    <li><a href="/misc/versions-cn">版本记录</a></li>
+                    <li><a href="/misc/contact-cn">联系方式</a></li>
+                </ul>
+            </menu>
+            <article>
+                <h1>提示（Prompt）开发</h1>
+<p>AJ-MCP 通过注解在 <code>@McpService</code> 类中定义提示（Prompt）。<code>@Prompt</code> 注解用于标记作为提示处理器的方法，<code>@PromptArg</code>
+用于定义交互式提示的参数。</p>
+<p>简单提示返回单条 <code>PromptMessage</code>，内容为文本。<code>@Prompt</code> 注解要求提供描述，方法返回配置好的消息（含角色和内容）。</p>
+<pre><code class="language-java">@Prompt(description = &quot;基础简单提示&quot;)
 public PromptMessage basic() {
     PromptMessage message = new PromptMessage();
     message.setRole(Role.USER);
@@ -99,9 +96,9 @@ public PromptMessage basic() {
     return message;
 }
 </code></pre>
-        <h2>多消息提示</h2>
-        <p>提示可以返回多条消息（<code>List&lt;PromptMessage&gt;</code>），支持多轮对话或多角色交互场景。</p>
-        <pre><code class="language-java">@Prompt(description = &quot;返回两条消息的提示&quot;)
+<h2>多消息提示</h2>
+<p>提示可以返回多条消息（<code>List&lt;PromptMessage&gt;</code>），支持多轮对话或多角色交互场景。</p>
+<pre><code class="language-java">@Prompt(description = &quot;返回两条消息的提示&quot;)
 public List&lt;PromptMessage&gt; multi() {
     PromptMessage message1 = new PromptMessage();
     message1.setRole(Role.USER);
@@ -114,9 +111,9 @@ public List&lt;PromptMessage&gt; multi() {
     return Arrays.asList(message1, message2);
 }
 </code></pre>
-        <h2>带参数提示</h2>
-        <p>提示可通过 <code>@PromptArg</code> 注解接收参数。参数会在列出提示时对客户端可见，并在获取提示时传递。</p>
-        <pre><code class="language-java">@Prompt(description = &quot;带参数的提示&quot;)
+<h2>带参数提示</h2>
+<p>提示可通过 <code>@PromptArg</code> 注解接收参数。参数会在列出提示时对客户端可见，并在获取提示时传递。</p>
+<pre><code class="language-java">@Prompt(description = &quot;带参数的提示&quot;)
 public PromptMessage parametrized(@PromptArg(description = &quot;姓名&quot;) String name) {
     PromptMessage message = new PromptMessage();
     message.setRole(Role.USER);
@@ -125,88 +122,88 @@ public PromptMessage parametrized(@PromptArg(description = &quot;姓名&quot;) S
     return message;
 }
 </code></pre>
-        <h2>内容类型与富媒体支持</h2>
-        <p>提示不仅支持文本，还支持图片和嵌入式资源等多种内容类型。每种内容类型有特定属性和编码要求。</p>
-        <table>
-            <thead>
-            <tr>
-                <th>内容类型</th>
-                <th>类名</th>
-                <th>关键属性</th>
-                <th>用途</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td>文本</td>
-                <td>ContentText</td>
-                <td>text</td>
-                <td>普通文本消息</td>
-            </tr>
-            <tr>
-                <td>图片</td>
-                <td>ContentImage</td>
-                <td>data, mimeType</td>
-                <td>Base64 编码图片</td>
-            </tr>
-            <tr>
-                <td>嵌入式资源</td>
-                <td>ContentEmbeddedResource</td>
-                <td>resource.uri, resource.mimeType</td>
-                <td>二进制数据引用</td>
-            </tr>
-            </tbody>
-        </table>
-        <h2>协议数据结构</h2>
-        <p>提示系统采用特定协议结构进行客户端与服务器之间的数据通信。</p>
-        <table>
-            <thead>
-            <tr>
-                <th>类名</th>
-                <th>作用</th>
-                <th>关键字段</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td>PromptItem</td>
-                <td>提示元数据（用于列表）</td>
-                <td>name, description, arguments</td>
-            </tr>
-            <tr>
-                <td>PromptMessage</td>
-                <td>单条消息内容</td>
-                <td>role, content</td>
-            </tr>
-            <tr>
-                <td>GetPromptResult</td>
-                <td>响应包装</td>
-                <td>result.description, result.messages</td>
-            </tr>
-            <tr>
-                <td>PromptArgument</td>
-                <td>参数定义</td>
-                <td>name, description, required</td>
-            </tr>
-            </tbody>
-        </table>
-        <h2>角色枚举</h2>
-        <p>Role 枚举用于定义提示消息中的角色：</p>
-        <ul>
-            <li>USER —— 用户视角的消息</li>
-            <li>ASSISTANT —— AI 助手视角的消息</li>
-        </ul>
+<h2>内容类型与富媒体支持</h2>
+<p>提示不仅支持文本，还支持图片和嵌入式资源等多种内容类型。每种内容类型有特定属性和编码要求。</p>
+<table>
+<thead>
+<tr>
+<th>内容类型</th>
+<th>类名</th>
+<th>关键属性</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>文本</td>
+<td>ContentText</td>
+<td>text</td>
+<td>普通文本消息</td>
+</tr>
+<tr>
+<td>图片</td>
+<td>ContentImage</td>
+<td>data, mimeType</td>
+<td>Base64 编码图片</td>
+</tr>
+<tr>
+<td>嵌入式资源</td>
+<td>ContentEmbeddedResource</td>
+<td>resource.uri, resource.mimeType</td>
+<td>二进制数据引用</td>
+</tr>
+</tbody>
+</table>
+<h2>协议数据结构</h2>
+<p>提示系统采用特定协议结构进行客户端与服务器之间的数据通信。</p>
+<table>
+<thead>
+<tr>
+<th>类名</th>
+<th>作用</th>
+<th>关键字段</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PromptItem</td>
+<td>提示元数据（用于列表）</td>
+<td>name, description, arguments</td>
+</tr>
+<tr>
+<td>PromptMessage</td>
+<td>单条消息内容</td>
+<td>role, content</td>
+</tr>
+<tr>
+<td>GetPromptResult</td>
+<td>响应包装</td>
+<td>result.description, result.messages</td>
+</tr>
+<tr>
+<td>PromptArgument</td>
+<td>参数定义</td>
+<td>name, description, required</td>
+</tr>
+</tbody>
+</table>
+<h2>角色枚举</h2>
+<p>Role 枚举用于定义提示消息中的角色：</p>
+<ul>
+<li>USER —— 用户视角的消息</li>
+<li>ASSISTANT —— AI 助手视角的消息</li>
+</ul>
 
-        <div id="comment-holder">
+                <div id="comment-holder">
+                </div>
+            </article>
         </div>
-    </article>
-</div>
-<footer>
-    AJ-Util，开源框架 <a href="https://framework.ajaxjs.com" target="_blank">AJ-Framework</a> 的一部分。联系方式：
-    frank@ajaxjs.com，<a href="https://blog.csdn.net/zhangxin09" target="_blank">作者博客</a>
-    <br/>
-    <br/>
-    Copyright © 2025 Frank Cheung. All rights reserved.
-</footer>
-</body>
+        <footer>
+             AJ-Util，开源框架 <a href="https://framework.ajaxjs.com" target="_blank">AJ-Framework</a> 的一部分。联系方式：
+             frank@ajaxjs.com，<a href="https://blog.csdn.net/zhangxin09" target="_blank">作者博客</a>
+             <br />
+             <br />
+             Copyright © 2025 Frank Cheung. All rights reserved.
+         </footer>
+    </body>
 </html>

@@ -12,7 +12,7 @@
 
     <artifactId>aj-mcp-common</artifactId>
     <name>a-mcp-common</name>
-    <version>1.7</version>
+    <version>1.8</version>
     <packaging>jar</packaging>
     <description>Common package for aj-mcp.</description>
 

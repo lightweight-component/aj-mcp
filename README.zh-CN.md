@@ -52,9 +52,9 @@ AJ-MCP 适合希望把现有 Java 业务能力开放给 AI 客户端，或者需
 
 | 模块                                 | 功能                                             | 当前版本  |
 |------------------------------------|------------------------------------------------|-------|
-| [`aj-mcp-common`](./aj-mcp-common) | 公共 JSON-RPC 消息、MCP 协议模型、内容类型、版本信息及 JSON 工具     | `1.7` |
-| [`aj-mcp-client`](./aj-mcp-client) | 同步客户端 API，以及 STDIO、HTTP/SSE、Streamable HTTP 传输 | `1.5` |
-| [`aj-mcp-server`](./aj-mcp-server) | 基于注解的能力扫描、请求分发、错误、会话及服务端传输                     | `1.4` |
+| [`aj-mcp-common`](./aj-mcp-common) | 公共 JSON-RPC 消息、MCP 协议模型、内容类型、版本信息及 JSON 工具     | `1.8` |
+| [`aj-mcp-client`](./aj-mcp-client) | 同步客户端 API，以及 STDIO、HTTP/SSE、Streamable HTTP 传输 | `1.6` |
+| [`aj-mcp-server`](./aj-mcp-server) | 基于注解的能力扫描、请求分发、错误、会话及服务端传输                     | `1.5` |
 | [`samples`](./samples)             | STDIO、Spring Boot/SSE 和内嵌 Tomcat 示例            | —     |
 
 Client 和 Server 已经传递依赖 `aj-mcp-common`，一般应用只需引入自己使用的客户端或服务端模块。
@@ -70,7 +70,7 @@ Client 和 Server 已经传递依赖 `aj-mcp-common`，一般应用只需引入�
 <dependency>
     <groupId>com.ajaxjs</groupId>
     <artifactId>aj-mcp-server</artifactId>
-    <version>1.4</version>
+    <version>1.5</version>
 </dependency>
 ```
 
@@ -108,7 +108,7 @@ STDIO 模式下，标准输出必须只用于 JSON-RPC 消息；业务日志应�
 <dependency>
     <groupId>com.ajaxjs</groupId>
     <artifactId>aj-mcp-client</artifactId>
-    <version>1.5</version>
+    <version>1.6</version>
 </dependency>
 ```
 
