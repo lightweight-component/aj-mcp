@@ -18,6 +18,7 @@ public class App {
         mgr.init("com.foo.myproduct");
 
         McpServer server = new McpServer();
+        server.setFeatureMgr(mgr);
         server.setTransport(new ServerStdio(server));
 
         ServerConfig serverConfig = new ServerConfig();

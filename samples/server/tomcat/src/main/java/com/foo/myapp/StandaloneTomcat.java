@@ -35,6 +35,7 @@ public class StandaloneTomcat {
         server.setServerConfig(serverConfig);
 
         server.start();
+        Runtime.getRuntime().addShutdownHook(new Thread(serverSse::close, "aj-mcp-sse-shutdown"));
 
         Tomcat tomcat = new Tomcat();
         tomcat.setPort(8080);
@@ -58,8 +59,8 @@ public class StandaloneTomcat {
 
         // Configure connectionTimeout and keepAliveTimeout
         Connector connector = tomcat.getConnector();
-        connector.setProperty("connectionTimeout", "60000"); // 20 seconds
-        connector.setProperty("keepAliveTimeout", "60000"); // 30 seconds
+        connector.setProperty("connectionTimeout", "60000"); // 60 seconds
+        connector.setProperty("keepAliveTimeout", "60000"); // 60 seconds
         connector.setProperty("maxKeepAliveRequests", "100"); // Optional: Max requests per connection
 
         tomcat.start();

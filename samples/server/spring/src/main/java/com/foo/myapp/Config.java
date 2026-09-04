@@ -16,7 +16,7 @@ public class Config {
      * Executes the server sse operation.
      * @return the result of the server sse operation.
      */
-    @Bean
+    @Bean(destroyMethod = "close")
     public ServerSse serverSse() {
         FeatureMgr mgr = new FeatureMgr();
         mgr.init("com.foo.myapp");

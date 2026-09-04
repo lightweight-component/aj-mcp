@@ -8,7 +8,7 @@ input and standard output.
 It demonstrates:
 
 - tools with strings, numbers, booleans, no arguments, errors, images, and multiple content items;
-- text and binary resources;
+- text and binary resources, including a URI-template greeting resource;
 - basic, parameterized, multi-message, image, and embedded-resource prompts;
 - package scanning and STDIO server startup.
 
@@ -31,5 +31,6 @@ try (McpClient client = McpClient.createStdioMcpClient(
 
 Standard output is the protocol channel and must contain only JSON-RPC messages. Send logs to standard error or a file.
 
-When adapting this sample, assign the scanned `FeatureMgr` to the server with `server.setFeatureMgr(mgr)` before
-starting it.
+`App` already assigns the scanned `FeatureMgr` to the `McpServer` before startup. The sample enables the current strict
+MCP lifecycle, so clients should initialize before listing or calling features. Try `demo://welcome`, `demo://image`,
+or a template URI such as `demo://greeting/Ada` after initialization.

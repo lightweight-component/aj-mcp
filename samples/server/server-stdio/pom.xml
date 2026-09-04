@@ -17,30 +17,28 @@
 
     </properties>
 
-    <url>https://framework.ajaxjs.com/docs/aj/?section=net</url>
+    <url>https://mcp.ajaxjs.com/</url>
     <scm>
-        <url>https://github.com/lightweight-component/aj-net</url>
-        <connection>scm:git:https://github.com/lightweight-component/aj-net.git</connection>
+        <url>https://github.com/lightweight-component/aj-mcp</url>
+        <connection>scm:git:https://github.com/lightweight-component/aj-mcp.git</connection>
     </scm>
 
     <issueManagement>
         <system>GitHub Issues</system>
-        <url>https://github.com/lightweight-component/aj-net/issues</url>
+        <url>https://github.com/lightweight-component/aj-mcp/issues</url>
     </issueManagement>
 
     <dependencies>
         <dependency>
             <groupId>com.ajaxjs</groupId>
             <artifactId>aj-mcp-server</artifactId>
-            <version>1.2</version>
+            <version>1.4</version>
         </dependency>
 
-        <!-- 编译为 jar 包时依赖的 -->
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>3.1.0</version>
-            <scope>provided</scope>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.36</version>
         </dependency>
     </dependencies>
 

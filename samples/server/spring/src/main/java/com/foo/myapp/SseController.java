@@ -11,12 +11,17 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents sse controller.
  */
 @RestController
 public class SseController {
+    /** Logger for connection lifecycle failures. */
+    private static final Logger LOG = LoggerFactory.getLogger(SseController.class);
+
     /**
      * Holds the server sse value.
      */
@@ -51,8 +56,7 @@ public class SseController {
                 }
             }
         } catch (IOException e) {
-            System.err.println("Error on SSE handle:" + e.getMessage());
-            e.printStackTrace();
+            LOG.warn("Unable to open the MCP SSE stream", e);
         } finally {
             serverSse.removeConnection(uuid);
         }

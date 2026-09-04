@@ -1,32 +1,25 @@
 # AJ-MCP Client 示例
 
-本模块是使用 `aj-mcp-client` 创建 Java 8 小型应用的起点。当前 `MyApp` 类有意保持最小内容，可以把下面任一示例复制进去，并改为实际
-MCP 服务地址。
+这是使用当前 AJ-MCP SDK 的 Java 8 可运行客户端示例。`MyApp` 会初始化连接并输出协商后的协议版本、工具、提示词、资源及资源模板。
 
 [English](./README.md)
 
-## 连接 STDIO 服务
+## 运行内置客户端
 
-```java
-public static void main(String[] args) throws Exception {
-    try (McpClient client = McpClient.createStdioMcpClient(
-            "java", "-jar", "/absolute/path/to/server.jar")) {
-        client.listTools().forEach(tool -> System.out.println(tool.getName()));
-    }
-}
+`MyApp` 支持以下传输参数：
+
+```text
+stdio <command> [arguments...]
+sse <http://host:port/sse>
+http <http://host:port/mcp>
 ```
 
-## 连接旧版 SSE 示例
-
-先启动 Spring 或 Tomcat 示例，然后使用：
+例如，打包 STDIO 服务端示例后：
 
 ```java
-McpTransport transport = new HttpMcpTransport("http://localhost:8080/sse");
-
-try (McpClient client = McpClient.builder().transport(transport).build()) {
-    client.initialize();
-    System.out.println(client.listResources());
-}
+McpClient client = McpClient.createStdioMcpClient(
+        "java", "-jar", "/absolute/path/to/my-app-jar-with-dependencies.jar");
 ```
 
-客户端使用完成后必须关闭，以释放传输层、子进程及等待中的请求。
+连接 Spring 或 Tomcat 兼容示例时使用 `sse http://localhost:8080/sse`。`http` 则选择当前 Streamable HTTP 客户端传输，需连接兼容的服务端。
+应用会始终关闭客户端，释放子进程、事件流与等待中的请求。

@@ -31,19 +31,13 @@
         <dependency>
             <groupId>com.ajaxjs</groupId>
             <artifactId>aj-mcp-server</artifactId>
-            <version>1.2</version>
+            <version>1.4</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-simple</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.2.11</version>
         </dependency>
 
         <dependency>

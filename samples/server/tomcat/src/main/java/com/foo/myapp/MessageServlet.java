@@ -33,7 +33,6 @@ public class MessageServlet extends HttpServlet {
             throw new IllegalArgumentException("The parameter 'uuid' is required.");
 
         String body = getBody(req);
-        System.out.println(body);
         serverSse.handle(uuid, body);
     }
 

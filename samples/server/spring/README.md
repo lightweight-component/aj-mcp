@@ -10,7 +10,8 @@ how to keep the MCP implementation framework-neutral while adapting it to Spring
 - `Config`: scans `com.foo.myapp` for `@McpService` features and creates `McpServer` plus `ServerSse` beans.
 - `SseController`: exposes `GET /sse`, opens a session, and advertises its message endpoint.
 - `MessageController`: exposes `POST /message?uuid=...` and routes JSON-RPC messages back to the originating session.
-- `mcp/McpServerTools`, `McpServerResources`, and `McpServerPrompts`: example MCP capabilities.
+- `mcp/McpServerTools`, `McpServerResources`, and `McpServerPrompts`: example MCP capabilities, including image/binary
+  content that has no external-file dependency and a URI-template greeting resource.
 - `Sse2Controller`: a standalone Spring `SseEmitter` demonstration at `/ss2`; it is not the MCP endpoint.
 
 ## Run
@@ -53,3 +54,5 @@ try (McpClient client = McpClient.builder().transport(transport).build()) {
   are released.
 - This sample demonstrates the legacy HTTP/SSE transport. For a new HTTP integration, prefer `ServerStreamableHttp`
   where client compatibility allows it.
+- `ServerSse` is a Spring bean with `close()` configured as its destruction method, so the heartbeat executor is released
+  on normal Spring shutdown.

@@ -3,7 +3,6 @@ package com.foo.myapp.mcp;
 import com.ajaxjs.mcp.protocol.common.Content;
 import com.ajaxjs.mcp.protocol.common.ContentImage;
 import com.ajaxjs.mcp.protocol.common.ContentText;
-import com.ajaxjs.mcp.server.common.ServerUtils;
 import com.ajaxjs.mcp.server.feature.annotation.McpService;
 import com.ajaxjs.mcp.server.feature.annotation.Tool;
 import com.ajaxjs.mcp.server.feature.annotation.ToolArg;
@@ -82,11 +81,9 @@ public class McpServerTools {
      */
     @Tool(description = "A nice pic")
     public ContentImage image() {
-        String base64EncodedImage = ServerUtils.encodeImageToBase64("bird-eye.jpg");
-
         ContentImage content = new ContentImage();
-        content.setMimeType("image/jpg");
-        content.setData(base64EncodedImage);
+        content.setMimeType("image/png");
+        content.setData(SampleMcpContent.TRANSPARENT_PNG);
 
         return content;
     }
@@ -97,11 +94,9 @@ public class McpServerTools {
      */
     @Tool(description = "List ALL")
     public List<Content> getAll() {
-        String base64EncodedImage = ServerUtils.encodeImageToBase64("bird-eye.jpg");
-
         ContentImage imgContent = new ContentImage();
-        imgContent.setMimeType("image/jpg");
-        imgContent.setData(base64EncodedImage);
+        imgContent.setMimeType("image/png");
+        imgContent.setData(SampleMcpContent.TRANSPARENT_PNG);
 
         ContentText textContent = new ContentText("Hello World");
 

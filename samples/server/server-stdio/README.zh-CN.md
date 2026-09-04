@@ -7,7 +7,7 @@
 示例包括：
 
 - 字符串、数字、布尔值、无参数、异常、图片和多内容返回等工具；
-- 文本与二进制资源；
+- 文本、二进制资源及 URI 模板问候资源；
 - 基础、带参数、多消息、图片及内嵌资源提示词；
 - 包扫描和 STDIO 服务启动。
 
@@ -29,4 +29,5 @@ try (McpClient client = McpClient.createStdioMcpClient(
 
 标准输出是协议通道，只能包含 JSON-RPC 消息。日志应写入标准错误或文件。
 
-基于该示例开发时，启动前要通过 `server.setFeatureMgr(mgr)` 把扫描得到的 `FeatureMgr` 设置到服务实例。
+`App` 已在启动前把扫描到的 `FeatureMgr` 设置到 `McpServer`。示例启用了当前 MCP 的严格生命周期，客户端必须先初始化再列举或调用功能。
+初始化后可读取 `demo://welcome`、`demo://image`，或 `demo://greeting/Ada` 这样的模板资源。

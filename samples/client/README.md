@@ -1,32 +1,27 @@
 # AJ-MCP Client Sample
 
-This module is the starting point for a small Java 8 application using `aj-mcp-client`. The current `MyApp` class is
-intentionally minimal; copy one of the examples below into it and point it at an MCP server.
+This Java 8 sample contains a runnable `MyApp` client for the current AJ-MCP SDK. It initializes a connection and prints
+the negotiated protocol version together with tools, prompts, resources, and resource templates.
 
 [中文](./README.zh-CN.md)
 
-## Connect to a STDIO server
+## Run the included client
 
-```java
-public static void main(String[] args) throws Exception {
-    try (McpClient client = McpClient.createStdioMcpClient(
-            "java", "-jar", "/absolute/path/to/server.jar")) {
-        client.listTools().forEach(tool -> System.out.println(tool.getName()));
-    }
-}
+`MyApp` accepts one of these transport forms:
+
+```text
+stdio <command> [arguments...]
+sse <http://host:port/sse>
+http <http://host:port/mcp>
 ```
 
-## Connect to the legacy SSE samples
-
-Start the Spring or Tomcat sample, then use:
+For example, after packaging the STDIO server sample:
 
 ```java
-McpTransport transport = new HttpMcpTransport("http://localhost:8080/sse");
-
-try (McpClient client = McpClient.builder().transport(transport).build()) {
-    client.initialize();
-    System.out.println(client.listResources());
-}
+McpClient client = McpClient.createStdioMcpClient(
+        "java", "-jar", "/absolute/path/to/my-app-jar-with-dependencies.jar");
 ```
 
-Always close the client to release its transport and any child process or pending request.
+Use `sse http://localhost:8080/sse` with the Spring or Tomcat compatibility samples. `http` selects the current
+Streamable HTTP client transport for a compatible server. The application always closes its client, releasing child
+processes, streams, and pending requests.

@@ -1,6 +1,6 @@
 # 基于内嵌 Tomcat 的 MCP SSE 服务示例
 
-这是一个不依赖 Spring、使用 Java 8 和内嵌 Tomcat 8.5 的独立 JAR 示例，通过旧版 HTTP/SSE 传输提供 MCP 服务。
+这是一个不依赖 Spring、使用 Java 8 和内嵌 Tomcat 9 的独立 JAR 示例，通过旧版 HTTP/SSE 传输提供 MCP 服务。
 
 [English](./README.md)
 
@@ -9,7 +9,7 @@
 - `GET /sse` 打开事件流，并公布当前会话的消息端点。
 - `POST /message?uuid=...` 接收 JSON-RPC 消息，只把响应发送给对应会话。
 
-工具、资源和提示词会从 `com.foo.myapp` 包中扫描注册。
+工具、资源和提示词会从 `com.foo.myapp` 包中扫描注册；示例包含无需外部文件的 PNG、二进制/文本资源和 URI 模板问候资源。
 
 ## 构建与运行
 

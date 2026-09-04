@@ -1,11 +1,11 @@
 package com.foo.myproduct;
 
 import com.ajaxjs.mcp.protocol.common.ContentEmbeddedResource;
+import com.ajaxjs.mcp.protocol.common.ContentEmbeddedResourceDetail;
 import com.ajaxjs.mcp.protocol.common.ContentImage;
 import com.ajaxjs.mcp.protocol.common.ContentText;
 import com.ajaxjs.mcp.protocol.prompt.PromptMessage;
 import com.ajaxjs.mcp.protocol.prompt.Role;
-import com.ajaxjs.mcp.server.common.ServerUtils;
 import com.ajaxjs.mcp.server.feature.annotation.McpService;
 import com.ajaxjs.mcp.server.feature.annotation.Prompt;
 import com.ajaxjs.mcp.server.feature.annotation.PromptArg;
@@ -68,10 +68,9 @@ public class McpServerPrompts {
      */
     @Prompt(description = "Prompt that returns an image")
     public PromptMessage image() {
-        String base64EncodedImage = ServerUtils.encodeImageToBase64("/com/ajaxjs/mcp/server/testcase/bird.jpg");
         ContentImage image = new ContentImage();
-        image.setMimeType("image/jpg");
-        image.setData(base64EncodedImage);
+        image.setMimeType("image/png");
+        image.setData(SampleMcpContent.TRANSPARENT_PNG);
 
         PromptMessage message = new PromptMessage();
         message.setRole(Role.USER);
@@ -87,9 +86,10 @@ public class McpServerPrompts {
     @Prompt(description = "Prompt that returns an embedded binary resource")
     public PromptMessage embeddedBinaryResource() {
         ContentEmbeddedResource embeddedResource = new ContentEmbeddedResource();
-        ContentEmbeddedResource.Resource resource = new ContentEmbeddedResource.Resource();
+        ContentEmbeddedResourceDetail resource = new ContentEmbeddedResourceDetail();
         resource.setUri("file:///embedded-blob");
         resource.setMimeType("application/octet-stream");
+        resource.setBlob(SampleMcpContent.TRANSPARENT_PNG);
 
         embeddedResource.setResource(resource);
 
