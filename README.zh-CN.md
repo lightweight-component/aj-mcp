@@ -3,10 +3,6 @@
 
 <div align="center" style="text-align: center;">
 
-[![Maven Central](https://img.shields.io/maven-central/v/com.ajaxjs/aj-mcp?label=Latest%20Release)](https://central.sonatype.com/artifact/com.ajaxjs/aj-mcp)
-![Java Version](https://img.shields.io/badge/Java-8-blue)
-[![Javadoc](https://img.shields.io/badge/javadoc-API-brightgreen.svg?)](https://javadoc.io/doc/com.ajaxjs/aj-mcp )
-![coverage](https://img.shields.io/badge/coverage-80%25-yellowgreen.svg?maxAge=2592000)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/lightweight-component/aj-mcp)
 ![GitHub repo size](https://img.shields.io/github/repo-size/lightweight-component/aj-mcp)
