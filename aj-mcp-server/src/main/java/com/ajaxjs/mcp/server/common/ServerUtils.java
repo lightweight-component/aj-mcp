@@ -8,6 +8,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 /**
  * Server Common Utils
@@ -85,5 +87,23 @@ public class ServerUtils {
         Integer nextPageNo = isLastPage ? null : pageNo + 1;
 
         return new PaginatedResponse<>(paginatedList, isLastPage, nextPageNo);
+    }
+
+    /**
+     * Builds a protocol-specific list detail while keeping cursor behavior
+     * identical for tools, prompts, resources, and resource templates.
+     */
+    public static <T, R> R paginatedDetail(List<T> list, Cursor cursor, McpServerInitialize instance,
+                                           Function<List<T>, R> detailFactory,
+                                           BiConsumer<R, String> nextCursorSetter) {
+        PaginatedResponse<T> page = cursor != null && cursor.getPageNo() != null
+                ? paginate(list, cursor, instance)
+                : new PaginatedResponse<>(list, true, null);
+        R detail = detailFactory.apply(page.getList());
+
+        if (!page.isLastPage())
+            nextCursorSetter.accept(detail, page.getNextPageNoAsBse64());
+
+        return detail;
     }
 }

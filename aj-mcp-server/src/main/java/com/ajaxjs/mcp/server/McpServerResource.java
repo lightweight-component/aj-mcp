@@ -49,18 +49,8 @@ public abstract class McpServerResource extends McpServerInitialize {
             resources.add(resourceItem);
         }
 
-        GetResourceListResultDetail resultList;
-
-        if (request.getParams() != null && request.getParams().getPageNo() != null) {
-            // do the page
-            PaginatedResponse<ResourceItem> page = ServerUtils.paginate(resources, request.getParams(), this);
-            resources = page.getList();
-            resultList = new GetResourceListResultDetail(resources);
-
-            if (!page.isLastPage())
-                resultList.setNextCursor(page.getNextPageNoAsBse64());
-        } else
-            resultList = new GetResourceListResultDetail(resources);
+        GetResourceListResultDetail resultList = ServerUtils.paginatedDetail(resources, request.getParams(), this,
+                GetResourceListResultDetail::new, GetResourceListResultDetail::setNextCursor);
 
         GetResourceListResult result = new GetResourceListResult(resultList);
         result.setId(requestRaw.getId());
@@ -81,16 +71,11 @@ public abstract class McpServerResource extends McpServerInitialize {
         for (ServerStoreResourceTemplate store : featureMgr.getResourceTemplateStore().values())
             templates.add(store.getResourceTemplate());
 
-        ResourceTemplatesResultDetail detail = new ResourceTemplatesResultDetail();
-
-        if (cursor != null && cursor.getPageNo() != null) {
-            PaginatedResponse<com.ajaxjs.mcp.protocol.resource.ResourceTemplate> page = ServerUtils.paginate(templates, cursor, this);
-            detail.setResourceTemplates(page.getList());
-
-            if (!page.isLastPage())
-                detail.setNextCursor(page.getNextPageNoAsBse64());
-        } else
-            detail.setResourceTemplates(templates);
+        ResourceTemplatesResultDetail detail = ServerUtils.paginatedDetail(templates, cursor, this, items -> {
+            ResourceTemplatesResultDetail value = new ResourceTemplatesResultDetail();
+            value.setResourceTemplates(items);
+            return value;
+        }, ResourceTemplatesResultDetail::setNextCursor);
 
         ResourceTemplateResult response = new ResourceTemplateResult(detail);
         response.setId(requestRaw.getId());

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN" data-language="zh" data-theme="light">
+<html lang="zh-CN" data-lang="zh" data-theme="light">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,14 +8,11 @@
     <meta name="theme-color" content="#f3f5f9">
     <title>AJ-MCP · Java 8 MCP SDK</title>
     <link rel="icon" href="asset/favicon.ico"/>
+    <script src="https://aj-util.ajaxjs.com/asset/js/common.js"></script>
     <script>
         (function () {
-            var theme = null;
-            try { theme = localStorage.getItem('aj-mcp-theme'); } catch (ignored) { }
-            if (theme !== 'light' && theme !== 'dark') {
-                theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-            }
-            document.documentElement.dataset.theme = theme;
+            window.AJUtils.initTheme();
+            window.AJUtils.initLanguage({ supported: ['zh', 'en'], fallback: 'en' });
         }());
     </script>
     <style>
@@ -166,7 +163,7 @@
         footer { padding-top: 30px; color: var(--muted); font-size: 12px; }
         footer a { color: var(--blue); font-weight: 700; }
         body [data-copy] { display: none; }
-        html[data-language="zh"] body [data-copy="zh"], html[data-language="en"] body [data-copy="en"] { display: block; }
+        html[data-lang="zh"] body [data-copy="zh"], html[data-lang="en"] body [data-copy="en"] { display: block; }
         @media (max-width: 800px) {
             .site { display: block; }
             .rail { position: static; align-self: auto; height: auto; min-height: auto; overflow: visible; padding: 20px 22px; }
@@ -281,30 +278,18 @@
 <script>
     (function () {
         var root = document.documentElement;
-        var languageButton = document.getElementById('language-toggle');
         var themeButton = document.getElementById('theme-toggle');
-        function read(key) { try { return localStorage.getItem(key); } catch (ignored) { return null; } }
-        function save(key, value) { try { localStorage.setItem(key, value); } catch (ignored) { } }
-        function language(value) { root.dataset.language = value; root.lang = value === 'zh' ? 'zh-CN' : 'en'; save('aj-mcp-language', value); }
-        function theme(value, persist) {
-            root.dataset.theme = value;
-            themeButton.textContent = value === 'dark' ? '☀' : '◐';
-            if (persist) save('aj-mcp-theme', value);
+        function refreshThemeLabel() {
+            themeButton.textContent = root.dataset.theme === 'dark' ? '☀' : '◐';
         }
-        var preferredLanguage = read('aj-mcp-language');
-        var preferredTheme = read('aj-mcp-theme');
-        var systemTheme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
-        language(preferredLanguage || (navigator.language && navigator.language.toLowerCase().indexOf('zh') === 0 ? 'zh' : 'en'));
-        theme(preferredTheme || root.dataset.theme, false);
-        languageButton.addEventListener('click', function () { language(root.dataset.language === 'zh' ? 'en' : 'zh'); });
-        themeButton.addEventListener('click', function () { theme(root.dataset.theme === 'dark' ? 'light' : 'dark', true); });
-        if (!preferredTheme && systemTheme) {
-            var followSystemTheme = function (event) {
-                if (!read('aj-mcp-theme')) theme(event.matches ? 'dark' : 'light', false);
-            };
-            if (systemTheme.addEventListener) systemTheme.addEventListener('change', followSystemTheme);
-            else systemTheme.addListener(followSystemTheme);
-        }
+        window.AJUtils.initLanguage({ supported: ['zh', 'en'], fallback: 'en' });
+        window.AJUtils.bindLanguageToggle({ selector: '#language-toggle', languages: ['zh', 'en'] });
+        window.AJUtils.initTheme();
+        refreshThemeLabel();
+        themeButton.addEventListener('click', function () {
+            window.AJUtils.applyTheme(root.dataset.theme === 'dark' ? 'light' : 'dark', true);
+            refreshThemeLabel();
+        });
     }());
 </script>
 </body>

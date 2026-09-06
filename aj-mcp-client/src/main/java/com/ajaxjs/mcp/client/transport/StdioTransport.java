@@ -1,6 +1,7 @@
 package com.ajaxjs.mcp.client.transport;
 
 import com.ajaxjs.mcp.common.JsonUtils;
+import com.ajaxjs.mcp.protocol.BaseJsonRpcMessage;
 import com.ajaxjs.mcp.protocol.McpRequest;
 import com.ajaxjs.mcp.protocol.initialize.InitializationNotification;
 import com.ajaxjs.mcp.protocol.initialize.InitializeRequest;
@@ -133,12 +134,8 @@ public class StdioTransport extends McpTransport {
 
     @Override
     public CompletableFuture<JsonNode> initialize(InitializeRequest request) {
-        String requestString = JsonUtils.toJson(request);
-        String initializationNotification = JsonUtils.toJson(new InitializationNotification());
-
-        return execute(requestString, numericId(request.getId()))
-                .thenCompose(originalResponse -> execute(initializationNotification, null)
-                        .thenCompose(nullNode -> CompletableFuture.completedFuture(originalResponse)));
+        return completeInitialization(execute(JsonUtils.toJson(request), numericId(request.getId())),
+                () -> execute(JsonUtils.toJson(new InitializationNotification()), null));
     }
 
     @Override

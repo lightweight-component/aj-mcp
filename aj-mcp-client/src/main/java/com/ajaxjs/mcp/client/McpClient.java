@@ -50,19 +50,9 @@ public class McpClient extends McpClientResource {
         params.setContext(context);
         request.setParams(params);
 
-        try {
-            JsonNode response = awaitResponse(transport.sendRequestWithResponse(request));
-            McpException.checkForErrors(response);
-
-            return JsonUtils.jsonNode2bean(response.get(RESPONSE_RESULT).get("completion"), CompleteResult.CompletionResult.class);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException(e);
-        } catch (ExecutionException | TimeoutException e) {
-            throw new RuntimeException(e);
-        } finally {
-            pendingRequests.remove(operationId);
-        }
+        JsonNode response = executeRequest(request);
+        McpException.checkForErrors(response);
+        return JsonUtils.jsonNode2bean(response.get(RESPONSE_RESULT).get("completion"), CompleteResult.CompletionResult.class);
     }
 
     @Override
@@ -78,21 +68,8 @@ public class McpClient extends McpClientResource {
         if (pageNo != 0)
             request.setParams(new Cursor(pageNo));
 
-        JsonNode result;
-
-        try {
-            CompletableFuture<JsonNode> resultFuture = transport.sendRequestWithResponse(request);
-            result = awaitResponse(resultFuture);
-            McpException.checkForErrors(result);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-
-            throw new RuntimeException(e);
-        } catch (ExecutionException | TimeoutException e) {
-            throw new RuntimeException(e);
-        } finally {
-            pendingRequests.remove(request.getId());
-        }
+        JsonNode result = executeRequest(request);
+        McpException.checkForErrors(result);
 
         return toolListFromMcpResponse((ArrayNode) result.get(RESPONSE_RESULT).get("tools"));
     }
@@ -105,21 +82,12 @@ public class McpClient extends McpClientResource {
         if (cursor != null)
             request.setParams(new Cursor(cursor));
 
-        try {
-            JsonNode response = awaitResponse(transport.sendRequestWithResponse(request));
-            McpException.checkForErrors(response);
-            JsonNode result = response.get(RESPONSE_RESULT);
-            List<ToolItem> items = toolListFromMcpResponse((ArrayNode) result.get("tools"));
+        JsonNode response = executeRequest(request);
+        McpException.checkForErrors(response);
+        JsonNode result = response.get(RESPONSE_RESULT);
+        List<ToolItem> items = toolListFromMcpResponse((ArrayNode) result.get("tools"));
 
-            return new McpPage<>(items, result.has("nextCursor") ? result.get("nextCursor").asText() : null);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException(e);
-        } catch (ExecutionException | TimeoutException e) {
-            throw new RuntimeException(e);
-        } finally {
-            pendingRequests.remove(request.getId());
-        }
+        return new McpPage<>(items, result.has("nextCursor") ? result.get("nextCursor").asText() : null);
     }
 
     /**
@@ -189,19 +157,10 @@ public class McpClient extends McpClientResource {
         long operationId = idGenerator.getAndIncrement();
         request.setId(operationId);
 
-        try {
-            JsonNode response = awaitResponse(transport.sendRequestWithResponse(request));
-            McpException.checkForErrors(response);
+        JsonNode response = executeRequest(request);
+        McpException.checkForErrors(response);
 
-            return JsonUtils.convertValue(response.get(RESPONSE_RESULT), CallToolResultDetail.class);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException(e);
-        } catch (ExecutionException | TimeoutException e) {
-            throw new RuntimeException(e);
-        } finally {
-            pendingRequests.remove(operationId);
-        }
+        return JsonUtils.convertValue(response.get(RESPONSE_RESULT), CallToolResultDetail.class);
     }
 
     @Override

@@ -700,18 +700,8 @@ public class McpServer extends McpServerPrompt {
         GetToolListResult result = new GetToolListResult();
         result.setId(requestRaw.getId());
 
-        GetToolListResultToolList toolList;
-
-        if (request.getParams() != null && request.getParams().getPageNo() != null) {
-            // do the page
-            PaginatedResponse<ToolItem> page = ServerUtils.paginate(tools, request.getParams(), this);
-            tools = page.getList();
-            toolList = new GetToolListResultToolList(tools);
-
-            if (!page.isLastPage())
-                toolList.setNextCursor(page.getNextPageNoAsBse64());
-        } else
-            toolList = new GetToolListResultToolList(tools);
+        GetToolListResultToolList toolList = ServerUtils.paginatedDetail(tools, request.getParams(), this,
+                GetToolListResultToolList::new, GetToolListResultToolList::setNextCursor);
 
         result.setResult(toolList);
 

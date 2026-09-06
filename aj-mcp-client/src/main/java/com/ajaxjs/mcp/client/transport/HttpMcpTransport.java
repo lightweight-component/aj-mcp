@@ -160,18 +160,14 @@ public class HttpMcpTransport extends McpTransport {
      */
     @Override
     public CompletableFuture<JsonNode> initialize(InitializeRequest request) {
-        Request httpRequest;
-        Request initializationNotification;
-
         try {
-            httpRequest = createRequest(request);
-            initializationNotification = createRequest(new InitializationNotification());
+            Request initializationRequest = createRequest(request);
+            Request initializedNotification = createRequest(new InitializationNotification());
+            return completeInitialization(execute(initializationRequest, numericId(request.getId())),
+                    () -> execute(initializedNotification, null));
         } catch (JsonProcessingException e) {
             return McpUtils.failedFuture(e);
         }
-
-        return execute(httpRequest, numericId(request.getId())).thenCompose(originalResponse -> execute(initializationNotification, null)
-                .thenCompose(nullNode -> CompletableFuture.completedFuture(originalResponse)));
     }
 
     /**

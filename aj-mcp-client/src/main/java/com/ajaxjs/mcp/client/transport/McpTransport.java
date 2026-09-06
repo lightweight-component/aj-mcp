@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * MCP 客户端传输接口
@@ -46,6 +47,18 @@ public abstract class McpTransport implements McpConstant, Closeable {
      * @return 服务返回的响应（异步） The future response from the server.
      */
     public abstract CompletableFuture<JsonNode> initialize(InitializeRequest request);
+
+    /**
+     * Sends either message of the initialization handshake using the transport's
+     * native framing. The returned future represents a response when {@code id}
+     * is non-null and an accepted notification otherwise.
+     */
+    protected CompletableFuture<JsonNode> completeInitialization(CompletableFuture<JsonNode> initializeResponse,
+                                                                  Supplier<CompletableFuture<JsonNode>> initializedNotification) {
+        // Keep the shared response so callers observe initialize's result after
+        // the required notifications/initialized message is accepted.
+        return initializeResponse.thenCompose(response -> initializedNotification.get().thenApply(ignored -> response));
+    }
 
     /**
      * 发送请求到服务端，有响应返回。

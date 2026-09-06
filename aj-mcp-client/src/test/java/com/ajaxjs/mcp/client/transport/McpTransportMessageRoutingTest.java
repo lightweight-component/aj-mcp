@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -57,6 +58,23 @@ class McpTransportMessageRoutingTest {
                 transport.sent.get().get("error").get("message").asText());
     }
 
+    @Test
+    void initializationHelperWaitsForTheNotificationAndKeepsTheOriginalResponse() {
+        CapturingTransport transport = new CapturingTransport();
+        CompletableFuture<JsonNode> initializeResponse = new CompletableFuture<>();
+        AtomicInteger notificationCount = new AtomicInteger();
+
+        CompletableFuture<JsonNode> completed = transport.completeInitializationForTest(initializeResponse,
+                () -> {
+                    notificationCount.incrementAndGet();
+                    return CompletableFuture.completedFuture(null);
+                });
+        initializeResponse.complete(JsonUtils.json2Node("{\"id\":9,\"result\":{}}"));
+
+        assertEquals(1, notificationCount.get());
+        assertEquals(9, completed.join().get("id").asInt());
+    }
+
     /**
      * Represents capturing transport.
      */
@@ -65,6 +83,11 @@ class McpTransportMessageRoutingTest {
          * Holds the sent value.
          */
         final AtomicReference<JsonNode> sent = new AtomicReference<>();
+
+        CompletableFuture<JsonNode> completeInitializationForTest(CompletableFuture<JsonNode> response,
+                                                                   java.util.function.Supplier<CompletableFuture<JsonNode>> notification) {
+            return completeInitialization(response, notification);
+        }
 
         @Override
         public void start(Map<Long, CompletableFuture<JsonNode>> pendingRequest) {

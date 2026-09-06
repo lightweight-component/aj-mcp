@@ -271,6 +271,24 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
     }
 
     /**
+     * Sends a request and applies the common synchronous client lifecycle. The
+     * transport removes successful responses itself; the finally block also
+     * covers timeouts and send failures, preventing stale pending entries.
+     */
+    protected JsonNode executeRequest(McpRequest request) {
+        try {
+            return awaitResponse(transport.sendRequestWithResponse(request));
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+        } catch (ExecutionException | TimeoutException e) {
+            throw new RuntimeException(e);
+        } finally {
+            pendingRequests.remove(request.getId());
+        }
+    }
+
+    /**
      * Create Initialize Params
      *
      * @return Initialize Params
@@ -313,17 +331,7 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
         PingRequest ping = new PingRequest();
         ping.setId(operationId);
 
-        try {
-            CompletableFuture<JsonNode> resultFuture = transport.sendRequestWithResponse(ping);
-            awaitResponse(resultFuture);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException(e);
-        } catch (ExecutionException | TimeoutException e) {
-            throw new RuntimeException(e);
-        } finally {
-            pendingRequests.remove(operationId);
-        }
+        executeRequest(ping);
     }
 
     @Override

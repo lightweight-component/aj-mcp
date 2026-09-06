@@ -48,18 +48,8 @@ public abstract class McpServerPrompt extends McpServerResource {
             prompts.add(promptItem);
         }
 
-        GetPromptListResultDetail resultList;
-
-        if (request.getParams() != null && request.getParams().getPageNo() != null) {
-            // do the page
-            PaginatedResponse<PromptItem> page = ServerUtils.paginate(prompts, request.getParams(), this);
-            prompts = page.getList();
-            resultList = new GetPromptListResultDetail(prompts);
-
-            if (!page.isLastPage())
-                resultList.setNextCursor(page.getNextPageNoAsBse64());
-        } else
-            resultList = new GetPromptListResultDetail(prompts);
+        GetPromptListResultDetail resultList = ServerUtils.paginatedDetail(prompts, request.getParams(), this,
+                GetPromptListResultDetail::new, GetPromptListResultDetail::setNextCursor);
 
         GetPromptListResult result = new GetPromptListResult(resultList);
         result.setId(requestRaw.getId());

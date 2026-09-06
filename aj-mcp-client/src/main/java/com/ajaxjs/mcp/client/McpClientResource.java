@@ -43,17 +43,7 @@ public abstract class McpClientResource extends McpClientPrompt {
         long operationId = idGenerator.getAndIncrement();
         request.setId(operationId);
 
-        try {
-            JsonNode response = awaitResponse(transport.sendRequestWithResponse(request));
-            McpException.checkForErrors(response);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException(e);
-        } catch (ExecutionException | TimeoutException e) {
-            throw new RuntimeException(e);
-        } finally {
-            pendingRequests.remove(operationId);
-        }
+        McpException.checkForErrors(executeRequest(request));
     }
 
     @Override
@@ -74,20 +64,11 @@ public abstract class McpClientResource extends McpClientPrompt {
         if (cursor != null)
             request.setParams(new Cursor(cursor));
 
-        try {
-            JsonNode response = awaitResponse(transport.sendRequestWithResponse(request));
-            McpException.checkForErrors(response);
-            JsonNode result = response.get(RESPONSE_RESULT);
+        JsonNode response = executeRequest(request);
+        McpException.checkForErrors(response);
+        JsonNode result = response.get(RESPONSE_RESULT);
 
-            return new McpPage<>(parseResourceRefs(response), nextCursor(result));
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException(e);
-        } catch (ExecutionException | TimeoutException e) {
-            throw new RuntimeException(e);
-        } finally {
-            pendingRequests.remove(request.getId());
-        }
+        return new McpPage<>(parseResourceRefs(response), nextCursor(result));
     }
 
     @Override
@@ -97,19 +78,7 @@ public abstract class McpClientResource extends McpClientPrompt {
         request.setId(operationId);
         request.setParams(new GetResourceRequestParams(uri));
 
-        try {
-            CompletableFuture<JsonNode> resultFuture = transport.sendRequestWithResponse(request);
-            JsonNode result = awaitResponse(resultFuture);
-
-            return parseResourceContents(result);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException(e);
-        } catch (ExecutionException | TimeoutException e) {
-            throw new RuntimeException(e);
-        } finally {
-            pendingRequests.remove(operationId);
-        }
+        return parseResourceContents(executeRequest(request));
     }
 
     @Override
@@ -130,19 +99,10 @@ public abstract class McpClientResource extends McpClientPrompt {
         if (cursor != null)
             request.setParams(new Cursor(cursor));
 
-        try {
-            JsonNode response = awaitResponse(transport.sendRequestWithResponse(request));
-            McpException.checkForErrors(response);
-            JsonNode result = response.get(RESPONSE_RESULT);
-            return new McpPage<>(parseResourceTemplateRefs(response), nextCursor(result));
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException(e);
-        } catch (ExecutionException | TimeoutException e) {
-            throw new RuntimeException(e);
-        } finally {
-            pendingRequests.remove(request.getId());
-        }
+        JsonNode response = executeRequest(request);
+        McpException.checkForErrors(response);
+        JsonNode result = response.get(RESPONSE_RESULT);
+        return new McpPage<>(parseResourceTemplateRefs(response), nextCursor(result));
     }
 
     /**
@@ -183,21 +143,10 @@ public abstract class McpClientResource extends McpClientPrompt {
         if (pageNo != 0)
             request.setParams(new Cursor(pageNo));
 
-        try {
-            CompletableFuture<JsonNode> resultFuture = transport.sendRequestWithResponse(request);
-            JsonNode result = awaitResponse(resultFuture);
-            List<ResourceItem> resources = parseResourceRefs(result);
-            resourceRefs.put(pageNo, resources);
+        List<ResourceItem> resources = parseResourceRefs(executeRequest(request));
+        resourceRefs.put(pageNo, resources);
 
-            return resources;
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException(e);
-        } catch (ExecutionException | TimeoutException e) {
-            throw new RuntimeException(e);
-        } finally {
-            pendingRequests.remove(request.getId());
-        }
+        return resources;
     }
 
     /**
@@ -218,21 +167,10 @@ public abstract class McpClientResource extends McpClientPrompt {
         if (pageNo != 0)
             request.setParams(new Cursor(pageNo));
 
-        try {
-            CompletableFuture<JsonNode> resultFuture = transport.sendRequestWithResponse(request);
-            JsonNode result = awaitResponse(resultFuture);
-            List<ResourceTemplate> templates = parseResourceTemplateRefs(result);
-            resourceTemplateRefs.put(pageNo, templates);
+        List<ResourceTemplate> templates = parseResourceTemplateRefs(executeRequest(request));
+        resourceTemplateRefs.put(pageNo, templates);
 
-            return templates;
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException(e);
-        } catch (ExecutionException | TimeoutException e) {
-            throw new RuntimeException(e);
-        } finally {
-            pendingRequests.remove(request.getId());
-        }
+        return templates;
     }
 
     /**

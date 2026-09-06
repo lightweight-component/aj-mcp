@@ -114,14 +114,16 @@ public class StreamableHttpTransport extends McpTransport {
     @Override
     public CompletableFuture<JsonNode> initialize(InitializeRequest request) {
         initializationVersion = request.getParams().getProtocolVersion();
-        return post(request, numericId(request.getId()), false).thenCompose(response -> {
-            InitializationNotification initialized = new InitializationNotification();
+        CompletableFuture<JsonNode> response = completeInitialization(
+                post(request, numericId(request.getId()), false),
+                () -> post(new InitializationNotification(), null, true));
 
-            return post(initialized, null, true).thenApply(ignored -> {
-                if (openEventStream)
-                    openGetStream();
-                return response;
-            });
+        if (!openEventStream)
+            return response;
+
+        return response.thenApply(result -> {
+            openGetStream();
+            return result;
         });
     }
 

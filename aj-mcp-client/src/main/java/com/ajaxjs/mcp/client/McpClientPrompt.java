@@ -39,20 +39,11 @@ public abstract class McpClientPrompt extends McpClientBase {
 
         if (cursor != null)
             request.setParams(new Cursor(cursor));
-        try {
-            JsonNode response = awaitResponse(transport.sendRequestWithResponse(request));
-            McpException.checkForErrors(response);
-            JsonNode result = response.get(RESPONSE_RESULT);
+        JsonNode response = executeRequest(request);
+        McpException.checkForErrors(response);
+        JsonNode result = response.get(RESPONSE_RESULT);
 
-            return new McpPage<>(parsePromptRefs(response), result.has("nextCursor") ? result.get("nextCursor").asText() : null);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException(e);
-        } catch (ExecutionException | TimeoutException e) {
-            throw new RuntimeException(e);
-        } finally {
-            pendingRequests.remove(request.getId());
-        }
+        return new McpPage<>(parsePromptRefs(response), result.has("nextCursor") ? result.get("nextCursor").asText() : null);
     }
 
     /**
@@ -73,22 +64,10 @@ public abstract class McpClientPrompt extends McpClientBase {
         if (pageNo != 0)
             request.setParams(new Cursor(pageNo));
 
-        try {
-            CompletableFuture<JsonNode> resultFuture = transport.sendRequestWithResponse(request);
-            JsonNode result = awaitResponse(resultFuture);
+        List<PromptItem> promptItems = parsePromptRefs(executeRequest(request));
+        promptRefs.put(pageNo, promptItems);
 
-            List<PromptItem> promptItems = parsePromptRefs(result);
-            promptRefs.put(pageNo, promptItems);
-
-            return promptItems;
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException(e);
-        } catch (ExecutionException | TimeoutException e) {
-            throw new RuntimeException(e);
-        } finally {
-            pendingRequests.remove(request.getId());
-        }
+        return promptItems;
     }
 
     /**
@@ -144,20 +123,10 @@ public abstract class McpClientPrompt extends McpClientBase {
         request.setId(operationId);
         request.setParams(params);
 
-        try {
-            CompletableFuture<JsonNode> resultFuture = transport.sendRequestWithResponse(request);
-            JsonNode result = awaitResponse(resultFuture);
-            McpException.checkForErrors(result);
+        JsonNode result = executeRequest(request);
+        McpException.checkForErrors(result);
 
-            return JsonUtils.jsonNode2bean(result.get(McpConstant.RESPONSE_RESULT), GetPromptResultDetail.class);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException(e);
-        } catch (ExecutionException | TimeoutException e) {
-            throw new RuntimeException(e);
-        } finally {
-            pendingRequests.remove(operationId);
-        }
+        return JsonUtils.jsonNode2bean(result.get(McpConstant.RESPONSE_RESULT), GetPromptResultDetail.class);
     }
 
     /**
