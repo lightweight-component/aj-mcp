@@ -17,5 +17,5 @@ public class ResourceTemplateRequest extends McpRequest {
     /**
      * Holds the method value.
      */
-    String method = RESOURCES_TEMPLATES_LIST;
+    private  String method = RESOURCES_TEMPLATES_LIST;
 }

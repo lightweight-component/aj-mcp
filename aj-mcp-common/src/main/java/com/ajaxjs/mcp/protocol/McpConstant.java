@@ -9,12 +9,12 @@ public interface McpConstant {
      */
     class Methods {
         /**
-         * Defines the initialize constant.
+         * Defines the initialized constant.
          */
         public static final String INITIALIZE = "initialize";
 
         /**
-         * Defines the notification cancelled constant.
+         * Defines the notification-canceled constant.
          */
         public static final String NOTIFICATION_CANCELLED = "notifications/cancelled";
 
@@ -114,7 +114,7 @@ public interface McpConstant {
         public static final String PROGRESS_NOTIFICATION = "notifications/progress";
 
         /**
-         * Defines the roots list constant.
+         * Defines the root list constant.
          */
         public static final String ROOTS_LIST = "roots/list";
 
@@ -129,7 +129,7 @@ public interface McpConstant {
         public static final String SAMPLING_CREATE_MESSAGE = "sampling/createMessage";
 
         /**
-         * Defines the elicitation create constant.
+         * Defines the elicitation creates constant.
          */
         public static final String ELICITATION_CREATE = "elicitation/create";
     }

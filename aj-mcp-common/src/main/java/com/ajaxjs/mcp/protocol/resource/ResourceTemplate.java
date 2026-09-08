@@ -11,26 +11,26 @@ public class ResourceTemplate {
     /**
      * Holds the uri template value.
      */
-    String uriTemplate;
+    private  String uriTemplate;
 
     /**
      * Holds the name value.
      */
-    String name;
+    private String name;
 
     /**
      * Holds the title value.
      */
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    String title;
+    private String title;
 
     /**
      * Holds the description value.
      */
-    String description;
+    private  String description;
 
     /**
      * Holds the mime type value.
      */
-    String mimeType;
+    private String mimeType;
 }

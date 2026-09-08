@@ -14,14 +14,19 @@ import com.ajaxjs.mcp.protocol.resource.SubscriptionUpdateNotification;
 import com.ajaxjs.mcp.protocol.tools.*;
 import com.ajaxjs.mcp.protocol.utils.completion.CompleteRequest;
 import com.ajaxjs.mcp.protocol.utils.completion.CompleteResult;
+import com.ajaxjs.mcp.protocol.utils.completion.CompleteResultDetail;
+import com.ajaxjs.mcp.protocol.utils.completion.CompletionResult;
 import com.ajaxjs.mcp.protocol.utils.pagination.Cursor;
 import com.ajaxjs.mcp.protocol.utils.ping.PingResponse;
-import com.ajaxjs.mcp.server.common.PaginatedResponse;
 import com.ajaxjs.mcp.server.common.ServerUtils;
 import com.ajaxjs.mcp.server.error.JsonRpcErrorCode;
 import com.ajaxjs.mcp.server.error.JsonRpcErrorException;
 import com.ajaxjs.mcp.server.feature.model.ServerStoreCompletion;
+import com.ajaxjs.mcp.server.feature.model.ServerStoreResourceTemplate;
 import com.ajaxjs.mcp.server.feature.model.ServerStoreTool;
+import com.ajaxjs.mcp.server.model.RequestKey;
+import com.ajaxjs.mcp.server.model.RunningRequest;
+import com.ajaxjs.mcp.server.model.SessionState;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Data;
@@ -33,7 +38,6 @@ import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -47,57 +51,47 @@ public class McpServer extends McpServerPrompt {
      * Holds the current session value.
      */
     private final ThreadLocal<String> currentSession = new ThreadLocal<>();
+
     /**
      * Holds the session protocol versions value.
      */
     private final Map<String, String> sessionProtocolVersions = new ConcurrentHashMap<>();
+
     /**
      * Holds the client capabilities value.
      */
     private final Map<String, InitializeRequestParams.Capabilities> clientCapabilities = new ConcurrentHashMap<>();
+
     /**
      * Holds the resource subscriptions value.
      */
     private final Map<String, Set<String>> resourceSubscriptions = new ConcurrentHashMap<>();
+
     /**
      * Holds the logging level value.
      */
     private volatile String loggingLevel = "info";
+
     /**
      * JSON-RPC request IDs are scoped to a connection. Keep the session in the
      * key so two clients using the same ID cannot cancel each other's tools.
      */
     private final Map<RequestKey, RunningRequest> runningRequests = new ConcurrentHashMap<>();
+
     /**
      * Holds the session states value.
      */
     private final Map<String, SessionState> sessionStates = new ConcurrentHashMap<>();
+
     /**
      * Holds the server request ids value.
      */
     private final AtomicLong serverRequestIds = new AtomicLong(1);
+
     /**
      * Holds the pending client responses value.
      */
     private final Map<String, CompletableFuture<JsonNode>> pendingClientResponses = new ConcurrentHashMap<>();
-
-    /**
-     * Represents session state.
-     */
-    private enum SessionState {
-        /**
-         * The session is allocated but has not initialized.
-         */
-        NEW,
-        /**
-         * The session has received initialization but is not ready yet.
-         */
-        INITIALIZING,
-        /**
-         * The session completed initialization and can handle requests.
-         */
-        READY
-    }
 
     /**
      * Executes the bind session operation.
@@ -134,6 +128,7 @@ public class McpServer extends McpServerPrompt {
             if (key.belongsTo(sessionId) && runningRequests.remove(key, request))
                 request.cancel();
         });
+
         String prefix = sessionId + ":";
         pendingClientResponses.forEach((key, future) -> {
             if (key.startsWith(prefix) && pendingClientResponses.remove(key, future))
@@ -159,17 +154,21 @@ public class McpServer extends McpServerPrompt {
     }
 
     /**
-     * Completes a pending server-to-client request response, if the JSON is a response envelope.
+     * Completes a pending server-to-client response, if the JSON is a response envelope.
      */
     boolean acceptClientResponse(String sessionId, String rawJson) {
         JsonNode message = JsonUtils.json2Node(rawJson);
+
         if (message.has(METHOD) || !message.has(ID))
             return false;
+
         CompletableFuture<JsonNode> future = pendingClientResponses.remove(sessionId + ":" + message.get(ID).asText());
+
         if (future != null)
             future.complete(message);
         else
             log.warn("Received client response for unknown server request id {}", message.get(ID));
+
         return true;
     }
 
@@ -182,12 +181,16 @@ public class McpServer extends McpServerPrompt {
      */
     public List<Root> listRoots(String sessionId, Duration timeout) {
         InitializeRequestParams.Capabilities capabilities = clientCapabilities.get(sessionId);
+
         if (capabilities == null || capabilities.getRoots() == null)
             throw new IllegalStateException("Client did not advertise roots capability");
+
         JsonNode result = requestClient(sessionId, Methods.ROOTS_LIST, null, timeout);
         List<Root> roots = new ArrayList<>();
+
         for (JsonNode root : result.path("roots"))
             roots.add(JsonUtils.convertValue(root, Root.class));
+
         return roots;
     }
 
@@ -199,13 +202,14 @@ public class McpServer extends McpServerPrompt {
      * @param timeout   the timeout value.
      * @return the result of the create message operation.
      */
-    public SamplingCreateMessageResult createMessage(String sessionId, SamplingCreateMessageParams params,
-                                                     Duration timeout) {
+    public SamplingCreateMessageResult createMessage(String sessionId, SamplingCreateMessageParams params, Duration timeout) {
         InitializeRequestParams.Capabilities capabilities = clientCapabilities.get(sessionId);
+
         if (capabilities == null || capabilities.getSampling() == null)
             throw new IllegalStateException("Client did not advertise sampling capability");
-        JsonNode result = requestClient(sessionId, Methods.SAMPLING_CREATE_MESSAGE,
-                JsonUtils.valueToTree(params), timeout);
+
+        JsonNode result = requestClient(sessionId, Methods.SAMPLING_CREATE_MESSAGE, JsonUtils.valueToTree(params), timeout);
+
         return JsonUtils.convertValue(result, SamplingCreateMessageResult.class);
     }
 
@@ -219,13 +223,17 @@ public class McpServer extends McpServerPrompt {
      */
     public ElicitResult elicit(String sessionId, ElicitRequestParams params, Duration timeout) {
         String version = sessionProtocolVersions.get(sessionId);
+
         if (version == null || !ProtocolVersion.from(version).supportsElicitation())
             throw new IllegalStateException("Elicitation requires an MCP 2025-06-18 session");
+
         InitializeRequestParams.Capabilities capabilities = clientCapabilities.get(sessionId);
+
         if (capabilities == null || capabilities.getElicitation() == null)
             throw new IllegalStateException("Client did not advertise elicitation capability");
-        JsonNode result = requestClient(sessionId, Methods.ELICITATION_CREATE,
-                JsonUtils.valueToTree(params), timeout);
+
+        JsonNode result = requestClient(sessionId, Methods.ELICITATION_CREATE, JsonUtils.valueToTree(params), timeout);
+
         return JsonUtils.convertValue(result, ElicitResult.class);
     }
 
@@ -253,8 +261,8 @@ public class McpServer extends McpServerPrompt {
 
         try {
             transport.send(sessionId, request.toString());
-            JsonNode response = timeout == null || timeout.isZero()
-                    ? future.get() : future.get(Math.max(1L, timeout.toMillis()), TimeUnit.MILLISECONDS);
+            JsonNode response = timeout == null || timeout.isZero() ? future.get() : future.get(Math.max(1L, timeout.toMillis()), TimeUnit.MILLISECONDS);
+
             if (response.has("error"))
                 throw new IllegalStateException("Client rejected " + method + ": " + response.get("error"));
 
@@ -297,14 +305,12 @@ public class McpServer extends McpServerPrompt {
 
         if (strict && !Methods.INITIALIZE.equals(requestRaw.getMethod()) && !Methods.PING.equals(requestRaw.getMethod())
                 && !Methods.NOTIFICATION_INITIALIZED.equals(requestRaw.getMethod()) && state != SessionState.READY)
-            throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_REQUEST,
-                    "MCP session is not initialized");
+            throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_REQUEST, "MCP session is not initialized");
 
         switch (requestRaw.getMethod()) {
             case Methods.INITIALIZE:
                 if (strict && state != SessionState.NEW)
-                    throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_REQUEST,
-                            "MCP session is already initialized");
+                    throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_REQUEST, "MCP session is already initialized");
 
                 JsonNode jsonNode = requestRaw.getJsonNode();
                 McpResponse initialized = initialize(requestRaw.getId(), jsonNode);
@@ -340,9 +346,9 @@ public class McpServer extends McpServerPrompt {
                 return setLoggingLevel(requestRaw);
             case Methods.NOTIFICATION_INITIALIZED:
                 if (strict && state != SessionState.INITIALIZING)
-                    throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_REQUEST,
-                            "Unexpected initialized notification");
+                    throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_REQUEST, "Unexpected initialized notification");
                 sessionStates.put(sessionId, SessionState.READY);
+
                 return null;
             case Methods.NOTIFICATION_CANCELLED:
                 cancelRequest(requestRaw);
@@ -387,8 +393,10 @@ public class McpServer extends McpServerPrompt {
     private static Object requestIdValue(JsonNode requestId) {
         if (requestId.isIntegralNumber())
             return requestId.longValue();
+
         if (requestId.isTextual())
             return requestId.textValue();
+
         throw new IllegalArgumentException("Cancellation requestId must be a string or integer");
     }
 
@@ -400,6 +408,7 @@ public class McpServer extends McpServerPrompt {
      */
     private RequestKey requestKey(Object requestId) {
         String sessionId = currentSession.get();
+
         return new RequestKey(sessionId == null ? "direct" : sessionId, requestId);
     }
 
@@ -425,14 +434,14 @@ public class McpServer extends McpServerPrompt {
     }
 
     /**
-     * Executes the publish tools changed operation.
+     * Executes the publication tools changed operation.
      */
     public void publishToolsChanged() {
         broadcastNotification(Methods.TOOLS_LIST_CHANGED_NOTIFICATION, null);
     }
 
     /**
-     * Executes the publish prompts changed operation.
+     * Executes the publication prompts changed operation.
      */
     public void publishPromptsChanged() {
         broadcastNotification(Methods.PROMPTS_LIST_CHANGED_NOTIFICATION, null);
@@ -493,6 +502,7 @@ public class McpServer extends McpServerPrompt {
 
         if (loggerName != null)
             params.put("logger", loggerName);
+
         params.set("data", JsonUtils.valueToTree(data));
 
         transport.broadcast(notificationJson(Methods.LOGGING_MESSAGE_NOTIFICATION, params));
@@ -530,7 +540,7 @@ public class McpServer extends McpServerPrompt {
      * Executes the change subscription operation.
      *
      * @param requestRaw the request raw value.
-     * @param subscribe  the subscribe value.
+     * @param subscribe  the subscribed value.
      * @return the result of the change subscription operation.
      */
     private McpResponse changeSubscription(McpRequestRawInfo requestRaw, boolean subscribe) {
@@ -601,10 +611,9 @@ public class McpServer extends McpServerPrompt {
         CompleteRequest.Params params = JsonUtils.jsonNode2bean(paramsNode, CompleteRequest.Params.class);
 
         if (params == null || params.getRef() == null || params.getArgument() == null)
-            throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_PARAMS,
-                    "ref and argument are required");
+            throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_PARAMS, "ref and argument are required");
 
-        CompleteRequest.Ref ref = params.getRef();
+        CompleteRequest.ParamsRef ref = params.getRef();
         String reference = "ref/prompt".equals(ref.getType()) ? ref.getName() : resourceTemplateName(ref.getUri());
         String key = ref.getType() + ":" + reference + ":" + params.getArgument().getName();
         ServerStoreCompletion store = getStore(featureMgr.getCompletionStore(), key, requestRaw.getId(), "completion provider");
@@ -613,20 +622,18 @@ public class McpServer extends McpServerPrompt {
         try {
             returned = store.getMethod().invoke(store.getInstance(), params.getArgument().getValue());
         } catch (IllegalAccessException e) {
-            throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INTERNAL_ERROR,
-                    "Completion method is not accessible", e);
+            throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INTERNAL_ERROR, "Completion method is not accessible", e);
         } catch (InvocationTargetException e) {
             Throwable cause = e.getCause() == null ? e : e.getCause();
-            throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INTERNAL_ERROR,
-                    "Completion execution failed: " + cause.getMessage(), cause);
+            throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INTERNAL_ERROR, "Completion execution failed: " + cause.getMessage(), cause);
         }
 
         List<String> values = new ArrayList<>();
 
-        if (returned instanceof List)
+        if (returned instanceof List) {
             for (Object value : (List<?>) returned)
                 values.add(String.valueOf(value));
-        else if (returned != null)
+        } else if (returned != null)
             values.add(String.valueOf(returned));
 
         int total = values.size();
@@ -637,8 +644,8 @@ public class McpServer extends McpServerPrompt {
 
         CompleteResult response = new CompleteResult();
         response.setId(requestRaw.getId());
-        CompleteResult.CompletionResult completion = new CompleteResult.CompletionResult(values, total, hasMore);
-        response.setResult(new CompleteResult.CompleteResultDetail(completion));
+        CompletionResult completion = new CompletionResult(values, total, hasMore);
+        response.setResult(new CompleteResultDetail(completion));
 
         return response;
     }
@@ -650,8 +657,7 @@ public class McpServer extends McpServerPrompt {
      * @return the result of the resource template name operation.
      */
     private String resourceTemplateName(String uriTemplate) {
-        for (com.ajaxjs.mcp.server.feature.model.ServerStoreResourceTemplate store
-                : featureMgr.getResourceTemplateStore().values())
+        for (ServerStoreResourceTemplate store : featureMgr.getResourceTemplateStore().values())
             if (java.util.Objects.equals(uriTemplate, store.getResourceTemplate().getUriTemplate()))
                 return store.getResourceTemplate().getName();
 
@@ -688,6 +694,7 @@ public class McpServer extends McpServerPrompt {
             // Never mutate the shared feature definition while projecting it to
             // a session's negotiated schema.
             ToolItem tool = JsonUtils.convertValue(store.getTool(), ToolItem.class);
+
             if (revision == ProtocolVersion.V_2024_11_05)
                 tool.setAnnotations(null);
             if (!revision.supportsStructuredToolOutput()) {
@@ -783,8 +790,7 @@ public class McpServer extends McpServerPrompt {
         RunningRequest previous = runningRequests.putIfAbsent(requestKey, runningRequest);
 
         if (previous != null)
-            throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_REQUEST,
-                    "A request with the same id is already running in this session");
+            throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_REQUEST, "A request with the same id is already running in this session");
 
         try {
             if (argValues == null)
@@ -792,8 +798,7 @@ public class McpServer extends McpServerPrompt {
             else
                 returnedValue = method.invoke(store.getInstance(), argValues);
         } catch (IllegalAccessException e) {
-            throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INTERNAL_ERROR,
-                    "Tool method is not accessible: " + params.getName(), e);
+            throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INTERNAL_ERROR, "Tool method is not accessible: " + params.getName(), e);
         } catch (InvocationTargetException e) {
             Throwable cause = e.getCause() == null ? e : e.getCause();
             log.warn("Tool '{}' execution failed", params.getName(), cause);
@@ -813,15 +818,19 @@ public class McpServer extends McpServerPrompt {
         if (returnedValue instanceof StructuredToolResult) {
             String sessionId = currentSession.get() == null ? "direct" : currentSession.get();
             String version = sessionProtocolVersions.get(sessionId);
+
             if (version == null || !ProtocolVersion.from(version).supportsStructuredToolOutput())
                 throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_REQUEST,
                         "Structured tool output requires MCP 2025-06-18");
+
             StructuredToolResult structured = (StructuredToolResult) returnedValue;
+
             try {
                 content = toolContentList(requestRaw.getId(), structured.getContent());
             } catch (JsonRpcErrorException e) {
                 return toolErrorResult(requestRaw.getId(), e);
             }
+
             structuredContent = structured.getStructuredContent();
             structuredError = structured.isError();
         } else if (returnedValue instanceof Content)
@@ -864,13 +873,14 @@ public class McpServer extends McpServerPrompt {
                     "Tool returned a null content list");
 
         List<Content> content = new ArrayList<>(values.size());
+
         for (Object value : values) {
             if (!(value instanceof Content))
                 throw new JsonRpcErrorException(requestId, JsonRpcErrorCode.INTERNAL_ERROR,
-                        "Tool content list contains an unsupported value: "
-                                + (value == null ? "null" : value.getClass().getName()));
+                        "Tool content list contains an unsupported value: " + (value == null ? "null" : value.getClass().getName()));
             content.add((Content) value);
         }
+
         return content;
     }
 
@@ -897,18 +907,25 @@ public class McpServer extends McpServerPrompt {
     public static Object convertToType(Object value, Class<?> targetType) {
         if (value == null)
             return null;
+
         if (targetType.isInstance(value))
             return value;
+
         if (targetType == String.class || targetType == char.class || targetType == Character.class)
             return value.toString();
+
         if (targetType == boolean.class || targetType == Boolean.class) {
             if (value instanceof Boolean)
                 return value;
+
             String booleanValue = value.toString();
+
             if ("true".equalsIgnoreCase(booleanValue) || "false".equalsIgnoreCase(booleanValue))
                 return Boolean.valueOf(booleanValue);
+
             throw new IllegalArgumentException("Value cannot be converted to Boolean: " + value);
         }
+
         if (targetType == byte.class || targetType == Byte.class)
             return number(value).byteValue();
         if (targetType == short.class || targetType == Short.class)
@@ -928,98 +945,19 @@ public class McpServer extends McpServerPrompt {
     /**
      * Executes the number operation.
      *
-     * @param value the value value.
+     * @param value the value.
      * @return the result of the number operation.
      */
     private static Number number(Object value) {
         if (value instanceof Number)
             return (Number) value;
+
         String text = value.toString();
+
         try {
-            return text.indexOf('.') >= 0 ? Double.valueOf(text) : Long.valueOf(text);
+            return text.indexOf('.') >= 0 ? Double.parseDouble(text) : Long.parseLong(text);
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Value cannot be converted to Number: " + value, e);
-        }
-    }
-
-    /**
-     * Represents request key.
-     */
-    private static final class RequestKey {
-        /**
-         * Holds the session id value.
-         */
-        private final String sessionId;
-        /**
-         * Holds the request id value.
-         */
-        private final Object requestId;
-
-        /**
-         * Creates a new request key.
-         *
-         * @param sessionId the session id value.
-         * @param requestId the request id value.
-         */
-        private RequestKey(String sessionId, Object requestId) {
-            this.sessionId = Objects.requireNonNull(sessionId, "sessionId");
-            this.requestId = Objects.requireNonNull(requestId, "requestId");
-        }
-
-        /**
-         * Executes the belongs to operation.
-         *
-         * @param sessionId the session id value.
-         * @return the result of the belongs to operation.
-         */
-        private boolean belongsTo(String sessionId) {
-            return this.sessionId.equals(sessionId);
-        }
-
-        @Override
-        public boolean equals(Object other) {
-            if (this == other)
-                return true;
-            if (!(other instanceof RequestKey))
-                return false;
-            RequestKey that = (RequestKey) other;
-            return sessionId.equals(that.sessionId) && requestId.equals(that.requestId);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(sessionId, requestId);
-        }
-    }
-
-    /**
-     * Represents running request.
-     */
-    private static final class RunningRequest {
-        /**
-         * Holds the thread value.
-         */
-        private final Thread thread;
-        /**
-         * Holds the cancelled value.
-         */
-        private final AtomicBoolean cancelled = new AtomicBoolean();
-
-        /**
-         * Creates a new running request.
-         *
-         * @param thread the thread value.
-         */
-        private RunningRequest(Thread thread) {
-            this.thread = thread;
-        }
-
-        /**
-         * Executes the cancel operation.
-         */
-        private void cancel() {
-            if (cancelled.compareAndSet(false, true))
-                thread.interrupt();
         }
     }
 
@@ -1032,6 +970,7 @@ public class McpServer extends McpServerPrompt {
      */
     private static McpResponse toolErrorResult(Object requestId, Throwable cause) {
         String message = cause.getMessage();
+
         if (message == null || message.trim().isEmpty())
             message = cause.getClass().getSimpleName();
 
@@ -1062,25 +1001,20 @@ public class McpServer extends McpServerPrompt {
             case "string":
                 return value.toString();
             case "number":
-                // 首先检查是否是数字类型
-                if (value instanceof Number) {
+                if (value instanceof Number) {// 首先检查是否是数字类型
                     Number numberValue = (Number) value;
 
                     if (numberValue.doubleValue() == numberValue.intValue()) {
                         // 如果没有小数部分，判断为整数
-                        if (numberValue.longValue() == numberValue.intValue()) {
-                            // 如果值在 int 范围内，返回 int
-                            return numberValue.intValue();
-                        } else
-                            // 否则返回 long
-                            return numberValue.longValue();
+                        if (numberValue.longValue() == numberValue.intValue())
+                            return numberValue.intValue();// 如果值在 int 范围内，返回 int
+                        else
+                            return numberValue.longValue();// 否则返回 long
                     } else
-                        // 如果有小数部分，返回 double
-                        return numberValue.doubleValue();
+                        return numberValue.doubleValue();// 如果有小数部分，返回 double
                 }
 
-                // 如果是字符串值，尝试解析成数字
-                try {
+                try {// 如果是字符串值，尝试解析成数字
                     String strValue = value.toString();
                     if (strValue.contains("."))  // 判断为小数，返回 double
                         return Double.parseDouble(strValue);
@@ -1101,6 +1035,7 @@ public class McpServer extends McpServerPrompt {
                     return value; // 如果已经是布尔值，直接返回
 
                 String strValue = value.toString().toLowerCase();
+
                 if ("true".equals(strValue) || "false".equals(strValue))
                     return Boolean.parseBoolean(strValue);
 
@@ -1110,5 +1045,4 @@ public class McpServer extends McpServerPrompt {
                 throw new IllegalArgumentException("Unsupported targetType: " + targetType);
         }
     }
-
 }

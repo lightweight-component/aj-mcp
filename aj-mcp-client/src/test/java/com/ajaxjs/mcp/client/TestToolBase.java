@@ -34,7 +34,7 @@ public abstract class TestToolBase {
         assertEquals("hi", toolExecutionResultString);
     }
 
-    McpToolProvider.McpToolProviderResult obtainTools() {
+    McpToolProviderResult obtainTools() {
         McpToolProvider toolProvider = new McpToolProvider();
         toolProvider.setMcpClient(mcpClient);
 

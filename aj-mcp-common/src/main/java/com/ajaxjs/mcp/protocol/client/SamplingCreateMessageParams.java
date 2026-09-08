@@ -11,7 +11,7 @@ import java.util.List;
 @Data
 public class SamplingCreateMessageParams {
     /**
-     * Holds the messages value.
+     * Holds the message value.
      */
     private List<JsonNode> messages;
 

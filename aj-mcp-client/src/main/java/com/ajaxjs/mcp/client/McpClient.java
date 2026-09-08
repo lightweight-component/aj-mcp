@@ -8,7 +8,7 @@ import com.ajaxjs.mcp.protocol.McpConstant;
 import com.ajaxjs.mcp.protocol.tools.*;
 import com.ajaxjs.mcp.protocol.utils.CancellationNotification;
 import com.ajaxjs.mcp.protocol.utils.completion.CompleteRequest;
-import com.ajaxjs.mcp.protocol.utils.completion.CompleteResult;
+import com.ajaxjs.mcp.protocol.utils.completion.CompletionResult;
 import com.ajaxjs.mcp.protocol.utils.pagination.Cursor;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -37,12 +37,12 @@ import java.util.stream.StreamSupport;
 @SuperBuilder
 public class McpClient extends McpClientResource {
     @Override
-    public CompleteResult.CompletionResult complete(CompleteRequest.Ref ref, CompleteRequest.Argument argument) {
+    public CompletionResult complete(CompleteRequest.ParamsRef ref, CompleteRequest.Argument argument) {
         return complete(ref, argument, null);
     }
 
     @Override
-    public CompleteResult.CompletionResult complete(CompleteRequest.Ref ref, CompleteRequest.Argument argument, Map<String, String> context) {
+    public CompletionResult complete(CompleteRequest.ParamsRef ref, CompleteRequest.Argument argument, Map<String, String> context) {
         long operationId = idGenerator.getAndIncrement();
         CompleteRequest request = new CompleteRequest();
         request.setId(operationId);
@@ -52,7 +52,8 @@ public class McpClient extends McpClientResource {
 
         JsonNode response = executeRequest(request);
         McpException.checkForErrors(response);
-        return JsonUtils.jsonNode2bean(response.get(RESPONSE_RESULT).get("completion"), CompleteResult.CompletionResult.class);
+
+        return JsonUtils.jsonNode2bean(response.get(RESPONSE_RESULT).get("completion"), CompletionResult.class);
     }
 
     @Override
@@ -211,7 +212,7 @@ public class McpClient extends McpClientResource {
      * Extracts successful result content from an ArrayNode.
      * This method processes each JsonNode in the ArrayNode, checks if its type is ContentType.TEXT,
      * and collects the text content into a single string separated by newlines.
-     * Throws a RuntimeException if an unsupported content type is encountered.
+     * Throw a RuntimeException if an unsupported content type is encountered.
      *
      * @param contents The ArrayNode containing the content elements.
      * @return A string composed of all text content entries, separated by newline characters.

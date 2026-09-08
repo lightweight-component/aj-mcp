@@ -5,6 +5,7 @@ import com.ajaxjs.mcp.protocol.client.ElicitRequestParams;
 import com.ajaxjs.mcp.protocol.client.ElicitResult;
 import com.ajaxjs.mcp.server.common.ServerConfig;
 import com.ajaxjs.mcp.server.feature.FeatureMgr;
+import com.ajaxjs.mcp.server.model.HttpResult;
 import com.ajaxjs.mcp.transport.McpTransportSync;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,7 +47,7 @@ class TestProtocolVersions {
 
     @Test
     void negotiates20250326AndRejectsBatch() {
-        ServerStreamableHttp.HttpResult initialized = initialize("2025-03-26", false);
+        HttpResult initialized = initialize("2025-03-26", false);
         assertEquals(200, initialized.getStatus());
         assertTrue(initialized.getBody().contains("\"protocolVersion\":\"2025-03-26\""));
         assertNotNull(initialized.getHeaders().get(ServerStreamableHttp.SESSION_ID_HEADER));
@@ -57,14 +58,14 @@ class TestProtocolVersions {
         assertTrue(tools.contains("\"readOnlyHint\":true"), tools);
         assertFalse(tools.contains("Weather result"), tools);
 
-        ServerStreamableHttp.HttpResult batch = transport.post("[]", Collections.<String, String>emptyMap());
+        HttpResult batch = transport.post("[]", Collections.<String, String>emptyMap());
         assertEquals(400, batch.getStatus());
         assertTrue(batch.getBody().contains("batching is not supported"));
     }
 
     @Test
     void versionHeaderIsRequiredFor20250618AndStructuredOutputIsReturned() {
-        ServerStreamableHttp.HttpResult initialized = initialize("2025-06-18", true);
+        HttpResult initialized = initialize("2025-06-18", true);
         String session = initialized.getHeaders().get(ServerStreamableHttp.SESSION_ID_HEADER);
 
         Map<String, String> noVersion = new HashMap<>();
@@ -76,7 +77,7 @@ class TestProtocolVersions {
         String tools = transport.post("{\"jsonrpc\":\"2.0\",\"id\":3,\"method\":\"tools/list\"}", headers).getBody();
         assertTrue(tools.contains("Weather result"), tools);
         assertTrue(tools.contains("outputSchema"), tools);
-        ServerStreamableHttp.HttpResult tool = transport.post(
+        HttpResult tool = transport.post(
                 "{\"jsonrpc\":\"2.0\",\"id\":2,\"method\":\"tools/call\",\"params\":{\"name\":\"structured\"}}",
                 headers);
         assertEquals(200, tool.getStatus());
@@ -85,7 +86,7 @@ class TestProtocolVersions {
 
     @Test
     void rejectsStructuredOutputForOlderRevision() {
-        ServerStreamableHttp.HttpResult initialized = initialize("2025-03-26", false);
+        HttpResult initialized = initialize("2025-03-26", false);
         String session = initialized.getHeaders().get(ServerStreamableHttp.SESSION_ID_HEADER);
         Map<String, String> headers = sessionHeaders(session, "2025-03-26");
         transport.post(initializedNotification(), headers);
@@ -99,11 +100,13 @@ class TestProtocolVersions {
     void elicitsOnlyFromCapable20250618Client() {
         server.setTransport(new ElicitationLoopback(server));
         server.bindSession("client-a");
+
         try {
             server.processMessage(McpServerInitialize.jsonRpcValidate(initializeJson("2025-06-18", true)));
         } finally {
             server.clearSession();
         }
+
         ElicitRequestParams params = new ElicitRequestParams();
         params.setMessage("Name?");
         params.setRequestedSchema(Collections.<String, Object>singletonMap("type", "object"));
@@ -112,7 +115,7 @@ class TestProtocolVersions {
         assertEquals("Ada", result.getContent().get("name"));
     }
 
-    private ServerStreamableHttp.HttpResult initialize(String version, boolean elicitation) {
+    private HttpResult initialize(String version, boolean elicitation) {
         return transport.post(initializeJson(version, elicitation), Collections.<String, String>emptyMap());
     }
 

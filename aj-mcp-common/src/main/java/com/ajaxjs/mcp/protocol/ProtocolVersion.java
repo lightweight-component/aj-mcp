@@ -16,10 +16,12 @@ public enum ProtocolVersion {
      * Defines the v 2024 11 05 constant.
      */
     V_2024_11_05("2024-11-05", false, false, false),
+
     /**
      * Defines the v 2025 03 26 constant.
      */
     V_2025_03_26("2025-03-26", true, false, false),
+
     /**
      * Defines the v 2025 06 18 constant.
      */
@@ -34,14 +36,17 @@ public enum ProtocolVersion {
      * Holds the value value.
      */
     private final String value;
+
     /**
      * Holds the streamable http value.
      */
     private final boolean streamableHttp;
+
     /**
      * Holds the structured tool output value.
      */
     private final boolean structuredToolOutput;
+
     /**
      * Holds the elicitation value.
      */
@@ -50,7 +55,7 @@ public enum ProtocolVersion {
     /**
      * Creates a new protocol version.
      *
-     * @param value                the value value.
+     * @param value                the value.
      * @param streamableHttp       the streamable http value.
      * @param structuredToolOutput the structured tool output value.
      * @param elicitation          the elicitation value.
@@ -81,16 +86,16 @@ public enum ProtocolVersion {
     }
 
     /**
-     * Executes the supports structured tool output operation.
+     * Executes the support structured tool output operation.
      *
-     * @return the result of the supports structured tool output operation.
+     * @return the result of the support structured tool output operation.
      */
     public boolean supportsStructuredToolOutput() {
         return structuredToolOutput;
     }
 
     /**
-     * Executes the supports elicitation operation.
+     * Executes the support elicitation operation.
      *
      * @return the result of the supports elicitation operation.
      */
@@ -99,10 +104,10 @@ public enum ProtocolVersion {
     }
 
     /**
-     * Executes the from operation.
+     * Executes the `from operation`.
      *
-     * @param value the value value.
-     * @return the result of the from operation.
+     * @param value the value.
+     * @return the result of the operation.
      */
     public static ProtocolVersion from(String value) {
         for (ProtocolVersion version : values()) {
@@ -114,9 +119,9 @@ public enum ProtocolVersion {
     }
 
     /**
-     * Executes the is supported operation.
+     * Executes the supported operation.
      *
-     * @param value the value value.
+     * @param value the value.
      * @return the result of the is supported operation.
      */
     public static boolean isSupported(String value) {

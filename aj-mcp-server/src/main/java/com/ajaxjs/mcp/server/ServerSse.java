@@ -4,6 +4,7 @@ import com.ajaxjs.mcp.common.JsonUtils;
 import com.ajaxjs.mcp.protocol.McpRequestRawInfo;
 import com.ajaxjs.mcp.protocol.McpResponse;
 import com.ajaxjs.mcp.server.error.JsonRpcErrorException;
+import com.ajaxjs.mcp.server.model.SseSession;
 import com.ajaxjs.mcp.transport.McpTransportSync;
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,7 +37,7 @@ public class ServerSse implements McpTransportSync {
     }
 
     /**
-     * Holds the connections value.
+     * Holds the connection value.
      */
     final Map<String, SseSession> connections = new ConcurrentHashMap<>();
 
@@ -140,10 +141,10 @@ public class ServerSse implements McpTransportSync {
     }
 
     /**
-     * Executes the is session open operation.
+     * Executes the session open operation.
      *
      * @param clientId the client id value.
-     * @return the result of the is session open operation.
+     * @return the result of the session open operation.
      */
     public boolean isSessionOpen(String clientId) {
         SseSession session = connections.get(clientId);
@@ -160,27 +161,27 @@ public class ServerSse implements McpTransportSync {
     }
 
     /**
-     * Executes the is started operation.
+     * Executes the started operation.
      *
-     * @return the result of the is started operation.
+     * @return the result of the started operation.
      */
     public boolean isStarted() {
         return started.get();
     }
 
     /**
-     * Executes the is closed operation.
+     * Executes the closed operation.
      *
-     * @return the result of the is closed operation.
+     * @return the result of the closed operation.
      */
     public boolean isClosed() {
         return closed.get();
     }
 
     /**
-     * Executes the is heartbeat running operation.
+     * Executes the heartbeat running operation.
      *
-     * @return the result of the is heartbeat running operation.
+     * @return the result of the heartbeat running operation.
      */
     public boolean isHeartbeatRunning() {
         ScheduledExecutorService executor = heartbeatExecutor;
@@ -373,72 +374,5 @@ public class ServerSse implements McpTransportSync {
 
         for (String clientId : connections.keySet())
             removeConnection(clientId);
-    }
-
-    /**
-     * Represents sse session.
-     */
-    static final class SseSession {
-        /**
-         * Holds the writer value.
-         */
-        private final PrintWriter writer;
-        /**
-         * Holds the closed value.
-         */
-        private final AtomicBoolean closed = new AtomicBoolean(false);
-
-        /**
-         * Creates a new sse session.
-         *
-         * @param writer the writer value.
-         */
-        SseSession(PrintWriter writer) {
-            this.writer = writer;
-        }
-
-        /**
-         * Executes the send data operation.
-         *
-         * @param data the data value.
-         */
-        void sendData(String data) {
-            sendFrame("data: " + data + "\n\n");
-        }
-
-        /**
-         * Executes the send frame operation.
-         *
-         * @param frame the frame value.
-         */
-        void sendFrame(String frame) {
-            synchronized (writer) {
-                if (closed.get())
-                    throw new IllegalStateException("SSE session is closed");
-                writer.write(frame);
-                writer.flush();
-                if (writer.checkError())
-                    throw new IllegalStateException("SSE connection write failed");
-            }
-        }
-
-        /**
-         * Executes the is closed operation.
-         *
-         * @return the result of the is closed operation.
-         */
-        boolean isClosed() {
-            return closed.get();
-        }
-
-        /**
-         * Executes the close operation.
-         */
-        void close() {
-            synchronized (writer) {
-                if (closed.compareAndSet(false, true))
-                    writer.close();
-            }
-        }
     }
 }

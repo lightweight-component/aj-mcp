@@ -2,7 +2,6 @@ package com.ajaxjs.mcp.protocol.utils;
 
 import com.ajaxjs.mcp.protocol.McpConstant;
 import com.ajaxjs.mcp.protocol.McpRequest;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -24,24 +23,8 @@ public class CancellationNotification extends McpRequest {
     /**
      * Holds the params value.
      */
-    private Params params;
+    private CancellationNotificationParams params;
 
-    /**
-     * Represents params.
-     */
-    @Data
-    public static class Params {
-        /**
-         * Holds the request id value.
-         */
-        private Object requestId;
-
-        /**
-         * Holds the reason value.
-         */
-        @JsonInclude(JsonInclude.Include.NON_NULL)
-        private String reason;
-    }
 
     /**
      * Creates a new cancellation notification.
@@ -49,7 +32,7 @@ public class CancellationNotification extends McpRequest {
      * @param requestId the request id value.
      */
     public CancellationNotification(Object requestId) {
-        this.params = new Params();
+        this.params = new CancellationNotificationParams();
         this.params.setRequestId(requestId);
     }
 

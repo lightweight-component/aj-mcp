@@ -12,5 +12,5 @@ public class ResourceContentText extends ResourceContent {
     /**
      * Holds the text value.
      */
-    String text;
+    private String text;
 }

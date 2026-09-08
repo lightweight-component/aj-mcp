@@ -16,7 +16,7 @@ public class InitializeRequestParams {
     private String protocolVersion;
 
     /**
-     * Holds the capabilities value.
+     * Holds the capability value.
      */
     private Capabilities capabilities;
 

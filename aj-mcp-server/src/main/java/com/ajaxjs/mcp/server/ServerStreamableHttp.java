@@ -7,10 +7,10 @@ import com.ajaxjs.mcp.protocol.McpResponse;
 import com.ajaxjs.mcp.protocol.ProtocolVersion;
 import com.ajaxjs.mcp.server.error.JsonRpcErrorCode;
 import com.ajaxjs.mcp.server.error.JsonRpcErrorException;
+import com.ajaxjs.mcp.server.model.HttpResult;
+import com.ajaxjs.mcp.server.model.StreamSession;
 import com.ajaxjs.mcp.transport.McpTransportSync;
 import com.fasterxml.jackson.databind.JsonNode;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -31,6 +31,7 @@ public class ServerStreamableHttp implements McpTransportSync {
      * Defines the protocol version header constant.
      */
     public static final String PROTOCOL_VERSION_HEADER = "MCP-Protocol-Version";
+
     /**
      * Defines the session id header constant.
      */
@@ -40,17 +41,19 @@ public class ServerStreamableHttp implements McpTransportSync {
      * Holds the server value.
      */
     private final McpServer server;
+
     /**
-     * Holds the streams value.
+     * Holds the stream value.
      */
     private final Map<String, StreamSession> streams = new ConcurrentHashMap<>();
+
     /**
      * Holds the closed value.
      */
     private volatile boolean closed;
 
     /**
-     * Creates a new server streamable http.
+     * Creates a new server-streamable http.
      *
      * @param server the server value.
      */
@@ -68,6 +71,7 @@ public class ServerStreamableHttp implements McpTransportSync {
     public HttpResult post(String body, Map<String, String> headers) {
         if (closed)
             return HttpResult.text(503, "MCP transport is closed");
+
         HttpResult originFailure = validateOrigin(headers);
 
         if (originFailure != null)
@@ -83,13 +87,11 @@ public class ServerStreamableHttp implements McpTransportSync {
         try {
             envelope = JsonUtils.json2Node(body);
         } catch (RuntimeException e) {
-            return HttpResult.json(400, new JsonRpcErrorException(JsonRpcErrorCode.PARSE_ERROR,
-                    "Unable to parse the JSON message").toJson());
+            return HttpResult.json(400, new JsonRpcErrorException(JsonRpcErrorCode.PARSE_ERROR, "Unable to parse the JSON message").toJson());
         }
 
         if (envelope.isArray())
-            return HttpResult.json(400, new JsonRpcErrorException(JsonRpcErrorCode.INVALID_REQUEST,
-                    "JSON-RPC batching is not supported").toJson());
+            return HttpResult.json(400, new JsonRpcErrorException(JsonRpcErrorCode.INVALID_REQUEST, "JSON-RPC batching is not supported").toJson());
 
         String method = envelope.path("method").asText(null);
         boolean initializing = McpConstant.Methods.INITIALIZE.equals(method);
@@ -98,20 +100,21 @@ public class ServerStreamableHttp implements McpTransportSync {
         if (initializing) {
             if (sessionId != null)
                 return HttpResult.text(400, "Initialization must not include an MCP session id");
+
             sessionId = UUID.randomUUID().toString();
         } else {
             if (sessionId == null)
                 return HttpResult.text(400, "Missing " + SESSION_ID_HEADER);
+
             String negotiated = server.getNegotiatedProtocolVersion(sessionId);
 
             if (negotiated == null)
                 return HttpResult.text(404, "Unknown or expired MCP session");
 
             String suppliedVersion = header(headers, PROTOCOL_VERSION_HEADER);
-            // 2025-06-18 made the negotiated HTTP version header mandatory.
 
-            if (ProtocolVersion.V_2025_06_18.value().equals(negotiated)
-                    && !negotiated.equals(suppliedVersion))
+            // 2025-06-18 made the negotiated HTTP version header mandatory.
+            if (ProtocolVersion.V_2025_06_18.value().equals(negotiated) && !negotiated.equals(suppliedVersion))
                 return HttpResult.text(400, "Missing or invalid " + PROTOCOL_VERSION_HEADER);
 
             if (suppliedVersion != null && !negotiated.equals(suppliedVersion))
@@ -122,8 +125,7 @@ public class ServerStreamableHttp implements McpTransportSync {
             server.bindSession(sessionId);
             McpRequestRawInfo raw = McpServerInitialize.jsonRpcValidate(body);
             McpResponse response = server.processMessage(raw);
-            Map<String, String> responseHeaders = initializing
-                    ? Collections.singletonMap(SESSION_ID_HEADER, sessionId) : Collections.emptyMap();
+            Map<String, String> responseHeaders = initializing ? Collections.singletonMap(SESSION_ID_HEADER, sessionId) : Collections.emptyMap();
 
             return response == null
                     ? new HttpResult(202, responseHeaders, null, null)
@@ -168,7 +170,7 @@ public class ServerStreamableHttp implements McpTransportSync {
         if (previous != null)
             previous.close();
 
-        return new HttpResult(200, Collections.<String, String>emptyMap(), "text/event-stream", null);
+        return new HttpResult(200, Collections.emptyMap(), "text/event-stream", null);
     }
 
     /**
@@ -189,7 +191,7 @@ public class ServerStreamableHttp implements McpTransportSync {
 
         removeSession(sessionId);
 
-        return new HttpResult(204, Collections.<String, String>emptyMap(), null, null);
+        return new HttpResult(204, Collections.emptyMap(), null, null);
     }
 
     /**
@@ -201,8 +203,7 @@ public class ServerStreamableHttp implements McpTransportSync {
     private HttpResult validateOrigin(Map<String, String> headers) {
         String origin = header(headers, "Origin");
 
-        if (origin != null && (server.getServerConfig() == null
-                || !server.getServerConfig().getAllowedOrigins().contains(origin)))
+        if (origin != null && (server.getServerConfig() == null || !server.getServerConfig().getAllowedOrigins().contains(origin)))
             return HttpResult.text(403, "Forbidden Origin");
 
         return null;
@@ -233,11 +234,13 @@ public class ServerStreamableHttp implements McpTransportSync {
 
         if (stream == null)
             throw new IllegalStateException("No Streamable HTTP GET stream for session " + sessionId);
+
         try {
             stream.send(json);
         } catch (RuntimeException e) {
             if (streams.remove(sessionId, stream))
                 stream.close();
+
             server.removeSession(sessionId);
             throw e;
         }
@@ -275,7 +278,7 @@ public class ServerStreamableHttp implements McpTransportSync {
 
     @Override
     public String handle(String rawJson) {
-        HttpResult result = post(rawJson, Collections.<String, String>emptyMap());
+        HttpResult result = post(rawJson, Collections.emptyMap());
 
         return result.getBody();
     }
@@ -289,97 +292,5 @@ public class ServerStreamableHttp implements McpTransportSync {
 
         for (String sessionId : streams.keySet())
             removeSession(sessionId);
-    }
-
-    /**
-     * Represents http result.
-     */
-    @Data
-    @AllArgsConstructor
-    public static class HttpResult {
-        /**
-         * Holds the status value.
-         */
-        private int status;
-        /**
-         * Holds the headers value.
-         */
-        private Map<String, String> headers;
-        /**
-         * Holds the content type value.
-         */
-        private String contentType;
-        /**
-         * Holds the body value.
-         */
-        private String body;
-
-        /**
-         * Executes the json operation.
-         *
-         * @param status the status value.
-         * @param body   the body value.
-         * @return the result of the json operation.
-         */
-        static HttpResult json(int status, String body) {
-            return new HttpResult(status, Collections.<String, String>emptyMap(), "application/json", body);
-        }
-
-        /**
-         * Executes the text operation.
-         *
-         * @param status the status value.
-         * @param body   the body value.
-         * @return the result of the text operation.
-         */
-        static HttpResult text(int status, String body) {
-            return new HttpResult(status, Collections.<String, String>emptyMap(), "text/plain", body);
-        }
-    }
-
-    /**
-     * Represents stream session.
-     */
-    private static final class StreamSession {
-        /**
-         * Holds the writer value.
-         */
-        private final PrintWriter writer;
-
-        /**
-         * Creates a new stream session.
-         *
-         * @param writer the writer value.
-         */
-        private StreamSession(PrintWriter writer) {
-            if (writer == null)
-                throw new IllegalArgumentException("writer is required");
-
-            this.writer = writer;
-        }
-
-        /**
-         * Executes the send operation.
-         *
-         * @param json the json value.
-         */
-        private void send(String json) {
-            synchronized (writer) {
-                writer.write("event: message\ndata: " + json + "\n\n");
-                writer.flush();
-
-                if (writer.checkError())
-                    throw new IllegalStateException("Streamable HTTP SSE write failed");
-            }
-        }
-
-        /**
-         * Executes the close operation.
-         */
-        private void close() {
-            synchronized (writer) {
-                writer.close();
-            }
-        }
     }
 }

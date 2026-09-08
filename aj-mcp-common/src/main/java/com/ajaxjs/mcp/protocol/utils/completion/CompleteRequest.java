@@ -37,7 +37,7 @@ public class CompleteRequest extends McpRequest {
         /**
          * Holds the ref value.
          */
-        Ref ref;
+        ParamsRef ref;
 
         /**
          * Holds the argument value.
@@ -56,7 +56,7 @@ public class CompleteRequest extends McpRequest {
          * @param ref      the ref value.
          * @param argument the argument value.
          */
-        public Params(Ref ref, Argument argument) {
+        public Params(ParamsRef ref, Argument argument) {
             this.ref = ref;
             this.argument = argument;
         }
@@ -69,7 +69,7 @@ public class CompleteRequest extends McpRequest {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class Ref {
+    public static class ParamsRef {
         /**
          * The protocol supports two types of completion references: ref/prompt | ref/resource
          */

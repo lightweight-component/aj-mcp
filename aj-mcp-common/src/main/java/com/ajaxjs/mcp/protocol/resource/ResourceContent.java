@@ -10,10 +10,10 @@ public abstract class ResourceContent {
     /**
      * Unique identifier for the resource
      */
-    String uri;
+    private String uri;
 
     /**
      * MIME type
      */
-    String mimeType;
+    private String mimeType;
 }
