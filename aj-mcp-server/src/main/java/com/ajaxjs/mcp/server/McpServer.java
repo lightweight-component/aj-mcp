@@ -30,6 +30,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.*;
@@ -63,6 +65,13 @@ public class McpServer extends McpServerPrompt {
      * Holds the logging level value.
      */
     private volatile String loggingLevel = "info";
+
+    /** Session-specific logging thresholds; the global value is only the default. */
+    private final Map<String, String> sessionLoggingLevels = new ConcurrentHashMap<>();
+
+    /** Syslog severity ordering used by MCP logging/setLevel. */
+    private static final List<String> LOG_LEVELS = Arrays.asList("debug", "info", "notice", "warning",
+            "error", "critical", "alert", "emergency");
     /**
      * JSON-RPC request IDs are scoped to a connection. Keep the session in the
      * key so two clients using the same ID cannot cancel each other's tools.
@@ -130,14 +139,24 @@ public class McpServer extends McpServerPrompt {
         sessionStates.remove(sessionId);
         sessionProtocolVersions.remove(sessionId);
         clientCapabilities.remove(sessionId);
+        sessionLoggingLevels.remove(sessionId);
         runningRequests.forEach((key, request) -> {
             if (key.belongsTo(sessionId) && runningRequests.remove(key, request))
                 request.cancel();
         });
+        failClientRequests(sessionId, new IllegalStateException("MCP session closed: " + sessionId));
+    }
+
+    /**
+     * Completes outstanding reverse calls when their receiving channel disappears.
+     * @param sessionId affected session identifier
+     * @param failure cause reported to waiting callers
+     */
+    void failClientRequests(String sessionId, Throwable failure) {
         String prefix = sessionId + ":";
         pendingClientResponses.forEach((key, future) -> {
             if (key.startsWith(prefix) && pendingClientResponses.remove(key, future))
-                future.completeExceptionally(new IllegalStateException("MCP session closed: " + sessionId));
+                future.completeExceptionally(failure);
         });
     }
 
@@ -165,6 +184,10 @@ public class McpServer extends McpServerPrompt {
         JsonNode message = JsonUtils.json2Node(rawJson);
         if (message.has(METHOD) || !message.has(ID))
             return false;
+        if (!"2.0".equals(message.path("jsonrpc").textValue())
+                || !(message.get(ID).isIntegralNumber() || message.get(ID).isTextual())
+                || message.has("result") == message.has("error"))
+            throw new JsonRpcErrorException(JsonRpcErrorCode.INVALID_REQUEST, "Invalid client response");
         CompletableFuture<JsonNode> future = pendingClientResponses.remove(sessionId + ":" + message.get(ID).asText());
         if (future != null)
             future.complete(message);
@@ -239,6 +262,13 @@ public class McpServer extends McpServerPrompt {
      * @return the result of the request client operation.
      */
     private JsonNode requestClient(String sessionId, String method, JsonNode params, Duration timeout) {
+        Duration effectiveTimeout = timeout;
+        if (effectiveTimeout == null || effectiveTimeout.isZero())
+            effectiveTimeout = serverConfig == null ? null : serverConfig.getClientRequestTimeout();
+        if (effectiveTimeout == null || effectiveTimeout.isZero())
+            effectiveTimeout = Duration.ofSeconds(60);
+        if (effectiveTimeout.isNegative())
+            throw new IllegalArgumentException("Client request timeout must not be negative");
         long id = serverRequestIds.getAndIncrement();
         String key = sessionId + ":" + id;
         CompletableFuture<JsonNode> future = new CompletableFuture<>();
@@ -253,8 +283,7 @@ public class McpServer extends McpServerPrompt {
 
         try {
             transport.send(sessionId, request.toString());
-            JsonNode response = timeout == null || timeout.isZero()
-                    ? future.get() : future.get(Math.max(1L, timeout.toMillis()), TimeUnit.MILLISECONDS);
+            JsonNode response = future.get(Math.max(1L, effectiveTimeout.toMillis()), TimeUnit.MILLISECONDS);
             if (response.has("error"))
                 throw new IllegalStateException("Client rejected " + method + ": " + response.get("error"));
 
@@ -416,7 +445,8 @@ public class McpServer extends McpServerPrompt {
         if (level == null || !java.util.Arrays.asList("debug", "info", "notice", "warning", "error", "critical", "alert", "emergency").contains(level))
             throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_PARAMS, "invalid logging level");
 
-        loggingLevel = level;
+        String sessionId = currentSession.get() == null ? "direct" : currentSession.get();
+        sessionLoggingLevels.put(sessionId, level);
         McpResponse response = new McpResponse();
         response.setId(requestRaw.getId());
         response.setResult(Collections.emptyMap());
@@ -488,14 +518,27 @@ public class McpServer extends McpServerPrompt {
      * @param data       the data value.
      */
     public void publishLog(String level, String loggerName, Object data) {
+        String severity = level == null ? loggingLevel : level;
+        if (!LOG_LEVELS.contains(severity))
+            throw new IllegalArgumentException("Invalid logging level: " + severity);
         ObjectNode params = JsonUtils.createObjectNode();
-        params.put("level", level == null ? loggingLevel : level);
+        params.put("level", severity);
 
         if (loggerName != null)
             params.put("logger", loggerName);
         params.set("data", JsonUtils.valueToTree(data));
 
-        transport.broadcast(notificationJson(Methods.LOGGING_MESSAGE_NOTIFICATION, params));
+        String json = notificationJson(Methods.LOGGING_MESSAGE_NOTIFICATION, params);
+        for (String sessionId : sessionProtocolVersions.keySet()) {
+            String threshold = sessionLoggingLevels.getOrDefault(sessionId, loggingLevel);
+            if (LOG_LEVELS.indexOf(severity) >= LOG_LEVELS.indexOf(threshold)) {
+                try {
+                    transport.send(sessionId, json);
+                } catch (RuntimeException e) {
+                    log.debug("Unable to send log to session {}", sessionId, e);
+                }
+            }
+        }
     }
 
     /**
@@ -600,6 +643,14 @@ public class McpServer extends McpServerPrompt {
 
         CompleteRequest.Params params = JsonUtils.jsonNode2bean(paramsNode, CompleteRequest.Params.class);
 
+        if (params != null && params.getContext() != null) {
+            String sessionId = currentSession.get() == null ? "direct" : currentSession.get();
+            String version = sessionProtocolVersions.get(sessionId);
+            if (version == null || ProtocolVersion.from(version) != ProtocolVersion.V_2025_06_18)
+                throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_PARAMS,
+                        "Completion context requires MCP 2025-06-18");
+        }
+
         if (params == null || params.getRef() == null || params.getArgument() == null)
             throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_PARAMS,
                     "ref and argument are required");
@@ -611,7 +662,12 @@ public class McpServer extends McpServerPrompt {
         Object returned;
 
         try {
-            returned = store.getMethod().invoke(store.getInstance(), params.getArgument().getValue());
+            if (store.getMethod().getParameterCount() == 2) {
+                Map<String, String> context = params.getContext() == null ? Collections.emptyMap()
+                        : Collections.unmodifiableMap(new LinkedHashMap<>(params.getContext()));
+                returned = store.getMethod().invoke(store.getInstance(), params.getArgument().getValue(), context);
+            } else
+                returned = store.getMethod().invoke(store.getInstance(), params.getArgument().getValue());
         } catch (IllegalAccessException e) {
             throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INTERNAL_ERROR,
                     "Completion method is not accessible", e);
@@ -769,7 +825,7 @@ public class McpServer extends McpServerPrompt {
                         throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_PARAMS,
                                 "arguments " + name + " is required for primitive parameter");
 
-                    argValues[i] = convertToType(arg, parameterType);
+                    argValues[i] = convertArgument(arg, parameterType, requestRaw.getId());
                 }
             }
         }
@@ -800,11 +856,16 @@ public class McpServer extends McpServerPrompt {
 
             return toolErrorResult(requestRaw.getId(), cause);
         } finally {
+            runningRequest.finish();
             runningRequests.remove(requestKey, runningRequest);
             // Executor workers are reused; do not leak a cancellation interrupt into
             // an unrelated request accepted by the same worker later.
-            Thread.interrupted();
+            if (runningRequest.cancelled.get())
+                Thread.interrupted();
         }
+
+        if (runningRequest.cancelled.get())
+            return toolErrorResult(requestRaw.getId(), new CancellationException("Tool cancelled (interrupted)"));
 
         List<Content> content;
         Map<String, Object> structuredContent = null;
@@ -897,9 +958,38 @@ public class McpServer extends McpServerPrompt {
     public static Object convertToType(Object value, Class<?> targetType) {
         if (value == null)
             return null;
+        if (targetType == byte.class || targetType == Byte.class || targetType == short.class || targetType == Short.class
+                || targetType == int.class || targetType == Integer.class || targetType == long.class || targetType == Long.class
+                || targetType == float.class || targetType == Float.class || targetType == double.class || targetType == Double.class
+                || targetType == BigInteger.class || targetType == BigDecimal.class) {
+            try {
+                BigDecimal number = new BigDecimal(value.toString());
+                if (targetType == byte.class || targetType == Byte.class) return number.byteValueExact();
+                if (targetType == short.class || targetType == Short.class) return number.shortValueExact();
+                if (targetType == int.class || targetType == Integer.class) return number.intValueExact();
+                if (targetType == long.class || targetType == Long.class) return number.longValueExact();
+                if (targetType == BigInteger.class) return number.toBigIntegerExact();
+                if (targetType == BigDecimal.class) return number;
+                if (targetType == float.class || targetType == Float.class) {
+                    float converted = number.floatValue();
+                    if (!Float.isFinite(converted)) throw new ArithmeticException("float overflow");
+                    return converted;
+                }
+                double converted = number.doubleValue();
+                if (!Double.isFinite(converted)) throw new ArithmeticException("double overflow");
+                return converted;
+            } catch (NumberFormatException | ArithmeticException e) {
+                throw new IllegalArgumentException("Value is outside the range or precision of " + targetType.getSimpleName() + ": " + value, e);
+            }
+        }
         if (targetType.isInstance(value))
             return value;
-        if (targetType == String.class || targetType == char.class || targetType == Character.class)
+        if (targetType == char.class || targetType == Character.class) {
+            String text = value.toString();
+            if (text.length() != 1) throw new IllegalArgumentException("Expected one character");
+            return text.charAt(0);
+        }
+        if (targetType == String.class)
             return value.toString();
         if (targetType == boolean.class || targetType == Boolean.class) {
             if (value instanceof Boolean)
@@ -909,20 +999,23 @@ public class McpServer extends McpServerPrompt {
                 return Boolean.valueOf(booleanValue);
             throw new IllegalArgumentException("Value cannot be converted to Boolean: " + value);
         }
-        if (targetType == byte.class || targetType == Byte.class)
-            return number(value).byteValue();
-        if (targetType == short.class || targetType == Short.class)
-            return number(value).shortValue();
-        if (targetType == int.class || targetType == Integer.class)
-            return number(value).intValue();
-        if (targetType == long.class || targetType == Long.class)
-            return number(value).longValue();
-        if (targetType == float.class || targetType == Float.class)
-            return number(value).floatValue();
-        if (targetType == double.class || targetType == Double.class)
-            return number(value).doubleValue();
-
         return JsonUtils.convertValue(value, targetType);
+    }
+
+    /**
+     * Converts reflection arguments while preserving the request ID on invalid input.
+     * @param value incoming argument value
+     * @param type declared Java parameter type
+     * @param requestId request to associate with a conversion error
+     * @return converted Java argument
+     * @throws JsonRpcErrorException if the argument cannot be converted without invalid narrowing
+     */
+    static Object convertArgument(Object value, Class<?> type, Object requestId) {
+        try {
+            return convertToType(value, type);
+        } catch (IllegalArgumentException e) {
+            throw new JsonRpcErrorException(requestId, JsonRpcErrorCode.INVALID_PARAMS, e.getMessage(), e);
+        }
     }
 
     /**
@@ -1005,6 +1098,9 @@ public class McpServer extends McpServerPrompt {
          */
         private final AtomicBoolean cancelled = new AtomicBoolean();
 
+        /** Prevents a late cancellation from interrupting a reused worker. */
+        private boolean finished;
+
         /**
          * Creates a new running request.
          *
@@ -1017,9 +1113,14 @@ public class McpServer extends McpServerPrompt {
         /**
          * Executes the cancel operation.
          */
-        private void cancel() {
-            if (cancelled.compareAndSet(false, true))
+        private synchronized void cancel() {
+            if (!finished && cancelled.compareAndSet(false, true))
                 thread.interrupt();
+        }
+
+        /** Atomically closes the cancellation window before releasing the worker. */
+        private synchronized void finish() {
+            finished = true;
         }
     }
 

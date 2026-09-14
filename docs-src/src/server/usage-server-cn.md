@@ -150,3 +150,15 @@ start();
 初始化会协商支持的版本，并创建 Streamable HTTP session。使用 MCP `2025-06-18` 时，后续 Streamable HTTP 请求必须带上协商后的
 `MCP-Protocol-Version` header。`strictLifecycle` 默认开启，普通请求必须在 `initialize` 和 `notifications/initialized`
 之后发送。本项目有意不支持 JSON-RPC batch。
+
+GET 响应须异步保持打开，控制器返回前 flush 响应头。在框架完成、错误或超时回调中调用
+`closeEventStream(sessionId, writer)`，由适配器关闭注册的 Writer。GET 每 15 秒发送心跳；
+`ServerConfig.sessionIdleTimeout` 默认 30 分钟，也会清理未打开 GET 的会话。执行中的 POST 不会过期，心跳本身不延长空闲时间。
+关闭传输层会移除全部会话。POST 仍返回 JSON，客户端响应和通知以无正文的 202 接收。
+
+反向调用传入 null/零超时时，使用 `clientRequestTimeout` 的有限默认值 60 秒。整数工具参数的小数或溢出返回
+`INVALID_PARAMS`，日志阈值按会话过滤。补全方法可采用 `(String value, Map<String, String> arguments)`，
+读取 2025-06-18 `context.arguments` 的只读视图；原单 String 参数签名继续支持。
+
+STDIO 使用 UTF-8。构造 `ServerStdio` 前可配置 `stdioWorkers`（默认 16）和 `stdioQueueCapacity`（默认 256）。
+队列满时返回繁忙错误，握手、ping、取消和反向响应仍可处理。

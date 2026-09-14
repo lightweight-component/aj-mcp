@@ -10,6 +10,7 @@ import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -79,7 +80,7 @@ public class StdioTransport extends McpTransport {
 
         try {
             process = processBuilder.start();
-            out = new PrintStream(process.getOutputStream(), true);
+            out = new PrintStream(process.getOutputStream(), true, StandardCharsets.UTF_8.name());
         } catch (IOException e) {
             log.warn("IOException when creating Process.", e);
             throw new UncheckedIOException(e);
@@ -88,7 +89,7 @@ public class StdioTransport extends McpTransport {
         Process startedProcess = process;
         stdoutReaderThread = new Thread(() -> {
             IOException channelFailure = null;
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(startedProcess.getInputStream()))) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(startedProcess.getInputStream(), StandardCharsets.UTF_8))) {
                 String line;
 
                 while ((line = reader.readLine()) != null) {
@@ -116,7 +117,7 @@ public class StdioTransport extends McpTransport {
         stdoutReaderThread.start();
 
         stderrReaderThread = new Thread(() -> {
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(startedProcess.getErrorStream()))) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(startedProcess.getErrorStream(), StandardCharsets.UTF_8))) {
                 String line;
 
                 while ((line = reader.readLine()) != null)

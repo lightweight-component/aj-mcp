@@ -66,13 +66,25 @@ class McpTransportMessageRoutingTest {
 
         CompletableFuture<JsonNode> completed = transport.completeInitializationForTest(initializeResponse,
                 () -> {
+                    assertEquals("2025-06-18", transport.getNegotiatedProtocolVersion());
                     notificationCount.incrementAndGet();
                     return CompletableFuture.completedFuture(null);
                 });
-        initializeResponse.complete(JsonUtils.json2Node("{\"id\":9,\"result\":{}}"));
+        initializeResponse.complete(JsonUtils.json2Node("{\"jsonrpc\":\"2.0\",\"id\":9,\"result\":{\"protocolVersion\":\"2025-06-18\"}}"));
 
         assertEquals(1, notificationCount.get());
         assertEquals(9, completed.join().get("id").asInt());
+    }
+
+    @Test
+    void unsupportedVersionNeverSendsInitializedNotification() {
+        CapturingTransport transport = new CapturingTransport();
+        AtomicInteger notifications = new AtomicInteger();
+        CompletableFuture<JsonNode> result = transport.completeInitializationForTest(
+                CompletableFuture.completedFuture(JsonUtils.json2Node("{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"protocolVersion\":\"2099-01-01\"}}")),
+                () -> { notifications.incrementAndGet(); return CompletableFuture.completedFuture(null); });
+        org.junit.jupiter.api.Assertions.assertTrue(result.isCompletedExceptionally());
+        assertEquals(0, notifications.get());
     }
 
     /**

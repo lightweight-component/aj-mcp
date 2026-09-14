@@ -1,6 +1,8 @@
 package com.ajaxjs.mcp.client.transport;
 
 import com.ajaxjs.mcp.common.JsonUtils;
+import com.ajaxjs.mcp.common.McpException;
+import com.ajaxjs.mcp.protocol.ProtocolVersion;
 import com.ajaxjs.mcp.protocol.BaseJsonRpcMessage;
 import com.ajaxjs.mcp.protocol.McpConstant;
 import com.ajaxjs.mcp.protocol.McpRequest;
@@ -14,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.Closeable;
 import java.util.Map;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -57,7 +60,14 @@ public abstract class McpTransport implements McpConstant, Closeable {
                                                                   Supplier<CompletableFuture<JsonNode>> initializedNotification) {
         // Keep the shared response so callers observe initialize's result after
         // the required notifications/initialized message is accepted.
-        return initializeResponse.thenCompose(response -> initializedNotification.get().thenApply(ignored -> response));
+        return initializeResponse.thenCompose(response -> {
+            McpException.checkForErrors(response);
+            JsonNode version = response.path(RESPONSE_RESULT).path("protocolVersion");
+            if (!version.isTextual() || !supportedProtocolVersions.contains(version.textValue()))
+                throw new IllegalStateException("Server selected unsupported protocol version: " + version);
+            setNegotiatedProtocolVersion(version.textValue());
+            return initializedNotification.get().thenApply(ignored -> response);
+        });
     }
 
     /**
@@ -125,6 +135,10 @@ public abstract class McpTransport implements McpConstant, Closeable {
     @Setter
     private volatile String negotiatedProtocolVersion;
 
+    /** Protocol revisions accepted before acknowledging initialization. */
+    @Setter
+    private List<String> supportedProtocolVersions = ProtocolVersion.supportedVersions();
+
     /**
      * Executes the set message handlers operation.
      *
@@ -179,6 +193,7 @@ public abstract class McpTransport implements McpConstant, Closeable {
             throw new UnsupportedOperationException("MCP Client is NOT initialized");
 
         pendingRequests.put(id, future);
+        future.whenComplete((result, failure) -> pendingRequests.remove(id, future));
     }
 
     /**

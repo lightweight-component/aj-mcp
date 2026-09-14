@@ -98,7 +98,7 @@ error.
 ## Quick start: Streamable HTTP
 
 ```java
-McpTransport transport = StreamableHttpTransport.builder()
+StreamableHttpTransport transport = StreamableHttpTransport.builder()
         .endpointUrl("http://localhost:8080/mcp")
         .openEventStream(true)
         .timeout(Duration.ofSeconds(30))
@@ -129,10 +129,12 @@ println(resource.getUri()));
 `openEventStream` enables the optional long-lived GET channel for server-originated messages. The transport retains the
 session ID returned by initialization and sends the negotiated protocol header when required.
 
-Current Streamable HTTP limitations: a POST response with `text/event-stream` is buffered before parsing rather than
-consumed incrementally; the optional GET stream opens asynchronously and has no reconnect/resumption policy. Use
-ordinary JSON POST responses, and do not depend on incremental progress or server requests delivered through a POST
-response.
+POST SSE responses are processed incrementally, including progress and server requests before the final response.
+The optional GET stream opens asynchronously and does not determine whether independent POST requests succeed.
+Use `transport.getEventStreamReady().get(5, TimeUnit.SECONDS)` when your application requires GET readiness;
+`isEventStreamOpen()` and `getEventStreamFailure()` expose current health. Disconnects retry up to five times with
+exponential backoff (200 ms to 5 seconds), carrying `Last-Event-ID` when available. HTTP 4xx responses stop retries;
+event replay depends on server support. Closing sends a best-effort DELETE with a two-second deadline.
 
 For an older server with separate SSE and message endpoints, use `HttpMcpTransport`:
 
@@ -166,8 +168,7 @@ opaque cursors. The older integer page methods remain available for compatibilit
 ## Lifecycle and errors
 
 - Call `initialize()` exactly once before normal requests when constructing a client manually.
-- Set `requestTimeout` to a positive duration for bounded behavior. A zero duration explicitly disables the client-side
-  timeout.
+- Set `requestTimeout` to a positive duration; null or zero uses the finite 60-second default. Negative durations are rejected.
 - Use try-with-resources or call `close()` in `finally`. Closing fails pending requests and releases the transport,
   worker threads, HTTP connections, and child process.
 - `callToolResult()` preserves the full MCP result, including structured content and `isError`. `callTool()` is a text

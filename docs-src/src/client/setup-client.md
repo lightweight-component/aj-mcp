@@ -88,7 +88,7 @@ connections.
 Newer revisions use one HTTP endpoint:
 
 ```java
-McpTransport transport = StreamableHttpTransport.builder()
+StreamableHttpTransport transport = StreamableHttpTransport.builder()
         .endpointUrl("http://localhost:8080/mcp")
         .openEventStream(true)
         .build();
@@ -108,10 +108,12 @@ automatically sends the negotiated `MCP-Protocol-Version` on subsequent requests
 Set `openEventStream(true)` when the client advertises Roots, Sampling, or Elicitation handlers. Those server-initiated
 requests are received through the optional GET event stream, which opens asynchronously after initialization.
 
-> Current limitations: request-scoped streaming over a POST `text/event-stream` response is buffered rather than
-> processed incrementally; use ordinary JSON POST responses. The optional GET event stream has no reconnect/resumption
-> policy, and initialization does not wait for that stream to become ready. Do not rely on incremental POST progress or
-> server requests delivered through a POST response until this limitation is removed.
+POST SSE responses are consumed incrementally, including progress and reverse requests before the final response.
+GET failure does not fail independent POST calls. For GET-dependent workflows, await
+`transport.getEventStreamReady().get(5, TimeUnit.SECONDS)` and inspect `isEventStreamOpen()` /
+`getEventStreamFailure()`. GET disconnects retry at most five times with exponential backoff (200 ms to 5 seconds),
+using `Last-Event-ID` when available; replay requires server support. HTTP 4xx stops retries. Closing sends a
+best-effort DELETE with a two-second deadline. STDIO always encodes messages as UTF-8.
 
 ## McpClient
 
@@ -137,7 +139,7 @@ All properties are listing below:
 | clientName      | Sets the name that the client will use to identify itself to the MCP server in the initialization message.                                                                        | String        | myapp/foo-app            |
 | clientVersion   | Sets the version string that the client will use to identify itself to the MCP server in the initialization message. The default value is "1.0".                                  | String        | 1.0/2.1.2                |
 | protocolVersion | Sets the protocol version that the client will advertise in the initialization message. The default value right now is "2024-11-05", but will change over time in later versions. | String        | 2024-11-05               |
-| requestTimeout  | Timeout applied to every request, including initialization and health checks. The default is 60 seconds; zero means wait indefinitely, and negative values are rejected.          | Duration      | `Duration.ofSeconds(60)` |
+| requestTimeout  | Timeout for requests, initialization and health checks. Null or zero uses the finite 60-second default; negative values are rejected. | Duration | `Duration.ofSeconds(60)` |
 
 Please note that after creating the McpClient, you should call `mcpClient.initialize();` right away.
 The next section describes protocol initialization.

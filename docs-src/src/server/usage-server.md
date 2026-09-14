@@ -163,3 +163,17 @@ Initialization negotiates a supported version and creates the Streamable HTTP se
 Streamable HTTP requests must include the negotiated `MCP-Protocol-Version` header. `strictLifecycle` is enabled by
 default, so normal requests require `initialize` followed by `notifications/initialized`. JSON-RPC batch messages are
 intentionally unsupported.
+
+Keep GET responses open asynchronously and flush headers before returning from the controller. Call
+`closeEventStream(sessionId, writer)` on framework completion/error/timeout; the adapter closes its registered writer.
+GET heartbeats run every 15 seconds. `ServerConfig.sessionIdleTimeout` defaults to 30 minutes and includes sessions
+without GET; active POSTs are protected, and heartbeat traffic alone does not renew idle sessions. Close removes all
+sessions. POST replies remain JSON; client responses/notifications are accepted with an empty 202 response.
+
+`clientRequestTimeout` supplies a finite 60-second default for reverse calls with null/zero timeout. Tool integral
+arguments reject fractions/overflow as `INVALID_PARAMS`. Logging thresholds apply separately to each session.
+Completion methods may accept `(String value, Map<String, String> arguments)` to read the immutable
+2025-06-18 `context.arguments`; the existing single-String signature is supported.
+
+STDIO uses UTF-8. Configure `stdioWorkers` (default 16) and `stdioQueueCapacity` (default 256) before constructing
+`ServerStdio`. Full queues produce a busy error while handshake, ping, cancellation and reverse replies remain usable.

@@ -36,27 +36,18 @@ class McpClientTimeoutTest {
 
     @Test
     @Timeout(2)
-    void zeroTimeoutMeansUnlimitedWaitForHealthCheck() {
-        CompletableFuture<JsonNode> response = new CompletableFuture<>();
-        TestTransport transport = new TestTransport(response);
-        McpClient client = McpClient.builder()
-                .transport(transport)
-                .requestTimeout(Duration.ZERO)
-                .build();
-        transport.start(client.pendingRequests);
-
-        Thread completer = new Thread(() -> {
-            try {
-                Thread.sleep(50);
-                response.complete(JsonNodeFactory.instance.objectNode());
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
+    void zeroAndNullTimeoutUseFiniteDefault() throws Exception {
+        CompletableFuture<JsonNode> response = new CompletableFuture<JsonNode>() {
+            @Override public JsonNode get() {
+                throw new AssertionError("Unbounded waiting must not be used");
             }
-        }, "timeout-test-completer");
-        completer.setDaemon(true);
-        completer.start();
-
-        assertDoesNotThrow(client::checkHealth);
+            @Override public JsonNode get(long timeout, java.util.concurrent.TimeUnit unit) {
+                assertEquals(60000, unit.toMillis(timeout));
+                return JsonNodeFactory.instance.objectNode();
+            }
+        };
+        McpClient.builder().requestTimeout(Duration.ZERO).build().awaitResponse(response);
+        McpClient.builder().requestTimeout(null).build().awaitResponse(response);
     }
 
     @Test

@@ -21,7 +21,7 @@ class TestStdioServerTool extends TestStdioServerBase {
         assertEquals(7, tools.size());
         Map<String, JsonNode> byName = new java.util.HashMap<>();
         tools.forEach(tool -> byName.put(tool.get("name").asText(), tool));
-        assertEquals("number", byName.get("echoInteger").get("inputSchema").get("properties").get("input").get("type").asText());
+        assertEquals("integer", byName.get("echoInteger").get("inputSchema").get("properties").get("input").get("type").asText());
         assertEquals("boolean", byName.get("echoBoolean").get("inputSchema").get("properties").get("input").get("type").asText());
 
         // Parameterless tools still require a valid JSON object input schema.

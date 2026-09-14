@@ -96,7 +96,7 @@ STDIO 子进程的标准输出必须仅用于逐行 JSON-RPC 消息，日志应�
 ## 快速开始：Streamable HTTP
 
 ```java
-McpTransport transport = StreamableHttpTransport.builder()
+StreamableHttpTransport transport = StreamableHttpTransport.builder()
         .endpointUrl("http://localhost:8080/mcp")
         .openEventStream(true)
         .timeout(Duration.ofSeconds(30))
@@ -127,8 +127,10 @@ println(resource.getUri()));
 `openEventStream` 用于打开可选的长期 GET 通道，以接收服务端主动消息。传输层会保存初始化返回的 Session
 ID，并在需要时发送协商后的协议版本请求头。
 
-当前 Streamable HTTP 的限制：`text/event-stream` 的 POST 响应会在解析前先完整缓冲，尚不能增量消费；可选 GET stream
-异步建立，且没有断线重连/恢复策略。请使用普通 JSON POST 响应，并且不要依赖通过 POST 响应传递的增量 progress 或服务端主动请求。
+POST SSE 响应会按事件增量处理，包括最终响应前的 progress 和服务端请求。可选 GET 流异步建立，其故障不会导致独立 POST 请求失败。
+业务需要确认 GET 就绪时，可调用 `transport.getEventStreamReady().get(5, TimeUnit.SECONDS)`；
+通过 `isEventStreamOpen()` 和 `getEventStreamFailure()` 查询当前状态。断线后按指数退避重试最多五次（200 毫秒至 5 秒），
+有事件 ID 时携带 `Last-Event-ID`；HTTP 4xx 停止重试，事件重放取决于服务端支持。关闭时发送尽力而为的 DELETE，最多等待两秒。
 
 连接分别提供 SSE 和消息端点的旧服务时，使用 `HttpMcpTransport`：
 
@@ -161,7 +163,7 @@ GetPromptResult.PromptResultDetail prompt =
 ## 生命周期与错误处理
 
 - 手动构造客户端时，应先且只调用一次 `initialize()`，再发送普通请求。
-- 为 `requestTimeout` 设置正数时长可以避免业务线程无限等待；设置为零表示明确关闭客户端超时。
+- `requestTimeout` 使用正数时长；null 或零使用有限的 60 秒默认值，负值不合法。
 - 使用 try-with-resources，或者在 `finally` 中调用 `close()`。关闭客户端会结束等待中的请求，并释放传输层、工作线程、HTTP
   连接和子进程。
 - `callToolResult()` 会保留完整 MCP 返回值，包括结构化内容及 `isError`；`callTool()` 是只返回文本的便捷方法。

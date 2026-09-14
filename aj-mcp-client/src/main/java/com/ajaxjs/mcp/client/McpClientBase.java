@@ -122,13 +122,14 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
     @Override
     public void initialize() {
         transport.setMessageHandlers(this::handleNotification, this::handleServerRequest);
-        transport.start(pendingRequests);
+        transport.setSupportedProtocolVersions(new ArrayList<>(supportedProtocolVersions));
         long operationId = idGenerator.getAndIncrement();
         InitializeRequest request = new InitializeRequest();
         request.setId(operationId);
         request.setParams(createInitializeParams());
 
         try {
+            transport.start(pendingRequests);
             CompletableFuture<JsonNode> future = transport.initialize(request); // here is almost a synchronous call
             JsonNode capabilities = awaitResponse(future);
             JsonNode negotiatedVersion = capabilities.path(RESPONSE_RESULT).path("protocolVersion");
@@ -151,6 +152,8 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
             throw new RuntimeException(e);
         } finally {
             pendingRequests.remove(operationId);
+            if (negotiatedProtocolVersion == null)
+                close();
         }
     }
 
@@ -257,17 +260,21 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
      */
     protected JsonNode awaitResponse(CompletableFuture<JsonNode> future)
             throws InterruptedException, ExecutionException, TimeoutException {
-        if (requestTimeout.isNegative())
+        Duration effectiveTimeout = requestTimeout == null || requestTimeout.isZero()
+                ? Duration.ofSeconds(60) : requestTimeout;
+        if (effectiveTimeout.isNegative())
             throw new IllegalArgumentException("requestTimeout must not be negative");
-
-        if (requestTimeout.isZero())
-            return future.get();
 
         // CompletableFuture only accepts a numeric timeout. Preserve positive
         // sub-millisecond durations instead of accidentally turning them into zero.
-        long timeoutMillis = Math.max(1L, requestTimeout.toMillis());
+        long timeoutMillis = Math.max(1L, effectiveTimeout.toMillis());
 
-        return future.get(timeoutMillis, TimeUnit.MILLISECONDS);
+        try {
+            return future.get(timeoutMillis, TimeUnit.MILLISECONDS);
+        } catch (TimeoutException | InterruptedException e) {
+            future.cancel(true);
+            throw e;
+        }
     }
 
     /**

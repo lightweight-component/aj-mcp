@@ -5,6 +5,7 @@ import com.ajaxjs.mcp.client.transport.StdioTransport;
 import com.ajaxjs.mcp.common.JsonUtils;
 import com.ajaxjs.mcp.common.McpException;
 import com.ajaxjs.mcp.protocol.McpConstant;
+import com.ajaxjs.mcp.protocol.ProtocolVersion;
 import com.ajaxjs.mcp.protocol.tools.*;
 import com.ajaxjs.mcp.protocol.utils.CancellationNotification;
 import com.ajaxjs.mcp.protocol.utils.completion.CompleteRequest;
@@ -43,6 +44,8 @@ public class McpClient extends McpClientResource {
 
     @Override
     public CompleteResult.CompletionResult complete(CompleteRequest.Ref ref, CompleteRequest.Argument argument, Map<String, String> context) {
+        if (context != null && !ProtocolVersion.V_2025_06_18.value().equals(getNegotiatedProtocolVersion()))
+            throw new IllegalStateException("Completion context requires MCP 2025-06-18");
         long operationId = idGenerator.getAndIncrement();
         CompleteRequest request = new CompleteRequest();
         request.setId(operationId);

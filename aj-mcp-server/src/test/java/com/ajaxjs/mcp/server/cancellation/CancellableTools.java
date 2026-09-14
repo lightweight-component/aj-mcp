@@ -40,4 +40,15 @@ public class CancellableTools {
     public String interruptedAtEntry() {
         return Boolean.toString(Thread.currentThread().isInterrupted());
     }
+
+    @Tool
+    public String ignoresInterrupt() {
+        entered.countDown();
+        try {
+            release.await();
+        } catch (InterruptedException ignored) {
+            // Deliberately ignores cancellation to exercise the framework's result boundary.
+        }
+        return "completed";
+    }
 }

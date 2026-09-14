@@ -79,7 +79,7 @@ McpTransport transport = HttpMcpTransport.builder()
 较新的协议版本使用单一 HTTP 端点：
 
 ```java
-McpTransport transport = StreamableHttpTransport.builder()
+StreamableHttpTransport transport = StreamableHttpTransport.builder()
         .endpointUrl("http://localhost:8080/mcp")
         .openEventStream(true)
         .build();
@@ -99,8 +99,11 @@ initialize();
 如果客户端声明了 Roots、Sampling 或 Elicitation handler，请设置 `openEventStream(true)`；服务端主动请求通过可选的 GET event
 stream 到达客户端。该流会在初始化后异步打开。
 
-> 当前限制：POST `text/event-stream` 响应会先完整缓冲，尚不能按事件增量处理；请使用普通 JSON POST 响应。可选 GET event
-> stream 目前没有断线重连/恢复策略，初始化也不会等待它就绪。在该限制解除前，请勿依赖通过 POST 响应增量发送的 progress 或服务端请求。
+POST SSE 响应按事件增量处理，包括最终响应前的 progress 和反向请求。GET 故障不会终止独立 POST 请求。
+依赖 GET 的业务应等待 `transport.getEventStreamReady().get(5, TimeUnit.SECONDS)`，并通过
+`isEventStreamOpen()` / `getEventStreamFailure()` 查询状态。GET 断线按指数退避重试最多五次（200 毫秒至 5 秒），
+有事件 ID 时携带 `Last-Event-ID`，重放能力由服务端提供；HTTP 4xx 停止重试。关闭时尽力发送 DELETE，最多等待两秒。
+STDIO 消息固定使用 UTF-8。
 
 ## MCP 客户端
 
@@ -126,7 +129,7 @@ McpClient mcpClient = McpClient.builder()
 | clientName      | 设置客户端在初始化消息中向 MCP 服务器标识自己的名称。                           | String   | myapp/foo-app            |
 | clientVersion   | 设置客户端在初始化消息中向 MCP 服务器标识自己的版本字符串。默认值为 "1.0"。             | String   | 1.0/2.1.2                |
 | protocolVersion | 设置客户端在初始化消息中声明的协议版本。当前默认值为 "2024-11-05"，但在后续版本中可能会有所更改。 | String   | 2024-11-05               |
-| requestTimeout  | 所有请求（包括初始化和健康检查）的超时时间。默认值为 60 秒；0 表示无限等待，负值不合法。         | Duration | `Duration.ofSeconds(60)` |
+| requestTimeout  | 请求、初始化和健康检查的超时时间。null 或零使用有限的 60 秒默认值，负值不合法。 | Duration | `Duration.ofSeconds(60)` |
 
 请注意，在创建 McpClient 后，应立即调用 `mcpClient.initialize();`。关于初始化工作将在下一小节介绍。
 

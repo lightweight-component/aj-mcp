@@ -1,9 +1,9 @@
 # aj-mcp remaining issues
 
-> Review date: 2026-08-11  
+> Review date: 2026-09-07
 > Scope: Java sources in `aj-mcp-common`, `aj-mcp-client`, and `aj-mcp-server`.  
-> Method: static source review plus inspection of the existing tests. No production source was changed during this
-> review.
+> Method: source review, targeted reproductions, and regression fixes. Historical evidence below describes the
+> pre-fix implementation; current status is recorded in the summary and September resolution notes.
 
 ## Priority definition
 
@@ -13,16 +13,50 @@
 
 ## Summary
 
-| Priority  |  Count | Main themes                                                                                                   |
-|-----------|-------:|---------------------------------------------------------------------------------------------------------------|
-| P0        |      1 | Streamable HTTP POST streaming                                                                                |
-| P1        |     11 | HTTP/SSE lifecycle, session cleanup, notification errors, reflection boundaries, capability/logging semantics |
-| P2        |      3 | JSON-RPC validation, schema expressiveness, cache/API safety, resource cleanup                                |
-| **Total** | **15** |                                                                                                               |
+| Priority | Remaining | Main themes |
+|----------|----------:|-------------|
+| P0 | 0 | Resolved |
+| P1 | 0 | Resolved |
+| P2 | 2 | JSON Schema keyword preservation; mutable cache/text-only convenience API |
+
+## Resolution notes — 2026-09-07
+
+- **Item 1:** The client now parses POST SSE incrementally and dispatches reverse requests/progress before the final
+  response. It finishes on the matching response rather than waiting for EOF. The server's JSON-only POST response
+  mode is permitted by MCP; optional server POST-SSE production is not a protocol defect and remains unsupported.
+- **Items 3, 4, 6:** GET health is independent from POST futures. First readiness is available through
+  `getEventStreamReady()`; current status/failure are observable. Disconnects retry at most five times with exponential
+  backoff and `Last-Event-ID`; HTTP 4xx stops retries. Replay requires peer support. GET remains explicitly optional.
+- **Items 5, 7:** Client close sends a bounded best-effort DELETE. Server sessions are tracked independently of GET,
+  expire after configurable inactivity, and are removed on shutdown even without GET. Heartbeats detect dead writers;
+  framework adapters must attach the identity-safe `closeEventStream(sessionId, writer)` callback to HTTP completion,
+  timeout and failure. A GET disconnect fails reverse calls but retains the session for reconnection.
+- **Item 8:** Failed notifications return an empty 202 instead of a JSON-RPC response.
+- **Item 9:** Null/zero server request timeout uses the finite configurable default (60 seconds); negative values fail.
+  Client null/zero request timeouts also use a finite 60-second default.
+- **Item 11:** Logging thresholds are per session, applied before sending, and removed with session state.
+- **Item 13:** Integral schemas use `integer`; exact numeric conversions reject fractions, overflow and non-finite
+  floating values. Invocation conversion failures preserve the request ID and produce `INVALID_PARAMS`.
+- **Item 15:** Cancellation and worker completion have a synchronized boundary. An interrupt-ignoring tool cannot
+  return success when cancellation wins, and late cancellation cannot interrupt a reused worker.
+- **Item 16:** Both `String` and `(String, Map<String, String>)` completion providers are supported. Context is
+  serialized as the standard `context.arguments` object while preserving the existing Java Map API; context-aware
+  requests are restricted to MCP 2025-06-18.
+- **Item 25 (also fixed):** STDIO has bounded workers/queue and returns a busy error on overload. Handshake, ping,
+  cancellation and reverse responses bypass the tool queue.
+- **New audit finding: HTTP reverse responses.** POST routes client responses through `acceptClientResponse` before
+  request-method validation, completing roots/sampling/elicitation futures and returning 202.
+- **New audit finding: version handshake.** The transport validates/stores the negotiated version before sending the
+  initialized notification or opening GET. Failed initialization closes its transport.
+- **New audit finding: STDIO charset.** Both directions explicitly use UTF-8 even on GBK-default JVMs.
+
+Regression coverage: `StreamableHttpPriorityTest`, `StdioUtf8Test`, `TestPriorityFixes`,
+`TestSessionScopedCancellation`, and portable `StdioTransportUnexpectedExitTest`, in addition to the existing suites.
+
 
 ## P0
 
-### 1. Streamable HTTP POST responses are not actually streamed on either side
+### Resolved (2026-09-07): 1. Streamable HTTP POST responses are not actually streamed on either side
 
 **Evidence**
 
@@ -72,7 +106,7 @@ cleanup. This item is no longer included in the remaining-issue count.
 
 ## P1
 
-### 3. Optional GET SSE failure incorrectly fails unrelated POST requests
+### Resolved (2026-09-07): 3. Optional GET SSE failure incorrectly fails unrelated POST requests
 
 **Evidence**: `aj-mcp-client/src/main/java/com/ajaxjs/mcp/client/transport/StreamableHttpTransport.java:238-251`
 
@@ -83,7 +117,7 @@ POST calls.
 **Suggested direction**: track GET-stream health separately. Only fail all requests when the whole session is known to
 be invalid; otherwise report/retry the optional stream without touching POST futures.
 
-### 4. GET SSE has no reconnect or event resumption
+### Resolved (2026-09-07): 4. GET SSE has no reconnect or event resumption
 
 **Evidence**: `StreamableHttpTransport.java:238-252`
 
@@ -93,7 +127,7 @@ server notifications and server-initiated requests silently stop for the rest of
 **Suggested direction**: model the stream state explicitly, reconnect with bounded backoff, propagate the last SSE event
 ID where supported, and make retry/terminal failure observable.
 
-### 5. Streamable HTTP sessions are not terminated by the client and can leak on the server
+### Resolved (2026-09-07): 5. Streamable HTTP sessions are not terminated by the client and can leak on the server
 
 **Evidence**
 
@@ -107,7 +141,7 @@ remains in `McpServer` state. There is also no idle expiration.
 **Suggested direction**: send DELETE best-effort before client shutdown, keep an explicit server session registry
 independent of GET streams, and add idle/session-expiry cleanup.
 
-### 6. Streamable HTTP initialization returns before the GET channel has succeeded
+### Resolved (2026-09-07): 6. Streamable HTTP initialization returns before the GET channel has succeeded
 
 **Evidence**: `StreamableHttpTransport.java:72-81,238-252`
 
@@ -118,7 +152,7 @@ already failed or is rejected.
 **Suggested direction**: when server-request capabilities require GET, wait for `onOpen` (with the normal initialization
 timeout) or fail initialization. If GET is intentionally optional, expose its readiness separately.
 
-### 7. Server Streamable HTTP GET streams have no disconnect/heartbeat lifecycle
+### Resolved (2026-09-07): 7. Server Streamable HTTP GET streams have no disconnect/heartbeat lifecycle
 
 **Evidence**: `aj-mcp-server/src/main/java/com/ajaxjs/mcp/server/ServerStreamableHttp.java:119-143,257-281`
 
@@ -129,7 +163,7 @@ disconnected client can remain registered indefinitely.
 **Suggested direction**: define an async stream handle with `onClose`, heartbeat scheduling, last-activity time, and
 idempotent removal. Document which layer owns and closes the servlet response/writer.
 
-### 8. Streamable HTTP sends JSON-RPC errors for notifications
+### Resolved (2026-09-07): 8. Streamable HTTP sends JSON-RPC errors for notifications
 
 **Evidence**: `ServerStreamableHttp.java:97-110`
 
@@ -139,7 +173,7 @@ notifications must not receive a response, including when their parameters or me
 **Suggested direction**: determine `expectsResponse` before processing, as `ServerStdio` already does, and return 202/no
 body for notification-shaped messages while logging the failure locally.
 
-### 9. Server-to-client requests can wait forever
+### Resolved (2026-09-07): 9. Server-to-client requests can wait forever
 
 **Evidence**: `aj-mcp-server/src/main/java/com/ajaxjs/mcp/server/McpServer.java:134-161`
 
@@ -160,7 +194,7 @@ requests without checking `roots` or `sampling`. A server can invoke methods the
 **Resolution (2026-08-11)**: `listRoots()` and `createMessage()` now require the corresponding capability in the target
 session before writing to the transport. Tests cover both advertised and missing capabilities.
 
-### 11. Logging level is global and is not used as a filter
+### Resolved (2026-09-07): 11. Logging level is global and is not used as a filter
 
 **Evidence**
 
@@ -190,7 +224,7 @@ converted to a tool error by the local catch clauses.
 **Resolution (2026-08-11)**: feature scanning now rejects every tool parameter without `@ToolArg` and reports the
 declaring class, method, and parameter index. A dedicated invalid-service fixture verifies startup-time failure.
 
-### 13. Tool numeric conversion silently truncates or overflows
+### Resolved (2026-09-07): 13. Tool numeric conversion silently truncates or overflows
 
 **Evidence**
 
@@ -216,7 +250,7 @@ return-list handling exists for prompts (`McpServerPrompt.java:150-159`) and res
 null/invalid-list returns become explicit `INTERNAL_ERROR` responses. Every collection element is validated before
 serialization, with regression tests for all three feature types.
 
-### 15. Cancellation success can be returned after a cancellation request
+### Resolved (2026-09-07): 15. Cancellation success can be returned after a cancellation request
 
 **Evidence**: `McpServer.java:582-604`
 
@@ -228,7 +262,7 @@ checking cancellation outcome.
 cancellation won the race. Document that cancellation is cooperative, while ensuring the protocol result is internally
 consistent.
 
-### 16. Completion context from 2025-06-18 is parsed but ignored
+### Resolved (2026-09-07): 16. Completion context from 2025-06-18 is parsed but ignored
 
 **Evidence**: `McpServer.java:394-412`; registration requires exactly one `String` at `FeatureMgr.java:140-153`
 
@@ -348,7 +382,7 @@ subscriptions to many unique URIs cause monotonic map growth.
 **Resolution (2026-08-11)**: unsubscribe and session removal now use `computeIfPresent` and atomically remove an entry
 when its session set becomes empty. Both paths are covered by a regression test.
 
-### 25. STDIO server uses an unbounded cached request executor
+### Resolved (2026-09-07): 25. STDIO server uses an unbounded cached request executor
 
 **Evidence**: `aj-mcp-server/src/main/java/com/ajaxjs/mcp/server/ServerStdio.java:42-46,82-100`
 
@@ -358,7 +392,7 @@ threads while tools block, leading to memory exhaustion and scheduler collapse.
 **Suggested direction**: use a bounded executor and queue with an explicit overload policy. Preserve enough concurrency
 for cancellation/server responses, but cap accepted work.
 
-## Cross-cutting test gaps to add with the fixes
+## Original audit test-gap checklist (historical)
 
 1. Two sessions using the same request ID, with cancellation issued by only one session.
 2. A POST SSE response that emits intermediate events before the final response and remains open between events.
@@ -371,7 +405,7 @@ for cancellation/server responses, but cap accepted work.
 9. Context-aware completion for 2025-06-18.
 10. Session initialization without GET followed by transport close/DELETE.
 
-## Suggested implementation order
+## Original implementation order (historical)
 
 1. Fix the remaining P0 item: request-scoped POST SSE.
 2. Make Streamable HTTP session/GET lifecycle reliable (items 3-8).

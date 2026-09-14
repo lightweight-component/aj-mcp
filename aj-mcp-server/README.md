@@ -157,9 +157,21 @@ requests that supply an `Origin` header.
 
 JSON-RPC batch requests are intentionally unsupported.
 
-Current Streamable HTTP limitations: ordinary JSON POST responses and the optional GET event stream are supported, but
-the server does not yet produce request-scoped POST SSE responses. A session that never opens the GET stream should be
-terminated through the `DELETE` endpoint; automatic idle-session expiry is not implemented.
+POST requests return JSON; client responses and notifications return 202 with no body. Request-scoped POST SSE output
+is not implemented; JSON responses are allowed by the MCP transport specification. Server-originated messages use GET.
+Keep the GET HTTP response open asynchronously, flush its headers immediately, and call
+`closeEventStream(sessionId, writer)` from the framework's completion/error/timeout callback. The adapter owns the
+registered writer until disconnect, replacement or shutdown. It sends heartbeats every 15 seconds and expires idle
+sessions after 30 minutes, including sessions without GET. In-flight POSTs are not expired; GET heartbeats alone do
+not renew idle sessions. DELETE and transport shutdown remove all session state.
+
+Integral tool parameters use JSON Schema `integer`; fractional and out-of-range values produce `INVALID_PARAMS`.
+Cancellation remains cooperative, but a tool that ignores the interrupt cannot return a successful result after
+cancellation wins. Logging thresholds are stored and applied per session.
+
+Completion providers may accept either `String value` or `(String value, Map<String, String> arguments)`.
+The second parameter is an immutable view of MCP 2025-06-18 `context.arguments`. Existing single-parameter providers
+remain compatible; the client's `complete(ref, argument, context)` Map API is unchanged.
 
 ## Configuration
 
@@ -172,6 +184,13 @@ terminated through the `DELETE` endpoint; automatic idle-session expiry is not i
 | `protocolVersions` | Supported revisions, newest first                       | all implemented revisions |
 | `strictLifecycle`  | Require initialize → initialized before normal requests | `true`                    |
 | `allowedOrigins`   | Accepted browser Origin values for Streamable HTTP      | empty                     |
+| `clientRequestTimeout` | Server-to-client timeout used when null/zero is passed | `Duration.ofSeconds(60)` |
+| `sessionIdleTimeout` | HTTP session inactivity limit | `Duration.ofMinutes(30)` |
+| `stdioWorkers` | Maximum concurrent STDIO requests | `16` |
+| `stdioQueueCapacity` | Queued STDIO requests before a busy error | `256` |
+
+STDIO uses UTF-8 regardless of the system charset. Set its worker/queue limits before constructing `ServerStdio`.
+Handshake, ping, cancellation and reverse responses remain serviceable while the tool queue is full.
 
 Create one `FeatureMgr` per server and assign it with `setFeatureMgr`. Feature stores are instance-scoped, so scanning
 one server does not populate another server.

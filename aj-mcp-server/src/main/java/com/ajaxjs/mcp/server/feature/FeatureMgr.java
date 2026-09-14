@@ -167,8 +167,10 @@ public class FeatureMgr {
      * @param instance      the instance value.
      */
     private void addCompletion(String referenceType, String referenceName, Method method, Object instance) {
-        if (method.getParameterTypes().length != 1 || method.getParameterTypes()[0] != String.class)
-            throw new IllegalArgumentException("Completion method must accept exactly one String parameter: " + method);
+        Class<?>[] types = method.getParameterTypes();
+        if ((types.length != 1 && types.length != 2) || types[0] != String.class
+                || (types.length == 2 && types[1] != Map.class))
+            throw new IllegalArgumentException("Completion method must accept String or (String, Map<String, String>): " + method);
         CompleteArg argument = method.getParameters()[0].getAnnotation(CompleteArg.class);
         String argumentName = argument == null || McpUtils.isEmptyText(argument.name())
                 ? method.getParameters()[0].getName() : argument.name();
@@ -295,6 +297,11 @@ public class FeatureMgr {
     public static String mapJavaTypeToJsType(Parameter parameter) {
         // 获取参数的类型
         Class<?> type = parameter.getType();
+
+        if (type == byte.class || type == Byte.class || type == short.class || type == Short.class
+                || type == int.class || type == Integer.class || type == long.class || type == Long.class
+                || type == java.math.BigInteger.class)
+            return "integer";
 
         // 基础类型和包装类型的映射
         if (type.isPrimitive()) {

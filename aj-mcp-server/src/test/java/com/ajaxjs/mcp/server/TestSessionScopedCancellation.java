@@ -66,6 +66,17 @@ class TestSessionScopedCancellation {
     }
 
     @Test
+    void ignoredInterruptCannotProduceSuccessfulResult() throws Exception {
+        CancellableTools.reset(1);
+        CompletableFuture<String> call = toolCall("session-a", 3, "ignoresInterrupt");
+        assertTrue(CancellableTools.entered.await(2, TimeUnit.SECONDS));
+        cancel("session-a", 3);
+        String response = call.get(2, TimeUnit.SECONDS);
+        assertTrue(response.contains("\"isError\":true"), response);
+        assertFalse(response.contains("completed"), response);
+    }
+
+    @Test
     void removingSessionInterruptsOnlyThatSessionsRequests() throws Exception {
         CancellableTools.reset(2);
         CompletableFuture<String> sessionA = toolCall("session-a", 9, "blocking");

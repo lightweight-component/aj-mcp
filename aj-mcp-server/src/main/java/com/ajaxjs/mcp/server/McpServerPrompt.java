@@ -119,7 +119,7 @@ public abstract class McpServerPrompt extends McpServerResource {
                 if (value == null && (definition.isRequired() || parameterTypes[i].isPrimitive()))
                     throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_PARAMS,
                             "argument " + paramOrder[i] + " is required");
-                argValues[i] = McpServer.convertToType(value, parameterTypes[i]);
+                argValues[i] = McpServer.convertArgument(value, parameterTypes[i], requestRaw.getId());
             }
         }
 

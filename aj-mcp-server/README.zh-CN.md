@@ -157,8 +157,18 @@ Controller 和 Servlet 接线方式请参考 [Spring Boot](../samples/server/spr
 
 本项目有意不支持 JSON-RPC batch 请求。
 
-当前 Streamable HTTP 的限制：支持普通 JSON POST 响应和可选 GET event stream，但服务端尚不能生成请求级的 POST SSE 响应。未打开
-GET stream 的 session 应通过 `DELETE` 端点终止；当前未实现自动空闲 session 过期。
+POST 请求返回 JSON；客户端响应和通知返回无正文的 202。服务端未实现请求级 POST SSE 输出，MCP 传输规范允许返回 JSON，
+服务端主动消息通过 GET 发送。框架须异步保持 GET 响应打开、立即 flush 响应头，并在完成、错误或超时回调中调用
+`closeEventStream(sessionId, writer)`。注册后的 Writer 由适配器持有，在断开、替换或关闭时释放。
+每 15 秒发送心跳，空闲会话默认 30 分钟过期，包括未打开 GET 的会话；正在处理的 POST 不会过期，GET 心跳本身不延长空闲时间。
+DELETE 和关闭传输层均清理完整会话状态。
+
+整数工具参数使用 JSON Schema `integer`，小数和越界值返回 `INVALID_PARAMS`。取消仍是协作式的，但取消先于执行结束时，
+忽略中断的工具也不能返回成功结果。日志阈值按会话保存并过滤。
+
+补全方法可采用 `String value` 或 `(String value, Map<String, String> arguments)` 签名。
+第二个参数是 MCP 2025-06-18 `context.arguments` 的只读视图；原单参数方法保持兼容，客户端
+`complete(ref, argument, context)` 的 Map API 保持不变。
 
 ## 配置
 
@@ -171,6 +181,12 @@ GET stream 的 session 应通过 `DELETE` 端点终止；当前未实现自动�
 | `protocolVersions` | 支持的协议版本，新版本优先                      | 所有已实现版本 |
 | `strictLifecycle`  | 普通请求前是否强制 initialize → initialized | `true`  |
 | `allowedOrigins`   | Streamable HTTP 接受的浏览器 Origin      | 空列表     |
+| `clientRequestTimeout` | 反向调用传入 null/零时使用的超时 | `Duration.ofSeconds(60)` |
+| `sessionIdleTimeout` | HTTP 会话空闲过期时间 | `Duration.ofMinutes(30)` |
+| `stdioWorkers` | STDIO 最大并发请求数 | `16` |
+| `stdioQueueCapacity` | STDIO 队列容量，满时返回繁忙错误 | `256` |
+
+STDIO 固定使用 UTF-8。在构造 `ServerStdio` 前设置线程和队列上限；工具队列满时，握手、ping、取消和反向响应仍可处理。
 
 每个服务创建一个 `FeatureMgr`，并通过 `setFeatureMgr` 赋给 `McpServer`。能力存储是实例级的，扫描一个服务不会自动填充另一个服务。
 

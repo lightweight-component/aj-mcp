@@ -2,12 +2,15 @@ package com.ajaxjs.mcp.protocol.utils.completion;
 
 import com.ajaxjs.mcp.protocol.McpRequest;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.Map;
+import java.util.Collections;
 
 import static com.ajaxjs.mcp.protocol.McpConstant.Methods.COMPLETION_COMPLETE;
 
@@ -47,8 +50,21 @@ public class CompleteRequest extends McpRequest {
         /**
          * Previously resolved variables, introduced in MCP 2025-06-18.
          */
-        @JsonInclude(JsonInclude.Include.NON_NULL)
+        @JsonIgnore
         Map<String, String> context;
+
+        /** @return the MCP context.arguments object while keeping the Java Map API compatible. */
+        @JsonProperty("context")
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        public Map<String, Map<String, String>> getWireContext() {
+            return context == null ? null : Collections.singletonMap("arguments", context);
+        }
+
+        /** @param value the MCP context object containing previously resolved arguments */
+        @JsonProperty("context")
+        public void setWireContext(Map<String, Map<String, String>> value) {
+            context = value == null ? null : value.get("arguments");
+        }
 
         /**
          * Creates a new params.

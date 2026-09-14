@@ -11,9 +11,13 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.RejectedExecutionException;
+import com.ajaxjs.mcp.server.common.ServerConfig;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -30,12 +34,12 @@ public class ServerStdio implements McpTransportSync {
     /**
      * Holds the reader value.
      */
-    private final BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+    private final BufferedReader reader = new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8));
 
     /**
      * Holds the writer value.
      */
-    private final PrintWriter writer = new PrintWriter(System.out, true);
+    private final PrintWriter writer = new PrintWriter(new OutputStreamWriter(System.out, StandardCharsets.UTF_8), true);
 
     /**
      * Holds the running value.
@@ -65,11 +69,7 @@ public class ServerStdio implements McpTransportSync {
     /**
      * Holds the request executor value.
      */
-    private final ExecutorService requestExecutor = Executors.newCachedThreadPool(runnable -> {
-        Thread thread = new Thread(runnable, "aj-mcp-server-stdio-request");
-        thread.setDaemon(true);
-        return thread;
-    });
+    private final ExecutorService requestExecutor;
 
     /**
      * Holds the server value.
@@ -83,6 +83,17 @@ public class ServerStdio implements McpTransportSync {
      */
     public ServerStdio(McpServer server) {
         this.server = server;
+        ServerConfig config = server.getServerConfig() == null ? new ServerConfig() : server.getServerConfig();
+        int workers = config.getStdioWorkers();
+        int capacity = config.getStdioQueueCapacity();
+        if (workers < 1 || capacity < 1)
+            throw new IllegalArgumentException("STDIO worker count and queue capacity must be positive");
+        requestExecutor = new ThreadPoolExecutor(workers, workers, 0L, TimeUnit.MILLISECONDS,
+                new ArrayBlockingQueue<>(capacity), runnable -> {
+                    Thread thread = new Thread(runnable, "aj-mcp-server-stdio-request");
+                    thread.setDaemon(true);
+                    return thread;
+                }, new ThreadPoolExecutor.AbortPolicy());
     }
 
     @Override
@@ -123,7 +134,7 @@ public class ServerStdio implements McpTransportSync {
                 final String message = line;
                 // Dispatch requests concurrently so the input loop remains able to
                 // receive notifications/cancelled while a tool is still running.
-                requestExecutor.execute(() -> processLine(message));
+                dispatchLine(message);
             }
         } catch (IOException e) {
             if (!closed.get())
@@ -171,6 +182,30 @@ public class ServerStdio implements McpTransportSync {
             log.warn("Message processing error: {}", e.getMessage());
             if (expectsResponse)
                 send("stdio", new JsonRpcErrorException(JsonRpcErrorCode.INTERNAL_ERROR, e.getMessage()).toJson());
+        }
+    }
+
+    /** Keeps handshake, cancellation and reverse responses flowing even when all tool workers are busy. */
+    private void dispatchLine(String message) {
+        JsonNode envelope;
+        try {
+            envelope = JsonUtils.json2Node(message);
+            String method = envelope.path("method").asText("");
+            if (!envelope.has("id") || !envelope.has("method") || "initialize".equals(method)
+                    || "ping".equals(method)) {
+                processLine(message);
+                return;
+            }
+        } catch (RuntimeException e) {
+            processLine(message);
+            return;
+        }
+        try {
+            requestExecutor.execute(() -> processLine(message));
+        } catch (RejectedExecutionException e) {
+            Object id = JsonUtils.convertValue(envelope.get("id"), Object.class);
+            send("stdio", new JsonRpcErrorException(id, JsonRpcErrorCode.INTERNAL_ERROR,
+                    "MCP server is busy; retry later").toJson());
         }
     }
 

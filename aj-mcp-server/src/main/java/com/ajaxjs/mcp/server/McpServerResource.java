@@ -153,7 +153,7 @@ public abstract class McpServerResource extends McpServerInitialize {
             Class<?>[] types = store.getMethod().getParameterTypes();
 
             for (int i = 0; i < values.length; i++)
-                values[i] = McpServer.convertToType(captured.get(store.getParameterNames().get(i)), types[i]);
+                values[i] = McpServer.convertArgument(captured.get(store.getParameterNames().get(i)), types[i], requestId);
 
             Object returned;
 

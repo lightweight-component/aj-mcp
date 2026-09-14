@@ -6,6 +6,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 
 import java.io.IOException;
+import java.io.File;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -23,7 +27,8 @@ class StdioTransportUnexpectedExitTest {
     @Timeout(5)
     void unexpectedProcessExitFailsPendingRequestImmediately() throws Exception {
         StdioTransport transport = StdioTransport.builder()
-                .command(Arrays.asList("/bin/sh", "-c", "sleep 0.2; exit 0"))
+                .command(Arrays.asList(new File(System.getProperty("java.home"), "bin/java").getPath(),
+                        "-cp", System.getProperty("java.class.path"), ExitAfterRequest.class.getName()))
                 .build();
         Map<Long, CompletableFuture<JsonNode>> pending = new ConcurrentHashMap<>();
 
@@ -41,6 +46,13 @@ class StdioTransportUnexpectedExitTest {
             assertTrue(pending.isEmpty());
         } finally {
             transport.close();
+        }
+    }
+
+    /** Portable child that exits as soon as the test request has been written. */
+    public static class ExitAfterRequest {
+        public static void main(String[] args) throws IOException {
+            new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8)).readLine();
         }
     }
 }
