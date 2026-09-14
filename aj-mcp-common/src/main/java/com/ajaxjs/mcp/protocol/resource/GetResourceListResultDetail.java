@@ -16,7 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 public class GetResourceListResultDetail {
     /**
-     * Holds the resources value.
+     * Holds the resource value.
      */
     @NonNull
     List<ResourceItem> resources;

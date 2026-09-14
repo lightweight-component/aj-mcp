@@ -4,6 +4,7 @@ import com.ajaxjs.mcp.common.JsonUtils;
 import com.ajaxjs.mcp.protocol.client.Root;
 import com.ajaxjs.mcp.protocol.utils.completion.CompleteRequest;
 import com.ajaxjs.mcp.server.common.ServerConfig;
+import com.ajaxjs.mcp.server.model.HttpResult;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.*;
 import java.io.*;
@@ -32,7 +33,7 @@ class TestPriorityFixes {
 
     private Map<String,String> session() {
         String init = "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{\"roots\":{}},\"clientInfo\":{\"name\":\"test\",\"version\":\"1\"}}}";
-        ServerStreamableHttp.HttpResult result = transport.post(init, Collections.emptyMap());
+        HttpResult result = transport.post(init, Collections.emptyMap());
         Map<String,String> headers = new HashMap<>(result.getHeaders());
         headers.put("MCP-Protocol-Version", "2025-06-18");
         assertEquals(202, transport.post("{\"jsonrpc\":\"2.0\",\"method\":\"notifications/initialized\"}", headers).getStatus());
@@ -51,7 +52,7 @@ class TestPriorityFixes {
         transport.openEventStream(sid, writer, h);
         CompletableFuture<List<Root>> call = CompletableFuture.supplyAsync(() -> server.listRoots(sid, Duration.ofSeconds(2)));
         long id = outgoing.get(1, TimeUnit.SECONDS).get("id").asLong();
-        ServerStreamableHttp.HttpResult accepted = transport.post("{\"jsonrpc\":\"2.0\",\"id\":"+id+",\"result\":{\"roots\":[{\"uri\":\"file:///workspace\"}]}}", h);
+        HttpResult accepted = transport.post("{\"jsonrpc\":\"2.0\",\"id\":"+id+",\"result\":{\"roots\":[{\"uri\":\"file:///workspace\"}]}}", h);
         assertEquals(202, accepted.getStatus()); assertNull(accepted.getBody());
         assertEquals("file:///workspace", call.get(1, TimeUnit.SECONDS).get(0).getUri());
         assertTrue(server.getPendingClientResponses().isEmpty());
@@ -60,7 +61,7 @@ class TestPriorityFixes {
     @Test
     void notificationFailureHasNoResponse() {
         Map<String,String> h = session();
-        ServerStreamableHttp.HttpResult result = transport.post("{\"jsonrpc\":\"2.0\",\"method\":\"notifications/initialized\"}", h);
+        HttpResult result = transport.post("{\"jsonrpc\":\"2.0\",\"method\":\"notifications/initialized\"}", h);
         assertEquals(202, result.getStatus()); assertNull(result.getBody());
     }
 

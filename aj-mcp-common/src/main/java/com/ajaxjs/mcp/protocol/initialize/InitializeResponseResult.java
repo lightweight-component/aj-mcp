@@ -16,7 +16,7 @@ public class InitializeResponseResult {
     private String protocolVersion;
 
     /**
-     * Holds the capabilities value.
+     * Holds the capability value.
      */
     private Capabilities capabilities;
 
@@ -31,13 +31,13 @@ public class InitializeResponseResult {
     @Data
     public static class Capabilities {
         /**
-         * Holds the prompts value.
+         * Holds the prompt value.
          */
         @JsonInclude(JsonInclude.Include.NON_NULL)
         private Prompts prompts;
 
         /**
-         * Holds the resources value.
+         * Holds the resource value.
          */
         @JsonInclude(JsonInclude.Include.NON_NULL)
         private Resources resources;
@@ -55,7 +55,7 @@ public class InitializeResponseResult {
         private Logging logging;
 
         /**
-         * Holds the completions value.
+         * Holds the completion value.
          */
         @JsonInclude(JsonInclude.Include.NON_NULL)
         private Completions completions;

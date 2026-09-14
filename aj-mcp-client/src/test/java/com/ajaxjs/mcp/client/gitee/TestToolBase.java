@@ -2,6 +2,7 @@ package com.ajaxjs.mcp.client.gitee;
 
 import com.ajaxjs.mcp.client.IMcpClient;
 import com.ajaxjs.mcp.client.McpToolProvider;
+import com.ajaxjs.mcp.client.McpToolProviderResult;
 import com.ajaxjs.mcp.protocol.tools.CallToolRequest;
 import com.ajaxjs.mcp.protocol.tools.ToolItem;
 import org.junit.jupiter.api.Test;
@@ -83,7 +84,7 @@ public abstract class TestToolBase {
         assertEquals("There was a timeout executing the tool", toolExecutionResultString);
     }
 
-    McpToolProvider.McpToolProviderResult obtainTools() {
+    McpToolProviderResult obtainTools() {
         McpToolProvider toolProvider = new McpToolProvider();
         toolProvider.setMcpClient(mcpClient);
 

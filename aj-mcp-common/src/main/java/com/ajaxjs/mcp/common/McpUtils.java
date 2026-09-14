@@ -25,10 +25,10 @@ public class McpUtils {
     }
 
     /**
-     * Executes the is empty text operation.
+     * Executes the empty text operation.
      *
      * @param str the str value.
-     * @return the result of the is empty text operation.
+     * @return the result of the empty text operation.
      */
     public static boolean isEmptyText(String str) {
         return !hasText(str);

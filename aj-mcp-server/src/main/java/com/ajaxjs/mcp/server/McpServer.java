@@ -14,13 +14,15 @@ import com.ajaxjs.mcp.protocol.resource.SubscriptionUpdateNotification;
 import com.ajaxjs.mcp.protocol.tools.*;
 import com.ajaxjs.mcp.protocol.utils.completion.CompleteRequest;
 import com.ajaxjs.mcp.protocol.utils.completion.CompleteResult;
+import com.ajaxjs.mcp.protocol.utils.completion.CompleteResultDetail;
+import com.ajaxjs.mcp.protocol.utils.completion.CompletionResult;
 import com.ajaxjs.mcp.protocol.utils.pagination.Cursor;
 import com.ajaxjs.mcp.protocol.utils.ping.PingResponse;
-import com.ajaxjs.mcp.server.common.PaginatedResponse;
 import com.ajaxjs.mcp.server.common.ServerUtils;
 import com.ajaxjs.mcp.server.error.JsonRpcErrorCode;
 import com.ajaxjs.mcp.server.error.JsonRpcErrorException;
 import com.ajaxjs.mcp.server.feature.model.ServerStoreCompletion;
+import com.ajaxjs.mcp.server.feature.model.ServerStoreResourceTemplate;
 import com.ajaxjs.mcp.server.feature.model.ServerStoreTool;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -31,7 +33,6 @@ import lombok.extern.slf4j.Slf4j;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.*;
@@ -57,10 +58,12 @@ public class McpServer extends McpServerPrompt {
      * Holds the client capabilities value.
      */
     private final Map<String, InitializeRequestParams.Capabilities> clientCapabilities = new ConcurrentHashMap<>();
+
     /**
      * Holds the resource subscriptions value.
      */
     private final Map<String, Set<String>> resourceSubscriptions = new ConcurrentHashMap<>();
+
     /**
      * Holds the logging level value.
      */
@@ -77,14 +80,17 @@ public class McpServer extends McpServerPrompt {
      * key so two clients using the same ID cannot cancel each other's tools.
      */
     private final Map<RequestKey, RunningRequest> runningRequests = new ConcurrentHashMap<>();
+
     /**
      * Holds the session states value.
      */
     private final Map<String, SessionState> sessionStates = new ConcurrentHashMap<>();
+
     /**
      * Holds the server request ids value.
      */
     private final AtomicLong serverRequestIds = new AtomicLong(1);
+
     /**
      * Holds the pending client responses value.
      */
@@ -156,7 +162,7 @@ public class McpServer extends McpServerPrompt {
         String prefix = sessionId + ":";
         pendingClientResponses.forEach((key, future) -> {
             if (key.startsWith(prefix) && pendingClientResponses.remove(key, future))
-                future.completeExceptionally(failure);
+                future.completeExceptionally(new IllegalStateException("MCP session closed: " + sessionId));
         });
     }
 
@@ -205,12 +211,16 @@ public class McpServer extends McpServerPrompt {
      */
     public List<Root> listRoots(String sessionId, Duration timeout) {
         InitializeRequestParams.Capabilities capabilities = clientCapabilities.get(sessionId);
+
         if (capabilities == null || capabilities.getRoots() == null)
             throw new IllegalStateException("Client did not advertise roots capability");
+
         JsonNode result = requestClient(sessionId, Methods.ROOTS_LIST, null, timeout);
         List<Root> roots = new ArrayList<>();
+
         for (JsonNode root : result.path("roots"))
             roots.add(JsonUtils.convertValue(root, Root.class));
+
         return roots;
     }
 
@@ -222,13 +232,14 @@ public class McpServer extends McpServerPrompt {
      * @param timeout   the timeout value.
      * @return the result of the create message operation.
      */
-    public SamplingCreateMessageResult createMessage(String sessionId, SamplingCreateMessageParams params,
-                                                     Duration timeout) {
+    public SamplingCreateMessageResult createMessage(String sessionId, SamplingCreateMessageParams params, Duration timeout) {
         InitializeRequestParams.Capabilities capabilities = clientCapabilities.get(sessionId);
+
         if (capabilities == null || capabilities.getSampling() == null)
             throw new IllegalStateException("Client did not advertise sampling capability");
-        JsonNode result = requestClient(sessionId, Methods.SAMPLING_CREATE_MESSAGE,
-                JsonUtils.valueToTree(params), timeout);
+
+        JsonNode result = requestClient(sessionId, Methods.SAMPLING_CREATE_MESSAGE, JsonUtils.valueToTree(params), timeout);
+
         return JsonUtils.convertValue(result, SamplingCreateMessageResult.class);
     }
 
@@ -242,13 +253,17 @@ public class McpServer extends McpServerPrompt {
      */
     public ElicitResult elicit(String sessionId, ElicitRequestParams params, Duration timeout) {
         String version = sessionProtocolVersions.get(sessionId);
+
         if (version == null || !ProtocolVersion.from(version).supportsElicitation())
             throw new IllegalStateException("Elicitation requires an MCP 2025-06-18 session");
+
         InitializeRequestParams.Capabilities capabilities = clientCapabilities.get(sessionId);
+
         if (capabilities == null || capabilities.getElicitation() == null)
             throw new IllegalStateException("Client did not advertise elicitation capability");
-        JsonNode result = requestClient(sessionId, Methods.ELICITATION_CREATE,
-                JsonUtils.valueToTree(params), timeout);
+
+        JsonNode result = requestClient(sessionId, Methods.ELICITATION_CREATE, JsonUtils.valueToTree(params), timeout);
+
         return JsonUtils.convertValue(result, ElicitResult.class);
     }
 
@@ -283,7 +298,8 @@ public class McpServer extends McpServerPrompt {
 
         try {
             transport.send(sessionId, request.toString());
-            JsonNode response = future.get(Math.max(1L, effectiveTimeout.toMillis()), TimeUnit.MILLISECONDS);
+            JsonNode response = timeout == null || timeout.isZero()
+                    ? future.get() : future.get(Math.max(1L, timeout.toMillis()), TimeUnit.MILLISECONDS);
             if (response.has("error"))
                 throw new IllegalStateException("Client rejected " + method + ": " + response.get("error"));
 
@@ -369,9 +385,9 @@ public class McpServer extends McpServerPrompt {
                 return setLoggingLevel(requestRaw);
             case Methods.NOTIFICATION_INITIALIZED:
                 if (strict && state != SessionState.INITIALIZING)
-                    throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_REQUEST,
-                            "Unexpected initialized notification");
+                    throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_REQUEST, "Unexpected initialized notification");
                 sessionStates.put(sessionId, SessionState.READY);
+
                 return null;
             case Methods.NOTIFICATION_CANCELLED:
                 cancelRequest(requestRaw);
@@ -455,14 +471,14 @@ public class McpServer extends McpServerPrompt {
     }
 
     /**
-     * Executes the publish tools changed operation.
+     * Executes the publication tools changed operation.
      */
     public void publishToolsChanged() {
         broadcastNotification(Methods.TOOLS_LIST_CHANGED_NOTIFICATION, null);
     }
 
     /**
-     * Executes the publish prompts changed operation.
+     * Executes the publication prompts changed operation.
      */
     public void publishPromptsChanged() {
         broadcastNotification(Methods.PROMPTS_LIST_CHANGED_NOTIFICATION, null);
@@ -573,7 +589,7 @@ public class McpServer extends McpServerPrompt {
      * Executes the change subscription operation.
      *
      * @param requestRaw the request raw value.
-     * @param subscribe  the subscribe value.
+     * @param subscribe  the subscribed value.
      * @return the result of the change subscription operation.
      */
     private McpResponse changeSubscription(McpRequestRawInfo requestRaw, boolean subscribe) {
@@ -652,10 +668,9 @@ public class McpServer extends McpServerPrompt {
         }
 
         if (params == null || params.getRef() == null || params.getArgument() == null)
-            throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_PARAMS,
-                    "ref and argument are required");
+            throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_PARAMS, "ref and argument are required");
 
-        CompleteRequest.Ref ref = params.getRef();
+        CompleteRequest.ParamsRef ref = params.getRef();
         String reference = "ref/prompt".equals(ref.getType()) ? ref.getName() : resourceTemplateName(ref.getUri());
         String key = ref.getType() + ":" + reference + ":" + params.getArgument().getName();
         ServerStoreCompletion store = getStore(featureMgr.getCompletionStore(), key, requestRaw.getId(), "completion provider");
@@ -693,8 +708,8 @@ public class McpServer extends McpServerPrompt {
 
         CompleteResult response = new CompleteResult();
         response.setId(requestRaw.getId());
-        CompleteResult.CompletionResult completion = new CompleteResult.CompletionResult(values, total, hasMore);
-        response.setResult(new CompleteResult.CompleteResultDetail(completion));
+        CompletionResult completion = new CompletionResult(values, total, hasMore);
+        response.setResult(new CompleteResultDetail(completion));
 
         return response;
     }
@@ -706,8 +721,7 @@ public class McpServer extends McpServerPrompt {
      * @return the result of the resource template name operation.
      */
     private String resourceTemplateName(String uriTemplate) {
-        for (com.ajaxjs.mcp.server.feature.model.ServerStoreResourceTemplate store
-                : featureMgr.getResourceTemplateStore().values())
+        for (ServerStoreResourceTemplate store : featureMgr.getResourceTemplateStore().values())
             if (java.util.Objects.equals(uriTemplate, store.getResourceTemplate().getUriTemplate()))
                 return store.getResourceTemplate().getName();
 
@@ -925,13 +939,14 @@ public class McpServer extends McpServerPrompt {
                     "Tool returned a null content list");
 
         List<Content> content = new ArrayList<>(values.size());
+
         for (Object value : values) {
             if (!(value instanceof Content))
                 throw new JsonRpcErrorException(requestId, JsonRpcErrorCode.INTERNAL_ERROR,
-                        "Tool content list contains an unsupported value: "
-                                + (value == null ? "null" : value.getClass().getName()));
+                        "Tool content list contains an unsupported value: " + (value == null ? "null" : value.getClass().getName()));
             content.add((Content) value);
         }
+
         return content;
     }
 
@@ -961,14 +976,14 @@ public class McpServer extends McpServerPrompt {
         if (targetType == byte.class || targetType == Byte.class || targetType == short.class || targetType == Short.class
                 || targetType == int.class || targetType == Integer.class || targetType == long.class || targetType == Long.class
                 || targetType == float.class || targetType == Float.class || targetType == double.class || targetType == Double.class
-                || targetType == BigInteger.class || targetType == BigDecimal.class) {
+                || targetType == BigDecimal.class) {
             try {
                 BigDecimal number = new BigDecimal(value.toString());
                 if (targetType == byte.class || targetType == Byte.class) return number.byteValueExact();
                 if (targetType == short.class || targetType == Short.class) return number.shortValueExact();
                 if (targetType == int.class || targetType == Integer.class) return number.intValueExact();
                 if (targetType == long.class || targetType == Long.class) return number.longValueExact();
-                if (targetType == BigInteger.class) return number.toBigIntegerExact();
+
                 if (targetType == BigDecimal.class) return number;
                 if (targetType == float.class || targetType == Float.class) {
                     float converted = number.floatValue();

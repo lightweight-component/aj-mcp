@@ -306,12 +306,12 @@ public class JsonUtils {
     }
 
     /**
-     * Executes the json node2bean operation.
+     * Executes the json node to bean operation.
      *
      * @param <T>      the t type.
      * @param jsonNode the json node value.
      * @param clazz    the clazz value.
-     * @return the result of the json node2bean operation.
+     * @return the result of the json node to bean operation.
      */
     public static <T> T jsonNode2bean(JsonNode jsonNode, Class<T> clazz) {
         try {

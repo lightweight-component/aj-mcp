@@ -14,5 +14,5 @@ public class GetResourceRequestParams {
     /**
      * Holds the uri value.
      */
-    String uri;
+    private String uri;
 }

@@ -11,6 +11,7 @@ import com.ajaxjs.mcp.protocol.tools.CallToolResultDetail;
 import com.ajaxjs.mcp.protocol.tools.ToolItem;
 import com.ajaxjs.mcp.protocol.utils.completion.CompleteRequest;
 import com.ajaxjs.mcp.protocol.utils.completion.CompleteResult;
+import com.ajaxjs.mcp.protocol.utils.completion.CompletionResult;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.List;
@@ -199,7 +200,7 @@ public interface IMcpClient extends AutoCloseable {
      * @param argument the argument whose values should be completed.
      * @return the completion result.
      */
-    CompleteResult.CompletionResult complete(CompleteRequest.Ref ref, CompleteRequest.Argument argument);
+    CompletionResult complete(CompleteRequest.ParamsRef ref, CompleteRequest.Argument argument);
 
     /**
      * 2025-06-18 completion request with previously resolved arguments.
@@ -209,8 +210,7 @@ public interface IMcpClient extends AutoCloseable {
      * @param context  the previously resolved argument values.
      * @return the completion result.
      */
-    CompleteResult.CompletionResult complete(CompleteRequest.Ref ref, CompleteRequest.Argument argument,
-                                             Map<String, String> context);
+    CompletionResult complete(CompleteRequest.ParamsRef ref, CompleteRequest.Argument argument, Map<String, String> context);
 
     /**
      * Registers an observer for a JSON-RPC notification method.

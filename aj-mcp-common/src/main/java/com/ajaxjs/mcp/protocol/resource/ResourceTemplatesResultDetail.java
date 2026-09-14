@@ -15,11 +15,11 @@ public class ResourceTemplatesResultDetail {
     /**
      * Holds the resource templates value.
      */
-    List<ResourceTemplate> resourceTemplates;
+    private List<ResourceTemplate> resourceTemplates;
 
     /**
      * Holds the next cursor value.
      */
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    String nextCursor;
+    private  String nextCursor;
 }
