@@ -5,7 +5,6 @@ import com.ajaxjs.mcp.protocol.McpRequestRawInfo;
 import com.ajaxjs.mcp.protocol.McpResponse;
 import com.ajaxjs.mcp.protocol.resource.*;
 import com.ajaxjs.mcp.protocol.utils.pagination.Cursor;
-import com.ajaxjs.mcp.server.common.PaginatedResponse;
 import com.ajaxjs.mcp.server.common.ServerUtils;
 import com.ajaxjs.mcp.server.error.JsonRpcErrorCode;
 import com.ajaxjs.mcp.server.error.JsonRpcErrorException;
@@ -20,7 +19,10 @@ import java.util.*;
 import java.util.regex.Matcher;
 
 /**
- * Represents mcp server resource.
+ * Resource-specific portion of the MCP server dispatcher.
+ * <p>
+ * This layer handles concrete resources, resource templates, URI-template matching,
+ * subscription bookkeeping, and conversion of Java method return values into MCP resource contents.
  */
 public abstract class McpServerResource extends McpServerInitialize {
     /**
@@ -59,10 +61,10 @@ public abstract class McpServerResource extends McpServerInitialize {
     }
 
     /**
-     * Executes the resource template list operation.
+     * Lists registered resource templates using the optional cursor supplied by the client.
      *
-     * @param requestRaw the request raw value.
-     * @return the result of the resource template list operation.
+     * @param requestRaw raw JSON-RPC request information.
+     * @return response containing the current page of resource templates.
      */
     McpResponse resourceTemplateList(McpRequestRawInfo requestRaw) {
         Cursor cursor = requestRaw.getJsonNode().has(PARAMS) ? JsonUtils.jsonNode2bean(requestRaw.getJsonNode().get(PARAMS), Cursor.class) : null;

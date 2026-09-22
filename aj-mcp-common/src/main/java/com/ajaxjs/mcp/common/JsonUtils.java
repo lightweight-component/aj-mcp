@@ -69,7 +69,7 @@ public class JsonUtils {
     /**
      * Executes the value to tree operation.
      *
-     * @param value the value value.
+     * @param value the value.
      * @return the result of the value to tree operation.
      */
     public static JsonNode valueToTree(Object value) {

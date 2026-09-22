@@ -3,30 +3,33 @@ package com.ajaxjs.mcp.server.model;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Represents running request.
+ * Tracks a request that is currently executing on a worker thread.
+ * <p>
+ * Cancellation is cooperative: the first cancel call records the state and interrupts the
+ * worker thread so blocking operations can react according to normal Java interruption rules.
  */
 public final class RunningRequest {
     /**
-     * Holds the thread value.
+     * Worker thread currently processing the JSON-RPC request.
      */
     private final Thread thread;
 
     /**
-     * Holds the canceled value.
+     * Ensures cancellation and interruption are performed only once.
      */
     private final AtomicBoolean cancelled = new AtomicBoolean();
 
     /**
-     * Creates a new running request.
+     * Creates a request tracker for the supplied worker thread.
      *
-     * @param thread the thread value.
+     * @param thread the worker thread to interrupt on cancellation.
      */
     public RunningRequest(Thread thread) {
         this.thread = thread;
     }
 
     /**
-     * Executes the cancel operation.
+     * Marks the request as cancelled and interrupts its worker thread on the first call.
      */
     public void cancel() {
         if (cancelled.compareAndSet(false, true))

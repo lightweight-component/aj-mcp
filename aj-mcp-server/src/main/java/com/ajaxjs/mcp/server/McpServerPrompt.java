@@ -5,7 +5,6 @@ import com.ajaxjs.mcp.protocol.McpRequestRawInfo;
 import com.ajaxjs.mcp.protocol.McpResponse;
 import com.ajaxjs.mcp.protocol.prompt.*;
 import com.ajaxjs.mcp.protocol.utils.pagination.Cursor;
-import com.ajaxjs.mcp.server.common.PaginatedResponse;
 import com.ajaxjs.mcp.server.common.ServerUtils;
 import com.ajaxjs.mcp.server.error.JsonRpcErrorCode;
 import com.ajaxjs.mcp.server.error.JsonRpcErrorException;
@@ -21,7 +20,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Represents mcp server prompt.
+ * Prompt-specific portion of the MCP server dispatcher.
+ * <p>
+ * This layer lists registered prompts, validates prompt/get parameters, invokes annotated
+ * prompt methods, and converts their results into protocol prompt messages.
  */
 @Slf4j
 public abstract class McpServerPrompt extends McpServerResource {
@@ -116,9 +118,11 @@ public abstract class McpServerPrompt extends McpServerResource {
             for (int i = 0; i < argumentsDefined.size(); i++) {
                 PromptArgument definition = argumentsDefined.get(i);
                 Object value = arguments.get(paramOrder[i]);
+
                 if (value == null && (definition.isRequired() || parameterTypes[i].isPrimitive()))
                     throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_PARAMS,
                             "argument " + paramOrder[i] + " is required");
+
                 argValues[i] = McpServer.convertArgument(value, parameterTypes[i], requestRaw.getId());
             }
         }
@@ -146,9 +150,11 @@ public abstract class McpServerPrompt extends McpServerResource {
             promptMessages = Collections.singletonList((PromptMessage) returnedValue);
         else if (returnedValue instanceof List) {
             promptMessages = new ArrayList<>();
+
             for (Object value : (List<?>) returnedValue) {
                 if (!(value instanceof PromptMessage))
                     throw invalidPromptReturn(requestRaw.getId(), value);
+
                 promptMessages.add((PromptMessage) value);
             }
         } else
@@ -169,7 +175,7 @@ public abstract class McpServerPrompt extends McpServerResource {
      * Executes the invalid prompt return operation.
      *
      * @param requestId the request id value.
-     * @param value     the value value.
+     * @param value     the value.
      * @return the result of the invalid prompt return operation.
      */
     private static JsonRpcErrorException invalidPromptReturn(Object requestId, Object value) {
@@ -203,10 +209,9 @@ public abstract class McpServerPrompt extends McpServerResource {
         for (int i = 0; i < paramOrder.length; i++) {
             String key = paramOrder[i];
 
-            if (map.containsKey(key)) {
+            if (map.containsKey(key))
                 result[i] = map.get(key);
-            } else {
-                // 如果 Map 中不存在对应的 key，可以选择设置默认值或抛出异常
+             else {                // 如果 Map 中不存在对应的 key，可以选择设置默认值或抛出异常
                 result[i] = null; // 默认值为 null
             }
         }

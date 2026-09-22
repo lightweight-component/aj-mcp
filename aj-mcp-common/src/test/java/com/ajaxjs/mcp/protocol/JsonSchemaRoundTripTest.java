@@ -4,6 +4,7 @@ import com.ajaxjs.mcp.common.JsonUtils;
 import com.ajaxjs.mcp.protocol.tools.JsonSchema;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class JsonSchemaRoundTripTest {

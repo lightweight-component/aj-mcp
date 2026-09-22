@@ -21,9 +21,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target(ElementType.PARAMETER)
 public @interface CompleteArg {
     /**
-     * The name of the completed argument
+     * Name of the prompt or resource-template argument for which this completion method
+     * provides candidate values. When empty, the Java parameter name is used if available.
      *
-     * @return the name of the completed argument
+     * @return the completed argument name, or an empty string to derive it from the parameter.
      */
     String name() default McpConstant.EMPTY_STR;
 

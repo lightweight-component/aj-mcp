@@ -4,19 +4,19 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
- * Represents json rpc error detail.
+ * Payload stored in the {@code error} member of a JSON-RPC error response.
  */
 @Data
 @AllArgsConstructor
 public class JsonRpcErrorDetail {
 
     /**
-     * Holds the code value.
+     * Machine-readable JSON-RPC error code.
      */
     private JsonRpcErrorCode code;
 
     /**
-     * Holds the message value.
+     * Human-readable diagnostic message returned to the peer.
      */
     private String message;
 }

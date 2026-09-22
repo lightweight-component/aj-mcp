@@ -16,10 +16,10 @@ public class SubscribeRequest extends McpRequest {
     /**
      * Holds the method value.
      */
-    private  String method = RESOURCES_SUBSCRIBE_REQUEST;
+    private String method = RESOURCES_SUBSCRIBE_REQUEST;
 
     /**
      * Holds the params value.
      */
-    private  GetResourceRequestParams params;
+    private GetResourceRequestParams params;
 }

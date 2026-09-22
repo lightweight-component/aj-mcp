@@ -3,14 +3,21 @@ package com.ajaxjs.mcp.protocol.tools;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.*;
+
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 
-/** Property schemas may be objects or booleans; preserve both without coercion. */
+/**
+ * Property schemas may be objects or booleans; preserve both without coercion.
+ */
 public final class JsonSchemaPropertyCodec {
-    private JsonSchemaPropertyCodec() { }
+    private JsonSchemaPropertyCodec() {
+    }
 
+    /**
+     * Deserializes object and boolean JSON Schema property forms.
+     */
     public static final class Reader extends JsonDeserializer<JsonSchemaProperty> {
         @Override
         public JsonSchemaProperty deserialize(JsonParser parser, DeserializationContext context) throws IOException {
@@ -36,6 +43,9 @@ public final class JsonSchemaPropertyCodec {
         }
     }
 
+    /**
+     * Serializes object and boolean JSON Schema property forms.
+     */
     public static final class Writer extends JsonSerializer<JsonSchemaProperty> {
         @Override
         public void serialize(JsonSchemaProperty value, JsonGenerator generator, SerializerProvider provider)

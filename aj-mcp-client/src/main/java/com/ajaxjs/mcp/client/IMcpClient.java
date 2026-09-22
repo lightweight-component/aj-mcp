@@ -10,7 +10,6 @@ import com.ajaxjs.mcp.protocol.tools.CallToolRequest;
 import com.ajaxjs.mcp.protocol.tools.CallToolResultDetail;
 import com.ajaxjs.mcp.protocol.tools.ToolItem;
 import com.ajaxjs.mcp.protocol.utils.completion.CompleteRequest;
-import com.ajaxjs.mcp.protocol.utils.completion.CompleteResult;
 import com.ajaxjs.mcp.protocol.utils.completion.CompletionResult;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -20,11 +19,31 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
- * Represents a client that can communicate with an MCP server over a given transport protocol, retrieve and execute tools using the server.
+ * Synchronous, high-level API for communicating with an MCP server.
+ *
+ * <p>An implementation owns one transport and exposes MCP feature families as
+ * ordinary Java methods. The transport is started and the initialization
+ * handshake is completed by {@link #initialize()}; feature methods must not be
+ * used before that call. Unless stated otherwise, methods block until the
+ * server replies or the configured request timeout expires.</p>
+ *
+ * <p>List methods hide pagination where possible. Use page methods when the
+ * caller needs to retain an opaque server cursor or avoid fetching all pages at
+ * once. Register notification and server-request handlers before initialization
+ * so their capabilities can be advertised in the handshake.</p>
  */
 public interface IMcpClient extends AutoCloseable {
     /**
-     * Initializes the client by sending an initialization request to the MCP server.
+     * Starts the transport and performs the MCP initialization handshake.
+     *
+     * <p>This negotiates the protocol revision and capabilities, sends the
+     * required {@code notifications/initialized} notification, and only then
+     * makes the client ready for feature requests. Register handlers and roots
+     * before calling this method. A failed or timed-out initialization closes
+     * the transport.</p>
+     *
+     * @throws RuntimeException if the transport cannot start, negotiation fails,
+     *                          or the server does not answer before the configured timeout
      */
     void initialize();
 
@@ -44,10 +63,14 @@ public interface IMcpClient extends AutoCloseable {
     List<ToolItem> listTools(int pageNo);
 
     /**
-     * Executes the list tool page operation.
+     * Retrieves one page of tools using an opaque server cursor.
      *
-     * @param cursor the cursor value.
-     * @return the result of the list tool page operation.
+     * <p>Pass {@code null} to request the first page. The returned cursor must
+     * be treated as opaque and passed unchanged to the next invocation; an
+     * absent cursor means that the server has no more results.</p>
+     *
+     * @param cursor opaque cursor from a previous page, or {@code null} for the first page
+     * @return the page items and the cursor for the next page
      */
     McpPage<ToolItem> listToolPage(String cursor);
 
@@ -92,10 +115,10 @@ public interface IMcpClient extends AutoCloseable {
     List<ResourceItem> listResources(int pageNo);
 
     /**
-     * Executes the list resource page operation.
+     * Retrieves one page of resources using an opaque server cursor.
      *
-     * @param cursor the cursor value.
-     * @return the result of the list resource page operation.
+     * @param cursor opaque cursor from a previous page, or {@code null} for the first page
+     * @return the page items and the cursor for the next page
      */
     McpPage<ResourceItem> listResourcePage(String cursor);
 
@@ -115,10 +138,10 @@ public interface IMcpClient extends AutoCloseable {
     List<ResourceTemplate> listResourceTemplates(int pageNo);
 
     /**
-     * Executes the list resource template page operation.
+     * Retrieves one page of resource templates using an opaque server cursor.
      *
-     * @param cursor the cursor value.
-     * @return the result of the list resource template page operation.
+     * @param cursor opaque cursor from a previous page, or {@code null} for the first page
+     * @return the page items and the cursor for the next page
      */
     McpPage<ResourceTemplate> listResourceTemplatePage(String cursor);
 
@@ -161,10 +184,10 @@ public interface IMcpClient extends AutoCloseable {
     List<PromptItem> listPrompts(int pageNo);
 
     /**
-     * Executes the list prompt page operation.
+     * Retrieves one page of prompts using an opaque server cursor.
      *
-     * @param cursor the cursor value.
-     * @return the result of the list prompt page operation.
+     * @param cursor opaque cursor from a previous page, or {@code null} for the first page
+     * @return the page items and the cursor for the next page
      */
     McpPage<PromptItem> listPromptPage(String cursor);
 
@@ -187,9 +210,14 @@ public interface IMcpClient extends AutoCloseable {
     GetPromptResultDetail getPrompt(String name, String arguments);
 
     /**
-     * Performs a health check that returns normally if the MCP server is reachable and
-     * properly responding to ping requests. If this method throws an exception,
-     * the health of this MCP client is considered degraded.
+     * Verifies both the local transport and the remote MCP connection.
+     *
+     * <p>The implementation first performs a transport-specific check (for
+     * example, whether a stdio child process is alive) and then sends the MCP
+     * {@code ping} request. A normal return indicates that the check completed;
+     * it does not guarantee that a later operation will succeed.</p>
+     *
+     * @throws RuntimeException if the client is not initialized or either check fails
      */
     void checkHealth();
 
@@ -213,31 +241,46 @@ public interface IMcpClient extends AutoCloseable {
     CompletionResult complete(CompleteRequest.ParamsRef ref, CompleteRequest.Argument argument, Map<String, String> context);
 
     /**
-     * Registers an observer for a JSON-RPC notification method.
+     * Registers or replaces a handler for a server notification.
      *
-     * @param method  the JSON-RPC notification method.
-     * @param handler the notification handler.
+     * <p>The handler receives the notification's {@code params} node rather
+     * than the complete JSON-RPC envelope. Registration before initialization
+     * is recommended for list-change notifications.</p>
+     *
+     * @param method  JSON-RPC notification method
+     * @param handler callback receiving notification parameters
      */
     void onNotification(String method, Consumer<JsonNode> handler);
 
     /**
-     * Registers a handler for a server-initiated JSON-RPC request such as roots/list or sampling/createMessage.
+     * Registers or replaces a handler for a server-initiated JSON-RPC request.
      *
-     * @param method  the JSON-RPC request method.
-     * @param handler the handler that produces the JSON-RPC result.
+     * <p>The handler receives the request's {@code params} node and must return
+     * the JSON value used as the result. A {@code null} result is treated as an
+     * unsupported request. Registering a handler before initialization also
+     * advertises the corresponding client capability when applicable.</p>
+     *
+     * @param method  JSON-RPC request method, such as {@code roots/list} or
+     *                {@code sampling/createMessage}
+     * @param handler callback that converts request parameters into a result
      */
     void onServerRequest(String method, Function<JsonNode, JsonNode> handler);
 
     /**
-     * Executes the set roots operation.
+     * Supplies the roots exposed to a server through {@code roots/list}.
      *
-     * @param roots         the roots value.
-     * @param notifyChanges the notify changes value.
+     * <p>The list is copied when configured. If {@code notifyChanges} is true,
+     * {@link #notifyRootsChanged()} may be used after the list changes.</p>
+     *
+     * @param roots         roots to expose to the server
+     * @param notifyChanges whether the client advertises and supports root-list change notifications
      */
     void setRoots(List<Root> roots, boolean notifyChanges);
 
     /**
-     * Executes the notify roots changed operation.
+     * Notifies the server that the configured roots list has changed.
+     *
+     * @throws IllegalStateException if root-list change notifications were not enabled
      */
     void notifyRootsChanged();
 
@@ -251,7 +294,11 @@ public interface IMcpClient extends AutoCloseable {
     /**
      * Registers the user-interaction handler advertised by MCP 2025-06-18 clients.
      *
-     * @param handler the handler that resolves an elicitation request.
+     * <p>The handler is called for server {@code elicitation/create} requests.
+     * It must return the decision/result that will be serialized as the JSON-RPC
+     * response.</p>
+     *
+     * @param handler handler that resolves an elicitation request
      */
     void setElicitationHandler(Function<ElicitRequestParams, ElicitResult> handler);
 

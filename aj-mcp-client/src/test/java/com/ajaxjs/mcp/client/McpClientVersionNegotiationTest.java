@@ -29,6 +29,7 @@ class McpClientVersionNegotiationTest {
                 JsonUtils.json2Node("[{\"name\":\"test\",\"inputSchema\":{\"type\":\"object\"},\"_meta\":{\"vendor/key\":[1,true]}}]");
         assertEquals(tools.get(0).get("_meta"), JsonUtils.valueToTree(McpClient.toolListFromMcpResponse(tools).get(0)).get("_meta"));
     }
+
     @Test
     void acceptsAConfiguredServerFallbackAndStoresItOnTransport() {
         NegotiatingTransport transport = new NegotiatingTransport();
@@ -47,6 +48,7 @@ class McpClientVersionNegotiationTest {
      */
     private static final class NegotiatingTransport extends McpTransport {
         private String title;
+
         @Override
         public void start(Map<Long, CompletableFuture<JsonNode>> pending) {
             setPendingRequests(pending);

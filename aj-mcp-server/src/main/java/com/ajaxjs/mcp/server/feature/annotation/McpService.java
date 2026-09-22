@@ -7,7 +7,12 @@ import java.lang.annotation.Target;
 
 
 /**
- * Represents mcp service.
+ * Marks a class as a container of MCP feature methods.
+ * <p>
+ * Package scanning looks for this annotation before registering methods annotated with
+ * {@link Tool}, {@link Prompt}, {@link Resource}, {@link ResourceTemplate}, or completion
+ * annotations. The annotation has no attributes because registration details are declared
+ * on individual methods.
  */
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)

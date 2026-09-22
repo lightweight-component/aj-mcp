@@ -8,8 +8,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -23,7 +23,8 @@ class McpTransportMessageRoutingTest {
         Map<Long, CompletableFuture<JsonNode>> pending = new java.util.HashMap<>();
         pending.put(7L, new CompletableFuture<>());
         transport.start(pending);
-        transport.setMessageHandlers(ignored -> {}, request -> {
+        transport.setMessageHandlers(ignored -> {
+        }, request -> {
             throw new AssertionError("Ping must bypass application handlers");
         });
         for (String id : new String[]{"7", "\"server-ping\""}) {
@@ -103,7 +104,10 @@ class McpTransportMessageRoutingTest {
         AtomicInteger notifications = new AtomicInteger();
         CompletableFuture<JsonNode> result = transport.completeInitializationForTest(
                 CompletableFuture.completedFuture(JsonUtils.json2Node("{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"protocolVersion\":\"2099-01-01\"}}")),
-                () -> { notifications.incrementAndGet(); return CompletableFuture.completedFuture(null); });
+                () -> {
+                    notifications.incrementAndGet();
+                    return CompletableFuture.completedFuture(null);
+                });
         org.junit.jupiter.api.Assertions.assertTrue(result.isCompletedExceptionally());
         assertEquals(0, notifications.get());
     }
@@ -118,7 +122,7 @@ class McpTransportMessageRoutingTest {
         final AtomicReference<JsonNode> sent = new AtomicReference<>();
 
         CompletableFuture<JsonNode> completeInitializationForTest(CompletableFuture<JsonNode> response,
-                                                                   java.util.function.Supplier<CompletableFuture<JsonNode>> notification) {
+                                                                  java.util.function.Supplier<CompletableFuture<JsonNode>> notification) {
             return completeInitialization(response, notification);
         }
 

@@ -1,5 +1,5 @@
 [![Maven Central](https://img.shields.io/maven-central/v/com.ajaxjs/aj-mcp-server?label=Latest%20Release)](https://central.sonatype.com/artifact/com.ajaxjs/aj-mcp-server)
-[![Javadoc](https://img.shields.io/badge/javadoc-1.5-brightgreen.svg?)](https://javadoc.io/doc/com.ajaxjs/aj-mcp-server)
+[![Javadoc](https://img.shields.io/badge/javadoc-1.6-brightgreen.svg?)](https://javadoc.io/doc/com.ajaxjs/aj-mcp-server)
 ![coverage](https://img.shields.io/badge/coverage-80%25-yellowgreen.svg?maxAge=2592000)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Email](https://img.shields.io/badge/Contact--me-Email-orange.svg)](mailto:frank@ajaxjs.com)
@@ -40,7 +40,7 @@ Runs on Java8+. Maven:
 <dependency>
     <groupId>com.ajaxjs</groupId>
     <artifactId>aj-mcp-server</artifactId>
-    <version>1.5</version>
+    <version>1.6</version>
 </dependency>
 ```
 
@@ -177,17 +177,17 @@ remain compatible; the client's `complete(ref, argument, context)` Map API is un
 
 `ServerConfig` controls:
 
-| Property           | Meaning                                                 | Default                   |
-|--------------------|---------------------------------------------------------|---------------------------|
-| `name`, `version`  | Server identity returned during initialization          | unset                     |
-| `pageSize`         | Number of tools/resources/prompts per page              | `3`                       |
-| `protocolVersions` | Supported revisions, newest first                       | all implemented revisions |
-| `strictLifecycle`  | Require initialize → initialized before normal requests | `true`                    |
-| `allowedOrigins`   | Accepted browser Origin values for Streamable HTTP      | empty                     |
-| `clientRequestTimeout` | Server-to-client timeout used when null/zero is passed | `Duration.ofSeconds(60)` |
-| `sessionIdleTimeout` | HTTP session inactivity limit | `Duration.ofMinutes(30)` |
-| `stdioWorkers` | Maximum concurrent STDIO requests | `16` |
-| `stdioQueueCapacity` | Queued STDIO requests before a busy error | `256` |
+| Property               | Meaning                                                 | Default                   |
+|------------------------|---------------------------------------------------------|---------------------------|
+| `name`, `version`      | Server identity returned during initialization          | unset                     |
+| `pageSize`             | Number of tools/resources/prompts per page              | `3`                       |
+| `protocolVersions`     | Supported revisions, newest first                       | all implemented revisions |
+| `strictLifecycle`      | Require initialize → initialized before normal requests | `true`                    |
+| `allowedOrigins`       | Accepted browser Origin values for Streamable HTTP      | empty                     |
+| `clientRequestTimeout` | Server-to-client timeout used when null/zero is passed  | `Duration.ofSeconds(60)`  |
+| `sessionIdleTimeout`   | HTTP session inactivity limit                           | `Duration.ofMinutes(30)`  |
+| `stdioWorkers`         | Maximum concurrent STDIO requests                       | `16`                      |
+| `stdioQueueCapacity`   | Queued STDIO requests before a busy error               | `256`                     |
 
 STDIO uses UTF-8 regardless of the system charset. Set its worker/queue limits before constructing `ServerStdio`.
 Handshake, ping, cancellation and reverse responses remain serviceable while the tool queue is full.

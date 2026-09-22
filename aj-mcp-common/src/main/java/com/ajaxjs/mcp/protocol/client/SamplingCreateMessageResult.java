@@ -1,5 +1,6 @@
 package com.ajaxjs.mcp.protocol.client;
 
+import com.ajaxjs.mcp.protocol.common.Metadata;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
 
@@ -7,7 +8,7 @@ import lombok.Data;
  * Result returned by the client for sampling/createMessage.
  */
 @Data
-public class SamplingCreateMessageResult extends com.ajaxjs.mcp.protocol.common.Metadata {
+public class SamplingCreateMessageResult extends Metadata {
     /**
      * Holds the role value.
      */

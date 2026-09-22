@@ -35,27 +35,27 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class ServerStreamableHttp implements McpTransportSync {
     /**
-     * Defines the protocol version header constant.
+     * HTTP header used by Streamable HTTP clients to declare the MCP protocol revision.
      */
     public static final String PROTOCOL_VERSION_HEADER = "MCP-Protocol-Version";
 
     /**
-     * Defines the session id header constant.
+     * HTTP header carrying the server-issued Streamable HTTP session id.
      */
     public static final String SESSION_ID_HEADER = "Mcp-Session-Id";
 
     /**
-     * Holds the server value.
+     * Shared server dispatcher used for all HTTP sessions.
      */
     private final McpServer server;
 
     /**
-     * Holds the stream value.
+     * Optional long-lived GET event streams keyed by HTTP session id.
      */
     private final Map<String, StreamSession> streams = new ConcurrentHashMap<>();
 
     /**
-     * Holds the closed value.
+     * Transport-level close flag checked by every request entry point.
      */
     private volatile boolean closed;
 
@@ -83,9 +83,9 @@ public class ServerStreamableHttp implements McpTransportSync {
     }
 
     /**
-     * Creates a new server-streamable http.
+     * Creates a framework-neutral Streamable HTTP adapter.
      *
-     * @param server the server value.
+     * @param server the server dispatcher used for JSON-RPC messages.
      */
     public ServerStreamableHttp(McpServer server) {
         this.server = server;

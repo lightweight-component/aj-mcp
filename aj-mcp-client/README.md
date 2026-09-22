@@ -1,5 +1,5 @@
 [![Maven Central](https://img.shields.io/maven-central/v/com.ajaxjs/aj-mcp-client?label=Latest%20Release)](https://central.sonatype.com/artifact/com.ajaxjs/aj-mcp-client)
-[![Javadoc](https://img.shields.io/badge/javadoc-1.6-brightgreen.svg?)](https://javadoc.io/doc/com.ajaxjs/aj-mcp-client)
+[![Javadoc](https://img.shields.io/badge/javadoc-1.7-brightgreen.svg?)](https://javadoc.io/doc/com.ajaxjs/aj-mcp-client)
 ![coverage](https://img.shields.io/badge/coverage-80%25-yellowgreen.svg?maxAge=2592000)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Email](https://img.shields.io/badge/Contact--me-Email-orange.svg)](mailto:frank@ajaxjs.com)
@@ -39,7 +39,7 @@ Runs on Java8+. Maven:
 <dependency>
     <groupId>com.ajaxjs</groupId>
     <artifactId>aj-mcp-client</artifactId>
-    <version>1.6</version>
+    <version>1.7</version>
 </dependency>
 ```
 
@@ -168,7 +168,8 @@ opaque cursors. The older integer page methods remain available for compatibilit
 ## Lifecycle and errors
 
 - Call `initialize()` exactly once before normal requests when constructing a client manually.
-- Set `requestTimeout` to a positive duration; null or zero uses the finite 60-second default. Negative durations are rejected.
+- Set `requestTimeout` to a positive duration; null or zero uses the finite 60-second default. Negative durations are
+  rejected.
 - Use try-with-resources or call `close()` in `finally`. Closing fails pending requests and releases the transport,
   worker threads, HTTP connections, and child process.
 - `callToolResult()` preserves the full MCP result, including structured content and `isError`. `callTool()` is a text

@@ -9,29 +9,33 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Annotates a business method of a bean as an exposed prompt template.
+ * Marks a business method as an MCP prompt template.
+ * <p>
+ * The annotated method is registered during feature scanning and is invoked when the peer
+ * requests the prompt by name. Method parameters annotated with {@link PromptArg} become
+ * prompt arguments exposed in the protocol metadata.
  */
 @Retention(RUNTIME)
 @Target(METHOD)
 public @interface Prompt {
     /**
-     * Executes the value operation.
+     * Protocol name of the prompt. When left empty, the Java method name is used.
      *
-     * @return the result of the value operation.
+     * @return the exposed prompt name, or an empty string to derive it from the method.
      */
     String value() default McpConstant.EMPTY_STR;
 
     /**
-     * An optional description.
+     * Optional description shown to clients when listing prompts.
      *
-     * @return description
+     * @return the prompt description, or an empty string when unspecified.
      */
     String description() default McpConstant.EMPTY_STR;
 
     /**
-     * Executes the title operation.
+     * Optional display title for protocol revisions that support prompt annotations.
      *
-     * @return the result of the title operation.
+     * @return the display title, or an empty string when unspecified.
      */
     String title() default McpConstant.EMPTY_STR;
 }

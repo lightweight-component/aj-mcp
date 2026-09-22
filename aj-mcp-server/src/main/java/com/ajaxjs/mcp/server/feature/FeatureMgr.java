@@ -21,36 +21,39 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Represents feature mgr.
+ * Registry and annotation processor for server-side MCP features.
+ * <p>
+ * It scans classes annotated with {@link McpService}, converts annotated methods into protocol
+ * metadata, and stores the reflective bindings used later by the request dispatcher.
  */
 @Slf4j
 public class FeatureMgr {
     /**
-     * Holds the prompt store value.
+     * Registered prompts keyed by their protocol names.
      */
     @Getter
     private final Map<String, ServerStorePrompt> promptStore = new ConcurrentHashMap<>();
 
     /**
-     * Holds the resource store value.
+     * Registered concrete resources keyed by resource URI.
      */
     @Getter
     private final Map<String, ServerStoreResource> resourceStore = new ConcurrentHashMap<>();
 
     /**
-     * Holds the tool store value.
+     * Registered tools keyed by their protocol names.
      */
     @Getter
     private final Map<String, ServerStoreTool> toolStore = new ConcurrentHashMap<>();
 
     /**
-     * Holds the resource template store value.
+     * Registered resource templates keyed by template URI.
      */
     @Getter
     private final Map<String, ServerStoreResourceTemplate> resourceTemplateStore = new ConcurrentHashMap<>();
 
     /**
-     * Holds the completion store value.
+     * Registered completion providers keyed by reference type, reference name, and argument name.
      */
     @Getter
     private final Map<String, ServerStoreCompletion> completionStore = new ConcurrentHashMap<>();

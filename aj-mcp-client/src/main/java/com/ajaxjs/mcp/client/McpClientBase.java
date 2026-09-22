@@ -27,13 +27,26 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
- * Base Class for MCP Client, mainly doing the initialize job.
+ * Shared implementation of the synchronous MCP client API.
+ *
+ * <p>This class owns request identifiers, pending-response tracking, protocol
+ * negotiation, pagination caches, and callbacks for server-originated messages.
+ * Subclasses only need to provide feature operations and a configured
+ * {@link McpTransport}. Instances represent one MCP session and should not be
+ * shared across independent transports or servers.</p>
+ *
+ * <p>Operations use a bounded request wait. A null or zero timeout is normalized
+ * to the default of 60 seconds, rather than creating an accidental infinite
+ * wait. Initialization failures close the transport and clean up pending state.</p>
  */
 @Slf4j
 @SuperBuilder
 public abstract class McpClientBase implements IMcpClient, McpConstant {
     /**
-     * Holds the transport value.
+     * Transport used for the lifetime of this client session.
+     *
+     * <p>The transport must be configured before {@link #initialize()} and
+     * should not be replaced while requests are in flight.</p>
      */
     McpTransport transport;
 
@@ -43,7 +56,9 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
     @Builder.Default
     String clientName = "aj-mcp";
 
-    /** Optional display label, separate from the stable clientName identifier. */
+    /**
+     * Optional display label, separate from the stable clientName identifier.
+     */
     String clientTitle;
 
     /**
@@ -53,14 +68,22 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
     String clientVersion = "1.0";
 
     /**
-     * Sets the protocol version that the client will advertise in the
-     * initialization message. The default value right now is "2024-11-05", but will change over time in later versions.
+     * Protocol revision initially advertised in the initialization request.
+     *
+     * <p>The server may select a different value from
+     * {@link #supportedProtocolVersions}. Revision-specific capabilities are
+     * validated after negotiation; setting a newer revision does not make an
+     * older server support it.</p>
      */
     @Builder.Default
     String protocolVersion = "2024-11-05";
 
     /**
-     * Revisions this client can accept if the server selects a fallback.
+     * Protocol revisions this client accepts in the server's initialize result.
+     *
+     * <p>The list is copied into the transport during initialization. It should
+     * contain only revisions understood by the application; selecting another
+     * revision causes initialization to fail.</p>
      */
     @Builder.Default
     List<String> supportedProtocolVersions = ProtocolVersion.supportedVersions();
@@ -71,14 +94,19 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
     private volatile String negotiatedProtocolVersion;
 
     /**
-     * Sets the timeout for every request, including initialization and health checks.
-     * The default value is 60 seconds. A value of zero means no timeout.
+     * Maximum wait for each synchronous request, including initialization and
+     * health checks.
+     *
+     * <p>Null or zero uses a 60-second default. Negative values are rejected.
+     * On timeout the underlying future is cancelled and its pending entry is
+     * removed.</p>
      */
     @Builder.Default
     Duration requestTimeout = Duration.ofSeconds(60);
 
     /**
-     * Holds the pending requests value.
+     * Per-session map from client request id to response future.
+     * Entries are removed after response, failure, timeout, or close.
      */
     final Map<Long, CompletableFuture<JsonNode>> pendingRequests = new ConcurrentHashMap<>();
 
@@ -88,17 +116,17 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
     final AtomicLong idGenerator = new AtomicLong(1);
 
     /**
-     * Holds the resource refs value.
+     * Cached resource pages keyed by page number; invalidated on resource-list changes.
      */
     final Map<Integer, List<ResourceItem>> resourceRefs = new ConcurrentHashMap<>();
 
     /**
-     * Holds the resource template refs value.
+     * Cached resource-template pages keyed by page number; invalidated on resource-list changes.
      */
     final Map<Integer, List<ResourceTemplate>> resourceTemplateRefs = new ConcurrentHashMap<>();
 
     /**
-     * Holds the prompt refs value.
+     * Cached prompt pages keyed by page number; invalidated on prompt-list changes.
      */
     final Map<Integer, List<PromptItem>> promptRefs = new ConcurrentHashMap<>();
 
@@ -122,6 +150,15 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
      */
     volatile boolean rootsListChanged;
 
+    /**
+     * Starts the transport, sends initialize, validates the selected protocol
+     * revision, and marks the transport ready for feature requests.
+     *
+     * <p>Handlers are installed before startup so server-originated requests
+     * received during or immediately after initialization can be answered. The
+     * pending initialize entry is removed in all outcomes; unsuccessful
+     * initialization closes the transport.</p>
+     */
     @Override
     public void initialize() {
         transport.setMessageHandlers(this::handleNotification, this::handleServerRequest);
@@ -284,6 +321,9 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
      * Sends a request and applies the common synchronous client lifecycle. The
      * transport removes successful responses itself; the finally block also
      * covers timeouts and send failures, preventing stale pending entries.
+     *
+     * @param request the request to send
+     * @return the response returned by the server
      */
     protected JsonNode executeRequest(McpRequest request) {
         try {

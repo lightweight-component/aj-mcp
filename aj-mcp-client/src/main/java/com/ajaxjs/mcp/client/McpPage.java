@@ -6,18 +6,23 @@ import lombok.Data;
 import java.util.List;
 
 /**
- * One MCP list page plus the opaque cursor supplied by the remote server.
+ * One page returned by an MCP list operation.
+ *
+ * <p>{@link #items} contains only the entries in this page. The
+ * {@link #nextCursor} value is an opaque server token: clients must not parse,
+ * manufacture, or persist assumptions about its format. Pass it unchanged to
+ * the next page request; a null value indicates that pagination is complete.</p>
  */
 @Data
 @AllArgsConstructor
 public class McpPage<T> {
     /**
-     * Holds the items value.
+     * Items contained in this page, in the order returned by the server.
      */
     private List<T> items;
 
     /**
-     * Holds the next cursor value.
+     * Opaque cursor for the next page, or null when this is the final page.
      */
     private String nextCursor;
 }

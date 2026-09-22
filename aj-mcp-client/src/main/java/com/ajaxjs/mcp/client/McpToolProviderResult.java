@@ -8,14 +8,19 @@ import java.util.Map;
 import java.util.function.Function;
 
 /**
- * Tool provider result
+ * Ordered mapping of discovered tool metadata to executable client functions.
+ *
+ * <p>The function accepts a {@link CallToolRequest} and returns the legacy
+ * string representation produced by its owning client. Lookup methods return
+ * {@code null} when no tool with the requested name exists; callers that need
+ * a mandatory tool should check explicitly and report a useful error.</p>
  */
 public class McpToolProviderResult extends LinkedHashMap<ToolItem, Function<CallToolRequest, String>> {
     /**
-     * Executes the find tool by name operation.
+     * Finds the metadata for a tool by its MCP name.
      *
-     * @param name the name value.
-     * @return the result of the find tool by name operation.
+     * @param name exact MCP tool name
+     * @return matching metadata, or {@code null} when absent
      */
     public ToolItem findToolByName(String name) {
         for (ToolItem tool : keySet()) {
@@ -27,10 +32,10 @@ public class McpToolProviderResult extends LinkedHashMap<ToolItem, Function<Call
     }
 
     /**
-     * Executes the find tool executor by name operation.
+     * Finds the client-bound executor for a tool by its MCP name.
      *
-     * @param name the name value.
-     * @return the result of the find tool executor by name operation.
+     * @param name exact MCP tool name
+     * @return executor for the matching tool, or {@code null} when absent
      */
     public Function<CallToolRequest, String> findToolExecutorByName(String name) {
         for (Map.Entry<ToolItem, Function<CallToolRequest, String>> entry : entrySet()) {

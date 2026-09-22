@@ -3,47 +3,50 @@ package com.ajaxjs.mcp.server.error;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * Represents json rpc error code.
+ * JSON-RPC error codes emitted by the server dispatcher and transports.
+ * <p>
+ * Standard JSON-RPC codes are kept in their reserved ranges, while MCP/server-specific
+ * conditions use the implementation-defined {@code -32000} range.
  */
 public enum JsonRpcErrorCode {
     /**
-     * Defines the resource not found constant.
+     * Requested MCP resource, prompt, tool, or template cannot be found in the current registry.
      */
     RESOURCE_NOT_FOUND(-32002),
     /**
-     * Defines the internal error constant.
+     * Unexpected server-side failure while handling an otherwise valid JSON-RPC request.
      */
     INTERNAL_ERROR(-32603),
     /**
-     * Defines the invalid params constant.
+     * Request parameters are missing, malformed, or cannot be converted to the expected Java type.
      */
     INVALID_PARAMS(-32602),
     /**
-     * Defines the method not found constant.
+     * The JSON-RPC method name is not implemented by this server.
      */
     METHOD_NOT_FOUND(-32601),
     /**
-     * Defines the invalid request constant.
+     * The JSON-RPC envelope is structurally invalid for a request or notification.
      */
     INVALID_REQUEST(-32600),
     /**
-     * Defines the parse error constant.
+     * The transport could not parse the incoming JSON payload.
      */
     PARSE_ERROR(-32700),
     /**
-     * Defines the security error constant.
+     * Request was rejected by a transport or policy check, such as an untrusted HTTP Origin.
      */
     SECURITY_ERROR(-32001);
 
     /**
-     * Holds the code value.
+     * Numeric JSON-RPC code serialized in the {@code error.code} field.
      */
     private final int code;
 
     /**
-     * Creates a new json rpc error code.
+     * Creates an enum entry bound to its wire-level integer code.
      *
-     * @param code the code value.
+     * @param code the JSON-RPC error code value.
      */
     JsonRpcErrorCode(int code) {
         this.code = code;

@@ -8,7 +8,9 @@ import lombok.Data;
  */
 @Data
 public class ResourceItem extends com.ajaxjs.mcp.protocol.common.Metadata {
-    /** Optional hints; omitted when unset to preserve existing wire output. */
+    /**
+     * Optional hints; omitted when unset to preserve existing wire output.
+     */
     @com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
     private com.ajaxjs.mcp.protocol.common.Annotations annotations;
 

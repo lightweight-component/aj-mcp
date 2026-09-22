@@ -8,8 +8,8 @@ import com.ajaxjs.mcp.server.feature.FeatureMgr;
 import com.ajaxjs.mcp.server.model.HttpResult;
 import com.ajaxjs.mcp.transport.McpTransportSync;
 import com.fasterxml.jackson.databind.JsonNode;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
@@ -33,7 +33,9 @@ class TestProtocolVersions {
     private ServerStreamableHttp transport;
 
     @AfterEach
-    void close() throws Exception { transport.close(); }
+    void close() throws Exception {
+        transport.close();
+    }
 
     @BeforeEach
     void setUp() {
@@ -108,8 +110,11 @@ class TestProtocolVersions {
             java.io.StringWriter output = new java.io.StringWriter();
             transport.openEventStream(sid, new java.io.PrintWriter(output), headers);
             server.bindSession(sid);
-            try { server.sendProgress("token", 1, 2.0, "Halfway"); }
-            finally { server.clearSession(); }
+            try {
+                server.sendProgress("token", 1, 2.0, "Halfway");
+            } finally {
+                server.clearSession();
+            }
             String frame = output.toString();
             JsonNode params = JsonUtils.json2Node(frame.substring(frame.indexOf("data: ") + 6).trim()).path("params");
             assertEquals(1, params.path("progress").asInt());

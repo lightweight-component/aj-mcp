@@ -7,7 +7,10 @@ import java.lang.annotation.Target;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Annotates a parameter of a {@link ResourceTemplate} method.
+ * Binds a Java method parameter to a variable declared by a {@link ResourceTemplate} URI template.
+ * <p>
+ * During resource reads, the server extracts template variables from the requested URI and
+ * supplies them to the annotated method parameters.
  */
 @Retention(RUNTIME)
 @Target(ElementType.PARAMETER)
@@ -18,9 +21,10 @@ public @interface ResourceTemplateArg {
     String ELEMENT_NAME = "<<element name>>";
 
     /**
-     * Executes the name operation.
+     * Name of the URI-template variable to bind. The default asks the scanner to use the Java
+     * parameter name unchanged.
      *
-     * @return the result of the name operation.
+     * @return the URI-template variable name or {@link #ELEMENT_NAME} to derive it.
      */
     String name() default ELEMENT_NAME;
 }

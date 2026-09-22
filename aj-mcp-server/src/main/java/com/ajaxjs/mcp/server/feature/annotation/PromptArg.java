@@ -10,22 +10,26 @@ import java.util.Optional;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Annotates a parameter of a {@link Prompt} method.
+ * Describes one argument accepted by a method annotated with {@link Prompt}.
+ * <p>
+ * Prompt arguments are advertised to clients and are converted from the request payload
+ * before invoking the Java method.
  */
 @Retention(RUNTIME)
 @Target(ElementType.PARAMETER)
 public @interface PromptArg {
     /**
-     * Executes the value operation.
+     * Prompt argument name exposed through the MCP protocol. When empty, the Java parameter
+     * name is used if it is available at runtime.
      *
-     * @return the result of the value operation.
+     * @return the protocol argument name, or an empty string to derive it from the parameter.
      */
     String value() default McpConstant.EMPTY_STR;
 
     /**
-     * Executes the description operation.
+     * Optional argument description included in prompt metadata.
      *
-     * @return the result of the description operation.
+     * @return the argument description, or an empty string when unspecified.
      */
     String description() default McpConstant.EMPTY_STR;
 

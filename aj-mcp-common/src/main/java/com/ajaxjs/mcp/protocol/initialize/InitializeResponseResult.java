@@ -1,5 +1,6 @@
 package com.ajaxjs.mcp.protocol.initialize;
 
+import com.ajaxjs.mcp.protocol.common.Metadata;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
@@ -9,7 +10,7 @@ import lombok.Data;
  * Server implementation information
  */
 @Data
-public class InitializeResponseResult extends com.ajaxjs.mcp.protocol.common.Metadata {
+public class InitializeResponseResult extends Metadata {
     /**
      * Holds the protocol version value.
      */
@@ -128,7 +129,9 @@ public class InitializeResponseResult extends com.ajaxjs.mcp.protocol.common.Met
      */
     @Data
     public static class ServerInfo {
-        /** Optional display name introduced in MCP 2025-06-18. */
+        /**
+         * Optional display name introduced in MCP 2025-06-18.
+         */
         @JsonInclude(JsonInclude.Include.NON_NULL)
         private String title;
         /**

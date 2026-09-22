@@ -10,15 +10,15 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class ServerStoreCompletion extends ServerStoreBase {
     /**
-     * Holds the reference type value.
+     * Completion reference type, such as prompt or resource-template reference.
      */
     private String referenceType;
     /**
-     * Holds the reference name value.
+     * Name of the prompt or resource template that owns the completed argument.
      */
     private String referenceName;
     /**
-     * Holds the argument name value.
+     * Argument name for which this provider returns completion candidates.
      */
     private String argumentName;
 }

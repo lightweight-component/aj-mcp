@@ -41,22 +41,26 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
 /**
- * MCP Server Tools
+ * Main synchronous MCP server implementation.
+ * <p>
+ * The class combines request dispatch, feature invocation, server-to-client reverse requests,
+ * per-session protocol negotiation state, lifecycle checks, cancellation tracking, and
+ * notification helpers used by the available transports.
  */
 @Slf4j
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class McpServer extends McpServerPrompt {
     /**
-     * Holds the current session value.
+     * Session id bound to the thread currently invoking a tool, prompt, or resource method.
      */
     private final ThreadLocal<String> currentSession = new ThreadLocal<>();
     /**
-     * Holds the session protocol versions value.
+     * Negotiated protocol revision for each active session.
      */
     private final Map<String, String> sessionProtocolVersions = new ConcurrentHashMap<>();
     /**
-     * Holds the client capabilities value.
+     * Client capabilities captured from each session's initialize request.
      */
     private final Map<String, InitializeRequestParams.Capabilities> clientCapabilities = new ConcurrentHashMap<>();
 
@@ -76,19 +80,23 @@ public class McpServer extends McpServerPrompt {
     }
 
     /**
-     * Holds the resource subscriptions value.
+     * Resource URI to session ids subscribed to update notifications for that resource.
      */
     private final Map<String, Set<String>> resourceSubscriptions = new ConcurrentHashMap<>();
 
     /**
-     * Holds the logging level value.
+     * Default logging threshold used before a session sets its own level.
      */
     private volatile String loggingLevel = "info";
 
-    /** Session-specific logging thresholds; the global value is only the default. */
+    /**
+     * Session-specific logging thresholds; the global value is only the default.
+     */
     private final Map<String, String> sessionLoggingLevels = new ConcurrentHashMap<>();
 
-    /** Syslog severity ordering used by MCP logging/setLevel. */
+    /**
+     * Syslog severity ordering used by MCP logging/setLevel.
+     */
     private static final List<String> LOG_LEVELS = Arrays.asList("debug", "info", "notice", "warning",
             "error", "critical", "alert", "emergency");
     /**
@@ -98,22 +106,22 @@ public class McpServer extends McpServerPrompt {
     private final Map<RequestKey, RunningRequest> runningRequests = new ConcurrentHashMap<>();
 
     /**
-     * Holds the session states value.
+     * Initialize/initialized lifecycle state for each active transport session.
      */
     private final Map<String, SessionState> sessionStates = new ConcurrentHashMap<>();
 
     /**
-     * Holds the server request ids value.
+     * Monotonic id source for reverse requests sent from this server to clients.
      */
     private final AtomicLong serverRequestIds = new AtomicLong(1);
 
     /**
-     * Holds the pending client responses value.
+     * Reverse requests awaiting a client response, keyed by session id and generated request id.
      */
     private final Map<String, CompletableFuture<JsonNode>> pendingClientResponses = new ConcurrentHashMap<>();
 
     /**
-     * Represents session state.
+     * Per-session initialize lifecycle state used when strict lifecycle enforcement is enabled.
      */
     private enum SessionState {
         /**
@@ -131,25 +139,26 @@ public class McpServer extends McpServerPrompt {
     }
 
     /**
-     * Executes the bind session operation.
+     * Binds a session id to the current thread while user code is being invoked.
      *
-     * @param sessionId the session id value.
+     * @param sessionId the active transport session id.
      */
     void bindSession(String sessionId) {
         currentSession.set(sessionId);
     }
 
     /**
-     * Executes the clear session operation.
+     * Clears the thread-local session binding after user code returns or fails.
      */
     void clearSession() {
         currentSession.remove();
     }
 
     /**
-     * Executes the remove session operation.
+     * Removes all state owned by a closing transport session and fails any work that cannot
+     * complete after the channel disappears.
      *
-     * @param sessionId the session id value.
+     * @param sessionId the session being removed.
      */
     void removeSession(String sessionId) {
         resourceSubscriptions.forEach((uri, ignored) ->
@@ -171,8 +180,9 @@ public class McpServer extends McpServerPrompt {
 
     /**
      * Completes outstanding reverse calls when their receiving channel disappears.
+     *
      * @param sessionId affected session identifier
-     * @param failure cause reported to waiting callers
+     * @param failure   cause reported to waiting callers
      */
     void failClientRequests(String sessionId, Throwable failure) {
         String prefix = sessionId + ":";
@@ -536,7 +546,15 @@ public class McpServer extends McpServerPrompt {
         sendProgress(sessionId, progressToken, progress, total, null);
     }
 
-    /** Sends optional human-readable progress text to peers supporting it. */
+    /**
+     * Sends optional human-readable progress text to peers supporting it.
+     *
+     * @param sessionId     the target session id.
+     * @param progressToken the progress token supplied by the caller.
+     * @param progress      the completed amount of work.
+     * @param total         the total amount of work, when known.
+     * @param message       the optional human-readable progress message.
+     */
     public void sendProgress(String sessionId, Object progressToken, double progress, Double total, String message) {
         ObjectNode params = JsonUtils.createObjectNode();
         params.set("progressToken", JsonUtils.valueToTree(progressToken));
@@ -563,7 +581,14 @@ public class McpServer extends McpServerPrompt {
         sendProgress(progressToken, progress, total, null);
     }
 
-    /** Sends progress text within the currently bound request session. */
+    /**
+     * Sends progress text within the currently bound request session.
+     *
+     * @param progressToken the progress token supplied by the caller.
+     * @param progress      the completed amount of work.
+     * @param total         the total amount of work, when known.
+     * @param message       the optional human-readable progress message.
+     */
     public void sendProgress(Object progressToken, double progress, Double total, String message) {
         String sessionId = currentSession.get();
 
@@ -1069,8 +1094,9 @@ public class McpServer extends McpServerPrompt {
 
     /**
      * Converts reflection arguments while preserving the request ID on invalid input.
-     * @param value incoming argument value
-     * @param type declared Java parameter type
+     *
+     * @param value     incoming argument value
+     * @param type      declared Java parameter type
      * @param requestId request to associate with a conversion error
      * @return converted Java argument
      * @throws JsonRpcErrorException if the argument cannot be converted without invalid narrowing
@@ -1163,7 +1189,9 @@ public class McpServer extends McpServerPrompt {
          */
         private final AtomicBoolean cancelled = new AtomicBoolean();
 
-        /** Prevents a late cancellation from interrupting a reused worker. */
+        /**
+         * Prevents a late cancellation from interrupting a reused worker.
+         */
         private boolean finished;
 
         /**
@@ -1183,7 +1211,9 @@ public class McpServer extends McpServerPrompt {
                 thread.interrupt();
         }
 
-        /** Atomically closes the cancellation window before releasing the worker. */
+        /**
+         * Atomically closes the cancellation window before releasing the worker.
+         */
         private synchronized void finish() {
             finished = true;
         }

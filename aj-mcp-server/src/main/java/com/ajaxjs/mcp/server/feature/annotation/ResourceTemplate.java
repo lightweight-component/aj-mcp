@@ -47,9 +47,9 @@ public @interface ResourceTemplate {
     String mimeType() default McpConstant.EMPTY_STR;
 
     /**
-     * Executes the title operation.
+     * Optional display title for protocol revisions that support resource template annotations.
      *
-     * @return the result of the title operation.
+     * @return the display title, or an empty string when unspecified.
      */
     String title() default McpConstant.EMPTY_STR;
 }

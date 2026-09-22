@@ -32,16 +32,16 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target(METHOD)
 public @interface Tool {
     /**
-     * Executes the value operation.
+     * Protocol name of the tool. When left empty, the Java method name is used.
      *
-     * @return the result of the value operation.
+     * @return the exposed tool name, or an empty string to derive it from the method.
      */
     String value() default McpConstant.EMPTY_STR;
 
     /**
-     * An optional description.
+     * Optional tool description included in {@code tools/list} responses.
      *
-     * @return description
+     * @return the tool description, or an empty string when unspecified.
      */
     String description() default McpConstant.EMPTY_STR;
 
@@ -67,23 +67,26 @@ public @interface Tool {
     boolean readOnlyHint() default false;
 
     /**
-     * Executes the destructive hint operation.
+     * Indicates whether invoking the tool may perform destructive updates such as deleting
+     * data, modifying external state, or triggering irreversible side effects.
      *
-     * @return the result of the destructive hint operation.
+     * @return {@code true} when clients should treat calls as potentially destructive.
      */
     boolean destructiveHint() default true;
 
     /**
-     * Executes the idempotent hint operation.
+     * Indicates whether repeating the same tool call is expected to have the same effect as
+     * calling it once.
      *
-     * @return the result of the idempotent hint operation.
+     * @return {@code true} when duplicate calls are expected to be safe.
      */
     boolean idempotentHint() default false;
 
     /**
-     * Executes the open world hint operation.
+     * Indicates whether the tool may interact with external systems outside the local server
+     * process, such as files, networks, databases, or third-party APIs.
      *
-     * @return the result of the open world hint operation.
+     * @return {@code true} when the tool can access an open world beyond the MCP server.
      */
     boolean openWorldHint() default true;
 

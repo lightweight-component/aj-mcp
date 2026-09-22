@@ -5,17 +5,20 @@ import lombok.Data;
 import java.lang.reflect.Method;
 
 /**
- * Represents server store base.
+ * Base runtime binding for an annotated MCP feature method.
+ * <p>
+ * Subclasses add protocol metadata for tools, prompts, resources, templates, or completions,
+ * while this base class keeps the Java object instance and reflective method used for invocation.
  */
 @Data
 public abstract class ServerStoreBase {
     /**
-     * Holds the instance value.
+     * Service object that owns the annotated method.
      */
     Object instance;
 
     /**
-     * Holds the method value.
+     * Reflective method invoked when the matching MCP request is dispatched.
      */
     Method method;
 }

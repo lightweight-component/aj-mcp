@@ -13,7 +13,18 @@ import java.util.concurrent.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-/** Discovers Streamable HTTP first, then legacy HTTP/SSE at the same URL. */
+/**
+ * HTTP transport that probes Streamable HTTP before falling back to legacy SSE.
+ *
+ * <p>The initial probe is the only operation eligible for fallback. Authentication,
+ * rate-limit, timeout, business, and post-initialization failures are propagated
+ * instead of being retried against another protocol. Once selected, the delegate
+ * remains stable for the lifetime of this transport.</p>
+ *
+ * <p>Both delegate transports receive the same pending-request map, callbacks,
+ * supported revisions, and headers. Closing this wrapper closes discovery,
+ * the selected delegate, and all outstanding requests.</p>
+ */
 public final class AutoHttpTransport extends McpTransport {
     private final String endpointUrl;
     private final Duration timeout;
@@ -32,10 +43,23 @@ public final class AutoHttpTransport extends McpTransport {
     private Function<JsonNode, JsonNode> requests;
     private CompletableFuture<JsonNode> initialization;
 
+    /**
+     * Creates a transport that discovers the protocol at the supplied endpoint.
+     *
+     * @param endpointUrl the MCP HTTP endpoint URL
+     */
     public AutoHttpTransport(String endpointUrl) {
         this(endpointUrl, true, Duration.ofSeconds(60), null);
     }
 
+    /**
+     * Creates a transport with automatic Streamable HTTP and legacy SSE discovery.
+     *
+     * @param endpointUrl     the MCP HTTP endpoint URL
+     * @param openEventStream whether to open the optional Streamable HTTP GET stream
+     * @param timeout         the HTTP operation timeout; null or zero uses the default
+     * @param requestHeaders  HTTP headers to send, or null for no additional headers
+     */
     @Builder
     public AutoHttpTransport(String endpointUrl, boolean openEventStream, Duration timeout,
                              Map<String, String> requestHeaders) {
@@ -47,6 +71,12 @@ public final class AutoHttpTransport extends McpTransport {
                 : Collections.unmodifiableMap(new LinkedHashMap<>(requestHeaders));
     }
 
+    /**
+     * Starts the Streamable HTTP probe transport.
+     *
+     * @param pendingRequest session-local map used to correlate responses
+     * @throws IllegalStateException if this transport was already started or closed
+     */
     @Override
     public synchronized void start(Map<Long, CompletableFuture<JsonNode>> pendingRequest) {
         if (closed || delegate != null) throw new IllegalStateException("Transport already started or closed");
@@ -58,7 +88,10 @@ public final class AutoHttpTransport extends McpTransport {
 
     private synchronized void install(McpTransport transport) {
         if (closed) {
-            try { transport.close(); } catch (IOException ignored) { }
+            try {
+                transport.close();
+            } catch (IOException ignored) {
+            }
             throw new IllegalStateException("HTTP transport is closed");
         }
         transport.setMessageHandlers(notifications, requests);
@@ -66,6 +99,14 @@ public final class AutoHttpTransport extends McpTransport {
         delegate = transport;
     }
 
+    /**
+     * Initializes the selected protocol, falling back only for an eligible
+     * initial HTTP rejection (400, 404, 405, or 415).
+     *
+     * @param request initialize request containing client capabilities and revisions
+     * @return future completed with the server initialize response
+     * @throws IllegalStateException if start was not called or initialization was repeated
+     */
     @Override
     public synchronized CompletableFuture<JsonNode> initialize(InitializeRequest request) {
         if (closed || delegate == null) throw new IllegalStateException("Transport is not started");
@@ -110,18 +151,33 @@ public final class AutoHttpTransport extends McpTransport {
         if (delegate != null) delegate.setMessageHandlers(notifications, requests);
     }
 
+    /**
+     * Sets the protocol versions that may be selected during initialization.
+     *
+     * @param supported supported protocol version strings
+     */
     @Override
     public synchronized void setSupportedProtocolVersions(List<String> supported) {
         versions = new ArrayList<>(supported);
         if (delegate != null) delegate.setSupportedProtocolVersions(versions);
     }
 
+    /**
+     * Records the negotiated protocol version and forwards it to the active delegate.
+     *
+     * @param version the negotiated protocol version
+     */
     @Override
     public void setNegotiatedProtocolVersion(String version) {
         super.setNegotiatedProtocolVersion(version);
         if (delegate != null) delegate.setNegotiatedProtocolVersion(version);
     }
 
+    /**
+     * Returns the protocol version negotiated by the active delegate.
+     *
+     * @return the negotiated version, or null before a delegate is selected
+     */
     @Override
     public String getNegotiatedProtocolVersion() {
         return delegate == null ? null : delegate.getNegotiatedProtocolVersion();
@@ -146,7 +202,9 @@ public final class AutoHttpTransport extends McpTransport {
     }
 
     @Override
-    protected void sendJson(JsonNode message) { delegate.sendJson(message); }
+    protected void sendJson(JsonNode message) {
+        delegate.sendJson(message);
+    }
 
     @Override
     public void checkHealth() {
@@ -154,8 +212,14 @@ public final class AutoHttpTransport extends McpTransport {
         delegate.checkHealth();
     }
 
-    /** True after the initial POST was rejected and legacy discovery was selected. */
-    public boolean isLegacySse() { return delegate instanceof HttpMcpTransport; }
+    /**
+     * Reports whether discovery selected the legacy HTTP/SSE transport.
+     *
+     * @return true after the initial probe selected legacy HTTP/SSE; otherwise false
+     */
+    public boolean isLegacySse() {
+        return delegate instanceof HttpMcpTransport;
+    }
 
     @Override
     public void close() {
@@ -169,7 +233,10 @@ public final class AutoHttpTransport extends McpTransport {
         }
         discovery.shutdownNow();
         if (current != null) {
-            try { current.close(); } catch (IOException ignored) { }
+            try {
+                current.close();
+            } catch (IOException ignored) {
+            }
         }
         failPendingRequests(new IOException("HTTP transport closed"));
     }

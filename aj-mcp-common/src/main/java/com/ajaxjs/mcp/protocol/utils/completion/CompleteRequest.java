@@ -1,16 +1,16 @@
 package com.ajaxjs.mcp.protocol.utils.completion;
 
 import com.ajaxjs.mcp.protocol.McpRequest;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import java.util.Map;
 import java.util.Collections;
+import java.util.Map;
 
 import static com.ajaxjs.mcp.protocol.McpConstant.Methods.COMPLETION_COMPLETE;
 
@@ -53,14 +53,18 @@ public class CompleteRequest extends McpRequest {
         @JsonIgnore
         Map<String, String> context;
 
-        /** @return the MCP context.arguments object while keeping the Java Map API compatible. */
+        /**
+         * @return the MCP context.arguments object while keeping the Java Map API compatible.
+         */
         @JsonProperty("context")
         @JsonInclude(JsonInclude.Include.NON_NULL)
         public Map<String, Map<String, String>> getWireContext() {
             return context == null ? null : Collections.singletonMap("arguments", context);
         }
 
-        /** @param value the MCP context object containing previously resolved arguments */
+        /**
+         * @param value the MCP context object containing previously resolved arguments
+         */
         @JsonProperty("context")
         public void setWireContext(Map<String, Map<String, String>> value) {
             context = value == null ? null : value.get("arguments");
@@ -86,15 +90,25 @@ public class CompleteRequest extends McpRequest {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class ParamsRef {
-        /** Optional display label for ref/prompt; keep the original three-argument constructor. */
+        /**
+         * Optional display label for ref/prompt; keep the original three-argument constructor.
+         */
         @JsonInclude(JsonInclude.Include.NON_NULL)
         private String title;
 
+        /**
+         * Creates a reference without a display title.
+         *
+         * @param type reference type
+         * @param name prompt or resource name
+         * @param uri  resource URI
+         */
         public ParamsRef(String type, String name, String uri) {
             this.type = type;
             this.name = name;
             this.uri = uri;
         }
+
         /**
          * The protocol supports two types of completion references: ref/prompt | ref/resource
          */

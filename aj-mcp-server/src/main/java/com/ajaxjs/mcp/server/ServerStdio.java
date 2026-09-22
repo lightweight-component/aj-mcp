@@ -3,6 +3,7 @@ package com.ajaxjs.mcp.server;
 import com.ajaxjs.mcp.common.JsonUtils;
 import com.ajaxjs.mcp.protocol.McpRequestRawInfo;
 import com.ajaxjs.mcp.protocol.McpResponse;
+import com.ajaxjs.mcp.server.common.ServerConfig;
 import com.ajaxjs.mcp.server.error.JsonRpcErrorCode;
 import com.ajaxjs.mcp.server.error.JsonRpcErrorException;
 import com.ajaxjs.mcp.transport.McpTransportSync;
@@ -12,74 +13,72 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.RejectedExecutionException;
-import com.ajaxjs.mcp.server.common.ServerConfig;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Represents server stdio.
+ * STDIO transport for embedding the server in command-line MCP integrations.
+ * <p>
+ * Each input line must contain one JSON-RPC message encoded as UTF-8. Protocol responses are
+ * written only to stdout, while diagnostics use logging so they do not corrupt the MCP stream.
  */
 @Data
 @Slf4j
 public class ServerStdio implements McpTransportSync {
     /**
-     * Holds the input value.
+     * Raw STDIO input stream supplied by the host process.
      */
     private final InputStream input = System.in;
 
     /**
-     * Holds the reader value.
+     * UTF-8 line reader for newline-delimited JSON-RPC messages.
      */
     private final BufferedReader reader = new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8));
 
     /**
-     * Holds the writer value.
+     * UTF-8 stdout writer reserved exclusively for JSON-RPC protocol output.
      */
     private final PrintWriter writer = new PrintWriter(new OutputStreamWriter(System.out, StandardCharsets.UTF_8), true);
 
     /**
-     * Holds the running value.
+     * Whether the input loop should keep accepting messages.
      */
     private final AtomicBoolean running = new AtomicBoolean(false);
 
     /**
-     * Holds the started value.
+     * Guards against starting the same transport more than once.
      */
     private final AtomicBoolean started = new AtomicBoolean(false);
 
     /**
-     * Holds the closed value.
+     * Idempotent close marker shared by lifecycle and I/O paths.
      */
     private final AtomicBoolean closed = new AtomicBoolean(false);
 
     /**
-     * Holds the lifecycle lock value.
+     * Monitor protecting start/close transitions.
      */
     private final Object lifecycleLock = new Object();
 
     /**
-     * Holds the input thread value.
+     * Background thread that reads STDIO and submits work to the request executor.
      */
     private volatile Thread inputThread;
 
     /**
-     * Holds the request executor value.
+     * Bounded worker pool that prevents long-running tools from blocking cancellation input.
      */
     private final ExecutorService requestExecutor;
 
     /**
-     * Holds the server value.
+     * Server dispatcher that handles decoded JSON-RPC messages.
      */
     private McpServer server;
 
     /**
-     * Creates a new server stdio.
+     * Creates a STDIO transport using concurrency limits from the server configuration.
      *
-     * @param server the server value.
+     * @param server the server dispatcher to invoke for each JSON-RPC message.
      */
     public ServerStdio(McpServer server) {
         this.server = server;
@@ -90,10 +89,10 @@ public class ServerStdio implements McpTransportSync {
             throw new IllegalArgumentException("STDIO worker count and queue capacity must be positive");
         requestExecutor = new ThreadPoolExecutor(workers, workers, 0L, TimeUnit.MILLISECONDS,
                 new ArrayBlockingQueue<>(capacity), runnable -> {
-                    Thread thread = new Thread(runnable, "aj-mcp-server-stdio-request");
-                    thread.setDaemon(true);
-                    return thread;
-                }, new ThreadPoolExecutor.AbortPolicy());
+            Thread thread = new Thread(runnable, "aj-mcp-server-stdio-request");
+            thread.setDaemon(true);
+            return thread;
+        }, new ThreadPoolExecutor.AbortPolicy());
     }
 
     @Override
@@ -125,7 +124,7 @@ public class ServerStdio implements McpTransportSync {
     }
 
     /**
-     * Executes the process input operation.
+     * Reads newline-delimited JSON-RPC messages until EOF, shutdown, or an I/O failure occurs.
      */
     private void processInput() {
         try {
@@ -155,9 +154,9 @@ public class ServerStdio implements McpTransportSync {
     }
 
     /**
-     * Executes the process line operation.
+     * Handles one raw JSON-RPC line and suppresses responses for valid notifications.
      *
-     * @param line the line value.
+     * @param line one complete JSON-RPC message read from stdin.
      */
     private void processLine(String line) {
         boolean expectsResponse = false;
@@ -185,7 +184,9 @@ public class ServerStdio implements McpTransportSync {
         }
     }
 
-    /** Keeps handshake, cancellation and reverse responses flowing even when all tool workers are busy. */
+    /**
+     * Keeps handshake, cancellation and reverse responses flowing even when all tool workers are busy.
+     */
     private void dispatchLine(String message) {
         JsonNode envelope;
         try {

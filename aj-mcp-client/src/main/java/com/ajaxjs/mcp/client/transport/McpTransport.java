@@ -2,10 +2,10 @@ package com.ajaxjs.mcp.client.transport;
 
 import com.ajaxjs.mcp.common.JsonUtils;
 import com.ajaxjs.mcp.common.McpException;
-import com.ajaxjs.mcp.protocol.ProtocolVersion;
 import com.ajaxjs.mcp.protocol.BaseJsonRpcMessage;
 import com.ajaxjs.mcp.protocol.McpConstant;
 import com.ajaxjs.mcp.protocol.McpRequest;
+import com.ajaxjs.mcp.protocol.ProtocolVersion;
 import com.ajaxjs.mcp.protocol.initialize.InitializeRequest;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -14,15 +14,27 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.Closeable;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
- * MCP 客户端传输接口
+ * Base contract for transports used by the MCP client.
+ *
+ * <p>A transport has two lifecycle phases: {@link #start(Map)} opens the
+ * underlying channel and installs pending-request state, while
+ * {@link #initialize(InitializeRequest)} performs MCP protocol negotiation.
+ * Callers must complete initialization before sending ordinary requests.
+ * Implementations must serialize writes appropriate to their framing and must
+ * fail pending futures when the channel closes unexpectedly.</p>
+ *
+ * <p>The transport also dispatches server notifications and server-initiated
+ * requests to handlers configured by the client. The latter must be answered
+ * through the transport's native framing; transports that do not support that
+ * direction may reject it explicitly.</p>
  */
 @Slf4j
 public abstract class McpTransport implements McpConstant, Closeable {
@@ -54,9 +66,13 @@ public abstract class McpTransport implements McpConstant, Closeable {
      * Sends either message of the initialization handshake using the transport's
      * native framing. The returned future represents a response when {@code id}
      * is non-null and an accepted notification otherwise.
+     *
+     * @param initializeResponse      the future returned by the initialize request
+     * @param initializedNotification supplies the future for the initialized notification
+     * @return a future completed with the initialize response after the notification is accepted
      */
     protected CompletableFuture<JsonNode> completeInitialization(CompletableFuture<JsonNode> initializeResponse,
-                                                                  Supplier<CompletableFuture<JsonNode>> initializedNotification) {
+                                                                 Supplier<CompletableFuture<JsonNode>> initializedNotification) {
         // Keep the shared response so callers observe initialize's result after
         // the required notifications/initialized message is accepted.
         return initializeResponse.thenCompose(response -> {
@@ -110,39 +126,43 @@ public abstract class McpTransport implements McpConstant, Closeable {
     public abstract void checkHealth();
 
     /**
-     * Holds the pending requests value.
+     * Session-local request table used to correlate numeric JSON-RPC responses.
+     * It must not be shared by unrelated client sessions.
      */
     @Setter
     private Map<Long, CompletableFuture<JsonNode>> pendingRequests;
     /**
-     * Holds the notification handler value.
+     * Callback for server notifications, receiving the complete JSON message.
      */
     private Consumer<JsonNode> notificationHandler;
     /**
-     * Holds the server request handler value.
+     * Callback for server-initiated requests, receiving the complete JSON message.
      */
     private Function<JsonNode, JsonNode> serverRequestHandler;
     /**
-     * Holds the initialized value.
+     * True only after the initialize response and initialized notification succeed.
      */
     private volatile boolean initialized;
 
     /**
-     * Holds the negotiated protocol version value.
+     * Protocol revision selected by the server during initialization.
      */
     @Getter
     @Setter
     private volatile String negotiatedProtocolVersion;
 
-    /** Protocol revisions accepted before acknowledging initialization. */
+    /**
+     * Protocol revisions accepted before acknowledging initialization. The
+     * server's selected value must occur in this list.
+     */
     @Setter
     private List<String> supportedProtocolVersions = ProtocolVersion.supportedVersions();
 
     /**
-     * Executes the set message handlers operation.
+     * Installs callbacks for messages initiated by the server.
      *
-     * @param notificationHandler  the notification handler value.
-     * @param serverRequestHandler the server request handler value.
+     * @param notificationHandler  receives JSON-RPC notifications; may be null
+     * @param serverRequestHandler receives server requests and returns their JSON result; may be null
      */
     public void setMessageHandlers(Consumer<JsonNode> notificationHandler,
                                    Function<JsonNode, JsonNode> serverRequestHandler) {
@@ -151,14 +171,17 @@ public abstract class McpTransport implements McpConstant, Closeable {
     }
 
     /**
-     * Executes the mark initialized operation.
+     * Marks the transport ready for ordinary MCP requests.
+     * This must be called only after successful initialization.
      */
     public void markInitialized() {
         initialized = true;
     }
 
     /**
-     * Executes the require initialized operation.
+     * Enforces the post-handshake lifecycle boundary for request operations.
+     *
+     * @throws IllegalStateException if initialization has not completed
      */
     protected void requireInitialized() {
         if (!initialized)

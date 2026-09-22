@@ -3,6 +3,7 @@ package com.ajaxjs.mcp.protocol.utils;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+
 /**
  * Represents params.
  */

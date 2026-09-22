@@ -14,8 +14,8 @@ import okhttp3.sse.EventSource;
 import okhttp3.sse.EventSourceListener;
 import okhttp3.sse.EventSources;
 
-import java.io.IOException;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -30,6 +30,12 @@ import java.util.concurrent.*;
  * 2025-06-18. A single endpoint accepts every JSON-RPC POST; a response can be
  * ordinary JSON or an SSE stream. The optional GET stream carries unsolicited
  * server messages.
+ *
+ * <p>POST and GET are independent channels. A GET disconnect may be retried
+ * without terminating unrelated POST operations. The session identifier
+ * returned during initialization is added to subsequent requests. Session
+ * recovery never replays a failed application request, avoiding duplicate side
+ * effects.</p>
  */
 @Slf4j
 public class StreamableHttpTransport extends McpTransport {
@@ -75,23 +81,37 @@ public class StreamableHttpTransport extends McpTransport {
      */
     private volatile boolean closed;
 
-    /** Completion of the first GET connection; independent of POST initialization. */
+    /**
+     * Completion of the first GET connection; independent of POST initialization.
+     */
     private final CompletableFuture<Void> eventStreamReady = new CompletableFuture<>();
-    /** Serializes bounded GET reconnection attempts. */
+    /**
+     * Serializes bounded GET reconnection attempts.
+     */
     private final ScheduledExecutorService reconnectExecutor = Executors.newSingleThreadScheduledExecutor(r -> {
         Thread thread = new Thread(r, "aj-mcp-http-reconnect");
         thread.setDaemon(true);
         return thread;
     });
-    /** Last successfully dispatched GET event, used only when resuming that stream. */
+    /**
+     * Last successfully dispatched GET event, used only when resuming that stream.
+     */
     private volatile String lastEventId;
-    /** Whether the GET connection is currently open. */
+    /**
+     * Whether the GET connection is currently open.
+     */
     private volatile boolean eventStreamOpen;
-    /** Most recent GET failure, observable without failing unrelated POST calls. */
+    /**
+     * Most recent GET failure, observable without failing unrelated POST calls.
+     */
     private volatile Throwable eventStreamFailure;
-    /** Consecutive GET disconnect count, capped at five retries. */
+    /**
+     * Consecutive GET disconnect count, capped at five retries.
+     */
     private int reconnectAttempts;
-    /** Scheduled reconnect, cancelled during shutdown. */
+    /**
+     * Scheduled reconnect, cancelled during shutdown.
+     */
     private ScheduledFuture<?> reconnectTask;
 
     private InitializeRequest initializationRequest;
@@ -100,21 +120,22 @@ public class StreamableHttpTransport extends McpTransport {
     private long sessionGeneration;
 
     /**
-     * Creates a new streamable http transport.
+     * Creates a Streamable HTTP transport with the optional GET event stream enabled.
      *
-     * @param endpointUrl the endpoint url value.
+     * @param endpointUrl MCP Streamable HTTP endpoint URL
      */
     public StreamableHttpTransport(String endpointUrl) {
         this(endpointUrl, true, Duration.ofSeconds(60), null);
     }
 
     /**
-     * Creates a new streamable http transport.
+     * Creates a Streamable HTTP transport.
      *
-     * @param endpointUrl     the endpoint url value.
-     * @param openEventStream the open event stream value.
-     * @param timeout         the timeout value.
-     * @param requestHeaders  the request headers value.
+     * @param endpointUrl     MCP endpoint URL
+     * @param openEventStream whether to open the optional long-lived GET stream
+     * @param timeout         call, connect, and write timeout; null or zero uses 60 seconds
+     * @param requestHeaders  additional headers copied for each request, or null
+     * @throws IllegalArgumentException if timeout is negative
      */
     @Builder
     public StreamableHttpTransport(String endpointUrl, boolean openEventStream, Duration timeout,
@@ -370,7 +391,8 @@ public class StreamableHttpTransport extends McpTransport {
 
     /**
      * Parses all data records in an SSE response while preserving record boundaries.
-     * @param body streaming response body, closed by the caller
+     *
+     * @param body   streaming response body, closed by the caller
      * @param future pending response; parsing stops when it completes
      * @throws IOException if the stream cannot be read
      */
@@ -464,8 +486,9 @@ public class StreamableHttpTransport extends McpTransport {
 
     /**
      * Records a GET failure and schedules at most five exponential-backoff retries.
-     * @param source disconnected source, used to ignore obsolete callbacks
-     * @param failure cause exposed through the GET health API
+     *
+     * @param source   disconnected source, used to ignore obsolete callbacks
+     * @param failure  cause exposed through the GET health API
      * @param response optional HTTP error response
      */
     private synchronized void getStreamFailed(EventSource source, Throwable failure, Response response) {
@@ -488,7 +511,9 @@ public class StreamableHttpTransport extends McpTransport {
         reconnectTask = reconnectExecutor.schedule(this::openGetStream, delay, TimeUnit.MILLISECONDS);
     }
 
-    /** Reinitialize once per expired session, never replaying application operations. */
+    /**
+     * Reinitialize once per expired session, never replaying application operations.
+     */
     private synchronized void recoverSession(String expiredSession) {
         if (closed || !Objects.equals(expiredSession, sessionId) || initializationRequest == null)
             return;
@@ -537,23 +562,45 @@ public class StreamableHttpTransport extends McpTransport {
                 });
     }
 
-    /** Completes when the latest automatic session rebuild finishes; never replays a failed call. */
+    /**
+     * Returns the future for the latest automatic session rebuild.
+     * Failed calls are never replayed.
+     *
+     * @return a future completed when recovery finishes, or an already completed future
+     * if no recovery is active
+     */
     public CompletableFuture<JsonNode> getSessionRecovery() {
         CompletableFuture<JsonNode> recovery = sessionRecovery;
         return recovery == null ? CompletableFuture.completedFuture(null) : recovery.thenApply(value -> value);
     }
 
-    /** @return a future for the first GET connection; callers may apply their own readiness timeout. */
+    /**
+     * Returns readiness of the optional GET event stream.
+     *
+     * <p>This future is independent of POST initialization. It completes when
+     * the first GET connection opens, or exceptionally if the stream cannot be
+     * established or the transport closes.</p>
+     *
+     * @return future for the first GET connection
+     */
     public CompletableFuture<Void> getEventStreamReady() {
         return eventStreamReady.thenApply(ignored -> null);
     }
 
-    /** @return whether the optional GET stream is connected now. */
+    /**
+     * Reports the current state of the optional GET event stream.
+     *
+     * @return true while the GET stream is connected
+     */
     public boolean isEventStreamOpen() {
         return eventStreamOpen;
     }
 
-    /** @return the latest GET failure, or null while connected. */
+    /**
+     * Returns the most recent GET stream failure.
+     *
+     * @return latest failure, or null if no failure has been observed
+     */
     public Throwable getEventStreamFailure() {
         return eventStreamFailure;
     }
@@ -596,9 +643,12 @@ public class StreamableHttpTransport extends McpTransport {
     }
 
     /**
-     * Executes the get session id operation.
+     * Returns the server-assigned MCP session identifier.
      *
-     * @return the result of the get session id operation.
+     * <p>The value is null before successful initialization. Callers normally do
+     * not need to send it themselves; the transport adds it to later requests.</p>
+     *
+     * @return current session identifier, or null when no session is established
      */
     public String getSessionId() {
         return sessionId;

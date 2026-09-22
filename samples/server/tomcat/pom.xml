@@ -26,7 +26,7 @@
         <dependency>
             <groupId>com.ajaxjs</groupId>
             <artifactId>aj-mcp-server</artifactId>
-            <version>1.5</version>
+            <version>1.6</version>
         </dependency>
 
         <dependency>

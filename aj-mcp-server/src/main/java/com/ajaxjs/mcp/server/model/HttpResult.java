@@ -7,48 +7,51 @@ import java.util.Collections;
 import java.util.Map;
 
 /**
- * Represents http result.
+ * Framework-neutral HTTP response returned by the Streamable HTTP adapter.
+ * <p>
+ * Servlet, Spring, or other web layers copy these fields to their native response objects
+ * without requiring the core transport to depend on a specific HTTP framework.
  */
 @Data
 @AllArgsConstructor
 public class HttpResult {
     /**
-     * Holds the status value.
+     * HTTP status code to send.
      */
     private int status;
 
     /**
-     * Holds the headers value.
+     * Additional response headers, excluding the content type.
      */
     private Map<String, String> headers;
 
     /**
-     * Holds the content type value.
+     * Media type for the response body.
      */
     private String contentType;
 
     /**
-     * Holds the body value.
+     * Response body text, usually a JSON-RPC payload or a diagnostic message.
      */
     private String body;
 
     /**
-     * Executes the json operation.
+     * Creates an {@code application/json} response.
      *
-     * @param status the status value.
-     * @param body   the body value.
-     * @return the result of the json operation.
+     * @param status HTTP status code.
+     * @param body   serialized JSON body.
+     * @return the response descriptor.
      */
     public static HttpResult json(int status, String body) {
         return new HttpResult(status, Collections.<String, String>emptyMap(), "application/json", body);
     }
 
     /**
-     * Executes the text operation.
+     * Creates a {@code text/plain} response, typically for HTTP-level validation failures.
      *
-     * @param status the status value.
-     * @param body   the body value.
-     * @return the result of the text operation.
+     * @param status HTTP status code.
+     * @param body   plain-text response body.
+     * @return the response descriptor.
      */
     public static HttpResult text(int status, String body) {
         return new HttpResult(status, Collections.<String, String>emptyMap(), "text/plain", body);

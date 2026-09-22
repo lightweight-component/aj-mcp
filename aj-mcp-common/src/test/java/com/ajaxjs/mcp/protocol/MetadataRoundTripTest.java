@@ -1,18 +1,24 @@
 package com.ajaxjs.mcp.protocol;
 
 import com.ajaxjs.mcp.common.JsonUtils;
-import com.ajaxjs.mcp.protocol.common.*;
-import com.ajaxjs.mcp.protocol.tools.*;
+import com.ajaxjs.mcp.protocol.common.Content;
+import com.ajaxjs.mcp.protocol.common.ContentResourceLink;
+import com.ajaxjs.mcp.protocol.common.ContentText;
+import com.ajaxjs.mcp.protocol.initialize.InitializeRequestParams;
+import com.ajaxjs.mcp.protocol.initialize.InitializeResponseResult;
 import com.ajaxjs.mcp.protocol.resource.ResourceItem;
-import com.ajaxjs.mcp.protocol.initialize.*;
+import com.ajaxjs.mcp.protocol.tools.CallToolResultDetail;
 import com.ajaxjs.mcp.protocol.utils.RequestMeta;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.Test;
+
 import java.util.Collections;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class MetadataRoundTripTest {
-    @Test void contentAndResourceHintsSurviveConversion() {
+    @Test
+    void contentAndResourceHintsSurviveConversion() {
         String json = "{\"type\":\"resource_link\",\"uri\":\"demo://a\",\"name\":\"a\",\"title\":\"Display A\","
                 + "\"annotations\":{\"audience\":[\"assistant\"],\"priority\":0.5,\"lastModified\":\"2025-06-18T12:00:00Z\"},"
                 + "\"_meta\":{\"vendor/key\":{\"items\":[1,true,\"text\"]}}}";
@@ -27,11 +33,13 @@ class MetadataRoundTripTest {
         assertFalse(JsonUtils.valueToTree(new ContentText("plain")).has("annotations"));
     }
 
-    @Test void resultMetadataIsNestedAndRequestExtensionsPreserveProgressApi() {
+    @Test
+    void resultMetadataIsNestedAndRequestExtensionsPreserveProgressApi() {
         CallToolResultDetail result = new CallToolResultDetail();
         result.setMeta(Collections.singletonMap("vendor/key", Collections.singletonList("value")));
         JsonNode wire = JsonUtils.valueToTree(result);
-        assertTrue(wire.has("_meta")); assertFalse(wire.has("meta"));
+        assertTrue(wire.has("_meta"));
+        assertFalse(wire.has("meta"));
         assertEquals(result.getMeta(), JsonUtils.convertValue(wire, CallToolResultDetail.class).getMeta());
         RequestMeta meta = new RequestMeta("progress-1");
         meta.setExtension("vendor/key", Collections.singletonMap("enabled", true));
@@ -41,9 +49,12 @@ class MetadataRoundTripTest {
         assertEquals(requestWire, JsonUtils.valueToTree(JsonUtils.convertValue(requestWire, RequestMeta.class)));
     }
 
-    @Test void implementationTitlesRoundTrip() {
+    @Test
+    void implementationTitlesRoundTrip() {
         InitializeRequestParams.ClientInfo client = new InitializeRequestParams.ClientInfo();
-        client.setName("client"); client.setVersion("1"); client.setTitle("Client label");
+        client.setName("client");
+        client.setVersion("1");
+        client.setTitle("Client label");
         assertEquals("Client label", JsonUtils.convertValue(JsonUtils.valueToTree(client),
                 InitializeRequestParams.ClientInfo.class).getTitle());
         InitializeResponseResult.ServerInfo server = new InitializeResponseResult.ServerInfo();

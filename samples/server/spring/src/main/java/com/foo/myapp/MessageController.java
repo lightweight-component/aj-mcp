@@ -22,6 +22,8 @@ public class MessageController {
      * Executes the handle json operation.
      * @param json the json value.
      * @param uuid the uuid value.
+     * @param req the incoming HTTP request.
+     * @param resp the outgoing HTTP response.
      */
     @PostMapping("/message")
     public void handleJson(@RequestBody String json, @RequestParam String uuid,

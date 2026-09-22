@@ -1,5 +1,5 @@
 [![Maven Central](https://img.shields.io/maven-central/v/com.ajaxjs/aj-mcp-server?label=Latest%20Release)](https://central.sonatype.com/artifact/com.ajaxjs/aj-mcp-server)
-[![Javadoc](https://img.shields.io/badge/javadoc-1.5-brightgreen.svg?)](https://javadoc.io/doc/com.ajaxjs/aj-mcp-server)
+[![Javadoc](https://img.shields.io/badge/javadoc-1.6-brightgreen.svg?)](https://javadoc.io/doc/com.ajaxjs/aj-mcp-server)
 ![coverage](https://img.shields.io/badge/coverage-80%25-yellowgreen.svg?maxAge=2592000)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Email](https://img.shields.io/badge/Contact--me-Email-orange.svg)](mailto:frank@ajaxjs.com)
@@ -42,7 +42,7 @@ Streamable HTTP 对外提供服务。
 <dependency>
     <groupId>com.ajaxjs</groupId>
     <artifactId>aj-mcp-server</artifactId>
-    <version>1.5</version>
+    <version>1.6</version>
 </dependency>
 ```
 
@@ -174,17 +174,17 @@ DELETE 和关闭传输层均清理完整会话状态。
 
 `ServerConfig` 的主要属性：
 
-| 属性                 | 含义                                 | 默认值     |
-|--------------------|------------------------------------|---------|
-| `name`、`version`   | 初始化时返回的服务身份                        | 未设置     |
-| `pageSize`         | 每页工具、资源或提示词数量                      | `3`     |
-| `protocolVersions` | 支持的协议版本，新版本优先                      | 所有已实现版本 |
-| `strictLifecycle`  | 普通请求前是否强制 initialize → initialized | `true`  |
-| `allowedOrigins`   | Streamable HTTP 接受的浏览器 Origin      | 空列表     |
-| `clientRequestTimeout` | 反向调用传入 null/零时使用的超时 | `Duration.ofSeconds(60)` |
-| `sessionIdleTimeout` | HTTP 会话空闲过期时间 | `Duration.ofMinutes(30)` |
-| `stdioWorkers` | STDIO 最大并发请求数 | `16` |
-| `stdioQueueCapacity` | STDIO 队列容量，满时返回繁忙错误 | `256` |
+| 属性                     | 含义                                 | 默认值                      |
+|------------------------|------------------------------------|--------------------------|
+| `name`、`version`       | 初始化时返回的服务身份                        | 未设置                      |
+| `pageSize`             | 每页工具、资源或提示词数量                      | `3`                      |
+| `protocolVersions`     | 支持的协议版本，新版本优先                      | 所有已实现版本                  |
+| `strictLifecycle`      | 普通请求前是否强制 initialize → initialized | `true`                   |
+| `allowedOrigins`       | Streamable HTTP 接受的浏览器 Origin      | 空列表                      |
+| `clientRequestTimeout` | 反向调用传入 null/零时使用的超时                | `Duration.ofSeconds(60)` |
+| `sessionIdleTimeout`   | HTTP 会话空闲过期时间                      | `Duration.ofMinutes(30)` |
+| `stdioWorkers`         | STDIO 最大并发请求数                      | `16`                     |
+| `stdioQueueCapacity`   | STDIO 队列容量，满时返回繁忙错误                | `256`                    |
 
 STDIO 固定使用 UTF-8。在构造 `ServerStdio` 前设置线程和队列上限；工具队列满时，握手、ping、取消和反向响应仍可处理。
 

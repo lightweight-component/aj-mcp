@@ -25,6 +25,7 @@ AJ-MCP 的公共模块，包含 Client 和 Server 共用的 JSON-RPC 消息、MC
 运行环境为 Java 8 及以上版本。Maven 配置：
 
 ```xml
+
 <dependency>
     <groupId>com.ajaxjs</groupId>
     <artifactId>aj-mcp-common</artifactId>

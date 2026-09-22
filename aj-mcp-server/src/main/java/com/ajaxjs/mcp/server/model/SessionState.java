@@ -1,21 +1,24 @@
 package com.ajaxjs.mcp.server.model;
 
 /**
- * Represents session state.
+ * Lifecycle state for a transport session during MCP initialization.
+ * <p>
+ * Transports use this enum to reject ordinary requests until the peer has completed the
+ * required {@code initialize} and {@code initialized} handshake.
  */
 public enum SessionState {
     /**
-     * The session is allocated but has not initialized.
+     * Session id exists, but no valid {@code initialize} request has been accepted yet.
      */
     NEW,
 
     /**
-     * The session has received initialization but is not ready yet.
+     * {@code initialize} succeeded and the server is waiting for the client {@code initialized} notification.
      */
     INITIALIZING,
 
     /**
-     * The session completed initialization and can handle requests.
+     * Handshake is complete and ordinary feature requests may be processed.
      */
     READY
 }

@@ -2,7 +2,9 @@ package com.ajaxjs.mcp.client.transport;
 
 import java.io.IOException;
 
-/** Structured HTTP failure; only an initial POST rejection may trigger transport discovery. */
+/**
+ * Structured HTTP failure; only an initial POST rejection may trigger transport discovery.
+ */
 final class HttpStatusException extends IOException {
     final int status;
     final boolean initialization;

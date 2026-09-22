@@ -17,7 +17,10 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 /**
- * Represents package annotation scanner.
+ * Lightweight classpath scanner used to discover MCP service classes by annotation.
+ * <p>
+ * It supports exploded class directories and JAR files and loads candidate classes without
+ * running static initializers so optional or side-effect-heavy services do not execute during scanning.
  */
 @Slf4j
 public class PackageAnnotationScanner {
@@ -83,19 +86,19 @@ public class PackageAnnotationScanner {
     }
 
     /**
-     * Defines the class file extension constant.
+     * File suffix used to identify Java bytecode entries in directories and JAR files.
      */
     private static final String CLASS_FILE_EXTENSION = ".class";
 
     /**
-     * Executes the find classes in jar operation.
+     * Scans a JAR file for classes under the target package and adds those carrying the annotation.
      *
-     * @param jarFile     the jar file value.
-     * @param packagePath the package path value.
-     * @param annotation  the annotation value.
-     * @param classLoader the class loader value.
-     * @param classes     the classes value.
-     * @throws ClassNotFoundException if the operation cannot complete.
+     * @param jarFile     JAR file currently being scanned.
+     * @param packagePath slash-separated package path inside the JAR.
+     * @param annotation  annotation that must be present on a candidate class.
+     * @param classLoader class loader used to resolve candidate classes.
+     * @param classes     mutable result set that receives matching classes.
+     * @throws ClassNotFoundException if a candidate class cannot be resolved.
      */
     private static void findClassesInJar(JarFile jarFile, String packagePath, Class<? extends Annotation> annotation,
                                          ClassLoader classLoader, Set<Class<?>> classes) throws ClassNotFoundException {
@@ -114,10 +117,10 @@ public class PackageAnnotationScanner {
     }
 
     /**
-     * Executes the add if annotated operation.
+     * Loads a candidate class without initialization and records it when the target annotation exists.
      *
-     * @param className   the class name value.
-     * @param annotation  the annotation value.
+     * @param className   fully qualified candidate class name.
+     * @param annotation  annotation required on the class.
      * @param classLoader the class loader value.
      * @param classes     the classes value.
      */

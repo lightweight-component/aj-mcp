@@ -1,5 +1,6 @@
 package com.ajaxjs.mcp.protocol.client;
 
+import com.ajaxjs.mcp.protocol.common.Metadata;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,7 +14,7 @@ import java.util.Map;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ElicitResult extends com.ajaxjs.mcp.protocol.common.Metadata {
+public class ElicitResult extends Metadata {
     /**
      * One of: accept, decline, cancel.
      */

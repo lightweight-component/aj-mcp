@@ -6,56 +6,58 @@ import lombok.AllArgsConstructor;
 import java.util.List;
 
 /**
- * A class representing the paginated response.
+ * Immutable page result used by MCP list operations before it is converted into a
+ * protocol-specific response object.
  *
- * @param <T> The type of the items in the list.
+ * @param <T> the type of the items contained in the current page.
  */
 @AllArgsConstructor
 public class PaginatedResponse<T> {
     /**
-     * Holds the list value.
+     * Items selected for the current page. The list reference is supplied by the caller and
+     * should be treated as read-only by response builders.
      */
     private final List<T> list;
     /**
-     * Holds the is last page value.
+     * Whether this page reaches the end of the source collection.
      */
     private final boolean isLastPage;
     /**
-     * Holds the next page no value.
+     * One-based page number to encode as the next cursor, or {@code null} when there is no next page.
      */
     private final Integer nextPageNo;
 
     /**
-     * Executes the get list operation.
+     * Returns the items selected for this page.
      *
-     * @return the result of the get list operation.
+     * @return the current page items.
      */
     public List<T> getList() {
         return list;
     }
 
     /**
-     * Executes the is last page operation.
+     * Indicates whether no further page is available.
      *
-     * @return the result of the is last page operation.
+     * @return {@code true} when this page is the last page.
      */
     public boolean isLastPage() {
         return isLastPage;
     }
 
     /**
-     * Executes the get next page no operation.
+     * Returns the one-based page number for the next cursor.
      *
-     * @return the result of the get next page no operation.
+     * @return the next page number, or {@code null} when this page is final.
      */
     public Integer getNextPageNo() {
         return nextPageNo;
     }
 
     /**
-     * Executes the get next page no as bse64 operation.
+     * Encodes the next page number as the opaque base64 cursor used by the MCP list APIs.
      *
-     * @return the result of the get next page no as bse64 operation.
+     * @return a base64 cursor containing the next page number.
      */
     public String getNextPageNoAsBse64() {
         return McpUtils.base64Encode(String.format("{\"page\":%d}", nextPageNo));

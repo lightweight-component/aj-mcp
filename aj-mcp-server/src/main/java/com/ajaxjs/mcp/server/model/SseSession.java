@@ -4,41 +4,45 @@ import java.io.PrintWriter;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Represents sse session.
+ * Represents one legacy HTTP/SSE client connection.
+ * <p>
+ * The session serializes all writes through the underlying {@link PrintWriter} so concurrent
+ * notifications cannot interleave, and it checks {@link PrintWriter#checkError()} because
+ * {@code PrintWriter} suppresses I/O exceptions.
  */
 public final class SseSession {
     /**
-     * Holds the writer value.
+     * HTTP response writer used for SSE frames.
      */
     private final PrintWriter writer;
 
     /**
-     * Holds the closed value.
+     * Idempotent close flag shared by send and close paths.
      */
     private final AtomicBoolean closed = new AtomicBoolean(false);
 
     /**
-     * Creates a new sse session.
+     * Creates a session around an already-open SSE response writer.
      *
-     * @param writer the writer value.
+     * @param writer the writer connected to the HTTP response body.
      */
     public SseSession(PrintWriter writer) {
         this.writer = writer;
     }
 
     /**
-     * Executes the send data operation.
+     * Sends one default {@code data:} SSE event containing a serialized JSON-RPC payload.
      *
-     * @param data the data value.
+     * @param data serialized payload to write as the event data.
      */
     public void sendData(String data) {
         sendFrame("data: " + data + "\n\n");
     }
 
     /**
-     * Executes the send frame operation.
+     * Writes one complete SSE frame and fails fast if the client connection is closed.
      *
-     * @param frame the frame value.
+     * @param frame complete SSE frame including the required trailing blank line.
      */
     public void sendFrame(String frame) {
         synchronized (writer) {
@@ -54,16 +58,16 @@ public final class SseSession {
     }
 
     /**
-     * Executes the is closed operation.
+     * Reports whether this SSE response has already been closed.
      *
-     * @return the result of the is closed operation.
+     * @return {@code true} after the first successful close.
      */
     public boolean isClosed() {
         return closed.get();
     }
 
     /**
-     * Executes the close operation.
+     * Closes the SSE writer once. Further send attempts fail with an {@link IllegalStateException}.
      */
     public void close() {
         synchronized (writer) {

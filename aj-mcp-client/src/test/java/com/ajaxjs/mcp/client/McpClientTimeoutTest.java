@@ -38,10 +38,13 @@ class McpClientTimeoutTest {
     @Timeout(2)
     void zeroAndNullTimeoutUseFiniteDefault() throws Exception {
         CompletableFuture<JsonNode> response = new CompletableFuture<JsonNode>() {
-            @Override public JsonNode get() {
+            @Override
+            public JsonNode get() {
                 throw new AssertionError("Unbounded waiting must not be used");
             }
-            @Override public JsonNode get(long timeout, java.util.concurrent.TimeUnit unit) {
+
+            @Override
+            public JsonNode get(long timeout, java.util.concurrent.TimeUnit unit) {
                 assertEquals(60000, unit.toMillis(timeout));
                 return JsonNodeFactory.instance.objectNode();
             }

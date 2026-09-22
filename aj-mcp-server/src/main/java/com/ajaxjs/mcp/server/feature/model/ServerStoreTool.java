@@ -7,13 +7,16 @@ import lombok.EqualsAndHashCode;
 import java.util.List;
 
 /**
- * Represents server store tool.
+ * Runtime binding for one exposed MCP tool.
+ * <p>
+ * It couples the protocol-facing {@link ToolItem} metadata with the Java method that performs
+ * the work and records parameter order for reflective invocation.
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class ServerStoreTool extends ServerStoreBase {
     /**
-     * Holds the tool value.
+     * Tool metadata returned by {@code tools/list} and used to validate calls.
      */
     ToolItem tool;
 

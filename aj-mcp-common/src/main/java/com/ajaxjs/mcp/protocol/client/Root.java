@@ -1,5 +1,6 @@
 package com.ajaxjs.mcp.protocol.client;
 
+import com.ajaxjs.mcp.protocol.common.Metadata;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Root extends com.ajaxjs.mcp.protocol.common.Metadata {
+public class Root extends Metadata {
     /**
      * Holds the uri value.
      */

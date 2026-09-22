@@ -21,5 +21,5 @@ public class ResourceTemplatesResultDetail extends com.ajaxjs.mcp.protocol.commo
      * Holds the next cursor value.
      */
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private  String nextCursor;
+    private String nextCursor;
 }

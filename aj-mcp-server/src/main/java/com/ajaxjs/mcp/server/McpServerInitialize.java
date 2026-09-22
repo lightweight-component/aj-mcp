@@ -22,35 +22,39 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Represents mcp server initialize.
+ * Base class for MCP server initialization and shared dispatcher helpers.
+ * <p>
+ * It owns the feature registry, server configuration, and active transport, and implements
+ * protocol-version negotiation for the {@code initialize} request before subclasses handle
+ * feature-specific methods.
  */
 @Slf4j
 @Data
 public abstract class McpServerInitialize implements McpConstant {
     /**
-     * Holds the feature mgr value.
+     * Instance-scoped registry for tools, prompts, resources, templates, and completion providers.
      */
     FeatureMgr featureMgr = new FeatureMgr();
 
     /**
-     * Holds the server config value.
+     * Configuration advertised to clients and consulted by transports.
      */
     ServerConfig serverConfig;
 
     /**
-     * Holds the transport value.
+     * Synchronous transport used to send responses, notifications, and reverse requests.
      */
     McpTransportSync transport;
 
     /**
-     * Executes the get store operation.
+     * Looks up a named feature binding and converts lookup failures to JSON-RPC validation errors.
      *
-     * @param <T>         the t type.
-     * @param map         the map value.
-     * @param name        the name value.
-     * @param requestId   the request id value.
-     * @param featureType the feature type value.
-     * @return the result of the get store operation.
+     * @param <T>         the store binding type.
+     * @param map         feature registry keyed by protocol name.
+     * @param name        requested feature name.
+     * @param requestId   request id used when constructing the protocol error.
+     * @param featureType human-readable feature type used in error messages.
+     * @return the matching store binding.
      */
     static <T> T getStore(Map<String, T> map, String name, Object requestId, String featureType) {
         if (McpUtils.isEmptyText(name))

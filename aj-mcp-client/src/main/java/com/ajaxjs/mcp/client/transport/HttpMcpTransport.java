@@ -18,18 +18,28 @@ import okio.Buffer;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.Map;
-import java.util.Objects;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 /**
- * Implements transport for MCP (Microservice Communication Protocol) using HTTP and SSE (Server-Sent Events).
- * This class is responsible for managing the connection with the server, sending requests, and handling responses.
+ * Legacy MCP transport using an SSE notification channel and HTTP POST requests.
+ *
+ * <p>The server first opens the SSE channel and announces the POST endpoint.
+ * Requests are then sent to that endpoint while responses and unsolicited
+ * messages are correlated through the shared JSON-RPC request table. This class
+ * is retained for servers implementing the older HTTP/SSE arrangement; new
+ * deployments should prefer {@link StreamableHttpTransport} or
+ * {@link AutoHttpTransport}.</p>
+ *
+ * <p>Closing is idempotent and fails pending requests. The supplied headers are
+ * copied at construction time so later caller-side map changes do not alter an
+ * active connection.</p>
  */
 @Slf4j
 public class HttpMcpTransport extends McpTransport {
@@ -73,27 +83,35 @@ public class HttpMcpTransport extends McpTransport {
     private volatile CompletableFuture<String> endpointReady;
 
     /**
-     * Constructor for creating an instance with only the SSE URL.
+     * Creates a legacy HTTP/SSE transport with default timeouts and logging disabled.
      *
-     * @param sseUrl The SSE URL.
+     * @param sseUrl SSE endpoint URL
      */
     public HttpMcpTransport(String sseUrl) {
         this(sseUrl, false, false);
     }
 
     /**
-     * Creates a new http mcp transport.
+     * Creates a legacy HTTP/SSE transport.
      *
-     * @param sseUrl       the sse url value.
-     * @param logResponses the log responses value.
-     * @param logRequests  the log requests value.
+     * @param sseUrl       SSE endpoint URL
+     * @param logResponses whether response bodies should be logged
+     * @param logRequests  whether request bodies should be logged
      */
     @Builder
     public HttpMcpTransport(String sseUrl, boolean logResponses, boolean logRequests) {
         this(sseUrl, logResponses, logRequests, Duration.ofSeconds(60), Collections.emptyMap());
     }
 
-    /** Configured legacy transport used by automatic HTTP discovery. */
+    /**
+     * Creates a configured legacy transport used by automatic HTTP discovery.
+     *
+     * @param sseUrl         the SSE endpoint URL
+     * @param logResponses   whether responses should be logged
+     * @param logRequests    whether requests should be logged
+     * @param timeout        the HTTP operation timeout; null or zero uses the default
+     * @param requestHeaders HTTP headers to send, or null for no additional headers
+     */
     public HttpMcpTransport(String sseUrl, boolean logResponses, boolean logRequests,
                             Duration timeout, Map<String, String> requestHeaders) {
         Objects.requireNonNull(sseUrl, "Missing SSE endpoint URL");

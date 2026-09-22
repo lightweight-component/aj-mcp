@@ -18,17 +18,24 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Represents server sse.
+ * Legacy HTTP/SSE transport for MCP clients that use a persistent GET stream plus POST requests.
+ * <p>
+ * The class manages client sessions, origin validation, heartbeat frames, serialized SSE writes,
+ * and delegates JSON-RPC dispatch to the shared {@link McpServer} instance.
  */
 @Slf4j
 public class ServerSse implements McpTransportSync {
     /**
      * Validate before opening a GET stream or dispatching a POST body.
      * Native MCP clients may omit Origin; supplied origins require an exact allowlist match.
+     *
+     * @param origin the HTTP Origin header value, or {@code null} when absent.
+     * @return {@code true} when the origin is absent or explicitly allowed.
      */
     public boolean isOriginAllowed(String origin) {
         if (origin == null)
             return true;
+
         return !origin.isEmpty() && !"null".equals(origin) && !"*".equals(origin)
                 && server.getServerConfig() != null
                 && server.getServerConfig().getAllowedOrigins() != null
@@ -36,36 +43,36 @@ public class ServerSse implements McpTransportSync {
     }
 
     /**
-     * Holds the server value.
+     * Shared server dispatcher used for all SSE client sessions.
      */
     private final McpServer server;
 
     /**
-     * Creates a new server sse.
+     * Creates a legacy SSE transport bound to an MCP server.
      *
-     * @param server the server value.
+     * @param server the server dispatcher used for incoming POST messages.
      */
     public ServerSse(McpServer server) {
         this.server = Objects.requireNonNull(server, "server is required");
     }
 
     /**
-     * Holds the connection value.
+     * Active SSE connections keyed by logical client/session id.
      */
     final Map<String, SseSession> connections = new ConcurrentHashMap<>();
 
     /**
-     * Holds the started value.
+     * Guards transport startup and heartbeat scheduling.
      */
     private final AtomicBoolean started = new AtomicBoolean(false);
 
     /**
-     * Holds the closed value.
+     * Idempotent close marker for the whole transport.
      */
     private final AtomicBoolean closed = new AtomicBoolean(false);
 
     /**
-     * Holds the heartbeat executor value.
+     * Scheduler that sends heartbeat comments to keep HTTP connections alive.
      */
     private volatile ScheduledExecutorService heartbeatExecutor;
 
@@ -101,11 +108,11 @@ public class ServerSse implements McpTransportSync {
     }
 
     /**
-     * Executes the register session operation.
+     * Registers or replaces one SSE connection for the given logical client id.
      *
-     * @param clientId the client id value.
-     * @param writer   the writer value.
-     * @return the result of the register session operation.
+     * @param clientId the logical client/session id.
+     * @param writer   the open response writer for the SSE stream.
+     * @return the newly registered session wrapper.
      */
     private synchronized SseSession registerSession(String clientId, PrintWriter writer) {
         if (closed.get())
@@ -127,9 +134,9 @@ public class ServerSse implements McpTransportSync {
     }
 
     /**
-     * Remove a connection when the client disconnects
+     * Removes a connection when the client disconnects and clears server state for that session.
      *
-     * @param clientId The client id.
+     * @param clientId the logical client/session id.
      */
     public void removeConnection(String clientId) {
         SseSession session = connections.remove(clientId);

@@ -12,7 +12,10 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 /**
- * Server Common Utils
+ * Shared utility methods used by server feature handlers and response builders.
+ * <p>
+ * This class keeps small protocol-adjacent helpers such as cursor pagination and resource
+ * encoding outside the transport and dispatcher classes.
  */
 public class ServerUtils {
     /**
@@ -48,13 +51,13 @@ public class ServerUtils {
     }
 
     /**
-     * Executes the paginate operation.
+     * Applies cursor pagination using the server's configured page size.
      *
-     * @param <T>      the t type.
-     * @param list     the list value.
-     * @param params   the params value.
-     * @param instance the instance value.
-     * @return the result of the paginate operation.
+     * @param <T>      element type in the source list.
+     * @param list     complete list before pagination.
+     * @param params   cursor parameters decoded from the request.
+     * @param instance server instance supplying pagination configuration.
+     * @return the selected page and next-page metadata.
      */
     public static <T> PaginatedResponse<T> paginate(List<T> list, Cursor params, McpServerInitialize instance) {
         Integer pageNo = params.getPageNo();
@@ -92,6 +95,15 @@ public class ServerUtils {
     /**
      * Builds a protocol-specific list detail while keeping cursor behavior
      * identical for tools, prompts, resources, and resource templates.
+     *
+     * @param <T>              the item type in the source list.
+     * @param <R>              the detail response type.
+     * @param list             the source list to paginate.
+     * @param cursor           the optional cursor requested by the peer.
+     * @param instance         the server instance that supplies pagination settings.
+     * @param detailFactory    creates the detail response from the current page.
+     * @param nextCursorSetter sets the next cursor on the detail response when more items remain.
+     * @return the detail response for the current page.
      */
     public static <T, R> R paginatedDetail(List<T> list, Cursor cursor, McpServerInitialize instance,
                                            Function<List<T>, R> detailFactory,

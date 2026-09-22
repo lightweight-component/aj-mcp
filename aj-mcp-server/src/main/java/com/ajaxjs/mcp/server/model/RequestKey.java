@@ -5,25 +5,28 @@ import lombok.RequiredArgsConstructor;
 import java.util.Objects;
 
 /**
- * Represents request key.
+ * Composite key for a JSON-RPC request id scoped to one transport session.
+ * <p>
+ * JSON-RPC ids are not globally unique across clients, so cancellation and running-request
+ * tracking must include the session id to avoid affecting another client that reused the same id.
  */
 @RequiredArgsConstructor
 public final class RequestKey {
     /**
-     * Holds the session id value.
+     * Transport session that owns the request.
      */
     private final String sessionId;
 
     /**
-     * Holds the request id value.
+     * JSON-RPC request id as supplied by the client.
      */
     private final Object requestId;
 
     /**
-     * Executes the belonging to operation.
+     * Tests whether this request key belongs to the supplied session.
      *
-     * @param sessionId the session id value.
-     * @return the result of the belonging to operation.
+     * @param sessionId the session id to compare.
+     * @return {@code true} when both session ids are equal.
      */
     public boolean belongsTo(String sessionId) {
         return this.sessionId.equals(sessionId);

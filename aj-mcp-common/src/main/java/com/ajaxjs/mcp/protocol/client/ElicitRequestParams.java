@@ -21,7 +21,7 @@ public class ElicitRequestParams {
     private Map<String, Object> requestedSchema;
 
     /**
-     * Holds the  meta value.
+     * Holds the meta value.
      */
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Map<String, Object> _meta;

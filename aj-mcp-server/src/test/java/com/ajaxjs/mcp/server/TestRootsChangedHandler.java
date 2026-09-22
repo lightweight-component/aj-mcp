@@ -4,11 +4,14 @@ import com.ajaxjs.mcp.common.JsonUtils;
 import com.ajaxjs.mcp.protocol.McpRequestRawInfo;
 import com.ajaxjs.mcp.server.common.ServerConfig;
 import com.ajaxjs.mcp.server.model.HttpResult;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.*;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class TestRootsChangedHandler {
@@ -28,7 +31,9 @@ class TestRootsChangedHandler {
     }
 
     @AfterEach
-    void close() throws Exception { transport.close(); }
+    void close() throws Exception {
+        transport.close();
+    }
 
     private String initialize(String version, String capabilities) {
         return "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\""
@@ -55,7 +60,9 @@ class TestRootsChangedHandler {
                 assertNull(server.processMessage(new McpRequestRawInfo(null,
                         "notifications/roots/list_changed", JsonUtils.json2Node(CHANGED))));
             }
-        } finally { server.clearSession(); }
+        } finally {
+            server.clearSession();
+        }
         assertEquals(Arrays.asList("first", "second"), notified);
     }
 
@@ -77,7 +84,9 @@ class TestRootsChangedHandler {
     void callbacksAreOptionalAndFailuresDoNotBreakReception() {
         Map<String, String> headers = session("{\"roots\":{\"listChanged\":true}}");
         notify(headers);
-        server.setRootsChangedHandler(id -> { throw new IllegalStateException("business failure"); });
+        server.setRootsChangedHandler(id -> {
+            throw new IllegalStateException("business failure");
+        });
         notify(headers);
         List<String> notified = new ArrayList<>();
         server.setRootsChangedHandler(notified::add);

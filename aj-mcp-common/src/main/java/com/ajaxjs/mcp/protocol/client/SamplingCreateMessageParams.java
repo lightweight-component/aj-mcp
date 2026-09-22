@@ -1,5 +1,6 @@
 package com.ajaxjs.mcp.protocol.client;
 
+import com.ajaxjs.mcp.protocol.common.Metadata;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
 
@@ -9,7 +10,7 @@ import java.util.List;
  * Parameters supplied by a server for sampling/createMessage.
  */
 @Data
-public class SamplingCreateMessageParams extends com.ajaxjs.mcp.protocol.common.Metadata {
+public class SamplingCreateMessageParams extends Metadata {
     /**
      * Holds the message value.
      */

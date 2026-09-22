@@ -1,7 +1,6 @@
 package com.ajaxjs.mcp.client.transport;
 
 import com.ajaxjs.mcp.common.JsonUtils;
-import com.ajaxjs.mcp.protocol.BaseJsonRpcMessage;
 import com.ajaxjs.mcp.protocol.McpRequest;
 import com.ajaxjs.mcp.protocol.initialize.InitializationNotification;
 import com.ajaxjs.mcp.protocol.initialize.InitializeRequest;
@@ -17,23 +16,34 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Represents stdio transport.
+ * MCP transport backed by a child process and its standard input/output streams.
+ *
+ * <p>Each outbound JSON-RPC message is written as one UTF-8 JSON line to the
+ * child's stdin. The child's stdout is reserved for protocol messages and is
+ * parsed line by line; stderr is treated as diagnostic logging and never enters
+ * the JSON-RPC stream. The transport starts daemon reader threads and fails
+ * pending requests if stdout closes unexpectedly or the process terminates.</p>
+ *
+ * <p>Configure {@link #command} with the executable and its arguments before
+ * calling {@link #start(Map)}. The environment map is applied on top of the
+ * current process environment.</p>
  */
 @Builder
 @Slf4j
 public class StdioTransport extends McpTransport {
     /**
-     * Holds the command value.
+     * Child-process command and arguments, in the form accepted by
+     * {@link ProcessBuilder#ProcessBuilder(List)}.
      */
     private final List<String> command;
 
     /**
-     * Holds the environment value.
+     * Additional environment variables for the child process, or null.
      */
     private final Map<String, String> environment;
 
     /**
-     * Holds the log events value.
+     * Whether protocol event diagnostics should be logged when enabled.
      */
     private boolean logEvents;
 
@@ -62,6 +72,13 @@ public class StdioTransport extends McpTransport {
      */
     private volatile boolean closed;
 
+    /**
+     * Starts the configured child process and its stdout/stderr reader threads.
+     *
+     * @param pendingRequest session-local map used to complete response futures
+     * @throws IllegalStateException if this transport is closed or already started
+     * @throws UncheckedIOException  if the child process cannot be created
+     */
     @Override
     public synchronized void start(Map<Long, CompletableFuture<JsonNode>> pendingRequest) {
         if (closed)

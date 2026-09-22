@@ -38,9 +38,9 @@ public @interface Resource {
     String description() default McpConstant.EMPTY_STR;
 
     /**
-     * The URI of this resource.
+     * Stable URI that identifies this concrete resource in the MCP resource catalog.
      *
-     * @return The URI of this resource.
+     * @return the resource URI sent to clients and later used for read requests.
      */
     String uri();
 
@@ -52,9 +52,9 @@ public @interface Resource {
     String mimeType() default McpConstant.EMPTY_STR;
 
     /**
-     * Executes the title operation.
+     * Optional display title for protocol revisions that support resource annotations.
      *
-     * @return the result of the title operation.
+     * @return the display title, or an empty string when unspecified.
      */
     String title() default McpConstant.EMPTY_STR;
 

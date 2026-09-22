@@ -8,8 +8,15 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * A tool provider backed by one or more MCP clients.
- * Usage:
+ * Aggregates tools exposed by one or more MCP clients.
+ *
+ * <p>Each discovered tool is associated with the client that supplied it, so
+ * invoking the returned function routes the call back to the correct server.
+ * If multiple servers expose equal tool metadata, normal map replacement rules
+ * apply. Tool discovery is performed each time {@link #provideTools()} is
+ * called; this class does not subscribe to list-change notifications.</p>
+ *
+ * <p>Usage:
  * Function{CallToolRequest, String} executor = obtainTools().findToolExecutorByName("echoString");
  * String toolExecutionResultString = executor.apply(new CallToolRequest("echoString", "{\"input\": \"hi\"}"));
  */
@@ -28,18 +35,22 @@ public class McpToolProvider {
     private boolean failIfOneServerFails;
 
     /**
-     * Executes the set mcp client operation.
+     * Configures a single MCP client as the provider source.
      *
-     * @param client the client value.
+     * @param client client from which tools will be discovered
      */
     public void setMcpClient(IMcpClient client) {
         setMcpClients(Collections.singletonList(client));
     }
 
     /**
-     * Get the tool list from all MCP clients.
+     * Discovers tools from every configured client and binds an executor to each.
      *
-     * @return tool list
+     * <p>When {@code failIfOneServerFails} is false, a failing client is
+     * logged and discovery continues. The returned result is never null.</p>
+     *
+     * @return aggregated tools and their client-bound executors
+     * @throws RuntimeException if discovery fails and failIfOneServerFails is true
      */
     public McpToolProviderResult provideTools() {
         McpToolProviderResult toolProviderResult = new McpToolProviderResult();

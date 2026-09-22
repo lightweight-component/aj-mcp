@@ -10,22 +10,26 @@ import java.util.Optional;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Annotates a parameter of a {@link Tool} method.
+ * Describes one argument of a method annotated with {@link Tool}.
+ * <p>
+ * The scanner uses this metadata to build the tool {@code inputSchema} and to map incoming
+ * JSON object properties to Java method parameters.
  */
 @Retention(RUNTIME)
 @Target(ElementType.PARAMETER)
 public @interface ToolArg {
     /**
-     * Executes the value operation.
+     * Argument name expected in the JSON object passed to {@code tools/call}. When empty,
+     * the Java parameter name is used if available.
      *
-     * @return the result of the value operation.
+     * @return the protocol argument name, or an empty string to derive it from the parameter.
      */
     String value() default McpConstant.EMPTY_STR;
 
     /**
-     * Executes the description operation.
+     * Optional argument description included in the generated JSON Schema.
      *
-     * @return the result of the description operation.
+     * @return the argument description, or an empty string when unspecified.
      */
     String description() default McpConstant.EMPTY_STR;
 

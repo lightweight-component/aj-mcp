@@ -14,19 +14,19 @@ import java.util.regex.Pattern;
 @EqualsAndHashCode(callSuper = true)
 public class ServerStoreResourceTemplate extends ServerStoreBase {
     /**
-     * Holds the resource template value.
+     * Protocol metadata advertised by {@code resources/templates/list}.
      */
     private ResourceTemplate resourceTemplate;
     /**
-     * Holds the parameter names value.
+     * Java method parameter names in invocation order.
      */
     private List<String> parameterNames;
     /**
-     * Holds the template variable names value.
+     * URI-template variable names extracted from the RFC 6570 template.
      */
     private List<String> templateVariableNames;
     /**
-     * Holds the uri pattern value.
+     * Compiled regular expression used to match incoming resource URIs and extract variables.
      */
     private Pattern uriPattern;
 }
