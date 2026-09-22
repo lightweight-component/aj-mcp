@@ -1,5 +1,8 @@
+
+
+
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
     <head>
         <meta charset="utf-8"/>
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
@@ -7,26 +10,37 @@
         <meta name="description" content="轻量级的 Java 8 Model Context Protocol (MCP) SDK. Working with Tools"/>
         <meta name="keywords" content="mcp, mcp sdk, java mcp, mcp client, mcp server, java8 mcp, Tools"/>
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
-        <link rel="stylesheet" href="/asset/style/main.css"/>
+        <link rel="stylesheet" href="https://framework.ajaxjs.com/static/new-ui/css/common.css" />
+        <link rel="stylesheet" href="https://aj-util.ajaxjs.com/asset/main.css" />
         <link rel="icon" type="image/png" href="/asset/favicon.ico"/>
+        <script defer src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.12.0/highlight.min.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.12.0/styles/github.min.css" />
+        <script src="https://aj-util.ajaxjs.com/asset/js/common.js"></script>
+        <script>
+            AJUtils.initTheme();
+            AJUtils.onReady(function () {
+                AJUtils.bindThemeToggle();
+                AJUtils.bindDocumentationLanguageToggle();
+            });
+        </script>
         <script src="/asset/common.js"></script>
     </head>
     <body>
         <nav>
             <div>
                 <div class="links">
-                    <a href="/">🏠 首页</a>
+                    <a href="/cn/">🏠 首页</a>
                     | ⚙️ 源码:
                     <a target="_blank" href="https://github.com/lightweight-component/aj-mcp">Github</a>/<a target="_blank" href="https://gitcode.com/lightweight-component/aj-mcp">Gitcode</a>
-                    |
-                    <a href="/">英文版本</a>
+                    | <button class="language-toggle" type="button" data-document-language-toggle data-language-target="/client/tool/" aria-label="切换至英文" title="切换至英文">EN</button>
+                    | <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换主题" title="切换主题">☾</button>
                 </div>
                 <h1>AJ MCP SDK</h1>
                 <h3>用户手册</h3>
             </div>
         </nav>
-        <div>
-            <menu>
+        <div class="docs-layout">
+            <menu class="docs-navigation" aria-label="文档导航">
                 
                 <ul>
                     <li class="selected">
@@ -82,7 +96,7 @@
                     <li><a href="/misc/contact-cn">联系方式</a></li>
                 </ul>
             </menu>
-            <article>
+            <article class="aj-text">
                 <h1>工具（Tool）使用指南</h1>
 <p>内容、资源、工具、请求参数及结果模型通过 <code>getMeta()</code> / <code>setMeta(Map&lt;String, Object&gt;)</code> 保留可选 <code>_meta</code>，
 嵌套扩展值不会丢失；它位于相应对象内，不放在 JSON-RPC 信封顶层。

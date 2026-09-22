@@ -1,5 +1,8 @@
+
+
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
         <meta charset="utf-8"/>
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
@@ -7,9 +10,21 @@
         <meta name="description" content="A lightweight Java 8 Model Context Protocol (MCP) SDK. MCP Server SDK Resources Development"/>
         <meta name="keywords" content="mcp, mcp sdk, java mcp, mcp client, mcp server, java8 mcp, Resources Development"/>
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
-        <link rel="stylesheet" href="/asset/style/main.css"/>
+        <link rel="stylesheet" href="https://framework.ajaxjs.com/static/new-ui/css/common.css" />
+        <link rel="stylesheet" href="https://aj-util.ajaxjs.com/asset/main.css" />
         <link rel="icon" type="image/png" href="/asset/favicon.ico"/>
+        <script defer src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.12.0/highlight.min.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.12.0/styles/github.min.css" />
+        <script src="https://aj-util.ajaxjs.com/asset/js/common.js"></script>
+        <script>
+            AJUtils.initTheme();
+            AJUtils.onReady(function () {
+                AJUtils.bindThemeToggle();
+                AJUtils.bindDocumentationLanguageToggle();
+            });
+        </script>
         <script src="/asset/common.js"></script>
+
         <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200..900&family=Noto+Serif+TC:wght@200..900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet" />
     </head>
     <body>
@@ -19,15 +34,15 @@
                     <a href="/">🏠 Home</a>
                     | ⚙️ Source:
                     <a target="_blank" href="https://github.com/lightweight-component/aj-mcp">Github</a>/<a target="_blank" href="https://gitcode.com/lightweight-component/aj-mcp">Gitcode</a>
-                    |
-                    <a href="/cn">Chinese Version</a>
+                    | <button class="language-toggle" type="button" data-document-language-toggle data-language-target="/server/res-server-cn/" aria-label="Switch language to Chinese" title="切换至中文">中</button>
+                    | <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch theme" title="Switch theme">☾</button>
                 </div>
                 <h1>AJ MCP SDK</h1>
                 <h3>User Manual</h3>
             </div>
         </nav>
-        <div>
-            <menu>
+        <div class="docs-layout">
+            <menu class="docs-navigation" aria-label="Documentation navigation">
                 
                 <ul>
                     <li class="selected">
@@ -83,7 +98,7 @@
                     <li><a href="/misc/contact">Contact</a></li>
                 </ul>
             </menu>
-            <article>
+            <article class="aj-text">
                 <h1>MCP Server SDK Feature Management</h1>
 <p>The AJ-MCP annotation system provides a declarative approach to exposing Java methods as MCP (Model Context Protocol)
 tools, resources, and prompts.

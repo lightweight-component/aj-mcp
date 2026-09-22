@@ -1,5 +1,8 @@
+
+
+
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
     <head>
         <meta charset="utf-8"/>
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
@@ -7,26 +10,37 @@
         <meta name="description" content="轻量级的 Java 8 Model Context Protocol (MCP) SDK. 用户手册 首页"/>
         <meta name="keywords" content="mcp, mcp sdk, java mcp, mcp client, mcp server, java8 mcp, 用户手册"/>
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
-        <link rel="stylesheet" href="/asset/style/main.css"/>
+        <link rel="stylesheet" href="https://framework.ajaxjs.com/static/new-ui/css/common.css" />
+        <link rel="stylesheet" href="https://aj-util.ajaxjs.com/asset/main.css" />
         <link rel="icon" type="image/png" href="/asset/favicon.ico"/>
+        <script defer src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.12.0/highlight.min.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.12.0/styles/github.min.css" />
+        <script src="https://aj-util.ajaxjs.com/asset/js/common.js"></script>
+        <script>
+            AJUtils.initTheme();
+            AJUtils.onReady(function () {
+                AJUtils.bindThemeToggle();
+                AJUtils.bindDocumentationLanguageToggle();
+            });
+        </script>
         <script src="/asset/common.js"></script>
     </head>
     <body>
         <nav>
             <div>
                 <div class="links">
-                    <a href="/">🏠 首页</a>
+                    <a href="/cn/">🏠 首页</a>
                     | ⚙️ 源码:
                     <a target="_blank" href="https://github.com/lightweight-component/aj-mcp">Github</a>/<a target="_blank" href="https://gitcode.com/lightweight-component/aj-mcp">Gitcode</a>
-                    |
-                    <a href="/">英文版本</a>
+                    | <button class="language-toggle" type="button" data-document-language-toggle data-language-target="/docs-index" aria-label="切换至英文" title="切换至英文">EN</button>
+                    | <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换主题" title="切换主题">☾</button>
                 </div>
                 <h1>AJ MCP SDK</h1>
                 <h3>用户手册</h3>
             </div>
         </nav>
-        <div>
-            <menu>
+        <div class="docs-layout">
+            <menu class="docs-navigation" aria-label="文档导航">
                 
                 <ul>
                     <li class="selected">
@@ -82,7 +96,7 @@
                     <li><a href="/misc/contact-cn">联系方式</a></li>
                 </ul>
             </menu>
-            <article>
+            <article class="aj-text">
                 <h1>欢迎使用 AJ MCP SDK 用户手册</h1>
 <p>AJ MCP SDK 是 <strong>模型上下文协议</strong>（MCP）的一个实现。MCP 是一种开放协议，旨在实现大型语言模型（LLM）应用与外部数据源和工具之间的无缝集成。本
 SDK 提供了声明式的 API，使开发者能够轻松地在自己的应用程序中实现 MCP 服务器功能。</p>
