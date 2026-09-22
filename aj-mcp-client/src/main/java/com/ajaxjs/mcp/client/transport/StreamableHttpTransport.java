@@ -94,6 +94,11 @@ public class StreamableHttpTransport extends McpTransport {
     /** Scheduled reconnect, cancelled during shutdown. */
     private ScheduledFuture<?> reconnectTask;
 
+    private InitializeRequest initializationRequest;
+    private volatile CompletableFuture<JsonNode> sessionRecovery;
+    private long recoveryId = -1;
+    private long sessionGeneration;
+
     /**
      * Creates a new streamable http transport.
      *
@@ -139,6 +144,7 @@ public class StreamableHttpTransport extends McpTransport {
 
     @Override
     public CompletableFuture<JsonNode> initialize(InitializeRequest request) {
+        initializationRequest = JsonUtils.convertValue(JsonUtils.valueToTree(request), InitializeRequest.class);
         initializationVersion = request.getParams().getProtocolVersion();
         CompletableFuture<JsonNode> response = completeInitialization(
                 post(request, numericId(request.getId()), false),
@@ -156,15 +162,21 @@ public class StreamableHttpTransport extends McpTransport {
     }
 
     @Override
-    public CompletableFuture<JsonNode> sendRequestWithResponse(McpRequest request) {
+    public synchronized CompletableFuture<JsonNode> sendRequestWithResponse(McpRequest request) {
         requireInitialized();
-
+        CompletableFuture<JsonNode> recovery = sessionRecovery;
+        if (recovery != null)
+            return recovery.thenCompose(ignored -> post(request, numericId(request.getId()), true));
         return post(request, numericId(request.getId()), true);
     }
 
     @Override
-    public void sendRequestWithoutResponse(McpRequest request) {
-        post(request, null, true);
+    public synchronized void sendRequestWithoutResponse(McpRequest request) {
+        CompletableFuture<JsonNode> recovery = sessionRecovery;
+        if (recovery == null)
+            post(request, null, true);
+        else
+            recovery.thenCompose(ignored -> post(request, null, true));
     }
 
     @Override
@@ -212,7 +224,7 @@ public class StreamableHttpTransport extends McpTransport {
      * @param versionHeader the version header value.
      * @return the result of the post bytes operation.
      */
-    private CompletableFuture<JsonNode> postBytes(byte[] json, Long id, boolean versionHeader) {
+    private synchronized CompletableFuture<JsonNode> postBytes(byte[] json, Long id, boolean versionHeader) {
         CompletableFuture<JsonNode> future = new CompletableFuture<>();
 
         if (closed) {
@@ -234,6 +246,8 @@ public class StreamableHttpTransport extends McpTransport {
                 return future;
             }
             Call pendingCall = client.newCall(builder.build());
+            final long generation = sessionGeneration;
+            final String sentSession = sessionId;
             future.whenComplete((result, failure) -> {
                 if (future.isCancelled())
                     pendingCall.cancel();
@@ -250,11 +264,23 @@ public class StreamableHttpTransport extends McpTransport {
                 @Override
                 public void onResponse(Call call, Response response) {
                     try (Response ignored = response) {
-                        captureSession(response);
+                        synchronized (StreamableHttpTransport.this) {
+                            if (closed || generation != sessionGeneration) {
+                                failOne(id, future, new IOException("MCP session changed; request was not replayed"));
+                                return;
+                            }
+                            if (response.code() == 404 && sentSession != null) {
+                                recoverSession(sentSession);
+                                failOne(id, future, new IOException("MCP session expired; request was not replayed"));
+                                return;
+                            }
+                            if (response.isSuccessful())
+                                captureSession(response);
+                        }
 
                         if (!response.isSuccessful()) {
                             String body = response.body() == null ? "" : response.body().string();
-                            failOne(id, future, new IOException("MCP HTTP " + response.code() + ": " + body));
+                            failOne(id, future, new HttpStatusException(response.code(), !versionHeader, body));
                             return;
                         }
 
@@ -405,6 +431,10 @@ public class StreamableHttpTransport extends McpTransport {
             @Override
             public void onEvent(EventSource source, String id, String type, String data) {
                 try {
+                    synchronized (StreamableHttpTransport.this) {
+                        if (source != eventSource || closed)
+                            return;
+                    }
                     if (data != null && !data.trim().isEmpty())
                         handle(JsonUtils.json2Node(data));
                     synchronized (StreamableHttpTransport.this) {
@@ -445,6 +475,10 @@ public class StreamableHttpTransport extends McpTransport {
         eventStreamOpen = false;
         eventStreamFailure = failure;
         int status = response == null ? 0 : response.code();
+        if (status == 404 && sessionId != null) {
+            recoverSession(sessionId);
+            return;
+        }
         if ((status >= 400 && status < 500) || reconnectAttempts >= 5) {
             eventStreamReady.completeExceptionally(failure);
             log.warn("MCP GET stream unavailable (HTTP {}); POST requests remain independent", status);
@@ -452,6 +486,61 @@ public class StreamableHttpTransport extends McpTransport {
         }
         long delay = Math.min(5000L, 200L << reconnectAttempts++);
         reconnectTask = reconnectExecutor.schedule(this::openGetStream, delay, TimeUnit.MILLISECONDS);
+    }
+
+    /** Reinitialize once per expired session, never replaying application operations. */
+    private synchronized void recoverSession(String expiredSession) {
+        if (closed || !Objects.equals(expiredSession, sessionId) || initializationRequest == null)
+            return;
+        // A rejected recovery handshake must fail, not start an unbounded retry loop.
+        if (sessionRecovery != null && !sessionRecovery.isDone())
+            return;
+        CompletableFuture<JsonNode> recovery = new CompletableFuture<>();
+        sessionRecovery = recovery;
+        sessionGeneration++;
+        sessionId = null;
+        lastEventId = null;
+        reconnectAttempts = 0;
+        eventStreamOpen = false;
+        if (reconnectTask != null)
+            reconnectTask.cancel(false);
+        EventSource obsolete = eventSource;
+        eventSource = null;
+        if (obsolete != null)
+            obsolete.cancel();
+        failPendingRequests(new IOException("MCP session expired; pending requests were not replayed"));
+        InitializeRequest request = JsonUtils.convertValue(JsonUtils.valueToTree(initializationRequest), InitializeRequest.class);
+        request.setId(recoveryId--);
+        // Retain the negotiated revision so existing client feature gates remain valid.
+        String expectedVersion = getNegotiatedProtocolVersion();
+        request.getParams().setProtocolVersion(expectedVersion);
+        CompletableFuture<JsonNode> handshake = post(request, numericId(request.getId()), false)
+                .thenApply(result -> {
+                    if (!expectedVersion.equals(result.path("result").path("protocolVersion").asText()))
+                        throw new IllegalStateException("Recovered session changed protocol version; create a new client");
+                    return result;
+                });
+        completeInitialization(handshake, () -> post(new InitializationNotification(), null, true))
+                .whenComplete((result, error) -> {
+                    synchronized (StreamableHttpTransport.this) {
+                        if (closed)
+                            recovery.completeExceptionally(new IOException("Transport closed during session recovery"));
+                        else if (error != null) {
+                            eventStreamFailure = error;
+                            recovery.completeExceptionally(error);
+                        } else {
+                            if (openEventStream)
+                                openGetStream();
+                            recovery.complete(result);
+                        }
+                    }
+                });
+    }
+
+    /** Completes when the latest automatic session rebuild finishes; never replays a failed call. */
+    public CompletableFuture<JsonNode> getSessionRecovery() {
+        CompletableFuture<JsonNode> recovery = sessionRecovery;
+        return recovery == null ? CompletableFuture.completedFuture(null) : recovery.thenApply(value -> value);
     }
 
     /** @return a future for the first GET connection; callers may apply their own readiness timeout. */

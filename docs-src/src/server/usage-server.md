@@ -10,6 +10,31 @@ layout: layouts/docs.njk
 
 # MCP Server SDK Usage
 
+### Client roots change callback
+
+Register a callback to receive `notifications/roots/list_changed`:
+
+```java
+server.setRootsChangedHandler(sessionId -> {
+    // Invalidate application-owned cached roots for this session.
+    rootsCache.remove(sessionId);
+});
+```
+
+`rootsCache` is your application's thread-safe cache, keyed by session ID. This callback works with STDIO, legacy SSE and Streamable HTTP for all three supported protocol versions. It runs only for clients that advertised `capabilities.roots.listChanged: true`. The notification contains no updated roots; query them separately with `server.listRoots(sessionId, timeout)` if needed.
+
+The handler runs on the receiving thread and must return promptly. Do not call blocking `listRoots` directly inside it: schedule refreshes on an application-owned executor, since the receiving thread may be needed to process the response. Handlers must be thread-safe; asynchronous refreshes must handle session closure and timeouts. The application owns executor shutdown. Callback runtime exceptions are logged without producing a JSON-RPC response or terminating reception. Pass `null` to `setRootsChangedHandler` to unregister. The SDK creates no executor and does not automatically refresh roots.
+
+### Legacy SSE Origin validation
+
+Before opening an SSE stream or dispatching a POST message, HTTP adapters must call `serverSse.isOriginAllowed(request.getHeader("Origin"))` and return HTTP 403 when it is false. Both bundled Spring and Tomcat adapters perform this check. Native clients without an Origin header remain supported; supplied origins require an exact match in `ServerConfig.allowedOrigins`. Empty and opaque `null` origins are rejected. Wildcards are not supported.
+
+```java
+config.setAllowedOrigins(java.util.Collections.singletonList("https://app.example.com"));
+```
+
+Origin validation is separate from authentication and does not automatically configure CORS response headers.
+
 ## MCP Server SDK Setup
 
 Add this dependency to build MCP servers:
@@ -151,6 +176,23 @@ start();
 ```
 
 ## Transport and lifecycle rules
+
+Set `ServerConfig.title` for an optional server display label; initialization emits it only for 2025-06-18.
+Clients can set `McpClient.builder().clientTitle(...)` (included when requesting 2025-06-18).
+`StructuredToolResult.setMeta(...)` carries application metadata into the wire tool result without flattening it.
+Streamable HTTP DELETE validates the version header before removing a session; an explicitly unsupported header
+is also rejected on initialization. Legacy HTTP/SSE sends the negotiated header on POSTs, including initialized.
+
+For a runnable Spring Boot example, see `samples/server/spring-streamable-http` in the repository.
+Run its `DemoApplication`, then `com.foo.StreamableHttpClientExample` from `samples/client`.
+The default endpoint is `http://127.0.0.1:8081/mcp`. This Java 8 sample demonstrates asynchronous GET,
+POST/DELETE, progress and reverse roots requests, with bilingual READMEs and random-port integration tests.
+
+`@Tool(title = "Weather")` exposes `annotations.title` in MCP 2025-03-26 and later; 2025-06-18 also
+exposes the top-level tool `title`. Both are omitted for 2024-11-05.
+Use `server.sendProgress(sessionId, token, progress, total, "Processing...")` or the current-session
+overload `server.sendProgress(token, progress, total, "Processing...")` to send a progress message.
+The optional `message` is omitted for 2024-11-05; existing overloads remain unchanged.
 
 - `ServerStdio` exchanges one JSON-RPC message per line. Keep `System.out` reserved for protocol output.
 - `ServerSse` is the legacy two-endpoint adapter: open a session with `openSession(...)`, route POST messages to

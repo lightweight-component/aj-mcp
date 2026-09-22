@@ -7,7 +7,7 @@ import lombok.Data;
  * Represents params.
  */
 @Data
-public  class CancellationNotificationParams {
+public class CancellationNotificationParams extends com.ajaxjs.mcp.protocol.common.Metadata {
     /**
      * Holds the request id value.
      */

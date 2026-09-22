@@ -271,6 +271,8 @@ public class FeatureMgr {
         }
 
         Map<String, Object> annotations = new LinkedHashMap<>();
+        if (!McpUtils.isEmptyText(tool.title()))
+            annotations.put("title", tool.title());
         annotations.put("readOnlyHint", tool.readOnlyHint());
         annotations.put("destructiveHint", tool.destructiveHint());
         annotations.put("idempotentHint", tool.idempotentHint());

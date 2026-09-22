@@ -10,6 +10,31 @@ layout: layouts/docs-cn.njk
 
 # MCP 服务器 SDK 使用说明
 
+### 客户端 roots 变更回调
+
+注册回调以接收 `notifications/roots/list_changed`：
+
+```java
+server.setRootsChangedHandler(sessionId -> {
+    // Invalidate application-owned cached roots for this session.
+    rootsCache.remove(sessionId);
+});
+```
+
+这里的 `rootsCache` 是应用自行维护、以会话 ID 为键的线程安全缓存。该回调适用于 STDIO、旧 SSE 和 Streamable HTTP，兼容三个已支持的协议版本。只有声明了 `capabilities.roots.listChanged: true` 的客户端才会触发回调。通知不包含新的 roots 内容，需要时请另行调用 `server.listRoots(sessionId, timeout)` 查询。
+
+回调在接收线程执行，应快速返回。不要在回调中直接阻塞调用 `listRoots`：接收线程可能还需要处理它的响应，应使用业务自行管理的执行器异步刷新。回调需保证线程安全，异步刷新需处理会话关闭和超时，执行器由应用负责关闭。回调抛出的运行时异常只会被记录，不会产生 JSON-RPC 响应或中断接收流程。传入 `null` 可注销回调。SDK 不创建额外执行器，也不会自动刷新 roots。
+
+### 旧 SSE 的 Origin 校验
+
+HTTP 适配层应在打开 SSE 流或处理 POST 消息之前调用 `serverSse.isOriginAllowed(request.getHeader("Origin"))`，返回 false 时响应 HTTP 403。内置 Spring 和 Tomcat 适配器已在两个入口加入检查。不携带 Origin 的原生客户端仍可连接；携带 Origin 时必须精确匹配 `ServerConfig.allowedOrigins`。空字符串和不透明来源 `null` 会被拒绝，不支持通配符。
+
+```java
+config.setAllowedOrigins(java.util.Collections.singletonList("https://app.example.com"));
+```
+
+Origin 校验不代替身份认证，也不会自动配置 CORS 响应头。
+
 ## MCP 服务器 SDK 安装
 
 添加如下依赖以构建 MCP 服务器：
@@ -160,5 +185,22 @@ GET 响应须异步保持打开，控制器返回前 flush 响应头。在框架
 `INVALID_PARAMS`，日志阈值按会话过滤。补全方法可采用 `(String value, Map<String, String> arguments)`，
 读取 2025-06-18 `context.arguments` 的只读视图；原单 String 参数签名继续支持。
 
+`@Tool(title = "天气")` 在 MCP 2025-03-26 及以后输出 `annotations.title`，2025-06-18 还输出工具顶层 `title`；
+2024-11-05 不输出这两个字段。
+进度文字可通过 `server.sendProgress(sessionId, token, progress, total, "处理中")` 发送，
+当前请求线程内也可使用 `server.sendProgress(token, progress, total, "处理中")`。
+对 2024-11-05 会自动省略 `message`；原有重载保持兼容。
+
 STDIO 使用 UTF-8。构造 `ServerStdio` 前可配置 `stdioWorkers`（默认 16）和 `stdioQueueCapacity`（默认 256）。
 队列满时返回繁忙错误，握手、ping、取消和反向响应仍可处理。
+
+`ServerConfig.title` 可配置服务端展示名，仅在 2025-06-18 初始化响应中输出。
+客户端可用 `McpClient.builder().clientTitle(...)`，请求 2025-06-18 时携带展示名。
+`StructuredToolResult.setMeta(...)` 会将应用元数据传入工具结果的 `_meta`，不展开到顶层。
+Streamable HTTP DELETE 在移除会话前校验版本头，初始化也拒绝显式不支持的版本头。
+旧 HTTP/SSE 的后续 POST（包括 initialized 通知）会携带协商后的版本头。
+
+可运行的新版示例位于源码 `samples/server/spring-streamable-http`：先运行 `DemoApplication`，
+再运行 `samples/client` 的 `com.foo.StreamableHttpClientExample`，默认端点为
+`http://127.0.0.1:8081/mcp`。兼容 Java 8，演示异步 GET、POST/DELETE、进度及反向 roots，
+附中英文 README 和随机端口集成测试。

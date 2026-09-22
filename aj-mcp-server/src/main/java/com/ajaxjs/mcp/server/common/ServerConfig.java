@@ -17,6 +17,9 @@ public class ServerConfig {
      */
     private String name;
 
+    /** Optional implementation display label, emitted only for June 2025 peers. */
+    private String title;
+
     /**
      * The version of the server.
      */
@@ -50,7 +53,8 @@ public class ServerConfig {
     private int stdioQueueCapacity = 256;
 
     /**
-     * Allowed browser Origin values for Streamable HTTP. Empty rejects every supplied Origin.
+     * Allowed browser Origin values for Streamable HTTP and legacy SSE HTTP adapters.
+     * Empty rejects every supplied Origin; native clients may omit the header.
      */
     private List<String> allowedOrigins = Collections.emptyList();
 }

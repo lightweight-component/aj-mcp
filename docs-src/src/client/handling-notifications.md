@@ -10,6 +10,8 @@ layout: layouts/docs.njk
 
 # Handling Notifications
 
+The client automatically answers server-initiated `ping` requests with an empty result and preserves the request ID. No application handler is needed. A ping notification without an ID receives no response.
+
 JSON-RPC notifications do not contain an `id` and must not receive a response. During initialization, the client sends
 `notifications/initialized`; the STDIO, legacy HTTP/SSE, and Streamable HTTP server transports suppress output for that
 notification.

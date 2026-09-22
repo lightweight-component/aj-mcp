@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetResourceRequestParams {
+public class GetResourceRequestParams extends com.ajaxjs.mcp.protocol.common.Metadata {
     /**
      * Holds the uri value.
      */

@@ -38,7 +38,8 @@ class TestStdioServerPrompt extends TestStdioServerBase {
     void testGetPrompt() {
         setIn("{\"jsonrpc\": \"2.0\",\"id\":1,\"method\":\"prompts/get\",\"params\":{\"name\":\"basic\"}}\n");
 
-        String expectedOutput = "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"description\":\"Basic simple prompt\",\"messages\":[{\"role\":\"USER\",\"content\":{\"type\":\"text\",\"text\":\"Hello, how are you?\"}}]}}\r\n";
+        // MCP role values are lowercase, including when reused in content annotations.
+        String expectedOutput = "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"description\":\"Basic simple prompt\",\"messages\":[{\"role\":\"user\",\"content\":{\"type\":\"text\",\"text\":\"Hello, how are you?\"}}]}}\r\n";
         assertEquals(expectedOutput, testOut.toString());
     }
 }

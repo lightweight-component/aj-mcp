@@ -23,6 +23,19 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Slf4j
 public class ServerSse implements McpTransportSync {
     /**
+     * Validate before opening a GET stream or dispatching a POST body.
+     * Native MCP clients may omit Origin; supplied origins require an exact allowlist match.
+     */
+    public boolean isOriginAllowed(String origin) {
+        if (origin == null)
+            return true;
+        return !origin.isEmpty() && !"null".equals(origin) && !"*".equals(origin)
+                && server.getServerConfig() != null
+                && server.getServerConfig().getAllowedOrigins() != null
+                && server.getServerConfig().getAllowedOrigins().contains(origin);
+    }
+
+    /**
      * Holds the server value.
      */
     private final McpServer server;

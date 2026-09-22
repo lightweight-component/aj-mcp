@@ -18,6 +18,27 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class McpTransportMessageRoutingTest {
     @Test
+    void pingIsBuiltInAndPreservesIdsWithoutConsumingPendingRequests() {
+        CapturingTransport transport = new CapturingTransport();
+        Map<Long, CompletableFuture<JsonNode>> pending = new java.util.HashMap<>();
+        pending.put(7L, new CompletableFuture<>());
+        transport.start(pending);
+        transport.setMessageHandlers(ignored -> {}, request -> {
+            throw new AssertionError("Ping must bypass application handlers");
+        });
+        for (String id : new String[]{"7", "\"server-ping\""}) {
+            transport.handle(JsonUtils.json2Node(
+                    "{\"jsonrpc\":\"2.0\",\"method\":\"ping\",\"id\":" + id + "}"));
+            assertEquals(JsonUtils.json2Node(id), transport.sent.get().get("id"));
+            assertEquals(JsonUtils.json2Node("{}"), transport.sent.get().get("result"));
+        }
+        assertEquals(false, pending.get(7L).isDone());
+        transport.sent.set(null);
+        transport.handle(JsonUtils.json2Node("{\"jsonrpc\":\"2.0\",\"method\":\"ping\"}"));
+        assertEquals(null, transport.sent.get());
+    }
+
+    @Test
     void routesNotificationWithoutProducingResponse() {
         CapturingTransport transport = new CapturingTransport();
         AtomicReference<JsonNode> params = new AtomicReference<>();

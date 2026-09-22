@@ -17,9 +17,14 @@
 |----------|----------:|-------------|
 | P0 | 0 | Resolved |
 | P1 | 0 | Resolved |
-| P2 | 2 | JSON Schema keyword preservation; mutable cache/text-only convenience API |
+| P2 | 1 | Mutable cache/text-only convenience API |
 
 ## Resolution notes — 2026-09-07
+
+September 22 follow-up: restored the HTTP reverse-response routing, notification suppression, POST activity
+cleanup and effective reverse timeout that had regressed; `TestPriorityFixes` now passes. Session-bound HTTP 404
+starts one fresh handshake without replaying pending operations. Added version-gated `annotations.title` and
+progress-message overloads, with regression coverage and bilingual documentation.
 
 - **Item 1:** The client now parses POST SSE incrementally and dispatches reverse requests/progress before the final
   response. It finishes on the matching response rather than waiting for EOF. The server's JSON-only POST response
@@ -309,7 +314,11 @@ instead of `INVALID_PARAMS`.
 protocol version, and non-empty textual client name/version. Deserialization failures are translated to
 `INVALID_PARAMS`. Tests cover missing and incorrectly typed fields.
 
-### 20. JSON Schema models discard valid schema keywords
+### Resolved (2026-09-22): 20. JSON Schema models discard valid schema keywords
+
+Schema models now retain extension keywords as JSON trees, including nested schemas and constraints.
+Union types, boolean property schemas, and schema-valued additionalProperties round-trip without coercion.
+Existing Java scalar setters remain available. Regression coverage: JsonSchemaRoundTripTest.
 
 **Evidence**
 

@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Root {
+public class Root extends com.ajaxjs.mcp.protocol.common.Metadata {
     /**
      * Holds the uri value.
      */

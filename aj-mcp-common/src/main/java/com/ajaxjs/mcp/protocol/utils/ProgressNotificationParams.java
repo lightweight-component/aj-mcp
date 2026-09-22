@@ -8,7 +8,8 @@ import lombok.Data;
  */
 @Data
 @AllArgsConstructor
-public class ProgressNotificationParams {
+@lombok.NoArgsConstructor
+public class ProgressNotificationParams extends com.ajaxjs.mcp.protocol.common.Metadata {
     /**
      * Holds the progress token value.
      */

@@ -85,6 +85,14 @@ public enum ProtocolVersion {
         return streamableHttp;
     }
 
+    /** Progress descriptions were introduced with the March 2025 revision. */
+    public boolean supportsProgressMessage() {
+        return this != V_2024_11_05;
+    }
+
+    /** Human-facing implementation titles were added in June 2025. */
+    public boolean supportsTitles() { return this == V_2025_06_18; }
+
     /**
      * Executes the support structured tool output operation.
      *

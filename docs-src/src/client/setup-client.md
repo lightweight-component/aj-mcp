@@ -39,9 +39,36 @@ Streamable HTTP.
 
 ## Setup the Transport
 
+For an end-to-end Streamable HTTP walkthrough, run the repository's
+`samples/server/spring-streamable-http` server and `samples/client` entry
+`com.foo.StreamableHttpClientExample`. It waits for GET readiness, calls tools, receives progress,
+answers roots requests, reads resources, retrieves prompts and closes the session.
+
 First, create the transport that matches the MCP server.
 
-### Stdio Transport
+### Automatic HTTP transport discovery
+
+When the server's HTTP transport is unknown, use `AutoHttpTransport`:
+
+```java
+McpTransport transport = new AutoHttpTransport("http://localhost:8080/mcp");
+McpClient client = McpClient.builder().transport(transport).build();
+client.initialize();
+// Use the client, then call client.close().
+```
+
+The initial POST tries Streamable HTTP. HTTP 400/404/405/415 triggers a GET to the **same URL**;
+an SSE `endpoint` event supplies the legacy POST address. No `/sse` path is guessed. Authentication errors,
+rate limits, server errors, network timeouts, and JSON-RPC errors do not trigger fallback. Once initialized,
+business calls never switch transports; a Streamable HTTP session 404 follows session recovery instead.
+Version negotiation is independent: the transport does not force 2024-11-05, and respects the client's supported versions.
+
+The builder accepts `endpointUrl`, `timeout`, `requestHeaders`, and `openEventStream` (for optional modern GET only;
+legacy SSE always needs GET). Headers are retained on fallback. Legacy endpoint events must resolve to the same
+origin to avoid forwarding credentials elsewhere. `isLegacySse()` reports the selected legacy implementation.
+Explicit `StreamableHttpTransport` and `HttpMcpTransport` remain available and never auto-switch.
+
+### Stdio Transport Examples
 
 Stdio stands for standard input/output. In this transport, the client launches a local MCP server subprocess and
 exchanges one JSON-RPC message per line through its standard streams.

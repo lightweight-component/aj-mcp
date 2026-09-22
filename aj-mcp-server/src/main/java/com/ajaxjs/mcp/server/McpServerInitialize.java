@@ -137,6 +137,8 @@ public abstract class McpServerInitialize implements McpConstant {
         InitializeResponseResult.ServerInfo serverInfo = new InitializeResponseResult.ServerInfo();
         serverInfo.setVersion(serverConfig.getVersion());
         serverInfo.setName(serverConfig.getName());
+        if (ProtocolVersion.from(serverProtocolVersion).supportsTitles())
+            serverInfo.setTitle(serverConfig.getTitle());
 
         InitializeResponseResult.Capabilities capabilities = new InitializeResponseResult.Capabilities();
         // Capabilities are promises. Only advertise methods that this server can

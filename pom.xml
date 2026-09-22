@@ -19,6 +19,7 @@
         <module>samples/client</module>
         <module>samples/server/server-stdio</module>
         <module>samples/server/spring</module>
+        <module>samples/server/spring-streamable-http</module>
         <module>samples/server/tomcat</module>
     </modules>
 </project>

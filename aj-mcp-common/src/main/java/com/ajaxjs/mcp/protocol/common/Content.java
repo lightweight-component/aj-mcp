@@ -22,7 +22,11 @@ import lombok.Data;
         @JsonSubTypes.Type(value = ContentEmbeddedResource.class, name = McpConstant.ContentType.RESOURCE),
         @JsonSubTypes.Type(value = ContentResourceLink.class, name = McpConstant.ContentType.RESOURCE_LINK)
 })
-public abstract class Content {
+public abstract class Content extends com.ajaxjs.mcp.protocol.common.Metadata {
+    /** Optional hints; omitted when unset to preserve existing wire output. */
+    @com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
+    private com.ajaxjs.mcp.protocol.common.Annotations annotations;
+
     /**
      * Holds the type value.
      */

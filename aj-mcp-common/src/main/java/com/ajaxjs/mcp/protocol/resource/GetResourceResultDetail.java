@@ -10,7 +10,7 @@ import java.util.List;
  */
 @Data
 @AllArgsConstructor
-public class GetResourceResultDetail {
+public class GetResourceResultDetail extends com.ajaxjs.mcp.protocol.common.Metadata {
     /**
      * Holds the contents value.
      */

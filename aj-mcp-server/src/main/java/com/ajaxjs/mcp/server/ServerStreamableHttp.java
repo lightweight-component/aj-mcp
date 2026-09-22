@@ -108,6 +108,10 @@ public class ServerStreamableHttp implements McpTransportSync {
             return originFailure;
 
         String contentType = header(headers, "Content-Type");
+        String requestedVersion = header(headers, PROTOCOL_VERSION_HEADER);
+        // Even initialize must reject an explicitly unsupported HTTP version header.
+        if (requestedVersion != null && !ProtocolVersion.isSupported(requestedVersion))
+            return HttpResult.text(400, "Invalid " + PROTOCOL_VERSION_HEADER);
 
         if (contentType != null && !contentType.toLowerCase().startsWith("application/json"))
             return HttpResult.text(415, "Content-Type must be application/json");
@@ -175,6 +179,9 @@ public class ServerStreamableHttp implements McpTransportSync {
 
         try {
             server.bindSession(sessionId);
+            // Responses have no method and must bypass request validation.
+            if (server.acceptClientResponse(sessionId, body))
+                return new HttpResult(202, Collections.emptyMap(), null, null);
             McpRequestRawInfo raw = McpServerInitialize.jsonRpcValidate(body);
             McpResponse response = server.processMessage(raw);
             Map<String, String> responseHeaders = initializing
@@ -184,11 +191,26 @@ public class ServerStreamableHttp implements McpTransportSync {
                     ? new HttpResult(202, responseHeaders, null, null)
                     : new HttpResult(200, responseHeaders, "application/json", JsonUtils.toJson(response));
         } catch (JsonRpcErrorException e) {
+            if (notification)
+                return new HttpResult(202, Collections.emptyMap(), null, null);
             return HttpResult.json(200, e.toJson());
         } catch (RuntimeException e) {
+            if (notification) {
+                log.debug("Notification processing failed", e);
+                return new HttpResult(202, Collections.emptyMap(), null, null);
+            }
             return HttpResult.json(200, new JsonRpcErrorException(JsonRpcErrorCode.INTERNAL_ERROR, e.getMessage() == null ? "Internal error" : e.getMessage()).toJson());
         } finally {
             server.clearSession();
+            synchronized (this) {
+                SessionActivity activity = sessions.get(sessionId);
+                if (activity != null) {
+                    activity.activePosts--;
+                    activity.lastActivity = System.nanoTime();
+                }
+                if (initializing && (notification || server.getNegotiatedProtocolVersion(sessionId) == null))
+                    removeSession(sessionId);
+            }
         }
     }
 
@@ -237,6 +259,8 @@ public class ServerStreamableHttp implements McpTransportSync {
      * @return the result of the delete operation.
      */
     public HttpResult delete(String sessionId, Map<String, String> headers) {
+        if (closed)
+            return HttpResult.text(503, "MCP transport is closed");
         HttpResult originFailure = validateOrigin(headers);
 
         if (originFailure != null)
@@ -244,6 +268,13 @@ public class ServerStreamableHttp implements McpTransportSync {
 
         if (sessionId == null || server.getNegotiatedProtocolVersion(sessionId) == null)
             return HttpResult.text(404, "Unknown or expired MCP session");
+
+        // DELETE is a subsequent HTTP request too: validate before destroying session state.
+        String version = header(headers, PROTOCOL_VERSION_HEADER);
+        String negotiated = server.getNegotiatedProtocolVersion(sessionId);
+        if ((version != null && !version.equals(negotiated))
+                || (ProtocolVersion.V_2025_06_18.value().equals(negotiated) && version == null))
+            return HttpResult.text(400, "Missing or invalid " + PROTOCOL_VERSION_HEADER);
 
         removeSession(sessionId);
 
@@ -294,10 +325,7 @@ public class ServerStreamableHttp implements McpTransportSync {
         try {
             stream.send(json);
         } catch (RuntimeException e) {
-            if (streams.remove(sessionId, stream))
-                stream.close();
-
-            server.removeSession(sessionId);
+            closeEventStream(sessionId, stream.getWriter());
             throw e;
         }
     }
@@ -334,7 +362,8 @@ public class ServerStreamableHttp implements McpTransportSync {
      *
      * @param sessionId the session id value.
      */
-    private void removeSession(String sessionId) {
+    private synchronized void removeSession(String sessionId) {
+        sessions.remove(sessionId);
         StreamSession stream = streams.remove(sessionId);
 
         if (stream != null)
@@ -403,7 +432,7 @@ public class ServerStreamableHttp implements McpTransportSync {
     }
 
     @Override
-    public void close() throws IOException {
+    public synchronized void close() throws IOException {
         if (closed)
             return;
 

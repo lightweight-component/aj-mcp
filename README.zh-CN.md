@@ -30,6 +30,8 @@ API，尤其适合仍需运行在 Java 8 或 Spring Boot 2.x 上的存量系统�
 - [AJ MCP Client](./aj-mcp-client)：MCP 客户端 SDK。
 - [AJ MCP Server](./aj-mcp-server)：MCP 服务器端 SDK。
 - [Samples](./samples)：客户端与服务器端的示例代码。
+- [Spring Streamable HTTP 示例](./samples/server/spring-streamable-http/README.zh-CN.md)：配套
+  `samples/client` 中的 `StreamableHttpClientExample`，兼容 Java 8。
 
 更多详细的介绍及文档，请查看[用户手册](https://mcp.ajaxjs.com/)以了解更多。
 

@@ -103,6 +103,9 @@ public class McpClient extends McpClientResource {
         for (JsonNode tool : array) {
             ToolItem toolSpecification = new ToolItem();
             toolSpecification.setName(tool.get("name").asText());
+            // This legacy conversion is manual: retain extension metadata explicitly.
+            if (tool.hasNonNull("_meta"))
+                toolSpecification.setMeta(JsonUtils.convertValue(tool.get("_meta"), java.util.Map.class));
 
             if (tool.has("description"))
                 toolSpecification.setDescription(tool.get("description").asText());

@@ -43,6 +43,9 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
     @Builder.Default
     String clientName = "aj-mcp";
 
+    /** Optional display label, separate from the stable clientName identifier. */
+    String clientTitle;
+
     /**
      * Sets the version string that the client will use to identify itself to the MCP server in the initialization message. The default value is "1.0".
      */
@@ -306,6 +309,8 @@ public abstract class McpClientBase implements IMcpClient, McpConstant {
 
         InitializeRequestParams.ClientInfo clientInfo = new InitializeRequestParams.ClientInfo();
         clientInfo.setName(clientName);
+        if (ProtocolVersion.from(protocolVersion).supportsTitles())
+            clientInfo.setTitle(clientTitle);
         clientInfo.setVersion(clientVersion);
         params.setClientInfo(clientInfo);
 

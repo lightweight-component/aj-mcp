@@ -35,6 +35,8 @@ Check out these three projects of MCP SDK components:
 - [AJ MCP Client](./aj-mcp-client), MCP Client SDK.
 - [AJ MCP Server](./aj-mcp-server), MCP Server SDK.
 - [Samples](./samples) for both client and server.
+- [Spring Streamable HTTP sample](./samples/server/spring-streamable-http/README.md), with a dedicated
+  `StreamableHttpClientExample` in `samples/client` (Java 8).
 
 For further information, please refer to the [User Manual](https://mcp.ajaxjs.com/) website.
 

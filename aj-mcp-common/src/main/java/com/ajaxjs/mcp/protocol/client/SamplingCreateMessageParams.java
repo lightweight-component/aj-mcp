@@ -9,7 +9,7 @@ import java.util.List;
  * Parameters supplied by a server for sampling/createMessage.
  */
 @Data
-public class SamplingCreateMessageParams {
+public class SamplingCreateMessageParams extends com.ajaxjs.mcp.protocol.common.Metadata {
     /**
      * Holds the message value.
      */

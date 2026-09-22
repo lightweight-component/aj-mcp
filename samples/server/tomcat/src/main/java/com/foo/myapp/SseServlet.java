@@ -30,6 +30,10 @@ public class SseServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
+        if (!serverSse.isOriginAllowed(req.getHeader("Origin"))) {
+            resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
         resp.setContentType("text/event-stream");
         resp.setCharacterEncoding("UTF-8");
         resp.setHeader("Cache-Control", "no-cache");

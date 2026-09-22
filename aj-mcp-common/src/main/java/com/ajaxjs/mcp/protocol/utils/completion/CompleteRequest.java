@@ -36,7 +36,7 @@ public class CompleteRequest extends McpRequest {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class Params {
+    public static class Params extends com.ajaxjs.mcp.protocol.common.Metadata {
         /**
          * Holds the ref value.
          */
@@ -86,6 +86,15 @@ public class CompleteRequest extends McpRequest {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class ParamsRef {
+        /** Optional display label for ref/prompt; keep the original three-argument constructor. */
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        private String title;
+
+        public ParamsRef(String type, String name, String uri) {
+            this.type = type;
+            this.name = name;
+            this.uri = uri;
+        }
         /**
          * The protocol supports two types of completion references: ref/prompt | ref/resource
          */

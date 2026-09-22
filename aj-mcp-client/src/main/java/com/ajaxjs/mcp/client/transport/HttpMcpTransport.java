@@ -17,10 +17,11 @@ import okhttp3.sse.EventSources;
 import okio.Buffer;
 
 import java.io.IOException;
-import java.net.URI;
 import java.time.Duration;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -68,6 +69,9 @@ public class HttpMcpTransport extends McpTransport {
      */
     private volatile boolean closed;
 
+    private final Map<String, String> requestHeaders;
+    private volatile CompletableFuture<String> endpointReady;
+
     /**
      * Constructor for creating an instance with only the SSE URL.
      *
@@ -86,16 +90,26 @@ public class HttpMcpTransport extends McpTransport {
      */
     @Builder
     public HttpMcpTransport(String sseUrl, boolean logResponses, boolean logRequests) {
+        this(sseUrl, logResponses, logRequests, Duration.ofSeconds(60), Collections.emptyMap());
+    }
+
+    /** Configured legacy transport used by automatic HTTP discovery. */
+    public HttpMcpTransport(String sseUrl, boolean logResponses, boolean logRequests,
+                            Duration timeout, Map<String, String> requestHeaders) {
         Objects.requireNonNull(sseUrl, "Missing SSE endpoint URL");
         this.sseUrl = sseUrl;
         this.logRequests = logRequests;
         this.logResponses = logResponses;
+        this.requestHeaders = requestHeaders == null ? Collections.emptyMap()
+                : Collections.unmodifiableMap(new LinkedHashMap<>(requestHeaders));
 
         OkHttpClient.Builder httpClientBuilder = new OkHttpClient.Builder();
-        Duration timeout = Duration.ofSeconds(60);
+        timeout = timeout == null || timeout.isZero() ? Duration.ofSeconds(60) : timeout;
+        if (timeout.isNegative())
+            throw new IllegalArgumentException("timeout must not be negative");
         httpClientBuilder.callTimeout(timeout);
         httpClientBuilder.connectTimeout(timeout);
-        httpClientBuilder.readTimeout(timeout);
+        httpClientBuilder.readTimeout(Duration.ZERO);
         httpClientBuilder.writeTimeout(timeout);
 
         if (logRequests)
@@ -162,9 +176,15 @@ public class HttpMcpTransport extends McpTransport {
     public CompletableFuture<JsonNode> initialize(InitializeRequest request) {
         try {
             Request initializationRequest = createRequest(request);
-            Request initializedNotification = createRequest(new InitializationNotification());
             return completeInitialization(execute(initializationRequest, numericId(request.getId())),
-                    () -> execute(initializedNotification, null));
+                    () -> {
+                        try {
+                            // Build after negotiation so the very first notification carries the selected version.
+                            return execute(createRequest(new InitializationNotification()), null);
+                        } catch (JsonProcessingException e) {
+                            return McpUtils.failedFuture(e);
+                        }
+                    });
         } catch (JsonProcessingException e) {
             return McpUtils.failedFuture(e);
         }
@@ -206,7 +226,7 @@ public class HttpMcpTransport extends McpTransport {
     @Override
     protected void sendJson(JsonNode message) {
         try {
-            Request request = new Request.Builder().url(postUrl).header("Content-Type", "application/json")
+            Request request = requestBuilder(postUrl).header("Content-Type", "application/json")
                     .post(RequestBody.create(JsonUtils.toJsonBytes(message))).build();
             execute(request, null);
         } catch (JsonProcessingException e) {
@@ -280,16 +300,28 @@ public class HttpMcpTransport extends McpTransport {
      * @return The EventSource object representing the SSE channel.
      */
     private EventSource startSseChannel(boolean logResponses) {
-        Request request = new Request.Builder().url(sseUrl).build();
+        Request request = requestBuilder(sseUrl).header("Accept", "text/event-stream").build();
         CompletableFuture<String> initializationFinished = new CompletableFuture<>();
+        endpointReady = initializationFinished;
         SseEventListener listener = new SseEventListener(this, logResponses, initializationFinished);
         EventSource eventSource = createEventSource(request, listener);
+        mcpSseEventListener = eventSource;
+        if (closed) {
+            eventSource.cancel();
+            throw new IllegalStateException("HTTP MCP transport is closed");
+        }
         int timeout = client.callTimeoutMillis() > 0 ? client.callTimeoutMillis() : Integer.MAX_VALUE;
 
         // wait for the SSE channel to be created, receive the POST url from the server, throw an exception if that failed
         try {
             String relativePostUrl = initializationFinished.get(timeout, TimeUnit.MILLISECONDS);
-            postUrl = URI.create(sseUrl).resolve(relativePostUrl).toString();
+            HttpUrl base = HttpUrl.get(sseUrl);
+            HttpUrl resolved = base.resolve(relativePostUrl);
+            // Never forward configured credentials to a different endpoint origin.
+            if (resolved == null || !base.scheme().equals(resolved.scheme())
+                    || !base.host().equals(resolved.host()) || base.port() != resolved.port())
+                throw new IllegalArgumentException("SSE endpoint must have the same origin as the server URL");
+            postUrl = resolved.toString();
             log.debug("Received the server's POST URL: {}", postUrl);
         } catch (Exception e) {
             eventSource.cancel();
@@ -320,8 +352,16 @@ public class HttpMcpTransport extends McpTransport {
      * @throws JsonProcessingException If there's an error processing the JSON.
      */
     private Request createRequest(BaseJsonRpcMessage message) throws JsonProcessingException {
-        return new Request.Builder().url(postUrl).header("Content-Type", "application/json")
+        return requestBuilder(postUrl).header("Content-Type", "application/json")
                 .post(RequestBody.create(JsonUtils.toJsonBytes(message))).build();
+    }
+
+    private Request.Builder requestBuilder(String url) {
+        Request.Builder builder = new Request.Builder().url(url);
+        requestHeaders.forEach(builder::header);
+        if (getNegotiatedProtocolVersion() != null)
+            builder.header(StreamableHttpTransport.PROTOCOL_VERSION_HEADER, getNegotiatedProtocolVersion());
+        return builder;
     }
 
     /**
@@ -341,12 +381,17 @@ public class HttpMcpTransport extends McpTransport {
             return;
 
         closed = true;
+        if (endpointReady != null)
+            endpointReady.completeExceptionally(new IOException("HTTP MCP transport is closed"));
         failPendingRequests(new IOException("HTTP MCP transport is closed"));
 
         if (mcpSseEventListener != null)
             mcpSseEventListener.cancel();
 
-        if (client != null)
+        if (client != null) {
+            client.dispatcher().cancelAll();
             client.dispatcher().executorService().shutdown();
+            client.connectionPool().evictAll();
+        }
     }
 }

@@ -10,6 +10,15 @@ layout: layouts/docs.njk
 
 # Initializing the Protocol
 
+## Expired Streamable HTTP sessions
+
+When a session-bound POST or GET returns HTTP 404, the transport starts a new initialization handshake without
+the old session ID. Pending calls fail and are **not replayed**, including tool calls that may have side effects.
+New calls wait for recovery; `transport.getSessionRecovery()` exposes its completion or failure.
+Recovery clears the old GET stream and event cursor, then reopens GET if enabled. A failed recovery is not retried
+indefinitely. If the server selects a different protocol revision, create a new client explicitly.
+Application-owned state, such as resource subscriptions, must be restored by the application after recovery.
+
 After creating a client, call `initialize()` before sending any other protocol request. It starts the transport,
 negotiates the protocol version and capabilities, and sends the `notifications/initialized` notification.
 

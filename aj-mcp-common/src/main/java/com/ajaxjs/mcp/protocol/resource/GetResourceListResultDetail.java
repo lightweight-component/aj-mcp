@@ -14,7 +14,7 @@ import java.util.List;
 @Data
 @RequiredArgsConstructor
 @NoArgsConstructor
-public class GetResourceListResultDetail {
+public class GetResourceListResultDetail extends com.ajaxjs.mcp.protocol.common.Metadata {
     /**
      * Holds the resource value.
      */

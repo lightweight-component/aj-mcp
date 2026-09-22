@@ -24,7 +24,13 @@ public class MessageController {
      * @param uuid the uuid value.
      */
     @PostMapping("/message")
-    public void handleJson(@RequestBody String json, @RequestParam String uuid) {
+    public void handleJson(@RequestBody String json, @RequestParam String uuid,
+                           javax.servlet.http.HttpServletRequest req,
+                           javax.servlet.http.HttpServletResponse resp) {
+        if (!serverSse.isOriginAllowed(req.getHeader("Origin"))) {
+            resp.setStatus(javax.servlet.http.HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
         System.out.println("Received JSON: " + json);
         serverSse.handle(uuid, json);
     }

@@ -7,7 +7,6 @@ import com.ajaxjs.mcp.protocol.BaseJsonRpcMessage;
 import com.ajaxjs.mcp.protocol.McpConstant;
 import com.ajaxjs.mcp.protocol.McpRequest;
 import com.ajaxjs.mcp.protocol.initialize.InitializeRequest;
-import com.ajaxjs.mcp.protocol.utils.ping.PingRequest;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
@@ -231,7 +230,10 @@ public abstract class McpTransport implements McpConstant, Closeable {
             response.put("jsonrpc", BaseJsonRpcMessage.VERSION);
             response.set(ID, message.get(ID));
 
-            if (serverRequestHandler == null)
+            // Ping is a protocol operation, independent of application capabilities.
+            if (Methods.PING.equals(message.path(METHOD).asText()))
+                response.putObject(RESPONSE_RESULT);
+            else if (serverRequestHandler == null)
                 response.putObject("error").put("code", -32601).put("message",
                         "No client handler for method " + message.get(METHOD).asText());
             else {
@@ -257,17 +259,6 @@ public abstract class McpTransport implements McpConstant, Closeable {
             if (op != null)
                 op.complete(message);
             else {
-                if (message.has(METHOD)) {
-                    String method = message.get(METHOD).asText();
-
-                    if (method.equals("ping")) {
-                        PingRequest req = new PingRequest();
-                        req.setId(messageId);
-                        sendRequestWithoutResponse(req);
-                        return;
-                    }
-                }
-
                 log.warn("Received response for unknown message id: {}", messageId);
             }
         } else if (message.has(METHOD)) {

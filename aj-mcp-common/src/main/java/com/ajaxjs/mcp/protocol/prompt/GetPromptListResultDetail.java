@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @RequiredArgsConstructor
 @NoArgsConstructor
-public class GetPromptListResultDetail {
+public class GetPromptListResultDetail extends com.ajaxjs.mcp.protocol.common.Metadata {
     /**
      * Holds the prompts value.
      */

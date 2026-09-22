@@ -10,6 +10,8 @@ layout: layouts/docs-cn.njk
 
 # 通知处理
 
+客户端会自动响应服务端发起的 `ping` 请求，返回空 result 并保留请求 ID，无需业务方注册处理器。不带 ID 的 ping 通知不会收到响应。
+
 JSON-RPC notification 不包含 `id`，服务端不得返回响应。初始化期间客户端会发送 `notifications/initialized`；STDIO、旧版
 HTTP/SSE 和 Streamable HTTP 服务端传输都不会为该通知输出响应。
 

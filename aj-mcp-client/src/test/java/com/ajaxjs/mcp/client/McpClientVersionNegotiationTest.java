@@ -17,6 +17,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class McpClientVersionNegotiationTest {
     @Test
+    void clientTitleOnlyAppearsForJuneVersionAndToolMetadataIsRetained() {
+        for (String version : new String[]{"2024-11-05", "2025-03-26", "2025-06-18"}) {
+            NegotiatingTransport transport = new NegotiatingTransport();
+            McpClient client = McpClient.builder().transport(transport).protocolVersion(version).clientTitle("Friendly client").build();
+            client.initialize();
+            assertEquals("2025-06-18".equals(version) ? "Friendly client" : null, transport.title);
+            client.close();
+        }
+        com.fasterxml.jackson.databind.node.ArrayNode tools = (com.fasterxml.jackson.databind.node.ArrayNode)
+                JsonUtils.json2Node("[{\"name\":\"test\",\"inputSchema\":{\"type\":\"object\"},\"_meta\":{\"vendor/key\":[1,true]}}]");
+        assertEquals(tools.get(0).get("_meta"), JsonUtils.valueToTree(McpClient.toolListFromMcpResponse(tools).get(0)).get("_meta"));
+    }
+    @Test
     void acceptsAConfiguredServerFallbackAndStoresItOnTransport() {
         NegotiatingTransport transport = new NegotiatingTransport();
         McpClient client = McpClient.builder()
@@ -33,6 +46,7 @@ class McpClientVersionNegotiationTest {
      * Represents negotiating transport.
      */
     private static final class NegotiatingTransport extends McpTransport {
+        private String title;
         @Override
         public void start(Map<Long, CompletableFuture<JsonNode>> pending) {
             setPendingRequests(pending);
@@ -40,6 +54,7 @@ class McpClientVersionNegotiationTest {
 
         @Override
         public CompletableFuture<JsonNode> initialize(InitializeRequest request) {
+            title = request.getParams().getClientInfo().getTitle();
             return CompletableFuture.completedFuture(JsonUtils.json2Node(
                     "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"protocolVersion\":\"2025-03-26\",\"capabilities\":{},\"serverInfo\":{\"name\":\"s\",\"version\":\"1\"}}}"));
         }

@@ -7,6 +7,9 @@ import lombok.Data;
  */
 @Data
 public class PromptArgument {
+    /** Optional display label; retained when reading June 2025 prompt definitions. */
+    @com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
+    private String title;
     /**
      * Holds the name value.
      */

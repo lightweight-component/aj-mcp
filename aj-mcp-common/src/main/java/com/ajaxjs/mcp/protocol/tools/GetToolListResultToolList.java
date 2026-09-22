@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @RequiredArgsConstructor
 @NoArgsConstructor
-public class GetToolListResultToolList {
+public class GetToolListResultToolList extends com.ajaxjs.mcp.protocol.common.Metadata {
     /**
      * Holds the tools value.
      */

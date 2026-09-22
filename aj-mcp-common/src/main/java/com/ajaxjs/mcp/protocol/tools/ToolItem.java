@@ -16,7 +16,7 @@ import java.util.Map;
  * Can be generated automatically from methods annotated with Tool using ToolItem helper.
  */
 @Data
-public class ToolItem {
+public class ToolItem extends com.ajaxjs.mcp.protocol.common.Metadata {
     /**
      * Unique identifier for the tool
      */

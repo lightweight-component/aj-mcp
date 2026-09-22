@@ -10,6 +10,15 @@ layout: layouts/docs.njk
 
 # Working with Tools
 
+Content, resource, tool, request-parameter and result models retain optional `_meta` through
+`getMeta()` / `setMeta(Map<String, Object>)`. Metadata stays nested under `_meta`, never on the JSON-RPC envelope.
+Tool-call parameters retain their existing `RequestMeta` API: `setExtension(key, value)` preserves vendor fields
+alongside `progressToken`. Elicitation parameters retain their existing `get_meta()` / `set_meta(...)` API.
+Content/resource `Annotations` supports `audience`, `priority`, and `lastModified`; resource links also expose `title`.
+Unset new fields are omitted. Annotations are untrusted display hints, not authorization rules.
+
+Tool schemas retain extension keywords through JSON parsing and serialization, including nested schemas, `items`, `enum`, `oneOf`, `$ref`, and constraints. Union types, boolean property schemas, and object-valued `additionalProperties` are preserved. Existing typed getters/setters remain available; `getKeywords()` exposes additional keywords as `JsonNode` values. Schema preservation does not perform JSON Schema validation.
+
 The tool system in AJ MCP provides a structured way to define callable functions that clients can discover and invoke.
 Each tool has a name, description, and a JSON Schema that defines its expected input parameters.
 The tool system is designed to make it easy for LLMs to understand what tools are available and how to use them.

@@ -8,7 +8,7 @@ import java.util.List;
  * Represents get prompt result detail.
  */
 @Data
-public class GetPromptResultDetail {
+public class GetPromptResultDetail extends com.ajaxjs.mcp.protocol.common.Metadata {
     /**
      * Holds the description value.
      */

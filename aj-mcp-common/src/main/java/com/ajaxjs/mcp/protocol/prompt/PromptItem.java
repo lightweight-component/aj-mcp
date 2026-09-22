@@ -9,7 +9,7 @@ import java.util.List;
  * Prompt item in the list
  */
 @Data
-public class PromptItem {
+public class PromptItem extends com.ajaxjs.mcp.protocol.common.Metadata {
     /**
      * Holds the name value.
      */

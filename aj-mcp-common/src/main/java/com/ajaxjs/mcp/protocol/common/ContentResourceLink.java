@@ -11,6 +11,9 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class ContentResourceLink extends Content {
+    /** Human-facing display name; name remains the stable identifier. */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String title;
     /**
      * Holds the uri value.
      */

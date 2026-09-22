@@ -13,7 +13,7 @@ import java.util.Map;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ElicitResult {
+public class ElicitResult extends com.ajaxjs.mcp.protocol.common.Metadata {
     /**
      * One of: accept, decline, cancel.
      */

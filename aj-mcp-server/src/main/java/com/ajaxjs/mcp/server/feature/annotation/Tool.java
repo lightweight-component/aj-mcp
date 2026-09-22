@@ -46,7 +46,7 @@ public @interface Tool {
     String description() default McpConstant.EMPTY_STR;
 
     /**
-     * Optional human-facing display name (2025-06-18).
+     * Optional display name: annotations.title since 2025-03-26, also top-level title since 2025-06-18.
      *
      * @return the display name, or an empty string when unspecified.
      */

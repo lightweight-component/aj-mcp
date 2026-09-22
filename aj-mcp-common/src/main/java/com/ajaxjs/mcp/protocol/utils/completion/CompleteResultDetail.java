@@ -8,7 +8,7 @@ import lombok.Data;
  */
 @Data
 @AllArgsConstructor
-public class CompleteResultDetail {
+public class CompleteResultDetail extends com.ajaxjs.mcp.protocol.common.Metadata {
     /**
      * Holds the completion value.
      */

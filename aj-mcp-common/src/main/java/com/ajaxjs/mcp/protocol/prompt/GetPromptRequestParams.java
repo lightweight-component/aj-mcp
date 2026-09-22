@@ -8,7 +8,7 @@ import java.util.Map;
  * Represents get prompt request params.
  */
 @Data
-public class GetPromptRequestParams {
+public class GetPromptRequestParams extends com.ajaxjs.mcp.protocol.common.Metadata {
     /**
      * Holds the name value.
      */

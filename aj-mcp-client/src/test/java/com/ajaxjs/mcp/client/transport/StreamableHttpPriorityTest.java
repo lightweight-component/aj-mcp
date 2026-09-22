@@ -59,6 +59,93 @@ class StreamableHttpPriorityTest {
     }
 
     @Test
+    void get404AlsoRebuildsSessionAndDropsOldEventCursor() throws Exception {
+        AtomicInteger initializes = new AtomicInteger();
+        CountDownLatch rebuilt = new CountDownLatch(1);
+        AtomicReference<String> cursor = new AtomicReference<>();
+        start(e -> {
+            if ("DELETE".equals(e.getRequestMethod())) { reply(e, 204, null); return; }
+            if ("GET".equals(e.getRequestMethod())) {
+                if ("session-1".equals(e.getRequestHeaders().getFirst("Mcp-Session-Id"))) reply(e, 404, null);
+                else {
+                    cursor.set(e.getRequestHeaders().getFirst("Last-Event-ID"));
+                    reply(e, 405, null); rebuilt.countDown();
+                }
+                return;
+            }
+            JsonNode request = body(e);
+            if ("initialize".equals(request.path("method").asText())) {
+                e.getResponseHeaders().set("Mcp-Session-Id", "session-" + initializes.incrementAndGet());
+                reply(e, 200, "{\"jsonrpc\":\"2.0\",\"id\":" + request.get("id")
+                        + ",\"result\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{},\"serverInfo\":{\"name\":\"test\",\"version\":\"1\"}}}");
+            } else reply(e, 202, null);
+        }, true);
+        McpClient.builder().transport(transport).build().initialize();
+        assertTrue(rebuilt.await(3, TimeUnit.SECONDS));
+        transport.getSessionRecovery().get(3, TimeUnit.SECONDS);
+        assertEquals(2, initializes.get()); assertEquals("session-2", transport.getSessionId());
+        assertNull(cursor.get());
+    }
+
+    @Test
+    void failedRecoveryDoesNotLoopOrSendFurtherCalls() throws Exception {
+        AtomicInteger initializes = new AtomicInteger(), calls = new AtomicInteger();
+        start(e -> {
+            if ("DELETE".equals(e.getRequestMethod())) { reply(e, 204, null); return; }
+            JsonNode request = body(e);
+            if ("initialize".equals(request.path("method").asText())) {
+                if (initializes.incrementAndGet() == 1) initializeReply(e);
+                else reply(e, 503, null);
+            } else if ("notifications/initialized".equals(request.path("method").asText())) {
+                reply(e, 202, null);
+            } else { calls.incrementAndGet(); reply(e, 404, null); }
+        }, false);
+        McpClient.builder().transport(transport).build().initialize();
+        PingRequest request = new PingRequest(); request.setId(20L);
+        assertThrows(ExecutionException.class, () -> transport.sendRequestWithResponse(request).get(3, TimeUnit.SECONDS));
+        assertThrows(ExecutionException.class, () -> transport.getSessionRecovery().get(3, TimeUnit.SECONDS));
+        request.setId(21L);
+        assertThrows(ExecutionException.class, () -> transport.sendRequestWithResponse(request).get(3, TimeUnit.SECONDS));
+        assertEquals(2, initializes.get());
+        assertEquals(1, calls.get());
+    }
+
+    @Test
+    void expiredSessionIsRebuiltWithoutReplayingTheFailedRequest() throws Exception {
+        AtomicInteger initializes = new AtomicInteger(), calls = new AtomicInteger();
+        AtomicReference<String> initHeader = new AtomicReference<>(), callHeader = new AtomicReference<>();
+        start(e -> {
+            if ("DELETE".equals(e.getRequestMethod())) { reply(e, 204, null); return; }
+            JsonNode request = body(e);
+            String method = request.path("method").asText();
+            if ("initialize".equals(method)) {
+                initHeader.set(e.getRequestHeaders().getFirst("Mcp-Session-Id"));
+                int count = initializes.incrementAndGet();
+                e.getResponseHeaders().set("Mcp-Session-Id", "session-" + count);
+                reply(e, 200, "{\"jsonrpc\":\"2.0\",\"id\":" + request.get("id")
+                        + ",\"result\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{},\"serverInfo\":{\"name\":\"test\",\"version\":\"1\"}}}");
+            } else if ("notifications/initialized".equals(method)) {
+                reply(e, 202, null);
+            } else {
+                callHeader.set(e.getRequestHeaders().getFirst("Mcp-Session-Id"));
+                if (calls.incrementAndGet() == 1) reply(e, 404, null);
+                else reply(e, 200, "{\"jsonrpc\":\"2.0\",\"id\":" + request.get("id") + ",\"result\":{}}");
+            }
+        }, false);
+        McpClient client = McpClient.builder().transport(transport).build();
+        client.initialize();
+        PingRequest first = new PingRequest(); first.setId(20L);
+        assertThrows(ExecutionException.class, () -> transport.sendRequestWithResponse(first).get(3, TimeUnit.SECONDS));
+        transport.getSessionRecovery().get(3, TimeUnit.SECONDS);
+        assertEquals(2, initializes.get());
+        assertNull(initHeader.get(), "New initialize must not carry the expired session id");
+        assertEquals(1, calls.get(), "Failed operations must not be replayed");
+        PingRequest second = new PingRequest(); second.setId(21L);
+        transport.sendRequestWithResponse(second).get(3, TimeUnit.SECONDS);
+        assertEquals("session-2", callHeader.get());
+    }
+
+    @Test
     void negotiatedVersionPrecedesInitializedAndDelete() throws Exception {
         AtomicReference<String> initializedVersion=new AtomicReference<>(), deleteVersion=new AtomicReference<>();
         AtomicInteger deletes=new AtomicInteger();

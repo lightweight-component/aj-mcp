@@ -13,7 +13,7 @@ import java.util.Map;
  */
 @Data
 @NoArgsConstructor
-public class Cursor {
+public class Cursor extends com.ajaxjs.mcp.protocol.common.Metadata {
     /**
      * Holds the cursor value.
      */

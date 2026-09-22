@@ -15,6 +15,10 @@ public enum Role {
      */
     ASSISTANT;
 
+    /** MCP roles are lowercase on the wire, including annotations.audience. */
+    @com.fasterxml.jackson.annotation.JsonValue
+    public String wireValue() { return name().toLowerCase(java.util.Locale.ROOT); }
+
     /**
      * To allow case-insensitive deserialization
      *

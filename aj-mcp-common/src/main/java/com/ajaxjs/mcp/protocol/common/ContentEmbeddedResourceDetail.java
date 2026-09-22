@@ -7,7 +7,7 @@ import lombok.Data;
  * Represents content embedded resource detail.
  */
 @Data
-public class ContentEmbeddedResourceDetail {
+public class ContentEmbeddedResourceDetail extends com.ajaxjs.mcp.protocol.common.Metadata {
     /**
      * A valid resource URI
      */

@@ -9,7 +9,7 @@ import lombok.Data;
  * Client implementation information
  */
 @Data
-public class InitializeRequestParams {
+public class InitializeRequestParams extends com.ajaxjs.mcp.protocol.common.Metadata {
     /**
      * Holds the protocol version value.
      */
@@ -89,6 +89,9 @@ public class InitializeRequestParams {
      */
     @Data
     public static class ClientInfo {
+        /** Optional display name introduced in MCP 2025-06-18. */
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        private String title;
         /**
          * Holds the name value.
          */

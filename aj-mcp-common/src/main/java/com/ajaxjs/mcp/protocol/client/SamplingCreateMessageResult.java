@@ -7,7 +7,7 @@ import lombok.Data;
  * Result returned by the client for sampling/createMessage.
  */
 @Data
-public class SamplingCreateMessageResult {
+public class SamplingCreateMessageResult extends com.ajaxjs.mcp.protocol.common.Metadata {
     /**
      * Holds the role value.
      */

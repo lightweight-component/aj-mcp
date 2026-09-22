@@ -2,6 +2,7 @@ package com.foo;
 
 import com.ajaxjs.mcp.client.McpClient;
 import com.ajaxjs.mcp.client.transport.HttpMcpTransport;
+import com.ajaxjs.mcp.client.transport.AutoHttpTransport;
 import com.ajaxjs.mcp.client.transport.McpTransport;
 import com.ajaxjs.mcp.client.transport.StreamableHttpTransport;
 
@@ -46,6 +47,8 @@ public class MyApp {
             transport = new HttpMcpTransport(args[1]);
         else if ("http".equals(args[0]))
             transport = new StreamableHttpTransport(args[1]);
+        else if ("auto".equals(args[0]))
+            transport = new AutoHttpTransport(args[1]);
         else
             throw new IllegalArgumentException("Unsupported transport: " + args[0]);
 
@@ -62,5 +65,6 @@ public class MyApp {
         System.err.println("  stdio <command> [arguments...]");
         System.err.println("  sse <http://host:port/sse>");
         System.err.println("  http <http://host:port/mcp>");
+        System.err.println("  auto <MCP server URL (modern endpoint or legacy SSE URL)>");
     }
 }

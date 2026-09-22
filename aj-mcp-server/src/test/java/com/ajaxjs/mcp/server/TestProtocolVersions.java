@@ -9,6 +9,7 @@ import com.ajaxjs.mcp.server.model.HttpResult;
 import com.ajaxjs.mcp.transport.McpTransportSync;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
@@ -31,6 +32,9 @@ class TestProtocolVersions {
      */
     private ServerStreamableHttp transport;
 
+    @AfterEach
+    void close() throws Exception { transport.close(); }
+
     @BeforeEach
     void setUp() {
         FeatureMgr features = new FeatureMgr();
@@ -46,6 +50,32 @@ class TestProtocolVersions {
     }
 
     @Test
+    void deleteValidatesVersionBeforeRemovingSessionAndInitializeRejectsUnknownHeader() {
+        HttpResult init = initialize("2025-06-18", false);
+        String sid = init.getHeaders().get(ServerStreamableHttp.SESSION_ID_HEADER);
+        Map<String, String> headers = sessionHeaders(sid, "2025-06-18");
+        headers.put(ServerStreamableHttp.PROTOCOL_VERSION_HEADER, "unknown");
+        assertEquals(400, transport.delete(sid, headers).getStatus());
+        assertNotNull(server.getNegotiatedProtocolVersion(sid));
+        headers.remove(ServerStreamableHttp.PROTOCOL_VERSION_HEADER);
+        assertEquals(400, transport.delete(sid, headers).getStatus());
+        headers.put(ServerStreamableHttp.PROTOCOL_VERSION_HEADER, "2025-06-18");
+        assertEquals(204, transport.delete(sid, headers).getStatus());
+        assertNull(server.getNegotiatedProtocolVersion(sid));
+        assertEquals(400, transport.post(initializeJson("2025-06-18", false),
+                Collections.singletonMap(ServerStreamableHttp.PROTOCOL_VERSION_HEADER, "unknown")).getStatus());
+    }
+
+    @Test
+    void serverTitleIsVersionGated() {
+        server.getServerConfig().setTitle("Friendly server");
+        assertEquals("Friendly server", JsonUtils.json2Node(initialize("2025-06-18", false).getBody())
+                .path("result").path("serverInfo").path("title").asText());
+        assertFalse(JsonUtils.json2Node(initialize("2025-03-26", false).getBody())
+                .path("result").path("serverInfo").has("title"));
+    }
+
+    @Test
     void negotiates20250326AndRejectsBatch() {
         HttpResult initialized = initialize("2025-03-26", false);
         assertEquals(200, initialized.getStatus());
@@ -56,11 +86,36 @@ class TestProtocolVersions {
         transport.post(initializedNotification(), headers);
         String tools = transport.post("{\"jsonrpc\":\"2.0\",\"id\":2,\"method\":\"tools/list\"}", headers).getBody();
         assertTrue(tools.contains("\"readOnlyHint\":true"), tools);
-        assertFalse(tools.contains("Weather result"), tools);
+        JsonNode structured = null;
+        for (JsonNode tool : JsonUtils.json2Node(tools).path("result").path("tools"))
+            if ("structured".equals(tool.path("name").asText())) structured = tool;
+        assertNotNull(structured);
+        assertEquals("Weather result", structured.path("annotations").path("title").asText());
+        assertFalse(structured.hasNonNull("title"));
 
         HttpResult batch = transport.post("[]", Collections.emptyMap());
         assertEquals(400, batch.getStatus());
         assertTrue(batch.getBody().contains("batching is not supported"));
+    }
+
+    @Test
+    void progressMessageAndAnnotationsRespectNegotiatedVersion() {
+        for (String version : com.ajaxjs.mcp.protocol.ProtocolVersion.supportedVersions()) {
+            HttpResult init = initialize(version, false);
+            String sid = init.getHeaders().get(ServerStreamableHttp.SESSION_ID_HEADER);
+            Map<String, String> headers = sessionHeaders(sid, version);
+            transport.post(initializedNotification(), headers);
+            java.io.StringWriter output = new java.io.StringWriter();
+            transport.openEventStream(sid, new java.io.PrintWriter(output), headers);
+            server.bindSession(sid);
+            try { server.sendProgress("token", 1, 2.0, "Halfway"); }
+            finally { server.clearSession(); }
+            String frame = output.toString();
+            JsonNode params = JsonUtils.json2Node(frame.substring(frame.indexOf("data: ") + 6).trim()).path("params");
+            assertEquals(1, params.path("progress").asInt());
+            assertEquals(!"2024-11-05".equals(version), params.has("message"));
+            if (params.has("message")) assertEquals("Halfway", params.path("message").asText());
+        }
     }
 
     @Test

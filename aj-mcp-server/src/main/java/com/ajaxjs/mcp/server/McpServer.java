@@ -38,6 +38,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
 
 /**
  * MCP Server Tools
@@ -58,6 +59,21 @@ public class McpServer extends McpServerPrompt {
      * Holds the client capabilities value.
      */
     private final Map<String, InitializeRequestParams.Capabilities> clientCapabilities = new ConcurrentHashMap<>();
+
+    private volatile Consumer<String> rootsChangedHandler;
+
+    /**
+     * Registers a server-local callback receiving the session whose roots changed.
+     * Pass null to unregister. Calls run on the receiving thread and may overlap
+     * across sessions, so handlers must be thread-safe and return promptly.
+     * Schedule listRoots on an application-owned executor instead of blocking
+     * this thread, which may also be needed to receive the roots/list response.
+     *
+     * @param handler roots invalidation callback, or null
+     */
+    public void setRootsChangedHandler(Consumer<String> handler) {
+        rootsChangedHandler = handler;
+    }
 
     /**
      * Holds the resource subscriptions value.
@@ -298,8 +314,7 @@ public class McpServer extends McpServerPrompt {
 
         try {
             transport.send(sessionId, request.toString());
-            JsonNode response = timeout == null || timeout.isZero()
-                    ? future.get() : future.get(Math.max(1L, timeout.toMillis()), TimeUnit.MILLISECONDS);
+            JsonNode response = future.get(Math.max(1L, effectiveTimeout.toMillis()), TimeUnit.MILLISECONDS);
             if (response.has("error"))
                 throw new IllegalStateException("Client rejected " + method + ": " + response.get("error"));
 
@@ -391,6 +406,24 @@ public class McpServer extends McpServerPrompt {
                 return null;
             case Methods.NOTIFICATION_CANCELLED:
                 cancelRequest(requestRaw);
+                return null;
+            case Methods.ROOTS_LIST_CHANGED_NOTIFICATION:
+                if (requestRaw.getId() != null)
+                    throw new JsonRpcErrorException(requestRaw.getId(), JsonRpcErrorCode.INVALID_REQUEST,
+                            "roots/list_changed must be a notification");
+                InitializeRequestParams.Capabilities capabilities = clientCapabilities.get(sessionId);
+                // Only clients advertising change notifications may invalidate session roots.
+                if (capabilities != null && capabilities.getRoots() != null && capabilities.getRoots().isListChanged()) {
+                    Consumer<String> handler = rootsChangedHandler;
+                    if (handler != null) {
+                        try {
+                            handler.accept(sessionId);
+                        } catch (RuntimeException e) {
+                            // Application callbacks must not terminate the receive loop or produce a response.
+                            log.warn("Roots changed handler failed for session {}", sessionId, e);
+                        }
+                    }
+                }
                 return null;
             default:
                 if (requestRaw.getId() == null)
@@ -500,12 +533,21 @@ public class McpServer extends McpServerPrompt {
      * @param total         the total value.
      */
     public void sendProgress(String sessionId, Object progressToken, double progress, Double total) {
+        sendProgress(sessionId, progressToken, progress, total, null);
+    }
+
+    /** Sends optional human-readable progress text to peers supporting it. */
+    public void sendProgress(String sessionId, Object progressToken, double progress, Double total, String message) {
         ObjectNode params = JsonUtils.createObjectNode();
         params.set("progressToken", JsonUtils.valueToTree(progressToken));
         params.put("progress", progress);
 
         if (total != null)
             params.put("total", total);
+
+        String version = getNegotiatedProtocolVersion(sessionId);
+        if (message != null && version != null && ProtocolVersion.from(version).supportsProgressMessage())
+            params.put("message", message);
 
         transport.send(sessionId, notificationJson(Methods.PROGRESS_NOTIFICATION, params));
     }
@@ -518,12 +560,17 @@ public class McpServer extends McpServerPrompt {
      * @param total         the total amount of work, when known.
      */
     public void sendProgress(Object progressToken, double progress, Double total) {
+        sendProgress(progressToken, progress, total, null);
+    }
+
+    /** Sends progress text within the currently bound request session. */
+    public void sendProgress(Object progressToken, double progress, Double total, String message) {
         String sessionId = currentSession.get();
 
         if (sessionId == null)
             throw new IllegalStateException("No MCP request session is bound to this thread");
 
-        sendProgress(sessionId, progressToken, progress, total);
+        sendProgress(sessionId, progressToken, progress, total, message);
     }
 
     /**
@@ -917,6 +964,9 @@ public class McpServer extends McpServerPrompt {
         CallToolResultDetail detail = new CallToolResultDetail();
         detail.setContent(content);
         detail.setStructuredContent(structuredContent);
+        // StructuredToolResult is an application wrapper; move its metadata into the wire result.
+        if (returnedValue instanceof StructuredToolResult)
+            detail.setMeta(((StructuredToolResult) returnedValue).getMeta());
         detail.setIsError(structuredError);
 
         CallToolResult result = new CallToolResult();

@@ -11,7 +11,7 @@ import java.util.List;
  */
 @Data
 @NoArgsConstructor
-public class ResourceTemplatesResultDetail {
+public class ResourceTemplatesResultDetail extends com.ajaxjs.mcp.protocol.common.Metadata {
     /**
      * Holds the resource templates value.
      */

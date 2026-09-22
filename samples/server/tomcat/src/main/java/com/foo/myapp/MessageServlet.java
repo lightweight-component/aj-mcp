@@ -27,6 +27,10 @@ public class MessageServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        if (!serverSse.isOriginAllowed(req.getHeader("Origin"))) {
+            resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
         String uuid = req.getParameter("uuid");
 
         if (uuid == null || uuid.isEmpty())

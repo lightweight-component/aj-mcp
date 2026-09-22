@@ -11,7 +11,7 @@ import java.util.Map;
  * Represents call tool result detail.
  */
 @Data
-public class CallToolResultDetail {
+public class CallToolResultDetail extends com.ajaxjs.mcp.protocol.common.Metadata {
     /**
      * Holds the is error value.
      */

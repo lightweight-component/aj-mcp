@@ -16,7 +16,7 @@ import java.util.Map;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class StructuredToolResult {
+public class StructuredToolResult extends com.ajaxjs.mcp.protocol.common.Metadata {
     /**
      * Holds the content value.
      */

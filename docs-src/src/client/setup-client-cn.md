@@ -33,9 +33,35 @@ layout: layouts/docs-cn.njk
 
 ## 设置传输层 Transport
 
+完整的 Streamable HTTP 演示：启动源码中的 `samples/server/spring-streamable-http`，
+再运行 `samples/client` 入口 `com.foo.StreamableHttpClientExample`。
+示例等待 GET 就绪，调用工具、接收进度、响应 roots、读取资源、获取提示词并关闭会话。
+
 首先创建与 MCP 服务端匹配的传输层。客户端支持 STDIO、旧版双端点 HTTP/SSE 和 Streamable HTTP 三类传输。
 
-### 标准输入输出（Stdio）传输
+### 自动识别 HTTP 传输
+
+不确定服务端使用哪一种 HTTP 传输时，可使用 `AutoHttpTransport`：
+
+```java
+McpTransport transport = new AutoHttpTransport("http://localhost:8080/mcp");
+McpClient client = McpClient.builder().transport(transport).build();
+client.initialize();
+// 使用完成后调用 client.close()。
+```
+
+首次 POST 尝试 Streamable HTTP；遇到 400/404/405/415 时，对**同一 URL** 发起 GET，
+等待 SSE `endpoint` 事件提供旧版 POST 地址，不猜测 `/sse` 路径。
+认证失败、限流、服务端错误、网络超时及 JSON-RPC 错误不会触发回退。
+初始化完成后的业务调用不会切换传输；Streamable HTTP 会话 404 仍走会话重建。
+协议版本单独协商，不强制降为 2024-11-05，并遵守客户端配置的受支持版本列表。
+
+Builder 可配置 `endpointUrl`、`timeout`、`requestHeaders` 和 `openEventStream`。
+最后一项仅控制新版可选 GET；旧版 SSE 必须打开 GET。回退保留自定义请求头；
+为防止凭据泄露，旧版 endpoint 必须与服务端 URL 同源。`isLegacySse()` 可查看是否选择了旧版实现。
+原有 `StreamableHttpTransport` 和 `HttpMcpTransport` 仍可显式使用，不会自动切换。
+
+### 标准输入输出（Stdio）示例
 
 “Stdio” 是标准输入/输出的缩写，通常用于在程序和人之间通过命令行交互。在这里，它用于 MCP 客户端和 MCP 服务器之间的交互。通常，Stdio
 用于本地应用程序，如 `*.exe` 程序或 Java Jar 程序等。
