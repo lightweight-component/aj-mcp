@@ -84,6 +84,20 @@
             </menu>
             <article>
                 <h1>MCP 服务器 SDK 使用说明</h1>
+<h3>客户端 roots 变更回调</h3>
+<p>注册回调以接收 <code>notifications/roots/list_changed</code>：</p>
+<pre><code class="language-java">server.setRootsChangedHandler(sessionId -&gt; {
+    // Invalidate application-owned cached roots for this session.
+    rootsCache.remove(sessionId);
+});
+</code></pre>
+<p>这里的 <code>rootsCache</code> 是应用自行维护、以会话 ID 为键的线程安全缓存。该回调适用于 STDIO、旧 SSE 和 Streamable HTTP，兼容三个已支持的协议版本。只有声明了 <code>capabilities.roots.listChanged: true</code> 的客户端才会触发回调。通知不包含新的 roots 内容，需要时请另行调用 <code>server.listRoots(sessionId, timeout)</code> 查询。</p>
+<p>回调在接收线程执行，应快速返回。不要在回调中直接阻塞调用 <code>listRoots</code>：接收线程可能还需要处理它的响应，应使用业务自行管理的执行器异步刷新。回调需保证线程安全，异步刷新需处理会话关闭和超时，执行器由应用负责关闭。回调抛出的运行时异常只会被记录，不会产生 JSON-RPC 响应或中断接收流程。传入 <code>null</code> 可注销回调。SDK 不创建额外执行器，也不会自动刷新 roots。</p>
+<h3>旧 SSE 的 Origin 校验</h3>
+<p>HTTP 适配层应在打开 SSE 流或处理 POST 消息之前调用 <code>serverSse.isOriginAllowed(request.getHeader(&quot;Origin&quot;))</code>，返回 false 时响应 HTTP 403。内置 Spring 和 Tomcat 适配器已在两个入口加入检查。不携带 Origin 的原生客户端仍可连接；携带 Origin 时必须精确匹配 <code>ServerConfig.allowedOrigins</code>。空字符串和不透明来源 <code>null</code> 会被拒绝，不支持通配符。</p>
+<pre><code class="language-java">config.setAllowedOrigins(java.util.Collections.singletonList(&quot;https://app.example.com&quot;));
+</code></pre>
+<p>Origin 校验不代替身份认证，也不会自动配置 CORS 响应头。</p>
 <h2>MCP 服务器 SDK 安装</h2>
 <p>添加如下依赖以构建 MCP 服务器：</p>
 <pre><code class="language-xml">
@@ -233,6 +247,29 @@ start();
 <p>初始化会协商支持的版本，并创建 Streamable HTTP session。使用 MCP <code>2025-06-18</code> 时，后续 Streamable HTTP 请求必须带上协商后的
 <code>MCP-Protocol-Version</code> header。<code>strictLifecycle</code> 默认开启，普通请求必须在 <code>initialize</code> 和 <code>notifications/initialized</code>
 之后发送。本项目有意不支持 JSON-RPC batch。</p>
+<p>GET 响应须异步保持打开，控制器返回前 flush 响应头。在框架完成、错误或超时回调中调用
+<code>closeEventStream(sessionId, writer)</code>，由适配器关闭注册的 Writer。GET 每 15 秒发送心跳；
+<code>ServerConfig.sessionIdleTimeout</code> 默认 30 分钟，也会清理未打开 GET 的会话。执行中的 POST 不会过期，心跳本身不延长空闲时间。
+关闭传输层会移除全部会话。POST 仍返回 JSON，客户端响应和通知以无正文的 202 接收。</p>
+<p>反向调用传入 null/零超时时，使用 <code>clientRequestTimeout</code> 的有限默认值 60 秒。整数工具参数的小数或溢出返回
+<code>INVALID_PARAMS</code>，日志阈值按会话过滤。补全方法可采用 <code>(String value, Map&lt;String, String&gt; arguments)</code>，
+读取 2025-06-18 <code>context.arguments</code> 的只读视图；原单 String 参数签名继续支持。</p>
+<p><code>@Tool(title = &quot;天气&quot;)</code> 在 MCP 2025-03-26 及以后输出 <code>annotations.title</code>，2025-06-18 还输出工具顶层 <code>title</code>；
+2024-11-05 不输出这两个字段。
+进度文字可通过 <code>server.sendProgress(sessionId, token, progress, total, &quot;处理中&quot;)</code> 发送，
+当前请求线程内也可使用 <code>server.sendProgress(token, progress, total, &quot;处理中&quot;)</code>。
+对 2024-11-05 会自动省略 <code>message</code>；原有重载保持兼容。</p>
+<p>STDIO 使用 UTF-8。构造 <code>ServerStdio</code> 前可配置 <code>stdioWorkers</code>（默认 16）和 <code>stdioQueueCapacity</code>（默认 256）。
+队列满时返回繁忙错误，握手、ping、取消和反向响应仍可处理。</p>
+<p><code>ServerConfig.title</code> 可配置服务端展示名，仅在 2025-06-18 初始化响应中输出。
+客户端可用 <code>McpClient.builder().clientTitle(...)</code>，请求 2025-06-18 时携带展示名。
+<code>StructuredToolResult.setMeta(...)</code> 会将应用元数据传入工具结果的 <code>_meta</code>，不展开到顶层。
+Streamable HTTP DELETE 在移除会话前校验版本头，初始化也拒绝显式不支持的版本头。
+旧 HTTP/SSE 的后续 POST（包括 initialized 通知）会携带协商后的版本头。</p>
+<p>可运行的新版示例位于源码 <code>samples/server/spring-streamable-http</code>：先运行 <code>DemoApplication</code>，
+再运行 <code>samples/client</code> 的 <code>com.foo.StreamableHttpClientExample</code>，默认端点为
+<code>http://127.0.0.1:8081/mcp</code>。兼容 Java 8，演示异步 GET、POST/DELETE、进度及反向 roots，
+附中英文 README 和随机端口集成测试。</p>
 
                 <div id="comment-holder">
                 </div>

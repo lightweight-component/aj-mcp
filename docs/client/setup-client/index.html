@@ -106,8 +106,28 @@
 The client supports three transport mechanisms: standard I/O (STDIO), the legacy two-endpoint HTTP/SSE transport, and
 Streamable HTTP.</p>
 <h2>Setup the Transport</h2>
+<p>For an end-to-end Streamable HTTP walkthrough, run the repository's
+<code>samples/server/spring-streamable-http</code> server and <code>samples/client</code> entry
+<code>com.foo.StreamableHttpClientExample</code>. It waits for GET readiness, calls tools, receives progress,
+answers roots requests, reads resources, retrieves prompts and closes the session.</p>
 <p>First, create the transport that matches the MCP server.</p>
-<h3>Stdio Transport</h3>
+<h3>Automatic HTTP transport discovery</h3>
+<p>When the server's HTTP transport is unknown, use <code>AutoHttpTransport</code>:</p>
+<pre><code class="language-java">McpTransport transport = new AutoHttpTransport(&quot;http://localhost:8080/mcp&quot;);
+McpClient client = McpClient.builder().transport(transport).build();
+client.initialize();
+// Use the client, then call client.close().
+</code></pre>
+<p>The initial POST tries Streamable HTTP. HTTP 400/404/405/415 triggers a GET to the <strong>same URL</strong>;
+an SSE <code>endpoint</code> event supplies the legacy POST address. No <code>/sse</code> path is guessed. Authentication errors,
+rate limits, server errors, network timeouts, and JSON-RPC errors do not trigger fallback. Once initialized,
+business calls never switch transports; a Streamable HTTP session 404 follows session recovery instead.
+Version negotiation is independent: the transport does not force 2024-11-05, and respects the client's supported versions.</p>
+<p>The builder accepts <code>endpointUrl</code>, <code>timeout</code>, <code>requestHeaders</code>, and <code>openEventStream</code> (for optional modern GET only;
+legacy SSE always needs GET). Headers are retained on fallback. Legacy endpoint events must resolve to the same
+origin to avoid forwarding credentials elsewhere. <code>isLegacySse()</code> reports the selected legacy implementation.
+Explicit <code>StreamableHttpTransport</code> and <code>HttpMcpTransport</code> remain available and never auto-switch.</p>
+<h3>Stdio Transport Examples</h3>
 <p>Stdio stands for standard input/output. In this transport, the client launches a local MCP server subprocess and
 exchanges one JSON-RPC message per line through its standard streams.</p>
 <pre><code class="language-java">// The MCP server is a Java program that communicates over stdio.
@@ -138,7 +158,7 @@ requests. It is useful when connecting to older MCP servers.</p>
 connections.</p>
 <h3>Streamable HTTP (2025-03-26 / 2025-06-18)</h3>
 <p>Newer revisions use one HTTP endpoint:</p>
-<pre><code class="language-java">McpTransport transport = StreamableHttpTransport.builder()
+<pre><code class="language-java">StreamableHttpTransport transport = StreamableHttpTransport.builder()
         .endpointUrl(&quot;http://localhost:8080/mcp&quot;)
         .openEventStream(true)
         .build();
@@ -155,12 +175,12 @@ initialize();
 automatically sends the negotiated <code>MCP-Protocol-Version</code> on subsequent requests.</p>
 <p>Set <code>openEventStream(true)</code> when the client advertises Roots, Sampling, or Elicitation handlers. Those server-initiated
 requests are received through the optional GET event stream, which opens asynchronously after initialization.</p>
-<blockquote>
-<p>Current limitations: request-scoped streaming over a POST <code>text/event-stream</code> response is buffered rather than
-processed incrementally; use ordinary JSON POST responses. The optional GET event stream has no reconnect/resumption
-policy, and initialization does not wait for that stream to become ready. Do not rely on incremental POST progress or
-server requests delivered through a POST response until this limitation is removed.</p>
-</blockquote>
+<p>POST SSE responses are consumed incrementally, including progress and reverse requests before the final response.
+GET failure does not fail independent POST calls. For GET-dependent workflows, await
+<code>transport.getEventStreamReady().get(5, TimeUnit.SECONDS)</code> and inspect <code>isEventStreamOpen()</code> /
+<code>getEventStreamFailure()</code>. GET disconnects retry at most five times with exponential backoff (200 ms to 5 seconds),
+using <code>Last-Event-ID</code> when available; replay requires server support. HTTP 4xx stops retries. Closing sends a
+best-effort DELETE with a two-second deadline. STDIO always encodes messages as UTF-8.</p>
 <h2>McpClient</h2>
 <p>The MCP Client serves as a bridge between local applications and remote tool implementations.</p>
 <pre><code class="language-java">McpClient mcpClient = McpClient.builder()
@@ -204,7 +224,7 @@ client.</p>
 </tr>
 <tr>
 <td>requestTimeout</td>
-<td>Timeout applied to every request, including initialization and health checks. The default is 60 seconds; zero means wait indefinitely, and negative values are rejected.</td>
+<td>Timeout for requests, initialization and health checks. Null or zero uses the finite 60-second default; negative values are rejected.</td>
 <td>Duration</td>
 <td><code>Duration.ofSeconds(60)</code></td>
 </tr>

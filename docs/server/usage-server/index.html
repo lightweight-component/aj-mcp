@@ -85,6 +85,20 @@
             </menu>
             <article>
                 <h1>MCP Server SDK Usage</h1>
+<h3>Client roots change callback</h3>
+<p>Register a callback to receive <code>notifications/roots/list_changed</code>:</p>
+<pre><code class="language-java">server.setRootsChangedHandler(sessionId -&gt; {
+    // Invalidate application-owned cached roots for this session.
+    rootsCache.remove(sessionId);
+});
+</code></pre>
+<p><code>rootsCache</code> is your application's thread-safe cache, keyed by session ID. This callback works with STDIO, legacy SSE and Streamable HTTP for all three supported protocol versions. It runs only for clients that advertised <code>capabilities.roots.listChanged: true</code>. The notification contains no updated roots; query them separately with <code>server.listRoots(sessionId, timeout)</code> if needed.</p>
+<p>The handler runs on the receiving thread and must return promptly. Do not call blocking <code>listRoots</code> directly inside it: schedule refreshes on an application-owned executor, since the receiving thread may be needed to process the response. Handlers must be thread-safe; asynchronous refreshes must handle session closure and timeouts. The application owns executor shutdown. Callback runtime exceptions are logged without producing a JSON-RPC response or terminating reception. Pass <code>null</code> to <code>setRootsChangedHandler</code> to unregister. The SDK creates no executor and does not automatically refresh roots.</p>
+<h3>Legacy SSE Origin validation</h3>
+<p>Before opening an SSE stream or dispatching a POST message, HTTP adapters must call <code>serverSse.isOriginAllowed(request.getHeader(&quot;Origin&quot;))</code> and return HTTP 403 when it is false. Both bundled Spring and Tomcat adapters perform this check. Native clients without an Origin header remain supported; supplied origins require an exact match in <code>ServerConfig.allowedOrigins</code>. Empty and opaque <code>null</code> origins are rejected. Wildcards are not supported.</p>
+<pre><code class="language-java">config.setAllowedOrigins(java.util.Collections.singletonList(&quot;https://app.example.com&quot;));
+</code></pre>
+<p>Origin validation is separate from authentication and does not automatically configure CORS response headers.</p>
 <h2>MCP Server SDK Setup</h2>
 <p>Add this dependency to build MCP servers:</p>
 <pre><code class="language-xml">
@@ -234,6 +248,20 @@ server.
 start();
 </code></pre>
 <h2>Transport and lifecycle rules</h2>
+<p>Set <code>ServerConfig.title</code> for an optional server display label; initialization emits it only for 2025-06-18.
+Clients can set <code>McpClient.builder().clientTitle(...)</code> (included when requesting 2025-06-18).
+<code>StructuredToolResult.setMeta(...)</code> carries application metadata into the wire tool result without flattening it.
+Streamable HTTP DELETE validates the version header before removing a session; an explicitly unsupported header
+is also rejected on initialization. Legacy HTTP/SSE sends the negotiated header on POSTs, including initialized.</p>
+<p>For a runnable Spring Boot example, see <code>samples/server/spring-streamable-http</code> in the repository.
+Run its <code>DemoApplication</code>, then <code>com.foo.StreamableHttpClientExample</code> from <code>samples/client</code>.
+The default endpoint is <code>http://127.0.0.1:8081/mcp</code>. This Java 8 sample demonstrates asynchronous GET,
+POST/DELETE, progress and reverse roots requests, with bilingual READMEs and random-port integration tests.</p>
+<p><code>@Tool(title = &quot;Weather&quot;)</code> exposes <code>annotations.title</code> in MCP 2025-03-26 and later; 2025-06-18 also
+exposes the top-level tool <code>title</code>. Both are omitted for 2024-11-05.
+Use <code>server.sendProgress(sessionId, token, progress, total, &quot;Processing...&quot;)</code> or the current-session
+overload <code>server.sendProgress(token, progress, total, &quot;Processing...&quot;)</code> to send a progress message.
+The optional <code>message</code> is omitted for 2024-11-05; existing overloads remain unchanged.</p>
 <ul>
 <li><code>ServerStdio</code> exchanges one JSON-RPC message per line. Keep <code>System.out</code> reserved for protocol output.</li>
 <li><code>ServerSse</code> is the legacy two-endpoint adapter: open a session with <code>openSession(...)</code>, route POST messages to
@@ -246,6 +274,17 @@ start();
 Streamable HTTP requests must include the negotiated <code>MCP-Protocol-Version</code> header. <code>strictLifecycle</code> is enabled by
 default, so normal requests require <code>initialize</code> followed by <code>notifications/initialized</code>. JSON-RPC batch messages are
 intentionally unsupported.</p>
+<p>Keep GET responses open asynchronously and flush headers before returning from the controller. Call
+<code>closeEventStream(sessionId, writer)</code> on framework completion/error/timeout; the adapter closes its registered writer.
+GET heartbeats run every 15 seconds. <code>ServerConfig.sessionIdleTimeout</code> defaults to 30 minutes and includes sessions
+without GET; active POSTs are protected, and heartbeat traffic alone does not renew idle sessions. Close removes all
+sessions. POST replies remain JSON; client responses/notifications are accepted with an empty 202 response.</p>
+<p><code>clientRequestTimeout</code> supplies a finite 60-second default for reverse calls with null/zero timeout. Tool integral
+arguments reject fractions/overflow as <code>INVALID_PARAMS</code>. Logging thresholds apply separately to each session.
+Completion methods may accept <code>(String value, Map&lt;String, String&gt; arguments)</code> to read the immutable
+2025-06-18 <code>context.arguments</code>; the existing single-String signature is supported.</p>
+<p>STDIO uses UTF-8. Configure <code>stdioWorkers</code> (default 16) and <code>stdioQueueCapacity</code> (default 256) before constructing
+<code>ServerStdio</code>. Full queues produce a busy error while handshake, ping, cancellation and reverse replies remain usable.</p>
 
             </article>
 

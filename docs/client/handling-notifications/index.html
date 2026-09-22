@@ -85,6 +85,7 @@
             </menu>
             <article>
                 <h1>Handling Notifications</h1>
+<p>The client automatically answers server-initiated <code>ping</code> requests with an empty result and preserves the request ID. No application handler is needed. A ping notification without an ID receives no response.</p>
 <p>JSON-RPC notifications do not contain an <code>id</code> and must not receive a response. During initialization, the client sends
 <code>notifications/initialized</code>; the STDIO, legacy HTTP/SSE, and Streamable HTTP server transports suppress output for that
 notification.</p>

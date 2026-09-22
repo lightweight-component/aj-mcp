@@ -50,7 +50,7 @@ AJ-MCP 适合希望把现有 Java 业务能力开放给 AI 客户端，或者需
 
 | 模块                                 | 功能                                             | 当前版本  |
 |------------------------------------|------------------------------------------------|-------|
-| [`aj-mcp-common`](./aj-mcp-common) | 公共 JSON-RPC 消息、MCP 协议模型、内容类型、版本信息及 JSON 工具     | `1.8` |
+| [`aj-mcp-common`](./aj-mcp-common) | 公共 JSON-RPC 消息、MCP 协议模型、内容类型、版本信息及 JSON 工具     | `1.9` |
 | [`aj-mcp-client`](./aj-mcp-client) | 同步客户端 API，以及 STDIO、HTTP/SSE、Streamable HTTP 传输 | `1.6` |
 | [`aj-mcp-server`](./aj-mcp-server) | 基于注解的能力扫描、请求分发、错误、会话及服务端传输                     | `1.5` |
 | [`samples`](./samples)             | STDIO、Spring Boot/SSE 和内嵌 Tomcat 示例            | —     |

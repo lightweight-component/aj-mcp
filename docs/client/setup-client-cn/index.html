@@ -101,8 +101,27 @@
 <li><strong>MCP 客户端</strong>：提供高层次的 API，使用传输层实现 MCP 协议。</li>
 </ul>
 <h2>设置传输层 Transport</h2>
+<p>完整的 Streamable HTTP 演示：启动源码中的 <code>samples/server/spring-streamable-http</code>，
+再运行 <code>samples/client</code> 入口 <code>com.foo.StreamableHttpClientExample</code>。
+示例等待 GET 就绪，调用工具、接收进度、响应 roots、读取资源、获取提示词并关闭会话。</p>
 <p>首先创建与 MCP 服务端匹配的传输层。客户端支持 STDIO、旧版双端点 HTTP/SSE 和 Streamable HTTP 三类传输。</p>
-<h3>标准输入输出（Stdio）传输</h3>
+<h3>自动识别 HTTP 传输</h3>
+<p>不确定服务端使用哪一种 HTTP 传输时，可使用 <code>AutoHttpTransport</code>：</p>
+<pre><code class="language-java">McpTransport transport = new AutoHttpTransport(&quot;http://localhost:8080/mcp&quot;);
+McpClient client = McpClient.builder().transport(transport).build();
+client.initialize();
+// 使用完成后调用 client.close()。
+</code></pre>
+<p>首次 POST 尝试 Streamable HTTP；遇到 400/404/405/415 时，对<strong>同一 URL</strong> 发起 GET，
+等待 SSE <code>endpoint</code> 事件提供旧版 POST 地址，不猜测 <code>/sse</code> 路径。
+认证失败、限流、服务端错误、网络超时及 JSON-RPC 错误不会触发回退。
+初始化完成后的业务调用不会切换传输；Streamable HTTP 会话 404 仍走会话重建。
+协议版本单独协商，不强制降为 2024-11-05，并遵守客户端配置的受支持版本列表。</p>
+<p>Builder 可配置 <code>endpointUrl</code>、<code>timeout</code>、<code>requestHeaders</code> 和 <code>openEventStream</code>。
+最后一项仅控制新版可选 GET；旧版 SSE 必须打开 GET。回退保留自定义请求头；
+为防止凭据泄露，旧版 endpoint 必须与服务端 URL 同源。<code>isLegacySse()</code> 可查看是否选择了旧版实现。
+原有 <code>StreamableHttpTransport</code> 和 <code>HttpMcpTransport</code> 仍可显式使用，不会自动切换。</p>
+<h3>标准输入输出（Stdio）示例</h3>
 <p>“Stdio” 是标准输入/输出的缩写，通常用于在程序和人之间通过命令行交互。在这里，它用于 MCP 客户端和 MCP 服务器之间的交互。通常，Stdio
 用于本地应用程序，如 <code>*.exe</code> 程序或 Java Jar 程序等。</p>
 <pre><code class="language-java">// MCP 服务器是一个 Java 程序，使用标准输入输出运行。
@@ -130,7 +149,7 @@ McpTransport transport = StdioTransport.builder()
 <p><code>sseUrl</code> 是必需的，它指定 MCP 服务器的 SSE 端点 URL。</p>
 <h3>Streamable HTTP（2025-03-26 / 2025-06-18）</h3>
 <p>较新的协议版本使用单一 HTTP 端点：</p>
-<pre><code class="language-java">McpTransport transport = StreamableHttpTransport.builder()
+<pre><code class="language-java">StreamableHttpTransport transport = StreamableHttpTransport.builder()
         .endpointUrl(&quot;http://localhost:8080/mcp&quot;)
         .openEventStream(true)
         .build();
@@ -147,10 +166,11 @@ initialize();
 <code>MCP-Protocol-Version</code>。</p>
 <p>如果客户端声明了 Roots、Sampling 或 Elicitation handler，请设置 <code>openEventStream(true)</code>；服务端主动请求通过可选的 GET event
 stream 到达客户端。该流会在初始化后异步打开。</p>
-<blockquote>
-<p>当前限制：POST <code>text/event-stream</code> 响应会先完整缓冲，尚不能按事件增量处理；请使用普通 JSON POST 响应。可选 GET event
-stream 目前没有断线重连/恢复策略，初始化也不会等待它就绪。在该限制解除前，请勿依赖通过 POST 响应增量发送的 progress 或服务端请求。</p>
-</blockquote>
+<p>POST SSE 响应按事件增量处理，包括最终响应前的 progress 和反向请求。GET 故障不会终止独立 POST 请求。
+依赖 GET 的业务应等待 <code>transport.getEventStreamReady().get(5, TimeUnit.SECONDS)</code>，并通过
+<code>isEventStreamOpen()</code> / <code>getEventStreamFailure()</code> 查询状态。GET 断线按指数退避重试最多五次（200 毫秒至 5 秒），
+有事件 ID 时携带 <code>Last-Event-ID</code>，重放能力由服务端提供；HTTP 4xx 停止重试。关闭时尽力发送 DELETE，最多等待两秒。
+STDIO 消息固定使用 UTF-8。</p>
 <h2>MCP 客户端</h2>
 <p>MCP 客户端充当本地应用程序与远程工具实现之间的桥梁。</p>
 <pre><code class="language-java">McpClient mcpClient = McpClient.builder()
@@ -195,7 +215,7 @@ stream 目前没有断线重连/恢复策略，初始化也不会等待它就绪
 </tr>
 <tr>
 <td>requestTimeout</td>
-<td>所有请求（包括初始化和健康检查）的超时时间。默认值为 60 秒；0 表示无限等待，负值不合法。</td>
+<td>请求、初始化和健康检查的超时时间。null 或零使用有限的 60 秒默认值，负值不合法。</td>
 <td>Duration</td>
 <td><code>Duration.ofSeconds(60)</code></td>
 </tr>

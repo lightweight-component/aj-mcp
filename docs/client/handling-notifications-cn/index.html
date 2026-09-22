@@ -84,6 +84,7 @@
             </menu>
             <article>
                 <h1>通知处理</h1>
+<p>客户端会自动响应服务端发起的 <code>ping</code> 请求，返回空 result 并保留请求 ID，无需业务方注册处理器。不带 ID 的 ping 通知不会收到响应。</p>
 <p>JSON-RPC notification 不包含 <code>id</code>，服务端不得返回响应。初始化期间客户端会发送 <code>notifications/initialized</code>；STDIO、旧版
 HTTP/SSE 和 Streamable HTTP 服务端传输都不会为该通知输出响应。</p>
 <p>可通过 <code>onNotification(method, handler)</code> 注册进度、资源更新、日志和列表变更通知。收到对应的列表变更通知后，Resource、ResourceTemplate

@@ -84,6 +84,12 @@
             </menu>
             <article>
                 <h1>协议初始化</h1>
+<h2>Streamable HTTP 会话过期</h2>
+<p>带会话 ID 的 POST 或 GET 收到 HTTP 404 后，传输层会去掉旧会话 ID，重新执行初始化握手。
+旧的待处理调用会异常完成，<strong>不会自动重放</strong>，避免有副作用的工具被重复执行。
+新调用等待重建完成，可通过 <code>transport.getSessionRecovery()</code> 观察成功或失败。
+重建会清理旧 GET 连接和事件游标，并在启用 GET 时重新连接；重建失败不会无限重试。
+如果服务端选择了不同的协议版本，需要显式创建新客户端。资源订阅等应用状态需要由应用在恢复后重新建立。</p>
 <p>创建客户端后，应在发送其他协议请求前调用 <code>initialize()</code>。该方法会启动传输层、协商协议版本和能力，并发送
 <code>notifications/initialized</code> 通知。</p>
 <p>Initialize 方法的步骤如下：</p>

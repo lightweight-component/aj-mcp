@@ -84,6 +84,13 @@
             </menu>
             <article>
                 <h1>工具（Tool）使用指南</h1>
+<p>内容、资源、工具、请求参数及结果模型通过 <code>getMeta()</code> / <code>setMeta(Map&lt;String, Object&gt;)</code> 保留可选 <code>_meta</code>，
+嵌套扩展值不会丢失；它位于相应对象内，不放在 JSON-RPC 信封顶层。
+工具调用参数保留原有 <code>RequestMeta</code> API，可用 <code>setExtension(key, value)</code> 在 <code>progressToken</code> 旁添加厂商字段。
+Elicitation 参数保留原有 <code>get_meta()</code> / <code>set_meta(...)</code> API。
+内容与资源的 <code>Annotations</code> 支持 <code>audience</code>、<code>priority</code> 和 <code>lastModified</code>，资源链接也支持 <code>title</code>。
+未设置的新字段不输出。Annotations 是不可信的展示提示，不代表授权规则。</p>
+<p>工具 schema 在 JSON 解析与序列化过程中保留扩展关键字，包括嵌套 schema、<code>items</code>、<code>enum</code>、<code>oneOf</code>、<code>$ref</code> 和约束；联合类型、布尔属性 schema 及对象形式的 <code>additionalProperties</code> 也会保留。现有类型化 getter/setter 继续可用，<code>getKeywords()</code> 提供额外关键字的 <code>JsonNode</code> 值。保留 schema 不等于执行 JSON Schema 校验。</p>
 <p>AJ MCP 的工具系统提供了一种结构化方式，用于定义可被客户端发现和调用的函数。每个工具都有名称、描述和一个定义其输入参数的
 JSON Schema。该工具系统旨在让大语言模型（LLM）能够轻松理解可用工具及其用法。</p>
 <h2>列出工具</h2>

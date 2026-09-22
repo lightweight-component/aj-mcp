@@ -56,7 +56,7 @@ JSON-RPC batch messages are intentionally not supported.
 
 | Module                             | Purpose                                                                                            | Current version |
 |------------------------------------|----------------------------------------------------------------------------------------------------|-----------------|
-| [`aj-mcp-common`](./aj-mcp-common) | Shared JSON-RPC messages, MCP protocol models, content types, version metadata, and JSON utilities | `1.8`           |
+| [`aj-mcp-common`](./aj-mcp-common) | Shared JSON-RPC messages, MCP protocol models, content types, version metadata, and JSON utilities | `1.9`           |
 | [`aj-mcp-client`](./aj-mcp-client) | Synchronous client API and STDIO, HTTP/SSE, and Streamable HTTP transports                         | `1.6`           |
 | [`aj-mcp-server`](./aj-mcp-server) | Annotation-based feature discovery, request dispatch, errors, sessions, and server transports      | `1.5`           |
 | [`samples`](./samples)             | STDIO, Spring Boot/SSE, and embedded Tomcat examples                                               | —               |
