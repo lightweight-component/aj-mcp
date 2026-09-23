@@ -57,8 +57,8 @@ JSON-RPC batch messages are intentionally not supported.
 | Module                             | Purpose                                                                                            | Current version |
 |------------------------------------|----------------------------------------------------------------------------------------------------|-----------------|
 | [`aj-mcp-common`](./aj-mcp-common) | Shared JSON-RPC messages, MCP protocol models, content types, version metadata, and JSON utilities | `1.9`           |
-| [`aj-mcp-client`](./aj-mcp-client) | Synchronous client API and STDIO, HTTP/SSE, and Streamable HTTP transports                         | `1.6`           |
-| [`aj-mcp-server`](./aj-mcp-server) | Annotation-based feature discovery, request dispatch, errors, sessions, and server transports      | `1.5`           |
+| [`aj-mcp-client`](./aj-mcp-client) | Synchronous client API and STDIO, HTTP/SSE, and Streamable HTTP transports                         | `1.7`           |
+| [`aj-mcp-server`](./aj-mcp-server) | Annotation-based feature discovery, request dispatch, errors, sessions, and server transports      | `1.6`           |
 | [`samples`](./samples)             | STDIO, Spring Boot/SSE, and embedded Tomcat examples                                               | —               |
 
 The client and server artifacts already depend on `aj-mcp-common`; applications normally add only the artifact they use.
@@ -74,7 +74,7 @@ Add the server dependency:
 <dependency>
     <groupId>com.ajaxjs</groupId>
     <artifactId>aj-mcp-server</artifactId>
-    <version>1.5</version>
+    <version>1.6</version>
 </dependency>
 ```
 
@@ -117,19 +117,10 @@ file. See the [server README](./aj-mcp-server/README.md) for tools, resources, p
 ```
 
 ```java
-try(McpClient client = McpClient.createStdioMcpClient(
-        "java", "-jar", "/path/to/mcp-server.jar")){
-        client.
-
-listTools().
-
-forEach(tool ->System.out.
-
-println(tool.getName()));
-String result = client.callTool("greet", "{\"name\":\"AJ-MCP\"}");
-    System.out.
-
-println(result);
+try(McpClient client = McpClient.createStdioMcpClient("java", "-jar", "/path/to/mcp-server.jar")) {
+  client.listTools().forEach(tool ->System.out.println(tool.getName()));
+  String result = client.callTool("greet", "{\"name\":\"AJ-MCP\"}");
+  System.out.println(result);
 }
 ```
 
@@ -160,13 +151,11 @@ powerful foundation to create your own Java based servers that can bridge AI wit
 imagine.
 
 Whether you want to connect to your favorite database, integrate with your company’s internal systems, or build
-something completely new - the sky
-truly is the limit! The simplicity of implementing MCP servers with AJ
+something completely new - the sky truly is the limit! The simplicity of implementing MCP servers with AJ
 means you can focus on the creative aspects rather than the plumbing.
 
 So what are you waiting for? Grab the code, fire up your IDE, and start building your own MCP server today. The future
-of AI-powered applications is
-here, and you can be part of shaping it!
+of AI-powered applications is here, and you can be part of shaping it!
 
 Have Fun!
 

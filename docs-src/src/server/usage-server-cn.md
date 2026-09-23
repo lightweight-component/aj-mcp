@@ -44,7 +44,7 @@ Origin 校验不代替身份认证，也不会自动配置 CORS 响应头。
 <dependency>
     <groupId>com.ajaxjs</groupId>
     <artifactId>aj-mcp-server</artifactId>
-    <version>1.5</version>
+    <version>1.6</version>
 </dependency>
 ```
 
