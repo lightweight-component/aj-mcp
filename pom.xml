@@ -13,6 +13,7 @@
     </properties>
 
     <modules>
+        <module>aj-mcp-2026</module>
         <module>aj-mcp-common</module>
         <module>aj-mcp-client</module>
         <module>aj-mcp-server</module>

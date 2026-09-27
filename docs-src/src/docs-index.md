@@ -10,6 +10,9 @@ layout: layouts/docs.njk
 
 # Welcome to the AJ MCP SDK User Manual
 
+The independent AJ MCP Next (Java 8, 2026-07-28) provides core/client/server modules, STDIO and sessionless HTTP.
+See the [Next overview](/next/overview/). The legacy SDK and initialize examples below do not apply to Next.
+
 The AJ MCP SDK is an implementation of the Model Context Protocol (MCP), an open protocol designed to enable seamless
 integration between Large
 Language Model (LLM) applications and external data sources and tools. The SDK provides declarative APIs that make it

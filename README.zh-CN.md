@@ -26,6 +26,9 @@ API，尤其适合仍需运行在 Java 8 或 Spring Boot 2.x 上的存量系统�
 
 请查看以下三个 MCP SDK 组件项目：
 
+另有独立的 [AJ MCP Next 工程](./aj-mcp-2026/README.zh-CN.md)，复用 AJ Util，面向 Java 8 和 `2026-07-28`。
+包含 core/client/server 三模块及 STDIO、无会话 HTTP 适配器，与本文介绍的旧版 SDK 分离。
+
 - [AJ MCP Common](./aj-mcp-common)：AJ-MCP 的通用库，包含模型上下文协议（Model Context Protocol）的实现及其他常用类。
 - [AJ MCP Client](./aj-mcp-client)：MCP 客户端 SDK。
 - [AJ MCP Server](./aj-mcp-server)：MCP 服务器端 SDK。

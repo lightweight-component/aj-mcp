@@ -1,0 +1,10 @@
+Bundled MCP protocol schema
+
+Upstream: Model Context Protocol, modelcontextprotocol/modelcontextprotocol
+Source: https://raw.githubusercontent.com/modelcontextprotocol/modelcontextprotocol/main/schema/2026-07-28/schema.json
+Retrieved: 2026-09-26
+Resource: com/ajaxjs/mcp2026/core/schema-2026-07-28.json
+Snapshot SHA-256 (UTF-8 with LF): 14d68853dec1cf9cd64fb801caf34b2dcb94ee88f91fb487581381e89845125c
+Modification: JSON pretty-print formatting only; definitions and descriptions retained.
+The snapshot is bundled and is not fetched or refreshed at runtime.
+See MCP-SCHEMA-LICENSE.txt for the upstream license text and transition notice.

@@ -10,6 +10,9 @@ layout: layouts/docs-cn.njk
 
 # 欢迎使用 AJ MCP SDK 用户手册
 
+独立的 AJ MCP Next（Java 8、2026-07-28）现已提供 core/client/server 三模块及 STDIO、无会话 HTTP。
+参阅 [Next 说明](/next/overview-cn/)；以下旧 SDK 文档及初始化用法不适用于 Next。
+
 AJ MCP SDK 是 **模型上下文协议**（MCP）的一个实现。MCP 是一种开放协议，旨在实现大型语言模型（LLM）应用与外部数据源和工具之间的无缝集成。本
 SDK 提供了声明式的 API，使开发者能够轻松地在自己的应用程序中实现 MCP 服务器功能。
 
