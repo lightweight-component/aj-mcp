@@ -20,38 +20,47 @@ public final class HttpClientTransport implements ClientTransport {
      * Validated absolute HTTP(S) endpoint used for every request.
      */
     private final String endpoint;
+
     /**
      * Immutable caller-supplied headers after framing and MCP-reserved headers are rejected.
      */
     private final Map<String, String> headers;
+
     /**
-     * Positive connect and read timeout applied to each HTTP exchange, in milliseconds.
+     * Positively connect and read timeout applied to each HTTP exchange, in milliseconds.
      */
     private final int ioTimeoutMs;
+
     /**
      * Strict JSON-RPC codec used for request bodies and JSON/SSE responses.
      */
     private final McpCodec codec = new McpCodec();
+
     /**
      * Bounded executor that owns blocking HTTP I/O.
      */
     private final ExecutorService io;
+
     /**
      * Separate executor used to disconnect connections without blocking cancellation callers.
      */
     private final ExecutorService cleanup;
+
     /**
      * Active exchanges keyed by request ID for response correlation and cancellation.
      */
     private final ConcurrentMap<RequestId, Exchange> active = new ConcurrentHashMap<>();
+
     /**
      * Latest validated tool descriptors needed to mirror declared HTTP parameter headers.
      */
     private final ConcurrentMap<String, ToolDefinition> tools = new ConcurrentHashMap<>();
+
     /**
      * Idempotent shutdown state that prevents new exchanges.
      */
     private final AtomicBoolean closed = new AtomicBoolean();
+
     /**
      * Single listener installed before requests may be sent.
      */

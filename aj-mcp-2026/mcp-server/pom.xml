@@ -7,21 +7,36 @@
         <version>1.36</version>
         <relativePath/>
     </parent>
+
     <artifactId>aj-mcp-next-server</artifactId>
-    <name>MCP Next server (Java 8)</name>
+    <name>aj-mcp-next-server</name>
+    <version>1.0</version>
+
+    <url>https://mcp.ajaxjs.com/</url>
+    <scm>
+        <url>https://github.com/lightweight-component/aj-mcp/tree/master/aj-mcp-common/</url>
+        <connection>scm:git:https://github.com/lightweight-component/aj-mcp.git</connection>
+    </scm>
+
+    <issueManagement>
+        <system>GitHub Issues</system>
+        <url>https://github.com/lightweight-component/aj-mcp/issues</url>
+    </issueManagement>
+
     <dependencies>
         <dependency>
             <groupId>com.ajaxjs</groupId>
             <artifactId>aj-mcp-next-core</artifactId>
-            <version>${project.version}</version>
+            <version>1.0</version>
         </dependency>
         <dependency>
             <groupId>com.ajaxjs</groupId>
             <artifactId>aj-mcp-next-client</artifactId>
-            <version>${project.version}</version>
+            <version>1.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
+
     <build>
         <plugins>
             <plugin>
