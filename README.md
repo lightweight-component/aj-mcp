@@ -32,6 +32,9 @@ Check out these three projects of MCP SDK components:
 The independent [AJ MCP Next project](./aj-mcp-2026/README.md) targets `2026-07-28` on Java 8 using AJ Util.
 It has core/client/server modules with STDIO and sessionless HTTP adapters, separate from this legacy SDK.
 
+For MCP `2026-07-28`, start with the [Spring Boot server and standalone Java client sample](./aj-mcp-2026/sample/README.md).
+It includes Maven dependencies, executable JAR commands, and echo/mock order tools.
+
 - [AJ MCP Common](./aj-mcp-common), Common library for AJ-MCP, it contains the implementation of the Model Context
   Protocol and some other common
   classes.

@@ -1,7 +1,25 @@
 # AJ MCP Next (Java 8)
 
+Start with the [Spring Boot server and standalone client examples](sample/README.md), including dependencies, packaging, and run instructions.
+
+Build from the repository root:
+
+```sh
+mvn -f aj-mcp-2026/pom.xml -pl sample/server,sample/client -am -DskipTests package
+```
+
+Start the server, then run the client in another terminal:
+
+```sh
+java -jar aj-mcp-2026/sample/server/target/aj-mcp-next-sample-server-1.0.jar
+java -jar aj-mcp-2026/sample/client/target/aj-mcp-next-sample-client-1.0.jar
+```
+
+The endpoint defaults to `http://127.0.0.1:8080/mcp` and provides `echo` and `query_order` tools.
+Spring Boot manages the SDK's JDK HTTP adapter; configure its port with `mcp.port`.
+
 An independent SDK project targeting MCP `2026-07-28`, reusing AJ Util where possible.
-Core is published as `com.ajaxjs:aj-mcp-next-core`, inheriting its version from `ajaxjs-parent`.
+Core uses the Maven coordinates `com.ajaxjs:aj-mcp-next-core:1.0`.
 The directory is still `aj-mcp-2026`. Core, client and server are implemented as three modules.
 
 | Module                             | Responsibility                                                                      | Dependency boundary                                                                               |

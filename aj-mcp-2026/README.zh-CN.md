@@ -1,7 +1,25 @@
 # AJ MCP Next（Java 8）
 
+第一次使用可以从[Spring Boot 服务端与独立客户端示例](sample/README.zh-CN.md)开始，包含依赖、打包和双端运行步骤。
+
+从仓库根目录执行：
+
+```sh
+mvn -f aj-mcp-2026/pom.xml -pl sample/server,sample/client -am -DskipTests package
+```
+
+先启动服务端，再在另一个终端运行客户端：
+
+```sh
+java -jar aj-mcp-2026/sample/server/target/aj-mcp-next-sample-server-1.0.jar
+java -jar aj-mcp-2026/sample/client/target/aj-mcp-next-sample-client-1.0.jar
+```
+
+服务端默认在 `http://127.0.0.1:8080/mcp` 提供 `echo` 和 `query_order` 工具，客户端会打印调用结果。
+示例使用 Spring Boot 管理 SDK 自带的 JDK HTTP 适配器；端口配置为 `mcp.port`。
+
 面向 MCP `2026-07-28` 的独立 SDK 工程，优先复用 AJ Util。
-core 制品名为 `com.ajaxjs:aj-mcp-next-core`，版本继承 `ajaxjs-parent`；目录仍是 `aj-mcp-2026`。
+core 制品名为 `com.ajaxjs:aj-mcp-next-core:1.0`；目录仍是 `aj-mcp-2026`。
 已实现 core、client、server 三个模块。
 
 | 模块                                       | 职责                                  | 依赖边界                                                                  |

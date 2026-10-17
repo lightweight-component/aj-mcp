@@ -11,5 +11,6 @@
         <module>mcp-core</module>
         <module>mcp-client</module>
         <module>mcp-server</module>
+        <module>sample</module>
     </modules>
 </project>
