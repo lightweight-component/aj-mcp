@@ -24,6 +24,10 @@
             });
         </script>
         <script src="/asset/common.js"></script>
+        <link rel="stylesheet" href="https://aj-util.ajaxjs.com/asset/static-search.css">
+        <link rel="stylesheet" href="/asset/search.css">
+        <script defer src="https://aj-util.ajaxjs.com/asset/js/static-search.js"></script>
+        <script defer src="/asset/search.js"></script>
 
         <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200..900&family=Noto+Serif+TC:wght@200..900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet" />
     </head>
@@ -43,6 +47,11 @@
         </nav>
         <div class="docs-layout">
             <menu class="docs-navigation" aria-label="Documentation navigation">
+                
+                <div data-mcp-search data-language="en">
+    <noscript>Enable JavaScript to search documentation.</noscript>
+</div>
+
                 
                 <ul>
                     <li class="selected">
@@ -99,7 +108,7 @@
                 </ul>
             </menu>
             <article class="aj-text">
-                <h1>Prompts Development</h1>
+                <h1 id="search-prompts-development">Prompts Development</h1>
 <p>AJ-MCP uses annotations to define prompts within <code>@McpService</code> classes. The <code>@Prompt</code> annotation marks methods that
 serve as prompt handlers, while
 <code>@PromptArg</code> defines parameters for interactive prompts.</p>
@@ -115,7 +124,7 @@ public PromptMessage basic() {
     return message;
 }
 </code></pre>
-<h2>Multi-Message Prompts</h2>
+<h2 id="search-multi-message-prompts">Multi-Message Prompts</h2>
 <p>Prompts can return multiple messages by returning a <code>List&lt;PromptMessage&gt;</code>. This enables creating conversation-style
 prompts with multiple turns or
 role-based interactions.</p>
@@ -132,7 +141,7 @@ public List&lt;PromptMessage&gt; multi() {
     return Arrays.asList(message1, message2);
 }
 </code></pre>
-<h2>Parameterized Prompts</h2>
+<h2 id="search-parameterized-prompts">Parameterized Prompts</h2>
 <p>Prompts can accept parameters using the <code>@PromptArg</code> annotation. Parameters become available to clients when listing
 prompts and are passed when
 retrieving the prompt.</p>
@@ -145,7 +154,7 @@ public PromptMessage parametrized(@PromptArg(description = &quot;The name&quot;)
     return message;
 }
 </code></pre>
-<h2>Content Types and Rich Media</h2>
+<h2 id="search-content-types-and-rich-media">Content Types and Rich Media</h2>
 <p>Prompts support multiple content types beyond text, including images and embedded resources. Each content type has
 specific properties and encoding
 requirements.</p>
@@ -179,7 +188,7 @@ requirements.</p>
 </tr>
 </tbody>
 </table>
-<h2>Protocol Data Structures</h2>
+<h2 id="search-protocol-data-structures">Protocol Data Structures</h2>
 <p>The prompt system uses specific protocol structures for communication between client and server.</p>
 <table>
 <thead>
@@ -212,7 +221,7 @@ requirements.</p>
 </tr>
 </tbody>
 </table>
-<h2>Role Enumeration</h2>
+<h2 id="search-role-enumeration">Role Enumeration</h2>
 <p>The Role enum defines message roles in prompt conversations:</p>
 <ul>
 <li>USER - Messages from the user perspective</li>

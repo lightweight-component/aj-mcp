@@ -24,6 +24,10 @@
             });
         </script>
         <script src="/asset/common.js"></script>
+        <link rel="stylesheet" href="https://aj-util.ajaxjs.com/asset/static-search.css">
+        <link rel="stylesheet" href="/asset/search.css">
+        <script defer src="https://aj-util.ajaxjs.com/asset/js/static-search.js"></script>
+        <script defer src="/asset/search.js"></script>
 
         <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200..900&family=Noto+Serif+TC:wght@200..900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet" />
     </head>
@@ -43,6 +47,11 @@
         </nav>
         <div class="docs-layout">
             <menu class="docs-navigation" aria-label="Documentation navigation">
+                
+                <div data-mcp-search data-language="en">
+    <noscript>Enable JavaScript to search documentation.</noscript>
+</div>
+
                 
                 <ul>
                     <li class="selected">
@@ -99,13 +108,13 @@
                 </ul>
             </menu>
             <article class="aj-text">
-                <h1>MCP Server SDK Feature Management</h1>
+                <h1 id="search-mcp-server-sdk-feature-management">MCP Server SDK Feature Management</h1>
 <p>The AJ-MCP annotation system provides a declarative approach to exposing Java methods as MCP (Model Context Protocol)
 tools, resources, and prompts.
 This system uses Java annotations to automatically discover and register functionality, eliminating the need for manual
 configuration or registration
 code.</p>
-<h2>Resources Development</h2>
+<h2 id="search-resources-development">Resources Development</h2>
 <p>Resources are exposed through the <code>@Resource</code> annotation on methods within <code>@McpService</code> classes. The annotation system
 automatically discovers and
 registers resources during server initialization.</p>
@@ -141,8 +150,8 @@ registers resources during server initialization.</p>
 </tr>
 </tbody>
 </table>
-<h3>Resource Content Types</h3>
-<h4>Text Resources</h4>
+<h3 id="search-resource-content-types">Resource Content Types</h3>
+<h4 id="search-text-resources">Text Resources</h4>
 <p>Text resources return <code>ResourceContentText</code> objects containing plain text or structured text data.</p>
 <pre><code class="language-java">@Resource(uri = &quot;file:///text&quot;, description = &quot;A nice piece of text&quot;, mimeType = &quot;text/plain&quot;)
 public ResourceContentText text() {
@@ -153,7 +162,7 @@ public ResourceContentText text() {
     return content;
 }
 </code></pre>
-<h4>Binary Resources</h4>
+<h4 id="search-binary-resources">Binary Resources</h4>
 <p>Binary resources return <code>ResourceContentBinary</code> objects containing Base64-encoded binary data.</p>
 <pre><code class="language-java">@Resource(uri = &quot;file:///blob&quot;, description = &quot;A nice pic&quot;, mimeType = &quot;image/jpg&quot;)
 public ResourceContentBinary blob() {
@@ -167,7 +176,7 @@ public ResourceContentBinary blob() {
     return content;
 }
 </code></pre>
-<h3>Resource Templates</h3>
+<h3 id="search-resource-templates">Resource Templates</h3>
 <p><code>@ResourceTemplate</code> methods are registered by <code>FeatureMgr</code>, exposed through <code>resources/templates/list</code>, and matched when
 <code>resources/read</code> receives a dynamic URI.</p>
 <table>

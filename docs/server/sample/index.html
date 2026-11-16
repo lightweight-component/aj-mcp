@@ -24,6 +24,10 @@
             });
         </script>
         <script src="/asset/common.js"></script>
+        <link rel="stylesheet" href="https://aj-util.ajaxjs.com/asset/static-search.css">
+        <link rel="stylesheet" href="/asset/search.css">
+        <script defer src="https://aj-util.ajaxjs.com/asset/js/static-search.js"></script>
+        <script defer src="/asset/search.js"></script>
 
         <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200..900&family=Noto+Serif+TC:wght@200..900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet" />
     </head>
@@ -43,6 +47,11 @@
         </nav>
         <div class="docs-layout">
             <menu class="docs-navigation" aria-label="Documentation navigation">
+                
+                <div data-mcp-search data-language="en">
+    <noscript>Enable JavaScript to search documentation.</noscript>
+</div>
+
                 
                 <ul>
                     <li class="selected">
@@ -99,10 +108,10 @@
                 </ul>
             </menu>
             <article class="aj-text">
-                <h1>MCP Server SDK Integration Samples</h1>
+                <h1 id="search-mcp-server-sdk-integration-samples">MCP Server SDK Integration Samples</h1>
 <p>The repository contains two integration samples: a standalone Tomcat server and a Spring Boot application, each exposing
 a simple MCP service.</p>
-<h2>Tomcat Application Integration</h2>
+<h2 id="search-tomcat-application-integration">Tomcat Application Integration</h2>
 <p>The Tomcat deployment shows a complete server setup pattern:</p>
 <pre><code class="language-java">package com.foo.myapp;
 
@@ -165,7 +174,7 @@ public class StandaloneTomcat {
     }
 }
 </code></pre>
-<h2>Spring Application Integration</h2>
+<h2 id="search-spring-application-integration">Spring Application Integration</h2>
 <p>The Spring configuration uses the same setup pattern, with <code>ServerSse</code> managed by the Spring container.</p>
 <pre><code class="language-java">package com.foo.myapp;
 
@@ -199,7 +208,7 @@ public class Config {
     }
 }
 </code></pre>
-<h2>Design Note</h2>
+<h2 id="search-design-note">Design Note</h2>
 <p>The legacy HTTP/SSE transport uses two endpoints:</p>
 <ul>
 <li><strong>SSE URL</strong>: the client opens this connection first. The server registers the session with

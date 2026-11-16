@@ -24,6 +24,10 @@
             });
         </script>
         <script src="/asset/common.js"></script>
+        <link rel="stylesheet" href="https://aj-util.ajaxjs.com/asset/static-search.css">
+        <link rel="stylesheet" href="/asset/search.css">
+        <script defer src="https://aj-util.ajaxjs.com/asset/js/static-search.js"></script>
+        <script defer src="/asset/search.js"></script>
     </head>
     <body>
         <nav>
@@ -41,6 +45,11 @@
         </nav>
         <div class="docs-layout">
             <menu class="docs-navigation" aria-label="文档导航">
+                
+                <div data-mcp-search data-language="zh">
+    <noscript>启用 JavaScript 后可搜索文档。</noscript>
+</div>
+
                 
                 <ul>
                     <li class="selected">
@@ -97,7 +106,7 @@
                 </ul>
             </menu>
             <article class="aj-text">
-                <h1>通知处理</h1>
+                <h1 id="search-通知处理">通知处理</h1>
 <p>客户端会自动响应服务端发起的 <code>ping</code> 请求，返回空 result 并保留请求 ID，无需业务方注册处理器。不带 ID 的 ping 通知不会收到响应。</p>
 <p>JSON-RPC notification 不包含 <code>id</code>，服务端不得返回响应。初始化期间客户端会发送 <code>notifications/initialized</code>；STDIO、旧版
 HTTP/SSE 和 Streamable HTTP 服务端传输都不会为该通知输出响应。</p>

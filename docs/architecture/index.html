@@ -24,6 +24,10 @@
             });
         </script>
         <script src="/asset/common.js"></script>
+        <link rel="stylesheet" href="https://aj-util.ajaxjs.com/asset/static-search.css">
+        <link rel="stylesheet" href="/asset/search.css">
+        <script defer src="https://aj-util.ajaxjs.com/asset/js/static-search.js"></script>
+        <script defer src="/asset/search.js"></script>
 
         <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200..900&family=Noto+Serif+TC:wght@200..900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet" />
     </head>
@@ -43,6 +47,11 @@
         </nav>
         <div class="docs-layout">
             <menu class="docs-navigation" aria-label="Documentation navigation">
+                
+                <div data-mcp-search data-language="en">
+    <noscript>Enable JavaScript to search documentation.</noscript>
+</div>
+
                 
                 <ul>
                     <li class="selected">
@@ -99,8 +108,8 @@
                 </ul>
             </menu>
             <article class="aj-text">
-                <h1>MCP Client and Server Architecture</h1>
-<h2>What is the Model Context Protocol?</h2>
+                <h1 id="search-mcp-client-and-server-architecture">MCP Client and Server Architecture</h1>
+<h2 id="search-what-is-the-model-context-protocol">What is the Model Context Protocol?</h2>
 <p>The <a href="https://modelcontextprotocol.io/introduction">Model Context Protocol (MCP)</a> enables AI applications to access
 external tools, data sources, and
 prompts. It serves as a bridge between AI models and the outside world, allowing language models to interact with
@@ -114,13 +123,13 @@ functionality.</p>
 <li>Notifications: Event-based communication between server and client</li>
 </ul>
 <p>In short, MCP gives LLM applications a standardized way to interact with external resources and tools.</p>
-<h2>Architecture</h2>
+<h2 id="search-architecture">Architecture</h2>
 <p>The AJ MCP SDK is structured around several core components that work together to implement the MCP specification:</p>
 <p><img src="/asset/imgs/a-1.jpg" alt=""></p>
 <p>The architecture follows a client-server model with three transports: standard I/O pipes, the legacy two-endpoint
 HTTP/SSE transport, and Streamable HTTP. All transports exchange JSON-RPC messages; Streamable HTTP is available for MCP
 <code>2025-03-26</code> and <code>2025-06-18</code>.</p>
-<h1>Stdio Mode vs SSE Mode Comparison</h1>
+<h1 id="search-stdio-mode-vs-sse-mode-comparison">Stdio Mode vs SSE Mode Comparison</h1>
 <table>
 <thead>
 <tr>

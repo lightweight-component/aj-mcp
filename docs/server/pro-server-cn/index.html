@@ -24,6 +24,10 @@
             });
         </script>
         <script src="/asset/common.js"></script>
+        <link rel="stylesheet" href="https://aj-util.ajaxjs.com/asset/static-search.css">
+        <link rel="stylesheet" href="/asset/search.css">
+        <script defer src="https://aj-util.ajaxjs.com/asset/js/static-search.js"></script>
+        <script defer src="/asset/search.js"></script>
     </head>
     <body>
         <nav>
@@ -41,6 +45,11 @@
         </nav>
         <div class="docs-layout">
             <menu class="docs-navigation" aria-label="文档导航">
+                
+                <div data-mcp-search data-language="zh">
+    <noscript>启用 JavaScript 后可搜索文档。</noscript>
+</div>
+
                 
                 <ul>
                     <li class="selected">
@@ -97,7 +106,7 @@
                 </ul>
             </menu>
             <article class="aj-text">
-                <h1>提示（Prompt）开发</h1>
+                <h1 id="search-提示-prompt-开发">提示（Prompt）开发</h1>
 <p>AJ-MCP 通过注解在 <code>@McpService</code> 类中定义提示（Prompt）。<code>@Prompt</code> 注解用于标记作为提示处理器的方法，<code>@PromptArg</code>
 用于定义交互式提示的参数。</p>
 <p>简单提示返回单条 <code>PromptMessage</code>，内容为文本。<code>@Prompt</code> 注解要求提供描述，方法返回配置好的消息（含角色和内容）。</p>
@@ -110,7 +119,7 @@ public PromptMessage basic() {
     return message;
 }
 </code></pre>
-<h2>多消息提示</h2>
+<h2 id="search-多消息提示">多消息提示</h2>
 <p>提示可以返回多条消息（<code>List&lt;PromptMessage&gt;</code>），支持多轮对话或多角色交互场景。</p>
 <pre><code class="language-java">@Prompt(description = &quot;返回两条消息的提示&quot;)
 public List&lt;PromptMessage&gt; multi() {
@@ -125,7 +134,7 @@ public List&lt;PromptMessage&gt; multi() {
     return Arrays.asList(message1, message2);
 }
 </code></pre>
-<h2>带参数提示</h2>
+<h2 id="search-带参数提示">带参数提示</h2>
 <p>提示可通过 <code>@PromptArg</code> 注解接收参数。参数会在列出提示时对客户端可见，并在获取提示时传递。</p>
 <pre><code class="language-java">@Prompt(description = &quot;带参数的提示&quot;)
 public PromptMessage parametrized(@PromptArg(description = &quot;姓名&quot;) String name) {
@@ -136,7 +145,7 @@ public PromptMessage parametrized(@PromptArg(description = &quot;姓名&quot;) S
     return message;
 }
 </code></pre>
-<h2>内容类型与富媒体支持</h2>
+<h2 id="search-内容类型与富媒体支持">内容类型与富媒体支持</h2>
 <p>提示不仅支持文本，还支持图片和嵌入式资源等多种内容类型。每种内容类型有特定属性和编码要求。</p>
 <table>
 <thead>
@@ -168,7 +177,7 @@ public PromptMessage parametrized(@PromptArg(description = &quot;姓名&quot;) S
 </tr>
 </tbody>
 </table>
-<h2>协议数据结构</h2>
+<h2 id="search-协议数据结构">协议数据结构</h2>
 <p>提示系统采用特定协议结构进行客户端与服务器之间的数据通信。</p>
 <table>
 <thead>
@@ -201,7 +210,7 @@ public PromptMessage parametrized(@PromptArg(description = &quot;姓名&quot;) S
 </tr>
 </tbody>
 </table>
-<h2>角色枚举</h2>
+<h2 id="search-角色枚举">角色枚举</h2>
 <p>Role 枚举用于定义提示消息中的角色：</p>
 <ul>
 <li>USER —— 用户视角的消息</li>

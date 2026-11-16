@@ -24,6 +24,10 @@
             });
         </script>
         <script src="/asset/common.js"></script>
+        <link rel="stylesheet" href="https://aj-util.ajaxjs.com/asset/static-search.css">
+        <link rel="stylesheet" href="/asset/search.css">
+        <script defer src="https://aj-util.ajaxjs.com/asset/js/static-search.js"></script>
+        <script defer src="/asset/search.js"></script>
     </head>
     <body>
         <nav>
@@ -41,6 +45,11 @@
         </nav>
         <div class="docs-layout">
             <menu class="docs-navigation" aria-label="文档导航">
+                
+                <div data-mcp-search data-language="zh">
+    <noscript>启用 JavaScript 后可搜索文档。</noscript>
+</div>
+
                 
                 <ul>
                     <li class="selected">
@@ -97,9 +106,9 @@
                 </ul>
             </menu>
             <article class="aj-text">
-                <h1>提示（Prompt）使用</h1>
+                <h1 id="search-提示-prompt-使用">提示（Prompt）使用</h1>
 <p>MCP 的提示系统为定义、存储和检索用于大语言模型（LLM）的提示模板提供了标准化方式。MCP 的提示可以是静态（固定内容）或模板化（可自定义参数）的消息序列。</p>
-<h2>列出提示</h2>
+<h2 id="search-列出提示">列出提示</h2>
 <p>列出所有可用提示：</p>
 <pre><code class="language-java">List&lt;PromptItem&gt; prompts = mcpClient.listPrompts();
 assertEquals(5, prompts.size(), &quot;期望返回 5 个提示&quot;);
@@ -121,7 +130,7 @@ static PromptItem findPromptByName(String name, List&lt;PromptItem&gt; promptRef
 <pre><code class="language-java">List&lt;PromptItem&gt; prompts = mcpClient.listPrompts(1);
 assertEquals(3, prompts.size(), &quot;期望返回 3 个提示&quot;);
 </code></pre>
-<h1>获取提示详情</h1>
+<h1 id="search-获取提示详情">获取提示详情</h1>
 <p>获取某个提示的详细信息：</p>
 <pre><code class="language-java">GetPromptResult.PromptResultDetail prompt = mcpClient.getPrompt(&quot;basic&quot;, new HashMap&lt;&gt;());
 assertEquals(&quot;基础简单提示&quot;, prompt.getDescription(), &quot;描述不应为 null&quot;);
@@ -135,7 +144,7 @@ assertEquals(&quot;Hello&quot;, ((ContentText) message.getContent()).getText(), 
 <p>通常，提示系统接收一个提示名称和参数映射。参数用于填充提示模板中的占位符。参数为 Map 类型，key 是参数名，value 是参数值；也可以传递
 JSON 字符串。</p>
 <p>如无需参数，则传递空 Map 即可。</p>
-<h2>嵌入式二进制资源</h2>
+<h2 id="search-嵌入式二进制资源">嵌入式二进制资源</h2>
 <p><code>ContentEmbeddedResource.Resource</code> 可以通过 <code>text</code> 表示文本内容，也可以通过 <code>blob</code> 表示 Base64 编码的二进制内容。还应设置
 URI 和 MIME type，并且 <code>text</code> 与 <code>blob</code> 只设置其中一个。</p>
 <pre><code class="language-java">ContentEmbeddedResource.Resource resource = new ContentEmbeddedResource.Resource();

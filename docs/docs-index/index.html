@@ -24,6 +24,10 @@
             });
         </script>
         <script src="/asset/common.js"></script>
+        <link rel="stylesheet" href="https://aj-util.ajaxjs.com/asset/static-search.css">
+        <link rel="stylesheet" href="/asset/search.css">
+        <script defer src="https://aj-util.ajaxjs.com/asset/js/static-search.js"></script>
+        <script defer src="/asset/search.js"></script>
 
         <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200..900&family=Noto+Serif+TC:wght@200..900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet" />
     </head>
@@ -43,6 +47,11 @@
         </nav>
         <div class="docs-layout">
             <menu class="docs-navigation" aria-label="Documentation navigation">
+                
+                <div data-mcp-search data-language="en">
+    <noscript>Enable JavaScript to search documentation.</noscript>
+</div>
+
                 
                 <ul>
                     <li class="selected">
@@ -99,17 +108,19 @@
                 </ul>
             </menu>
             <article class="aj-text">
-                <h1>Welcome to the AJ MCP SDK User Manual</h1>
+                <h1 id="search-welcome-to-the-aj-mcp-sdk-user-manual">Welcome to the AJ MCP SDK User Manual</h1>
+<p>The independent AJ MCP Next (Java 8, 2026-07-28) provides core/client/server modules, STDIO and sessionless HTTP.
+See the <a href="/next/overview/">Next overview</a>. The legacy SDK and initialize examples below do not apply to Next.</p>
 <p>The AJ MCP SDK is an implementation of the Model Context Protocol (MCP), an open protocol designed to enable seamless
 integration between Large
 Language Model (LLM) applications and external data sources and tools. The SDK provides declarative APIs that make it
 easy to implement MCP server features in Java applications.</p>
-<h2>Why AJ MCP SDK?</h2>
+<h2 id="search-why-aj-mcp-sdk">Why AJ MCP SDK?</h2>
 <p>Compared with other MCP SDKs, AJ MCP SDK is designed to be lightweight and easy to use. It supports Java 8 and provides
 a simple and
 intuitive API for developers to implement MCP server features. The size of the SDK is small, making it easy to integrate
 into your application.</p>
-<h3>Why Java 8?</h3>
+<h3 id="search-why-java-8">Why Java 8?</h3>
 <p>MCP is a protocol-based framework and should therefore be more universally applicable. It should address a broader range
 of market demands.</p>
 <p>Currently, the situation with developing MCP in Java is:</p>
@@ -141,19 +152,19 @@ of market demands.</p>
 </table>
 <p>Given that a large number of servers still run on JDK 8, the ability to develop MCP (or MCP Server) with Java 8 is
 essential to ensure broad compatibility and flexibility — that’s what real freedom for MCP means.</p>
-<h2>Learn More</h2>
+<h2 id="search-learn-more">Learn More</h2>
 <p>For specific information about working with individual components,
 please see dedicated pages on <a href="architecture">Architecture</a>, <a href="client">Client SDK</a>, <a href="server">Server SDK</a>.</p>
-<h2>Source Code</h2>
+<h2 id="search-source-code">Source Code</h2>
 <p>Licensed under the GNU General Public License v3.0.</p>
 <ul>
 <li>GitHub: <a href="https://github.com/lightweight-component/aj-mcp">https://github.com/lightweight-component/aj-mcp</a></li>
 <li>GitCode: <a href="https://gitcode.com/lightweight-component/aj-mcp">https://gitcode.com/lightweight-component/aj-mcp</a>, which
 may be faster for users in China.</li>
 </ul>
-<h2>Links</h2>
+<h2 id="search-links">Links</h2>
 <p><a href="https://mcp.ajaxjs.com">Website</a> | <a href="https://deepwiki.com/lightweight-component/aj-mcp">DeepWiki</a></p>
-<h2>JavaDoc</h2>
+<h2 id="search-javadoc">JavaDoc</h2>
 <ul>
 <li><a href="https://javadoc.io/doc/com.ajaxjs/aj-mcp-common">aj-mcp-common</a></li>
 <li><a href="https://javadoc.io/doc/com.ajaxjs/aj-mcp-client">aj-mcp-client</a></li>

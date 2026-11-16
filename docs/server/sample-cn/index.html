@@ -24,6 +24,10 @@
             });
         </script>
         <script src="/asset/common.js"></script>
+        <link rel="stylesheet" href="https://aj-util.ajaxjs.com/asset/static-search.css">
+        <link rel="stylesheet" href="/asset/search.css">
+        <script defer src="https://aj-util.ajaxjs.com/asset/js/static-search.js"></script>
+        <script defer src="/asset/search.js"></script>
     </head>
     <body>
         <nav>
@@ -41,6 +45,11 @@
         </nav>
         <div class="docs-layout">
             <menu class="docs-navigation" aria-label="文档导航">
+                
+                <div data-mcp-search data-language="zh">
+    <noscript>启用 JavaScript 后可搜索文档。</noscript>
+</div>
+
                 
                 <ul>
                     <li class="selected">
@@ -97,9 +106,9 @@
                 </ul>
             </menu>
             <article class="aj-text">
-                <h1>MCP 服务器 SDK 集成示例</h1>
+                <h1 id="search-mcp-服务器-sdk-集成示例">MCP 服务器 SDK 集成示例</h1>
 <p>本项目的源代码仓库包含两个集成示例：一个是带有简单 MCP 服务的独立 Tomcat 服务器，另一个是带有 MCP 服务的 Spring Boot 应用程序。</p>
-<h2>Tomcat 应用集成</h2>
+<h2 id="search-tomcat-应用集成">Tomcat 应用集成</h2>
 <p>Tomcat 部署展示了一个完整的服务器搭建模式：</p>
 <pre><code class="language-java">package com.foo.myapp;
 
@@ -162,7 +171,7 @@ public class StandaloneTomcat {
     }
 }
 </code></pre>
-<h2>Spring 应用集成</h2>
+<h2 id="search-spring-应用集成">Spring 应用集成</h2>
 <p>Spring 配置采用相同的初始化方式，并由 Spring 容器管理 <code>ServerSse</code> Bean。</p>
 <pre><code class="language-java">package com.foo.myapp;
 
@@ -196,7 +205,7 @@ public class Config {
     }
 }
 </code></pre>
-<h2>设计说明</h2>
+<h2 id="search-设计说明">设计说明</h2>
 <p>旧版 HTTP/SSE 传输包含两个端点：</p>
 <ul>
 <li><strong>SSE URL</strong>：客户端首先建立该连接。服务端通过 <code>openSession(clientId, writer, postPath)</code> 注册会话，并发送包含 POST 路径的

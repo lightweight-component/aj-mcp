@@ -24,6 +24,10 @@
             });
         </script>
         <script src="/asset/common.js"></script>
+        <link rel="stylesheet" href="https://aj-util.ajaxjs.com/asset/static-search.css">
+        <link rel="stylesheet" href="/asset/search.css">
+        <script defer src="https://aj-util.ajaxjs.com/asset/js/static-search.js"></script>
+        <script defer src="/asset/search.js"></script>
     </head>
     <body>
         <nav>
@@ -41,6 +45,11 @@
         </nav>
         <div class="docs-layout">
             <menu class="docs-navigation" aria-label="文档导航">
+                
+                <div data-mcp-search data-language="zh">
+    <noscript>启用 JavaScript 后可搜索文档。</noscript>
+</div>
+
                 
                 <ul>
                     <li class="selected">
@@ -97,8 +106,8 @@
                 </ul>
             </menu>
             <article class="aj-text">
-                <h1>MCP 客户端 SDK 设置</h1>
-<h2>安装依赖</h2>
+                <h1 id="search-mcp-客户端-sdk-设置">MCP 客户端 SDK 设置</h1>
+<h2 id="search-安装依赖">安装依赖</h2>
 <p>我们需要使用 AJ MCP SDK 来进行 API 请求。安装依赖如下：</p>
 <pre><code class="language-xml">
 &lt;dependency&gt;
@@ -114,12 +123,12 @@
 <li><strong>传输层</strong>：管理子进程并处理底层消息交换。</li>
 <li><strong>MCP 客户端</strong>：提供高层次的 API，使用传输层实现 MCP 协议。</li>
 </ul>
-<h2>设置传输层 Transport</h2>
+<h2 id="search-设置传输层-transport">设置传输层 Transport</h2>
 <p>完整的 Streamable HTTP 演示：启动源码中的 <code>samples/server/spring-streamable-http</code>，
 再运行 <code>samples/client</code> 入口 <code>com.foo.StreamableHttpClientExample</code>。
 示例等待 GET 就绪，调用工具、接收进度、响应 roots、读取资源、获取提示词并关闭会话。</p>
 <p>首先创建与 MCP 服务端匹配的传输层。客户端支持 STDIO、旧版双端点 HTTP/SSE 和 Streamable HTTP 三类传输。</p>
-<h3>自动识别 HTTP 传输</h3>
+<h3 id="search-自动识别-http-传输">自动识别 HTTP 传输</h3>
 <p>不确定服务端使用哪一种 HTTP 传输时，可使用 <code>AutoHttpTransport</code>：</p>
 <pre><code class="language-java">McpTransport transport = new AutoHttpTransport(&quot;http://localhost:8080/mcp&quot;);
 McpClient client = McpClient.builder().transport(transport).build();
@@ -135,7 +144,7 @@ client.initialize();
 最后一项仅控制新版可选 GET；旧版 SSE 必须打开 GET。回退保留自定义请求头；
 为防止凭据泄露，旧版 endpoint 必须与服务端 URL 同源。<code>isLegacySse()</code> 可查看是否选择了旧版实现。
 原有 <code>StreamableHttpTransport</code> 和 <code>HttpMcpTransport</code> 仍可显式使用，不会自动切换。</p>
-<h3>标准输入输出（Stdio）示例</h3>
+<h3 id="search-标准输入输出-stdio-示例">标准输入输出（Stdio）示例</h3>
 <p>“Stdio” 是标准输入/输出的缩写，通常用于在程序和人之间通过命令行交互。在这里，它用于 MCP 客户端和 MCP 服务器之间的交互。通常，Stdio
 用于本地应用程序，如 <code>*.exe</code> 程序或 Java Jar 程序等。</p>
 <pre><code class="language-java">// MCP 服务器是一个 Java 程序，使用标准输入输出运行。
@@ -152,7 +161,7 @@ McpTransport transport = StdioTransport.builder()
                 .build();
 </code></pre>
 <p>调试时可将 <code>logEvents</code> 设置为 <code>true</code>，以记录发出的协议消息。传输层也会持续消费子进程的 stderr，避免错误输出管道写满后阻塞子进程。</p>
-<h3>旧版 HTTP/SSE 传输</h3>
+<h3 id="search-旧版-http-sse-传输">旧版 HTTP/SSE 传输</h3>
 <p>旧版传输使用 SSE 端点承载服务端到客户端的消息，并使用服务端公布的 POST 端点承载客户端请求，适用于需要对接旧 MCP 服务的场景。</p>
 <pre><code class="language-java">McpTransport transport = HttpMcpTransport.builder()
         .sseUrl(&quot;http://localhost:8080/sse&quot;)
@@ -161,7 +170,7 @@ McpTransport transport = StdioTransport.builder()
         .build();
 </code></pre>
 <p><code>sseUrl</code> 是必需的，它指定 MCP 服务器的 SSE 端点 URL。</p>
-<h3>Streamable HTTP（2025-03-26 / 2025-06-18）</h3>
+<h3 id="search-streamable-http-2025-03-26-2025-06-18">Streamable HTTP（2025-03-26 / 2025-06-18）</h3>
 <p>较新的协议版本使用单一 HTTP 端点：</p>
 <pre><code class="language-java">StreamableHttpTransport transport = StreamableHttpTransport.builder()
         .endpointUrl(&quot;http://localhost:8080/mcp&quot;)
@@ -185,7 +194,7 @@ stream 到达客户端。该流会在初始化后异步打开。</p>
 <code>isEventStreamOpen()</code> / <code>getEventStreamFailure()</code> 查询状态。GET 断线按指数退避重试最多五次（200 毫秒至 5 秒），
 有事件 ID 时携带 <code>Last-Event-ID</code>，重放能力由服务端提供；HTTP 4xx 停止重试。关闭时尽力发送 DELETE，最多等待两秒。
 STDIO 消息固定使用 UTF-8。</p>
-<h2>MCP 客户端</h2>
+<h2 id="search-mcp-客户端">MCP 客户端</h2>
 <p>MCP 客户端充当本地应用程序与远程工具实现之间的桥梁。</p>
 <pre><code class="language-java">McpClient mcpClient = McpClient.builder()
         .clientName(&quot;my-host&quot;)

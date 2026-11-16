@@ -24,6 +24,10 @@
             });
         </script>
         <script src="/asset/common.js"></script>
+        <link rel="stylesheet" href="https://aj-util.ajaxjs.com/asset/static-search.css">
+        <link rel="stylesheet" href="/asset/search.css">
+        <script defer src="https://aj-util.ajaxjs.com/asset/js/static-search.js"></script>
+        <script defer src="/asset/search.js"></script>
     </head>
     <body>
         <nav>
@@ -41,6 +45,11 @@
         </nav>
         <div class="docs-layout">
             <menu class="docs-navigation" aria-label="文档导航">
+                
+                <div data-mcp-search data-language="zh">
+    <noscript>启用 JavaScript 后可搜索文档。</noscript>
+</div>
+
                 
                 <ul>
                     <li class="selected">
@@ -97,8 +106,8 @@
                 </ul>
             </menu>
             <article class="aj-text">
-                <h1>协议初始化</h1>
-<h2>Streamable HTTP 会话过期</h2>
+                <h1 id="search-协议初始化">协议初始化</h1>
+<h2 id="search-streamable-http-会话过期">Streamable HTTP 会话过期</h2>
 <p>带会话 ID 的 POST 或 GET 收到 HTTP 404 后，传输层会去掉旧会话 ID，重新执行初始化握手。
 旧的待处理调用会异常完成，<strong>不会自动重放</strong>，避免有副作用的工具被重复执行。
 新调用等待重建完成，可通过 <code>transport.getSessionRecovery()</code> 观察成功或失败。

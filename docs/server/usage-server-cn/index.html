@@ -24,6 +24,10 @@
             });
         </script>
         <script src="/asset/common.js"></script>
+        <link rel="stylesheet" href="https://aj-util.ajaxjs.com/asset/static-search.css">
+        <link rel="stylesheet" href="/asset/search.css">
+        <script defer src="https://aj-util.ajaxjs.com/asset/js/static-search.js"></script>
+        <script defer src="/asset/search.js"></script>
     </head>
     <body>
         <nav>
@@ -41,6 +45,11 @@
         </nav>
         <div class="docs-layout">
             <menu class="docs-navigation" aria-label="文档导航">
+                
+                <div data-mcp-search data-language="zh">
+    <noscript>启用 JavaScript 后可搜索文档。</noscript>
+</div>
+
                 
                 <ul>
                     <li class="selected">
@@ -97,8 +106,8 @@
                 </ul>
             </menu>
             <article class="aj-text">
-                <h1>MCP 服务器 SDK 使用说明</h1>
-<h3>客户端 roots 变更回调</h3>
+                <h1 id="search-mcp-服务器-sdk-使用说明">MCP 服务器 SDK 使用说明</h1>
+<h3 id="search-客户端-roots-变更回调">客户端 roots 变更回调</h3>
 <p>注册回调以接收 <code>notifications/roots/list_changed</code>：</p>
 <pre><code class="language-java">server.setRootsChangedHandler(sessionId -&gt; {
     // Invalidate application-owned cached roots for this session.
@@ -107,12 +116,12 @@
 </code></pre>
 <p>这里的 <code>rootsCache</code> 是应用自行维护、以会话 ID 为键的线程安全缓存。该回调适用于 STDIO、旧 SSE 和 Streamable HTTP，兼容三个已支持的协议版本。只有声明了 <code>capabilities.roots.listChanged: true</code> 的客户端才会触发回调。通知不包含新的 roots 内容，需要时请另行调用 <code>server.listRoots(sessionId, timeout)</code> 查询。</p>
 <p>回调在接收线程执行，应快速返回。不要在回调中直接阻塞调用 <code>listRoots</code>：接收线程可能还需要处理它的响应，应使用业务自行管理的执行器异步刷新。回调需保证线程安全，异步刷新需处理会话关闭和超时，执行器由应用负责关闭。回调抛出的运行时异常只会被记录，不会产生 JSON-RPC 响应或中断接收流程。传入 <code>null</code> 可注销回调。SDK 不创建额外执行器，也不会自动刷新 roots。</p>
-<h3>旧 SSE 的 Origin 校验</h3>
+<h3 id="search-旧-sse-的-origin-校验">旧 SSE 的 Origin 校验</h3>
 <p>HTTP 适配层应在打开 SSE 流或处理 POST 消息之前调用 <code>serverSse.isOriginAllowed(request.getHeader(&quot;Origin&quot;))</code>，返回 false 时响应 HTTP 403。内置 Spring 和 Tomcat 适配器已在两个入口加入检查。不携带 Origin 的原生客户端仍可连接；携带 Origin 时必须精确匹配 <code>ServerConfig.allowedOrigins</code>。空字符串和不透明来源 <code>null</code> 会被拒绝，不支持通配符。</p>
 <pre><code class="language-java">config.setAllowedOrigins(java.util.Collections.singletonList(&quot;https://app.example.com&quot;));
 </code></pre>
 <p>Origin 校验不代替身份认证，也不会自动配置 CORS 响应头。</p>
-<h2>MCP 服务器 SDK 安装</h2>
+<h2 id="search-mcp-服务器-sdk-安装">MCP 服务器 SDK 安装</h2>
 <p>添加如下依赖以构建 MCP 服务器：</p>
 <pre><code class="language-xml">
 &lt;dependency&gt;
@@ -130,7 +139,7 @@
 <li><code>@Tool</code>、<code>@Resource</code>、<code>@Prompt</code> 等注解</li>
 <li>STDIO、旧版 HTTP/SSE 与 Streamable HTTP 传输实现</li>
 </ul>
-<h2>创建服务器</h2>
+<h2 id="search-创建服务器">创建服务器</h2>
 <p>要创建 MCP 服务器，需要以下步骤：</p>
 <ol>
 <li>定义服务类：创建带有 <code>@McpService</code> 注解的类</li>
@@ -139,7 +148,7 @@
 <li>配置传输层：设置 STDIO、旧版 HTTP/SSE 或 Streamable HTTP，并配置相关服务器参数</li>
 <li>启动服务器：调用 <code>server.start()</code></li>
 </ol>
-<h2>创建 MCP 服务类</h2>
+<h2 id="search-创建-mcp-服务类">创建 MCP 服务类</h2>
 <p>AJ-MCP 通过注解扫描自动发现、注册和管理 MCP 功能（工具、资源、提示）。开发者只需在带有 <code>@McpService</code> 注解的类中，使用 <code>@Tool</code>、
 <code>@Resource</code> 或 <code>@Prompt</code> 注解标记方法，即可暴露相应功能。</p>
 <pre><code class="language-java">
@@ -159,9 +168,9 @@ public class MyServerFeatures {
     }
 }
 </code></pre>
-<h2>服务器功能管理</h2>
+<h2 id="search-服务器功能管理">服务器功能管理</h2>
 <p>每个服务器使用独立的 <code>FeatureMgr</code> 实例负责包扫描、注解处理与功能存储，因此同一 JVM 中的多个服务器不会共享工具、资源或提示。</p>
-<h3>注解体系</h3>
+<h3 id="search-注解体系">注解体系</h3>
 <p>注解体系围绕几个核心注解展开，用于标记类和方法以供 MCP 识别和暴露：</p>
 <table>
 <thead>
@@ -206,14 +215,14 @@ public class MyServerFeatures {
 </table>
 <p>调用 <code>FeatureMgr.init()</code> 会扫描指定包，并注册 <code>@McpService</code> 类中的 <code>@Tool</code>、<code>@Resource</code> 和 <code>@Prompt</code>
 方法。单个类无法加载时会记录日志并跳过，不会中断整个扫描过程。</p>
-<h3>初始化功能管理器</h3>
+<h3 id="search-初始化功能管理器">初始化功能管理器</h3>
 <p><code>FeatureMgr.init()</code> 方法负责整个注解发现流程。它首先扫描指定包下带有 <code>@McpService</code> 注解的类。</p>
 <pre><code class="language-java">FeatureMgr mgr = new FeatureMgr();
 mgr.
 
 init(&quot;com.foo.myproduct&quot;);
 </code></pre>
-<h2>服务器配置</h2>
+<h2 id="search-服务器配置">服务器配置</h2>
 <p>包扫描初始化功能管理器后，可进行服务器配置，包括：</p>
 <ul>
 <li>创建服务器实例并设置传输层</li>
@@ -249,7 +258,7 @@ server.
 
 start();
 </code></pre>
-<h2>传输与生命周期规则</h2>
+<h2 id="search-传输与生命周期规则">传输与生命周期规则</h2>
 <ul>
 <li><code>ServerStdio</code> 每行交换一个 JSON-RPC 消息，<code>System.out</code> 必须仅用于协议输出。</li>
 <li><code>ServerSse</code> 是旧版双端点适配器：用 <code>openSession(...)</code> 建立会话，把 POST 消息交给 <code>handle(sessionId, body)</code>

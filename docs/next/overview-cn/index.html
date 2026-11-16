@@ -1,0 +1,138 @@
+
+
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+        <title>AJ MCP SDK/AJ MCP Next</title>
+        <meta name="description" content="轻量级的 Java 8 Model Context Protocol (MCP) SDK. 面向逐请求现代 MCP 的 Java 8 SDK"/>
+        <meta name="keywords" content="mcp, mcp sdk, java mcp, mcp client, mcp server, java8 mcp, "/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <link rel="stylesheet" href="https://framework.ajaxjs.com/static/new-ui/css/common.css" />
+        <link rel="stylesheet" href="https://aj-util.ajaxjs.com/asset/main.css" />
+        <link rel="icon" type="image/png" href="/asset/favicon.ico"/>
+        <script defer src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.12.0/highlight.min.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.12.0/styles/github.min.css" />
+        <script src="https://aj-util.ajaxjs.com/asset/js/common.js"></script>
+        <script>
+            AJUtils.initTheme();
+            AJUtils.onReady(function () {
+                AJUtils.bindThemeToggle();
+                AJUtils.bindDocumentationLanguageToggle();
+            });
+        </script>
+        <script src="/asset/common.js"></script>
+        <link rel="stylesheet" href="https://aj-util.ajaxjs.com/asset/static-search.css">
+        <link rel="stylesheet" href="/asset/search.css">
+        <script defer src="https://aj-util.ajaxjs.com/asset/js/static-search.js"></script>
+        <script defer src="/asset/search.js"></script>
+    </head>
+    <body>
+        <nav>
+            <div>
+                <div class="links">
+                    <a href="/cn/">🏠 首页</a>
+                    | ⚙️ 源码:
+                    <a target="_blank" href="https://github.com/lightweight-component/aj-mcp">Github</a>/<a target="_blank" href="https://gitcode.com/lightweight-component/aj-mcp">Gitcode</a>
+                    | <button class="language-toggle" type="button" data-document-language-toggle data-language-target="/next/overview/" aria-label="切换至英文" title="切换至英文">EN</button>
+                    | <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换主题" title="切换主题">☾</button>
+                </div>
+                <h1>AJ MCP SDK</h1>
+                <h3>用户手册</h3>
+            </div>
+        </nav>
+        <div class="docs-layout">
+            <menu class="docs-navigation" aria-label="文档导航">
+                
+                <div data-mcp-search data-language="zh">
+    <noscript>启用 JavaScript 后可搜索文档。</noscript>
+</div>
+
+                
+                <ul>
+                    <li class="selected">
+                        <a href="/cn">首页</a>
+                    </li>
+                    <li>
+                        <a href="/architecture/index-cn">架构原理</a>
+                    </li>
+                </ul>
+                <h3>MCP 客户端 SDK</h3>
+                <ul>
+                    <li>
+                        <a href="/client/setup-client-cn">安装与配置</a>
+                    </li>
+                    <li>
+                       <a href="/client/initialization-cn">初始化</a>
+                    </li>
+                    <li>
+                       <a href="/client/resource-cn">资源用法</a>
+                    </li>
+                     <li>
+                       <a href="/client/prompt-cn">提示用法</a>
+                    </li>
+                     <li>
+                       <a href="/client/tool-cn">工具用法</a>
+                    </li>
+                    <li>
+                       <a href="/client/handling-notifications-cn">通知处理</a>
+                    </li>
+                </ul>
+                <h3>MCP 服务端 SDK</h3>
+                <ul>
+                      <li>
+                           <a href="/server/usage-server-cn">Server SDK 用法指南</a>
+                      </li>
+                      <li>
+                           <a href="/server/res-server-cn">Resources 用法</a>
+                      </li>
+                      <li>
+                           <a href="/server/pro-server-cn">Prompts 用法</a>
+                      </li>
+                      <li>
+                             <a href="/server/tool-server-cn">Tools 用法</a>
+                       </li>
+                      <li>
+                         <a href="/server/sample-cn">整合例子</a>
+                      </li>
+                </ul>
+
+                <h3>其他</h3>
+                <ul>
+                    <li><a href="/misc/versions-cn">版本记录</a></li>
+                    <li><a href="/misc/contact-cn">联系方式</a></li>
+                </ul>
+            </menu>
+            <article class="aj-text">
+                <h1 id="search-aj-mcp-next">AJ MCP Next</h1>
+<p>独立的 aj-mcp-2026 工程仅面向 MCP 2026-07-28。Maven 制品为
+com.ajaxjs:aj-mcp-next-core、aj-mcp-next-client、aj-mcp-next-server，版本继承 ajaxjs-parent。
+不沿用旧 SDK 的 initialize 握手和 HTTP 会话。</p>
+<p>Core 提供消息、严格 JSON/Schema 校验和协议辅助；client 提供有界调用、MRTR 输入 handler、订阅及 STDIO/HTTP；
+server 提供注册分发、生命周期、AJ Util AES-GCM 状态保护和 STDIO/JDK HTTP。
+复用 AJ Util JSON 引擎及 AJ HTTP 连接初始化。</p>
+<p>默认调用超时 30 秒。HTTP 默认本地回环、拒绝未允许的 Origin，各请求独立 POST 响应流。
+远程部署仍需认证、TLS 和宿主网络限制。不内置自动工具重放、旧协议回退、共享授权缓存、OAuth 授权服务或 Tasks 扩展。</p>
+<p>完整示例和限制位于仓库文档：
+<a href="https://github.com/lightweight-component/aj-mcp/tree/main/aj-mcp-2026">工程</a>、
+<a href="https://github.com/lightweight-component/aj-mcp/tree/main/aj-mcp-2026/mcp-client">client</a>、
+<a href="https://github.com/lightweight-component/aj-mcp/tree/main/aj-mcp-2026/mcp-server">server</a>。
+本地源码需提交/发布后才会出现在托管仓库中。</p>
+<p>在仓库根目录执行 <code>mvn -f aj-mcp-2026/pom.xml -DskipTests=false clean verify</code>。
+verify 覆盖真实 HTTP、子进程 STDIO 和打包 JAR 示例，不代表官方符合性认证。</p>
+
+                <div id="comment-holder">
+                </div>
+            </article>
+        </div>
+        <footer>
+             AJ-Util，开源框架 <a href="https://framework.ajaxjs.com" target="_blank">AJ-Framework</a> 的一部分。联系方式：
+             frank@ajaxjs.com，<a href="https://blog.csdn.net/zhangxin09" target="_blank">作者博客</a>
+             <br />
+             <br />
+             Copyright © 2025 Frank Cheung. All rights reserved.
+         </footer>
+    </body>
+</html>

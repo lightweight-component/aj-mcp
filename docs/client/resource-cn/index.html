@@ -24,6 +24,10 @@
             });
         </script>
         <script src="/asset/common.js"></script>
+        <link rel="stylesheet" href="https://aj-util.ajaxjs.com/asset/static-search.css">
+        <link rel="stylesheet" href="/asset/search.css">
+        <script defer src="https://aj-util.ajaxjs.com/asset/js/static-search.js"></script>
+        <script defer src="/asset/search.js"></script>
     </head>
     <body>
         <nav>
@@ -41,6 +45,11 @@
         </nav>
         <div class="docs-layout">
             <menu class="docs-navigation" aria-label="文档导航">
+                
+                <div data-mcp-search data-language="zh">
+    <noscript>启用 JavaScript 后可搜索文档。</noscript>
+</div>
+
                 
                 <ul>
                     <li class="selected">
@@ -97,10 +106,10 @@
                 </ul>
             </menu>
             <article class="aj-text">
-                <h2>资源（Resource）使用</h2>
+                <h2 id="search-资源-resource-使用">资源（Resource）使用</h2>
 <p>资源系统使 LLM 驱动的应用能够通过统一接口访问结构化内容。每个资源通过 URI 标识，可以表示任何对 LLM 有用的内容类型。AJ MCP
 客户端提供发现和访问服务器端资源的方法。</p>
-<h3>列出资源</h3>
+<h3 id="search-列出资源">列出资源</h3>
 <p>列出所有可用资源：</p>
 <pre><code class="language-java">List&lt;ResourceItem&gt; resourceList = mcpClient.listResources();
 assertEquals(2, resourceList.size(), &quot;期望恰好有两个资源&quot;);
@@ -117,7 +126,7 @@ assertEquals(&quot;A nice pic&quot;, blob.getDescription(), &quot;描述不符�
 <pre><code class="language-java">List&lt;ResourceItem&gt; resourceList = mcpClient.listResources(1);
 assertEquals(2, resourceList.size(), &quot;Expected exactly two resources&quot;);
 </code></pre>
-<h3>读取资源内容</h3>
+<h3 id="search-读取资源内容">读取资源内容</h3>
 <p>读取某个资源内容：</p>
 <pre><code class="language-java">GetResourceResult.ResourceResultDetail response = mcpClient.readResource(&quot;file:///text&quot;);
 assertEquals(1, response.getContents().size(), &quot;期望内容数量为 1&quot;);
@@ -149,7 +158,7 @@ ResourceContentText textContents = (ResourceContentText) contents;
 assertEquals(&quot;file:///text-template/hello&quot;, textContents.getUri(), &quot;URI 应为 'file:///text-template/hello'&quot;);
 assertEquals(&quot;text hello&quot;, textContents.getText(), &quot;文本内容应为 'text hello'&quot;);
 </code></pre>
-<h3>资源订阅</h3>
+<h3 id="search-资源订阅">资源订阅</h3>
 <p>客户端可订阅资源变更通知，以便在资源更新时及时获知：</p>
 <p>mcpClient.subscribeResource(&quot;test://resource/path&quot;);</p>
 <p>如需取消资源通知：</p>

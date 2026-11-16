@@ -24,6 +24,10 @@
             });
         </script>
         <script src="/asset/common.js"></script>
+        <link rel="stylesheet" href="https://aj-util.ajaxjs.com/asset/static-search.css">
+        <link rel="stylesheet" href="/asset/search.css">
+        <script defer src="https://aj-util.ajaxjs.com/asset/js/static-search.js"></script>
+        <script defer src="/asset/search.js"></script>
 
         <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200..900&family=Noto+Serif+TC:wght@200..900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet" />
     </head>
@@ -43,6 +47,11 @@
         </nav>
         <div class="docs-layout">
             <menu class="docs-navigation" aria-label="Documentation navigation">
+                
+                <div data-mcp-search data-language="en">
+    <noscript>Enable JavaScript to search documentation.</noscript>
+</div>
+
                 
                 <ul>
                     <li class="selected">
@@ -99,7 +108,7 @@
                 </ul>
             </menu>
             <article class="aj-text">
-                <h1>Working with Tools</h1>
+                <h1 id="search-working-with-tools">Working with Tools</h1>
 <p>Content, resource, tool, request-parameter and result models retain optional <code>_meta</code> through
 <code>getMeta()</code> / <code>setMeta(Map&lt;String, Object&gt;)</code>. Metadata stays nested under <code>_meta</code>, never on the JSON-RPC envelope.
 Tool-call parameters retain their existing <code>RequestMeta</code> API: <code>setExtension(key, value)</code> preserves vendor fields
@@ -110,7 +119,7 @@ Unset new fields are omitted. Annotations are untrusted display hints, not autho
 <p>The tool system in AJ MCP provides a structured way to define callable functions that clients can discover and invoke.
 Each tool has a name, description, and a JSON Schema that defines its expected input parameters.
 The tool system is designed to make it easy for LLMs to understand what tools are available and how to use them.</p>
-<h2>Listing Tools</h2>
+<h2 id="search-listing-tools">Listing Tools</h2>
 <p>To list available tools:</p>
 <pre><code class="language-java">List&lt;ToolItem&gt; tools = mcpClient.listTools();
 
@@ -121,7 +130,7 @@ assertEquals(7,tools.size());
 <pre><code class="language-java">List&lt;ToolItem&gt; tools = mcpClient.listTools(1);
 assertEquals(3, tools.size());
 </code></pre>
-<h2>Calling Tools</h2>
+<h2 id="search-calling-tools">Calling Tools</h2>
 <p>To call a tool:</p>
 <pre><code class="language-java">String toolExecutionResultString = mcpClient.callTool(&quot;echoString&quot;, &quot;{\&quot;input\&quot;: \&quot;hi\&quot;}&quot;);
 
@@ -130,7 +139,7 @@ assertEquals(&quot;hi&quot;,toolExecutionResultString);
 <p>The current <code>callTool()</code> convenience API returns a <code>String</code> assembled from text content. It does not expose image
 content through this method. Tool-level errors are returned as an error message string; transport and timeout failures
 follow the client exception/timeout behavior.</p>
-<h2>Handling Notifications</h2>
+<h2 id="search-handling-notifications">Handling Notifications</h2>
 <p>Register callbacks with <code>onNotification(method, handler)</code> for progress, logging, resource updates, and list-change
 notifications. Use <code>onServerRequest(method, handler)</code> to answer server-initiated requests; <code>setRoots(...)</code>,
 <code>setSamplingHandler(...)</code>, and <code>setElicitationHandler(...)</code> configure the standard handlers before <code>initialize()</code>.

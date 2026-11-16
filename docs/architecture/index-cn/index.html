@@ -24,6 +24,10 @@
             });
         </script>
         <script src="/asset/common.js"></script>
+        <link rel="stylesheet" href="https://aj-util.ajaxjs.com/asset/static-search.css">
+        <link rel="stylesheet" href="/asset/search.css">
+        <script defer src="https://aj-util.ajaxjs.com/asset/js/static-search.js"></script>
+        <script defer src="/asset/search.js"></script>
     </head>
     <body>
         <nav>
@@ -41,6 +45,11 @@
         </nav>
         <div class="docs-layout">
             <menu class="docs-navigation" aria-label="文档导航">
+                
+                <div data-mcp-search data-language="zh">
+    <noscript>启用 JavaScript 后可搜索文档。</noscript>
+</div>
+
                 
                 <ul>
                     <li class="selected">
@@ -97,8 +106,8 @@
                 </ul>
             </menu>
             <article class="aj-text">
-                <h1>MCP 客户端与服务器架构</h1>
-<h2>什么是模型上下文协议（MCP）？</h2>
+                <h1 id="search-mcp-客户端与服务器架构">MCP 客户端与服务器架构</h1>
+<h2 id="search-什么是模型上下文协议-mcp">什么是模型上下文协议（MCP）？</h2>
 <p><a href="https://modelcontextprotocol.io/introduction">模型上下文协议（Model Context Protocol, MCP）</a> 使 AI 应用能够访问外部工具、数据源和提示信息。它在
 AI 模型与外部世界之间架起了一座桥梁，使语言模型能够与应用程序特定的资源和功能进行交互。</p>
 <p>MCP 提供了以下核心能力：</p>
@@ -109,12 +118,12 @@ AI 模型与外部世界之间架起了一座桥梁，使语言模型能够与�
 <li><strong>通知（Notifications）</strong>：服务器与客户端之间的基于事件的通信</li>
 </ul>
 <p>简而言之，MCP 为 LLM 应用提供了丰富多样的上下文，使其能够与外部资源和工具进行交互。</p>
-<h2>架构说明</h2>
+<h2 id="search-架构说明">架构说明</h2>
 <p>AJ MCP SDK 的结构围绕几个核心组件构建，这些组件协同工作以实现 MCP 规范：</p>
 <p><img src="/asset/imgs/a-1.jpg" alt="架构图"></p>
 <p>该架构采用客户端-服务器模型，并支持三类传输：标准 I/O 管道、旧版双端点 HTTP/SSE，以及 Streamable HTTP。三者都交换 JSON-RPC
 消息；Streamable HTTP 用于 MCP <code>2025-03-26</code> 和 <code>2025-06-18</code>。</p>
-<h1>Stdio 模式 vs SSE 模式对比</h1>
+<h1 id="search-stdio-模式-vs-sse-模式对比">Stdio 模式 vs SSE 模式对比</h1>
 <table>
 <thead>
 <tr>

@@ -24,6 +24,10 @@
             });
         </script>
         <script src="/asset/common.js"></script>
+        <link rel="stylesheet" href="https://aj-util.ajaxjs.com/asset/static-search.css">
+        <link rel="stylesheet" href="/asset/search.css">
+        <script defer src="https://aj-util.ajaxjs.com/asset/js/static-search.js"></script>
+        <script defer src="/asset/search.js"></script>
 
         <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200..900&family=Noto+Serif+TC:wght@200..900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet" />
     </head>
@@ -43,6 +47,11 @@
         </nav>
         <div class="docs-layout">
             <menu class="docs-navigation" aria-label="Documentation navigation">
+                
+                <div data-mcp-search data-language="en">
+    <noscript>Enable JavaScript to search documentation.</noscript>
+</div>
+
                 
                 <ul>
                     <li class="selected">
@@ -99,12 +108,12 @@
                 </ul>
             </menu>
             <article class="aj-text">
-                <h1>Working with Prompts</h1>
+                <h1 id="search-working-with-prompts">Working with Prompts</h1>
 <p>The prompt system in MCP provides a standardized way to define, store, and retrieve prompt templates for use with Large
 Language Models (LLMs).
 Prompts in MCP are predefined message sequences that can be either static (with fixed content) or templated (with
 customizable parameters).</p>
-<h2>Listing Prompts</h2>
+<h2 id="search-listing-prompts">Listing Prompts</h2>
 <p>To list available prompts:</p>
 <pre><code class="language-java">List&lt;PromptItem&gt; prompts = mcpClient.listPrompts();
 assertEquals(5, prompts.size(), &quot;Expected 5 prompts&quot;);
@@ -128,7 +137,7 @@ cached independently.</p>
 <pre><code class="language-java">List&lt;PromptItem&gt; prompts = mcpClient.listPrompts(1);
 assertEquals(3, prompts.size(), &quot;Expected 3 prompts&quot;);
 </code></pre>
-<h1>Getting Prompt Details</h1>
+<h1 id="search-getting-prompt-details">Getting Prompt Details</h1>
 <p>To get details of a specific prompt:</p>
 <pre><code class="language-java">GetPromptResult.PromptResultDetail prompt = mcpClient.getPrompt(&quot;basic&quot;, new HashMap&lt;&gt;());
 assertEquals(&quot;Basic simple prompt&quot;, prompt.getDescription(), &quot;Description should not be null&quot;);
@@ -143,7 +152,7 @@ assertEquals(&quot;Hello&quot;, ((ContentText) message.getContent()).getText(), 
 placeholders in the prompt template.
 Arguments may be supplied as a map, where each key is an argument name, or as a JSON object string.</p>
 <p>If you don't want to use arguments, you can pass an empty map.</p>
-<h2>Embedded Binary Resources</h2>
+<h2 id="search-embedded-binary-resources">Embedded Binary Resources</h2>
 <p><code>ContentEmbeddedResource.Resource</code> supports either textual content through <code>text</code> or base64-encoded binary content
 through <code>blob</code>. Set the URI and MIME type as well, and set only one of <code>text</code> and <code>blob</code>.</p>
 <pre><code class="language-java">ContentEmbeddedResource.Resource resource = new ContentEmbeddedResource.Resource();

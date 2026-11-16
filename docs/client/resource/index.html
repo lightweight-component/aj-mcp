@@ -24,6 +24,10 @@
             });
         </script>
         <script src="/asset/common.js"></script>
+        <link rel="stylesheet" href="https://aj-util.ajaxjs.com/asset/static-search.css">
+        <link rel="stylesheet" href="/asset/search.css">
+        <script defer src="https://aj-util.ajaxjs.com/asset/js/static-search.js"></script>
+        <script defer src="/asset/search.js"></script>
 
         <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200..900&family=Noto+Serif+TC:wght@200..900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet" />
     </head>
@@ -43,6 +47,11 @@
         </nav>
         <div class="docs-layout">
             <menu class="docs-navigation" aria-label="Documentation navigation">
+                
+                <div data-mcp-search data-language="en">
+    <noscript>Enable JavaScript to search documentation.</noscript>
+</div>
+
                 
                 <ul>
                     <li class="selected">
@@ -99,11 +108,11 @@
                 </ul>
             </menu>
             <article class="aj-text">
-                <h2>Working with Resources</h2>
+                <h2 id="search-working-with-resources">Working with Resources</h2>
 <p>The resource system enables LLM-powered applications to access structured content through a unified interface.
 Resources are identified by URIs and can represent any type of content that might be useful for an LLM to process.
 The AJ MCP client provides methods for discovering and accessing resources exposed by the server.</p>
-<h3>Listing Resources</h3>
+<h3 id="search-listing-resources">Listing Resources</h3>
 <p>To list available resources:</p>
 <pre><code class="language-java">List&lt;ResourceItem&gt; resourceList = mcpClient.listResources();
 assertEquals(2, resourceList.size(), &quot;Expected exactly two resources&quot;);
@@ -120,7 +129,7 @@ page is cached independently, so requesting page 2 does not overwrite page 0.</p
 <pre><code class="language-java">List&lt;ResourceItem&gt; resourceList = mcpClient.listResources(1);
 assertEquals(2, resourceList.size(), &quot;Expected exactly two resources&quot;);
 </code></pre>
-<h3>Reading Resource Contents</h3>
+<h3 id="search-reading-resource-contents">Reading Resource Contents</h3>
 <p>To read the contents of a resource:</p>
 <pre><code class="language-java">GetResourceResult.ResourceResultDetail response = mcpClient.readResource(&quot;file:///text&quot;);
 assertEquals(1, response.getContents().size(), &quot;Expected exactly one content&quot;);
@@ -154,7 +163,7 @@ ResourceContentText textContents = (ResourceContentText) contents;
 assertEquals(&quot;file:///text-template/hello&quot;, textContents.getUri(), &quot;URI should be 'file:///text-template/hello'&quot;);
 assertEquals(&quot;text hello&quot;, textContents.getText(), &quot;Text content should be 'text hello'&quot;);
 </code></pre>
-<h3>Resource Subscriptions</h3>
+<h3 id="search-resource-subscriptions">Resource Subscriptions</h3>
 <p>The client can subscribe to resource changes to receive notifications when resources are updated:</p>
 <p>mcpClient.subscribeResource(&quot;test://resource/path&quot;);</p>
 <p>To stop receiving notifications for a resource:</p>

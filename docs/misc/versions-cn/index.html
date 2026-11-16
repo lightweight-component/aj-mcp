@@ -24,6 +24,10 @@
             });
         </script>
         <script src="/asset/common.js"></script>
+        <link rel="stylesheet" href="https://aj-util.ajaxjs.com/asset/static-search.css">
+        <link rel="stylesheet" href="/asset/search.css">
+        <script defer src="https://aj-util.ajaxjs.com/asset/js/static-search.js"></script>
+        <script defer src="/asset/search.js"></script>
     </head>
     <body>
         <nav>
@@ -41,6 +45,11 @@
         </nav>
         <div class="docs-layout">
             <menu class="docs-navigation" aria-label="文档导航">
+                
+                <div data-mcp-search data-language="zh">
+    <noscript>启用 JavaScript 后可搜索文档。</noscript>
+</div>
+
                 
                 <ul>
                     <li class="selected">
@@ -97,8 +106,8 @@
                 </ul>
             </menu>
             <article class="aj-text">
-                <h1>版本发布说明</h1>
-<h2>尚未发布的维护更新</h2>
+                <h1 id="search-版本发布说明">版本发布说明</h1>
+<h2 id="search-尚未发布的维护更新">尚未发布的维护更新</h2>
 <ul>
 <li>修复 HTTP 响应泄漏，以及 SSE、Stdio 故障后的 pending request 清理。</li>
 <li>完善客户端 Stdio 和服务端 SSE 的关闭生命周期。</li>
@@ -120,11 +129,11 @@ completion context 传入服务端 provider 方法仍属于后续工作。</li>
 </ul>
 <p>Streamable HTTP 当前支持普通 JSON POST 响应和可选 GET event stream。POST <code>text/event-stream</code> 响应会先完整缓冲，尚不能增量分发；GET
 stream 的就绪状态为异步。请求级 POST SSE 流式传输、断线重连/恢复以及完整的空闲 session 过期机制仍属于后续工作。</p>
-<h2>aj-mcp-common 1.5 / aj-mcp-client 1.3 / aj-mcp-server 1.2 — 2025-06-10</h2>
+<h2 id="search-aj-mcp-common-1-5-aj-mcp-client-1-3-aj-mcp-server-1-2-2025-06-10">aj-mcp-common 1.5 / aj-mcp-client 1.3 / aj-mcp-server 1.2 — 2025-06-10</h2>
 <ul>
 <li>增加<a href="https://modelcontextprotocol.io/specification/2024-11-05/server/utilities/pagination">分页支持</a>。</li>
 </ul>
-<h2>1.0 — 2025-06-01</h2>
+<h2 id="search-1-0-2025-06-01">1.0 — 2025-06-01</h2>
 <ul>
 <li>首次发布。</li>
 </ul>

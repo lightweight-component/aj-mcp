@@ -1,0 +1,14 @@
+/* Only site/theme integration lives here; reusable styles come from static-search.css. */
+html[data-theme="dark"] [data-mcp-search] .ss-search {
+    --ss-text: #e6edf3;
+    --ss-background: #0d1117;
+    --ss-border: #30363d;
+    --ss-control-border: #57606a;
+    --ss-link: #79c0ff;
+    --ss-muted: #b1bac4;
+    --ss-highlight: #725e12;
+    --ss-highlight-text: #fff;
+}
+@media (max-width: 820px) {
+    .docs-navigation.is-searching { max-height: none; }
+}

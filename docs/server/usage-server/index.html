@@ -24,6 +24,10 @@
             });
         </script>
         <script src="/asset/common.js"></script>
+        <link rel="stylesheet" href="https://aj-util.ajaxjs.com/asset/static-search.css">
+        <link rel="stylesheet" href="/asset/search.css">
+        <script defer src="https://aj-util.ajaxjs.com/asset/js/static-search.js"></script>
+        <script defer src="/asset/search.js"></script>
 
         <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200..900&family=Noto+Serif+TC:wght@200..900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet" />
     </head>
@@ -43,6 +47,11 @@
         </nav>
         <div class="docs-layout">
             <menu class="docs-navigation" aria-label="Documentation navigation">
+                
+                <div data-mcp-search data-language="en">
+    <noscript>Enable JavaScript to search documentation.</noscript>
+</div>
+
                 
                 <ul>
                     <li class="selected">
@@ -99,8 +108,8 @@
                 </ul>
             </menu>
             <article class="aj-text">
-                <h1>MCP Server SDK Usage</h1>
-<h3>Client roots change callback</h3>
+                <h1 id="search-mcp-server-sdk-usage">MCP Server SDK Usage</h1>
+<h3 id="search-client-roots-change-callback">Client roots change callback</h3>
 <p>Register a callback to receive <code>notifications/roots/list_changed</code>:</p>
 <pre><code class="language-java">server.setRootsChangedHandler(sessionId -&gt; {
     // Invalidate application-owned cached roots for this session.
@@ -109,12 +118,12 @@
 </code></pre>
 <p><code>rootsCache</code> is your application's thread-safe cache, keyed by session ID. This callback works with STDIO, legacy SSE and Streamable HTTP for all three supported protocol versions. It runs only for clients that advertised <code>capabilities.roots.listChanged: true</code>. The notification contains no updated roots; query them separately with <code>server.listRoots(sessionId, timeout)</code> if needed.</p>
 <p>The handler runs on the receiving thread and must return promptly. Do not call blocking <code>listRoots</code> directly inside it: schedule refreshes on an application-owned executor, since the receiving thread may be needed to process the response. Handlers must be thread-safe; asynchronous refreshes must handle session closure and timeouts. The application owns executor shutdown. Callback runtime exceptions are logged without producing a JSON-RPC response or terminating reception. Pass <code>null</code> to <code>setRootsChangedHandler</code> to unregister. The SDK creates no executor and does not automatically refresh roots.</p>
-<h3>Legacy SSE Origin validation</h3>
+<h3 id="search-legacy-sse-origin-validation">Legacy SSE Origin validation</h3>
 <p>Before opening an SSE stream or dispatching a POST message, HTTP adapters must call <code>serverSse.isOriginAllowed(request.getHeader(&quot;Origin&quot;))</code> and return HTTP 403 when it is false. Both bundled Spring and Tomcat adapters perform this check. Native clients without an Origin header remain supported; supplied origins require an exact match in <code>ServerConfig.allowedOrigins</code>. Empty and opaque <code>null</code> origins are rejected. Wildcards are not supported.</p>
 <pre><code class="language-java">config.setAllowedOrigins(java.util.Collections.singletonList(&quot;https://app.example.com&quot;));
 </code></pre>
 <p>Origin validation is separate from authentication and does not automatically configure CORS response headers.</p>
-<h2>MCP Server SDK Setup</h2>
+<h2 id="search-mcp-server-sdk-setup">MCP Server SDK Setup</h2>
 <p>Add this dependency to build MCP servers:</p>
 <pre><code class="language-xml">
 &lt;dependency&gt;
@@ -132,7 +141,7 @@
 <li><code>@Tool</code>, <code>@Resource</code>, <code>@Prompt</code> annotations</li>
 <li>Transport implementations for STDIO, legacy HTTP/SSE, and Streamable HTTP</li>
 </ul>
-<h2>Creating a Server</h2>
+<h2 id="search-creating-a-server">Creating a Server</h2>
 <p>To create an MCP server, you need to:</p>
 <ol>
 <li>Define Service Classes: Create classes annotated with <code>@McpService</code></li>
@@ -141,7 +150,7 @@
 <li>Configure Transport: Set up STDIO, legacy HTTP/SSE, or Streamable HTTP and its server details</li>
 <li>Start Server: Call <code>server.start()</code></li>
 </ol>
-<h2>Creating MCP Service Class</h2>
+<h2 id="search-creating-mcp-service-class">Creating MCP Service Class</h2>
 <p>AJ-MCP automatically discovers, registers, and manages MCP features (tools, resources, and prompts) through
 annotation-based scanning.
 This system enables developers to expose functionality simply by annotating methods with <code>@Tool</code>, <code>@Resource</code>, or
@@ -164,10 +173,10 @@ public class MyServerFeatures {
     }
 }
 </code></pre>
-<h2>Server Feature Management</h2>
+<h2 id="search-server-feature-management">Server Feature Management</h2>
 <p>Each server uses a <code>FeatureMgr</code> instance to coordinate package scanning, annotation processing, and feature storage. The
 stores are instance-scoped, so multiple servers in the same JVM do not share tools, resources, or prompts.</p>
-<h3>Annotation System</h3>
+<h3 id="search-annotation-system">Annotation System</h3>
 <p>The annotation system is built around several key annotations that mark classes and methods for MCP exposure:</p>
 <table>
 <thead>
@@ -212,7 +221,7 @@ stores are instance-scoped, so multiple servers in the same JVM do not share too
 </table>
 <p>Calling <code>FeatureMgr.init()</code> scans a package and registers methods from classes annotated with <code>@McpService</code>. A class
 that cannot be loaded is logged and skipped without aborting the rest of the scan.</p>
-<h3>Initialize Feature Manager</h3>
+<h3 id="search-initialize-feature-manager">Initialize Feature Manager</h3>
 <p>The <code>FeatureMgr.init()</code> method orchestrates the entire annotation discovery process. It begins by scanning specified
 packages for classes annotated
 with <code>@McpService</code>.</p>
@@ -221,7 +230,7 @@ mgr.
 
 init(&quot;com.foo.myproduct&quot;);
 </code></pre>
-<h2>Server Configuration</h2>
+<h2 id="search-server-configuration">Server Configuration</h2>
 <p>After feature manager initialization with package scanning, we can configure the server with:</p>
 <ul>
 <li>Server instance creation with transport layer setup</li>
@@ -262,7 +271,7 @@ server.
 
 start();
 </code></pre>
-<h2>Transport and lifecycle rules</h2>
+<h2 id="search-transport-and-lifecycle-rules">Transport and lifecycle rules</h2>
 <p>Set <code>ServerConfig.title</code> for an optional server display label; initialization emits it only for 2025-06-18.
 Clients can set <code>McpClient.builder().clientTitle(...)</code> (included when requesting 2025-06-18).
 <code>StructuredToolResult.setMeta(...)</code> carries application metadata into the wire tool result without flattening it.

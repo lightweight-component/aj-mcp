@@ -24,6 +24,10 @@
             });
         </script>
         <script src="/asset/common.js"></script>
+        <link rel="stylesheet" href="https://aj-util.ajaxjs.com/asset/static-search.css">
+        <link rel="stylesheet" href="/asset/search.css">
+        <script defer src="https://aj-util.ajaxjs.com/asset/js/static-search.js"></script>
+        <script defer src="/asset/search.js"></script>
     </head>
     <body>
         <nav>
@@ -41,6 +45,11 @@
         </nav>
         <div class="docs-layout">
             <menu class="docs-navigation" aria-label="文档导航">
+                
+                <div data-mcp-search data-language="zh">
+    <noscript>启用 JavaScript 后可搜索文档。</noscript>
+</div>
+
                 
                 <ul>
                     <li class="selected">
@@ -97,13 +106,15 @@
                 </ul>
             </menu>
             <article class="aj-text">
-                <h1>欢迎使用 AJ MCP SDK 用户手册</h1>
+                <h1 id="search-欢迎使用-aj-mcp-sdk-用户手册">欢迎使用 AJ MCP SDK 用户手册</h1>
+<p>独立的 AJ MCP Next（Java 8、2026-07-28）现已提供 core/client/server 三模块及 STDIO、无会话 HTTP。
+参阅 <a href="/next/overview-cn/">Next 说明</a>；以下旧 SDK 文档及初始化用法不适用于 Next。</p>
 <p>AJ MCP SDK 是 <strong>模型上下文协议</strong>（MCP）的一个实现。MCP 是一种开放协议，旨在实现大型语言模型（LLM）应用与外部数据源和工具之间的无缝集成。本
 SDK 提供了声明式的 API，使开发者能够轻松地在自己的应用程序中实现 MCP 服务器功能。</p>
-<h2>为什么选择 AJ MCP SDK？</h2>
+<h2 id="search-为什么选择-aj-mcp-sdk">为什么选择 AJ MCP SDK？</h2>
 <p>与其他 MCP SDK 相比，AJ MCP SDK 被设计得更轻量、更易于使用。它基于 Java 8 构建，为开发者提供了简单直观的 API 来实现 MCP
 服务器功能。SDK 的体积小巧，便于集成到你的应用程序中。</p>
-<h3>为什么还在使用 Java 8？</h3>
+<h3 id="search-为什么还在使用-java-8">为什么还在使用 Java 8？</h3>
 <p>MCP 是一个基于协议的框架，因此应具有更强的通用性，满足更广泛的市场需求。</p>
 <p>目前 Java 领域中开发 MCP 的情况如下：</p>
 <table>
@@ -134,23 +145,23 @@ SDK 提供了声明式的 API，使开发者能够轻松地在自己的应用程
 </table>
 <p>考虑到仍有大量服务器运行在 JDK 8 上，使用 Java 8 开发 MCP（或 MCP 服务器）对于确保广泛兼容性和灵活性至关重要——这才是 MCP
 真正意义上的自由。</p>
-<h2>更多信息</h2>
+<h2 id="search-更多信息">更多信息</h2>
 <p>如需了解各组件的具体使用方法，请参阅以下页面：</p>
 <ul>
 <li><a href="architecture">架构说明</a></li>
 <li><a href="client">客户端 SDK</a></li>
 <li><a href="server">服务端 SDK</a></li>
 </ul>
-<h2>源代码</h2>
+<h2 id="search-源代码">源代码</h2>
 <p>本项目采用 GNU GENERAL PUBLIC LICENSE v3.0 协议开源。</p>
 <ul>
 <li>GitHub 地址：<a href="https://github.com/lightweight-component/aj-mcp">https://github.com/lightweight-component/aj-mcp</a></li>
 <li>GitCode
 地址（适合中国用户快速访问）：<a href="https://gitcode.com/lightweight-component/aj-mcp">https://gitcode.com/lightweight-component/aj-mcp</a></li>
 </ul>
-<h2>相关链接</h2>
+<h2 id="search-相关链接">相关链接</h2>
 <p><a href="https://mcp.ajaxjs.com">官网</a> | <a href="https://deepwiki.com/lightweight-component/aj-mcp">DeepWiki 页面</a></p>
-<h2>JavaDoc 文档</h2>
+<h2 id="search-javadoc-文档">JavaDoc 文档</h2>
 <ul>
 <li><a href="https://javadoc.io/doc/com.ajaxjs/aj-mcp-common">aj-mcp-common</a></li>
 <li><a href="https://javadoc.io/doc/com.ajaxjs/aj-mcp-client">aj-mcp-client</a></li>

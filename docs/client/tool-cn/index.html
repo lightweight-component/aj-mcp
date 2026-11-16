@@ -24,6 +24,10 @@
             });
         </script>
         <script src="/asset/common.js"></script>
+        <link rel="stylesheet" href="https://aj-util.ajaxjs.com/asset/static-search.css">
+        <link rel="stylesheet" href="/asset/search.css">
+        <script defer src="https://aj-util.ajaxjs.com/asset/js/static-search.js"></script>
+        <script defer src="/asset/search.js"></script>
     </head>
     <body>
         <nav>
@@ -41,6 +45,11 @@
         </nav>
         <div class="docs-layout">
             <menu class="docs-navigation" aria-label="文档导航">
+                
+                <div data-mcp-search data-language="zh">
+    <noscript>启用 JavaScript 后可搜索文档。</noscript>
+</div>
+
                 
                 <ul>
                     <li class="selected">
@@ -97,7 +106,7 @@
                 </ul>
             </menu>
             <article class="aj-text">
-                <h1>工具（Tool）使用指南</h1>
+                <h1 id="search-工具-tool-使用指南">工具（Tool）使用指南</h1>
 <p>内容、资源、工具、请求参数及结果模型通过 <code>getMeta()</code> / <code>setMeta(Map&lt;String, Object&gt;)</code> 保留可选 <code>_meta</code>，
 嵌套扩展值不会丢失；它位于相应对象内，不放在 JSON-RPC 信封顶层。
 工具调用参数保留原有 <code>RequestMeta</code> API，可用 <code>setExtension(key, value)</code> 在 <code>progressToken</code> 旁添加厂商字段。
@@ -107,7 +116,7 @@ Elicitation 参数保留原有 <code>get_meta()</code> / <code>set_meta(...)</co
 <p>工具 schema 在 JSON 解析与序列化过程中保留扩展关键字，包括嵌套 schema、<code>items</code>、<code>enum</code>、<code>oneOf</code>、<code>$ref</code> 和约束；联合类型、布尔属性 schema 及对象形式的 <code>additionalProperties</code> 也会保留。现有类型化 getter/setter 继续可用，<code>getKeywords()</code> 提供额外关键字的 <code>JsonNode</code> 值。保留 schema 不等于执行 JSON Schema 校验。</p>
 <p>AJ MCP 的工具系统提供了一种结构化方式，用于定义可被客户端发现和调用的函数。每个工具都有名称、描述和一个定义其输入参数的
 JSON Schema。该工具系统旨在让大语言模型（LLM）能够轻松理解可用工具及其用法。</p>
-<h2>列出工具</h2>
+<h2 id="search-列出工具">列出工具</h2>
 <p>列出所有可用工具：</p>
 <pre><code class="language-java">List&lt;ToolItem&gt; tools = mcpClient.listTools();
 
@@ -117,14 +126,14 @@ assertEquals(7,tools.size());
 <pre><code class="language-java">List&lt;ToolItem&gt; tools = mcpClient.listTools(1);
 assertEquals(3, tools.size());
 </code></pre>
-<h2>调用工具</h2>
+<h2 id="search-调用工具">调用工具</h2>
 <p>调用某个工具：</p>
 <pre><code class="language-java">String toolExecutionResultString = mcpClient.callTool(&quot;echoString&quot;, &quot;{\&quot;input\&quot;: \&quot;hi\&quot;}&quot;);
 
 assertEquals(&quot;hi&quot;,toolExecutionResultString);
 </code></pre>
 <p>当前 <code>callTool()</code> 便捷接口返回由文本内容拼接而成的 <code>String</code>，不会通过该方法暴露图片内容。工具业务错误会转换为错误消息字符串；传输错误和超时则遵循客户端的异常与超时处理逻辑。</p>
-<h2>通知处理</h2>
+<h2 id="search-通知处理">通知处理</h2>
 <p>可使用 <code>onNotification(method, handler)</code> 注册 progress、日志、资源更新和列表变更通知的回调；使用
 <code>onServerRequest(method, handler)</code> 响应服务端主动请求。<code>setRoots(...)</code>、<code>setSamplingHandler(...)</code> 与
 <code>setElicitationHandler(...)</code> 会在 <code>initialize()</code> 前配置标准

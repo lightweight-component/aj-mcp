@@ -24,6 +24,10 @@
             });
         </script>
         <script src="/asset/common.js"></script>
+        <link rel="stylesheet" href="https://aj-util.ajaxjs.com/asset/static-search.css">
+        <link rel="stylesheet" href="/asset/search.css">
+        <script defer src="https://aj-util.ajaxjs.com/asset/js/static-search.js"></script>
+        <script defer src="/asset/search.js"></script>
 
         <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200..900&family=Noto+Serif+TC:wght@200..900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet" />
     </head>
@@ -43,6 +47,11 @@
         </nav>
         <div class="docs-layout">
             <menu class="docs-navigation" aria-label="Documentation navigation">
+                
+                <div data-mcp-search data-language="en">
+    <noscript>Enable JavaScript to search documentation.</noscript>
+</div>
+
                 
                 <ul>
                     <li class="selected">
@@ -99,8 +108,8 @@
                 </ul>
             </menu>
             <article class="aj-text">
-                <h1>Initializing the Protocol</h1>
-<h2>Expired Streamable HTTP sessions</h2>
+                <h1 id="search-initializing-the-protocol">Initializing the Protocol</h1>
+<h2 id="search-expired-streamable-http-sessions">Expired Streamable HTTP sessions</h2>
 <p>When a session-bound POST or GET returns HTTP 404, the transport starts a new initialization handshake without
 the old session ID. Pending calls fail and are <strong>not replayed</strong>, including tool calls that may have side effects.
 New calls wait for recovery; <code>transport.getSessionRecovery()</code> exposes its completion or failure.
