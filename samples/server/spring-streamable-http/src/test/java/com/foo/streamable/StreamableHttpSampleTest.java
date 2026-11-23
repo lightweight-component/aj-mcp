@@ -37,7 +37,8 @@ class StreamableHttpSampleTest {
                 if (message.path("message").asText().startsWith("Completed step")) updates.countDown();
             });
             client.setRoots(Collections.singletonList(new Root("file:///sample-workspace", "workspace")), false);
-            client.initialize(); transport.getEventStreamReady().get(5, TimeUnit.SECONDS);
+            client.initialize();
+            transport.getEventStreamReady().get(5, TimeUnit.SECONDS);
             session = transport.getSessionId();
             assertEquals(version, client.getNegotiatedProtocolVersion());
             assertEquals(4, client.listTools().size());
