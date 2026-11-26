@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>aj-mcp-common</artifactId>
-    <name>a-mcp-common</name>
+    <name>aj-mcp-common</name>
     <version>1.9</version>
     <packaging>jar</packaging>
     <description>Common package for aj-mcp.</description>
